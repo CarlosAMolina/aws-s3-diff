@@ -6,10 +6,10 @@ from utils import get_aws_accounts
 def _get_export_config() -> dict:
     _file_name_what_to_analyze = "s3-uris-to-analyze.txt"
     result = {}
-    with open(_file_name_what_to_analyze, "r") as f:
+    with open(_file_name_what_to_analyze) as f:
         for s3_uri in f.read().splitlines():
             bucket_name, file_path_name = _get_bucket_and_path_from_s3_uri(s3_uri)
-            if bucket_name not in result.keys():
+            if bucket_name not in result:
                 result[bucket_name] = []
             result[bucket_name].append(file_path_name)
         return result

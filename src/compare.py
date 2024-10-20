@@ -1,14 +1,12 @@
-from pathlib import PurePath
 import os
+from pathlib import PurePath
 
 import pandas as pd
 from pandas import DataFrame as Df
 
-
 from config import AWS_ACCOUNT_WITH_DATA_TO_SYNC
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from utils import get_aws_accounts
-
 
 FilePathNamesToCompare = tuple[str, str, str]
 
