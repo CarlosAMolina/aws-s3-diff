@@ -1,3 +1,10 @@
+## Develop
+
+```bash
+poetry install --all-extras
+poetry run pre-commit install
+```
+
 ## How to run the program
 
 ### Export s3 data

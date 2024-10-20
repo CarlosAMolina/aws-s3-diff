@@ -1,5 +1,6 @@
 [tool.poetry]
-name = "aws-s3-compare-paths"
+package-mode = false
+name = "aws-s3-diff"
 version = "0.1.0"
 description = "Compare S3 files between different AWS accounts"
 authors = ["CarlosAMolina <15368012+CarlosAMolina@users.noreply.github.com>"]
@@ -12,6 +13,7 @@ python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
+pre-commit = "3.8.0"
 
 [build-system]
 requires = ["poetry-core"]
