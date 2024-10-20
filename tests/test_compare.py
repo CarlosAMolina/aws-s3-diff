@@ -1,11 +1,10 @@
 import unittest
 from pathlib import Path
 
-from pandas.testing import assert_frame_equal
 from pandas import DataFrame as Df
+from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
-
 
 current_path = Path(__file__).parent.resolve()
 
