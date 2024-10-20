@@ -20,6 +20,19 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 line-length = 120
 
+# https://docs.astral.sh/ruff/linter/#rule-selection
+[tool.ruff.lint]
+select = [
+    "B", # flake8-bugbear
+    "E", # pycodestyle
+    "F", # Pyflakes
+    "I", # isort
+    "R", # Refactor (R)
+    "SIM", # flake8-simplify
+    "UP", # pyupgrade
+    "W", # Warning (W)
+]
+
 [tool.ruff.lint.isort]
 force-single-line = true
 order-by-type = false
