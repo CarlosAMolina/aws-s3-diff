@@ -115,8 +115,11 @@ def _get_tuple_index_multi_index(index: str) -> tuple[str, str, str]:
 def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
     aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     for aws_account_to_compare in _get_accounts_where_files_must_be_copied(config):
-        condition_copied_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
+        condition_sync_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
+        )
+        condition_sync_ok_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
+            df.loc[:, (aws_account_with_data_to_sync, "size")] == df.loc[:, (aws_account_to_compare, "size")]
         )
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
@@ -126,11 +129,17 @@ def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
             ]
         ] = None
         df.loc[
-            condition_copied_wrong_in_account,
+            condition_sync_wrong_in_account,
             [
                 ("analysis", column_name_compare_result),
             ],
         ] = False
+        df.loc[
+            condition_sync_ok_in_account,
+            [
+                ("analysis", column_name_compare_result),
+            ],
+        ] = True
     return df
 
 
