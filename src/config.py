@@ -8,9 +8,9 @@ from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 
 
 class Config:
-    def __init__(self, path_config_files: Path) -> None:
-        self._path_config_files = path_config_files
-        self._path_folder_exported_s3_data = path_config_files
+    def __init__(self, path_config_files_and_folder_exported_s3_data: Path) -> None:
+        self._path_config_files = path_config_files_and_folder_exported_s3_data
+        self._path_folder_exported_s3_data = path_config_files_and_folder_exported_s3_data
 
     def get_aws_accounts(self) -> list[str]:
         path_to_check = self._path_folder_exported_s3_data.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
