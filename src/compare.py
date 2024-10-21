@@ -119,7 +119,7 @@ def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
             df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
         )
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        column_name_compare_result = f"is_{aws_account_with_data_to_sync}_copied_ok_in_{aws_account_to_compare}"
+        column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         df[
             [
                 ("analysis", column_name_compare_result),
@@ -144,7 +144,7 @@ def _get_accounts_where_files_must_be_copied(config: Config) -> list[str]:
 def _show_summary(config: Config, df: Df):
     for aws_account_to_compare in _get_accounts_where_files_must_be_copied(config):
         aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
-        column_name_compare_result = f"is_{aws_account_with_data_to_sync}_copied_ok_in_{aws_account_to_compare}"
+        column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
         )
@@ -160,8 +160,17 @@ class _CsvExporter:
 
     def _get_df_to_export(self, df: Df) -> Df:
         result = df.copy()
-        result.columns = ["_".join(values) for values in result.columns]
+        csv_column_names = ["_".join(values) for values in result.columns]
+        csv_column_names = [
+            self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
+        ]
+        result.columns = csv_column_names
         return result
+
+    def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
+        if column_name.startswith("analysis_"):
+            return column_name.replace("analysis_", "", 1)
+        return column_name
 
 
 if __name__ == "__main__":

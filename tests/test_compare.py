@@ -10,14 +10,14 @@ from src import compare as m_compare
 from src.config import Config
 
 
-class Test_get_df_combine_files(unittest.TestCase):
+class TestS3DataComparator(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    def test_get_df_combine_files(self):
+    def test_get_df_s3_data_analyzed(self):
         config = self._get_config_for_the_test()
-        result = m_compare._get_df_combine_files(config)
+        result = m_compare._S3DataComparator()._get_df_s3_data_analyzed(config)
         result_as_csv_export = m_compare._CsvExporter()._get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
         assert_frame_equal(expected_result, result_as_csv_export)
