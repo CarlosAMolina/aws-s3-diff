@@ -3,11 +3,12 @@ import logging
 import os
 import os.path
 from collections import namedtuple
+from pathlib import Path
 from pathlib import PurePath
 
 import boto3
 
-from config import export_config as config
+from config import Config
 from constants import MAIN_FOLDER_NAME_EXPORTS
 
 S3Query = namedtuple("S3Query", "bucket prefix")
@@ -21,7 +22,8 @@ logger = logging.getLogger(__name__)
 def run():
     if os.path.isdir(MAIN_FOLDER_NAME_EXPORTS):
         raise FileExistsError(f"The folder '{MAIN_FOLDER_NAME_EXPORTS}' exists, drop it before continue")
-    for bucket_name in config.keys():
+    path_config_files = Path(__file__).parent.absolute()
+    for bucket_name in Config(path_config_files).get_dict_s3_uris_to_analyze().keys():
         exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
         os.makedirs(exported_files_directory_path)
