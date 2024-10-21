@@ -1,6 +1,6 @@
 import os
-from pathlib import PurePath
 from pathlib import Path
+from pathlib import PurePath
 
 import pandas as pd
 from pandas import DataFrame as Df
@@ -12,20 +12,22 @@ FilePathNamesToCompare = tuple[str, str, str]
 
 
 def run():
-    _run_file_name()
+    path_config_files_and_folder_exported_s3_data = Path(__file__).parent.absolute()
+    config = Config(path_config_files_and_folder_exported_s3_data)
+    _run_file_name(config)
 
 
-def _run_file_name():
-    s3_data_df = _get_df_combine_files()
-    s3_analyzed_df = _get_df_analyze_s3_data(s3_data_df)
-    _show_summary(s3_analyzed_df)
+def _run_file_name(config: Config):
+    s3_data_df = _get_df_combine_files(config)
+    s3_analyzed_df = _get_df_analyze_s3_data(config, s3_data_df)
+    _show_summary(config, s3_analyzed_df)
     _export_to_csv(s3_analyzed_df)
 
 
-def _get_df_combine_files() -> Df:
+def _get_df_combine_files(config: Config) -> Df:
     result = Df()
-    buckets_and_files: dict = _get_buckets_and_exported_files()
-    for aws_account in _get_aws_accounts():
+    buckets_and_files: dict = _get_buckets_and_exported_files(config)
+    for aws_account in config.get_aws_accounts():
         account_df = _get_df_combine_files_for_aws_account(aws_account, buckets_and_files)
         result = result.join(account_df, how="outer")
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
@@ -45,11 +47,11 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: d
     return result
 
 
-def _get_buckets_and_exported_files() -> dict[str, list[str]]:
-    aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
+    aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     bucket_names = os.listdir(PurePath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS, aws_account_with_data_to_sync))
     bucket_names.sort()
-    accounts = _get_aws_accounts()
+    accounts = config.get_aws_accounts()
     accounts.remove(aws_account_with_data_to_sync)
     accounts.sort()
     for account in accounts:
@@ -72,19 +74,19 @@ def _get_buckets_and_exported_files() -> dict[str, list[str]]:
             files_for_bucket_in_account.sort()
             if file_names != files_for_bucket_in_account:
                 raise ValueError(
-                    f"The S3 data has not been exported correctly. Error comparing files in account '{account}' and bucket '{bucket}'"
+                    "The S3 data has not been exported correctly"
+                    f". Error comparing files in account '{account}' and bucket '{bucket}'"
                 )
         result[bucket] = file_names
     return result
 
 
 def _get_df_from_file(file_path_name: PurePath) -> Df:
-    result = pd.read_csv(
+    return pd.read_csv(
         file_path_name,
         index_col="name",
         parse_dates=["date"],
     )
-    return result
 
 
 def _get_column_names_mult_index(column_names: list[str]) -> list[tuple[str, str]]:
@@ -107,9 +109,9 @@ def _get_tuple_index_multi_index(index: str) -> tuple[str, str, str]:
     return bucket_name, path_name, file_name
 
 
-def _get_df_analyze_s3_data(df: Df) -> Df:
-    aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
-    for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
+def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
+    aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
+    for aws_account_to_compare in _get_accounts_where_files_must_be_copied(config):
         condition_copied_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
         )
@@ -129,16 +131,16 @@ def _get_df_analyze_s3_data(df: Df) -> Df:
     return df
 
 
-def _get_accounts_where_files_must_be_copied() -> list[str]:
-    result = _get_aws_accounts()
-    aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+def _get_accounts_where_files_must_be_copied(config: Config) -> list[str]:
+    result = config.get_aws_accounts()
+    aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     result.remove(aws_account_with_data_to_sync)
     return result
 
 
-def _show_summary(df: Df):
-    for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
-        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+def _show_summary(config: Config, df: Df):
+    for aws_account_to_compare in _get_accounts_where_files_must_be_copied(config):
+        aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
         column_name_compare_result = f"is_{aws_account_with_data_to_sync}_copied_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
@@ -147,15 +149,6 @@ def _show_summary(df: Df):
         print(f"Files not copied in {aws_account_to_compare} ({len(result)}):")
         print(result)
 
-# TODO this function is called too many times, refactor to call only once
-def _get_aws_account_with_data_to_sync() -> str:
-        path_config_files = Path(__file__).parent.absolute()
-        return Config(path_config_files).get_aws_account_with_data_to_sync()
-
-# TODO this function is called too many times, refactor to call only once
-def _get_aws_accounts() -> list[str]:
-        path_folder_exported_s3_data = Path(__file__).parent.absolute()
-        return Config(path_folder_exported_s3_data).get_aws_accounts()
 
 def _export_to_csv(df: Df):
     to_csv_df = df.copy()
