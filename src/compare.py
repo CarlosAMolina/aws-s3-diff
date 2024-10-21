@@ -21,7 +21,7 @@ def _run_file_name(config: Config):
     s3_data_df = _get_df_combine_files(config)
     s3_analyzed_df = _get_df_analyze_s3_data(config, s3_data_df)
     _show_summary(config, s3_analyzed_df)
-    _export_to_csv(s3_analyzed_df)
+    _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
 
 
 def _get_df_combine_files(config: Config) -> Df:
@@ -146,10 +146,15 @@ def _show_summary(config: Config, df: Df):
         print(result)
 
 
-def _export_to_csv(df: Df):
-    to_csv_df = df.copy()
-    to_csv_df.columns = ["_".join(values) for values in to_csv_df.columns]
-    to_csv_df.to_csv("/tmp/analysis.csv")
+class _CsvExporter:
+    def export(self, df: Df, file_path_name: str):
+        csv_df = self._get_df_to_export(df)
+        csv_df.to_csv(file_path_name)
+
+    def _get_df_to_export(self, df: Df) -> Df:
+        result = df.copy()
+        result.columns = ["_".join(values) for values in result.columns]
+        return result
 
 
 if __name__ == "__main__":
