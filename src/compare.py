@@ -38,18 +38,6 @@ def _get_df_combine_files(config: Config) -> Df:
     return result
 
 
-def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: dict, config: Config) -> Df:
-    result = Df()
-    for bucket_name, file_names in buckets_and_files.items():
-        for file_name in file_names:
-            file_path_name = config.get_path_exported_s3_data().joinpath(aws_account, bucket_name, file_name)
-            file_df = _get_df_from_file(file_path_name)
-            file_df = file_df.add_prefix(f"{aws_account}_value_")
-            file_df = file_df.set_index(f"{bucket_name}_path_{file_name}_file_" + file_df.index.astype(str))
-            result = pd.concat([result, file_df])
-    return result
-
-
 def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
     aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     bucket_names = os.listdir(config.get_path_exported_s3_data().joinpath(aws_account_with_data_to_sync))
@@ -77,6 +65,18 @@ def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
                     f". Error comparing files in account '{account}' and bucket '{bucket}'"
                 )
         result[bucket] = file_names
+    return result
+
+
+def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: dict, config: Config) -> Df:
+    result = Df()
+    for bucket_name, file_names in buckets_and_files.items():
+        for file_name in file_names:
+            file_path_name = config.get_path_exported_s3_data().joinpath(aws_account, bucket_name, file_name)
+            file_df = _get_df_from_file(file_path_name)
+            file_df = file_df.add_prefix(f"{aws_account}_value_")
+            file_df = file_df.set_index(f"{bucket_name}_path_{file_name}_file_" + file_df.index.astype(str))
+            result = pd.concat([result, file_df])
     return result
 
 
