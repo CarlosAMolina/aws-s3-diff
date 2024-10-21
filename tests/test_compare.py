@@ -18,7 +18,13 @@ class TestS3DataComparator(unittest.TestCase):
     def test_get_df_s3_data_analyzed(self):
         config = self._get_config_for_the_test()
         result = m_compare._S3DataComparator()._get_df_s3_data_analyzed(config)
-        result_as_csv_export = m_compare._CsvExporter()._get_df_to_export(result).reset_index()
+        # Required to convert to str because reading a csv column with bools and strings returns a str column.
+        result_as_csv_export = (
+            m_compare._CsvExporter()
+            ._get_df_to_export(result)
+            .reset_index()
+            .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})
+        )
         expected_result = self._get_df_from_csv_expected_result()
         assert_frame_equal(expected_result, result_as_csv_export)
 

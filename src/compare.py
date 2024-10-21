@@ -121,6 +121,7 @@ def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
         condition_sync_ok_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, (aws_account_with_data_to_sync, "size")] == df.loc[:, (aws_account_to_compare, "size")]
         )
+        condition_sync_not_required = df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         df[
@@ -140,6 +141,12 @@ def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
                 ("analysis", column_name_compare_result),
             ],
         ] = True
+        df.loc[
+            condition_sync_not_required,
+            [
+                ("analysis", column_name_compare_result),
+            ],
+        ] = "No file to sync"
     return df
 
 
