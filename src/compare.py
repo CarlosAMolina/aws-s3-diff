@@ -6,7 +6,6 @@ import pandas as pd
 from pandas import DataFrame as Df
 
 from config import Config
-from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 
 FilePathNamesToCompare = tuple[str, str, str]
 
@@ -64,14 +63,10 @@ def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
             )
     result = {}
     for bucket in bucket_names:
-        file_names = os.listdir(
-            config.get_path_exported_s3_data().joinpath(aws_account_with_data_to_sync, bucket)
-        )
+        file_names = os.listdir(config.get_path_exported_s3_data().joinpath(aws_account_with_data_to_sync, bucket))
         file_names.sort()
         for account in accounts:
-            files_for_bucket_in_account = os.listdir(
-                config.get_path_exported_s3_data().joinpath(account, bucket)
-            )
+            files_for_bucket_in_account = os.listdir(config.get_path_exported_s3_data().joinpath(account, bucket))
             files_for_bucket_in_account.sort()
             if file_names != files_for_bucket_in_account:
                 raise ValueError(
@@ -87,7 +82,7 @@ def _get_df_from_file(file_path_name: PurePath) -> Df:
         file_path_name,
         index_col="name",
         parse_dates=["date"],
-    )
+    ).astype({"size": "Int64"})
 
 
 def _get_column_names_mult_index(column_names: list[str]) -> list[tuple[str, str]]:

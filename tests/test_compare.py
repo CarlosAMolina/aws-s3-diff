@@ -7,7 +7,6 @@ from pandas.testing import assert_frame_equal
 from src import compare as m_compare
 from src.config import Config
 
-
 current_path = Path(__file__).parent.resolve()
 
 

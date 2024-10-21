@@ -23,11 +23,13 @@ def run():
     if os.path.isdir(MAIN_FOLDER_NAME_EXPORTS):
         raise FileExistsError(f"The folder '{MAIN_FOLDER_NAME_EXPORTS}' exists, drop it before continue")
     path_config_files = Path(__file__).parent.absolute()
-    for bucket_name in Config(path_config_files).get_dict_s3_uris_to_analyze().keys():
+    path_with_folder_exported_s3_data = path_config_files
+    config = Config(path_config_files, path_with_folder_exported_s3_data)
+    for bucket_name in config.get_dict_s3_uris_to_analyze():
         exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
         os.makedirs(exported_files_directory_path)
-    s3_queries = _get_s3_queries()
+    s3_queries = _get_s3_queries(config)
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = _get_s3_data(s3_query)
@@ -41,7 +43,7 @@ def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
     return PurePath(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
 
 
-def _get_s3_queries() -> list[S3Query]:
+def _get_s3_queries(config: Config) -> list[S3Query]:
     return [S3Query(bucket, path_name) for bucket, path_names in config.items() for path_name in path_names]
 
 
@@ -51,6 +53,7 @@ def _get_s3_data(s3_query: S3Query) -> S3Data:
     query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
     _raise_exception_if_subfolders_in_s3(s3_client, s3_query.bucket, query_prefix)
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
     operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
     paginator = s3_client.get_paginator("list_objects_v2")
     page_iterator = paginator.paginate(**operation_parameters)
