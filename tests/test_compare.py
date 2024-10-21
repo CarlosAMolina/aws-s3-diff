@@ -1,13 +1,11 @@
 import unittest
 from pathlib import Path
 
-from pandas import DataFrame as Df
 from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
 from src.config import Config
-
-current_path = Path(__file__).parent.resolve()
+from tests.dfs import expected_result_compare_df
 
 
 class Test_get_df_combine_files(unittest.TestCase):
@@ -18,5 +16,4 @@ class Test_get_df_combine_files(unittest.TestCase):
         path_with_folder_exported_s3_data = current_path
         config = Config(path_config_files, path_with_folder_exported_s3_data)
         result = m_compare._get_df_combine_files(config)
-        expected_result = Df()
-        assert_frame_equal(expected_result, result)
+        assert_frame_equal(expected_result_compare_df, result)
