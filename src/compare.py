@@ -129,24 +129,18 @@ def _get_df_analyze_s3_data(config: Config, df: Df) -> Df:
                 ("analysis", column_name_compare_result),
             ]
         ] = None
-        df.loc[
-            condition_sync_wrong_in_account,
-            [
-                ("analysis", column_name_compare_result),
-            ],
-        ] = False
-        df.loc[
-            condition_sync_ok_in_account,
-            [
-                ("analysis", column_name_compare_result),
-            ],
-        ] = True
-        df.loc[
-            condition_sync_not_required,
-            [
-                ("analysis", column_name_compare_result),
-            ],
-        ] = "No file to sync"
+        for condition_and_result in (
+            (condition_sync_wrong_in_account, False),
+            (condition_sync_ok_in_account, True),
+            (condition_sync_not_required, "No file to sync"),
+        ):
+            condition, result = condition_and_result
+            df.loc[
+                condition,
+                [
+                    ("analysis", column_name_compare_result),
+                ],
+            ] = result
     return df
 
 
