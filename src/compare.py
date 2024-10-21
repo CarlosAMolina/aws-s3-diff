@@ -14,14 +14,18 @@ def run():
     path_config_files = Path(__file__).parent.absolute()
     path_with_folder_exported_s3_data = Path(__file__).parent.absolute()
     config = Config(path_config_files, path_with_folder_exported_s3_data)
-    _run_file_name(config)
+    _S3DataComparator().run(config)
 
 
-def _run_file_name(config: Config):
-    s3_data_df = _get_df_combine_files(config)
-    s3_analyzed_df = _get_df_analyze_s3_data(config, s3_data_df)
-    _show_summary(config, s3_analyzed_df)
-    _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
+class _S3DataComparator:
+    def run(self, config: Config):
+        s3_analyzed_df = self._get_df_s3_data_analyzed(config)
+        _show_summary(config, s3_analyzed_df)
+        _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
+
+    def _get_df_s3_data_analyzed(self, config) -> Df:
+        s3_data_df = _get_df_combine_files(config)
+        return _get_df_analyze_s3_data(config, s3_data_df)
 
 
 def _get_df_combine_files(config: Config) -> Df:
