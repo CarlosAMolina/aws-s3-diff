@@ -1,4 +1,4 @@
-level_0,level_1,level_2,aws_account_1_pro_date,aws_account_1_pro_size,aws_account_2_release_date,aws_account_2_release_size,aws_account_3_dev_date,aws_account_3_dev_size
+bucket,s3_path,file_name,aws_account_1_pro_date,aws_account_1_pro_size,aws_account_2_release_date,aws_account_2_release_size,aws_account_3_dev_date,aws_account_3_dev_size
 cars,europe-spain,cars_20241014.csv,2024-10-14 08:49:01+00:00,33201,2024-10-19 22:33:01+00:00,33201,2024-10-14 08:49:01+00:00,33201
 pets,dogs-big_size,dogs-20240914.xlsx,2024-09-14 20:11:33+00:00,23543,2024-09-14 22:01:33+00:00,23543,2024-09-14 22:11:33+00:00,23543
 pets,dogs-big_size,dogs-20241015.xlsx,2024-10-15 10:23:18+00:00,123433,2024-10-15 11:20:18+00:00,123433,2024-10-15 12:29:18+00:00,553433

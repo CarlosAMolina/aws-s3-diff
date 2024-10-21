@@ -30,8 +30,11 @@ def _get_df_combine_files(config: Config) -> Df:
     for aws_account in config.get_aws_accounts():
         account_df = _get_df_combine_files_for_aws_account(aws_account, buckets_and_files, config)
         result = result.join(account_df, how="outer")
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
-    result.index = pd.MultiIndex.from_tuples(_get_index_multi_index(result.index))
+    result.index = pd.MultiIndex.from_tuples(
+        _get_index_multi_index(result.index), names=["bucket", "s3_path", "file_name"]
+    )
     return result
 
 
