@@ -8,12 +8,12 @@ from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 
 
 class Config:
-    def __init__(self, path_config_files_and_folder_exported_s3_data: Path) -> None:
-        self._path_config_files = path_config_files_and_folder_exported_s3_data
-        self._path_folder_exported_s3_data = path_config_files_and_folder_exported_s3_data
+    def __init__(self, path_config_files: Path, path_with_folder_exported_s3_data: Path):
+        self._path_config_files = path_config_files
+        self._path_with_folder_exported_s3_data = path_with_folder_exported_s3_data
 
     def get_aws_accounts(self) -> list[str]:
-        path_to_check = self._path_folder_exported_s3_data.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+        path_to_check = self.get_path_exported_s3_data()
         result = os.listdir(path_to_check)
         result.sort()
         return result
@@ -34,6 +34,9 @@ class Config:
                     result[bucket_name] = []
                 result[bucket_name].append(file_path_name)
             return result
+
+    def get_path_exported_s3_data(self) -> Path:
+        return self._path_with_folder_exported_s3_data.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
 
 def _get_bucket_and_path_from_s3_uri(s3_uri: str) -> tuple[str, str]:
