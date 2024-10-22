@@ -117,7 +117,9 @@ class _S3DataAnalyzer:
         self._config = config
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
-        return self._get_df_set_analysis_sync(df)
+        result = df.copy()
+        result = self._get_df_set_analysis_sync(result)
+        return self._get_df_set_analysis_must_file_exist(result)
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         aws_account_with_data_to_sync = self._config.get_aws_account_with_data_to_sync()
@@ -130,10 +132,10 @@ class _S3DataAnalyzer:
             )
             condition_sync_not_required = df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()
             # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-            column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
+            column_name_result = f"is_sync_ok_in_{aws_account_to_compare}"
             df[
                 [
-                    ("analysis", column_name_compare_result),
+                    ("analysis", column_name_result),
                 ]
             ] = None
             for condition_and_result in (
@@ -145,9 +147,31 @@ class _S3DataAnalyzer:
                 df.loc[
                     condition,
                     [
-                        ("analysis", column_name_compare_result),
+                        ("analysis", column_name_result),
                     ],
                 ] = result
+        return df
+
+    def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
+        aws_account_with_data_to_sync = self._config.get_aws_account_with_data_to_sync()
+        aws_account_without_more_files = self._config.get_aws_account_that_must_not_have_more_files()
+        column_name_result = f"must_exist_in_{aws_account_without_more_files}"
+        df[
+            [
+                ("analysis", column_name_result),
+            ]
+        ] = None
+        condition_must_not_exist = (df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()) & (
+            df.loc[:, (aws_account_without_more_files, "size")].notnull()
+        )
+        for condition_and_result in ((condition_must_not_exist, False),):
+            condition, result = condition_and_result
+            df.loc[
+                condition,
+                [
+                    ("analysis", column_name_result),
+                ],
+            ] = result
         return df
 
 

@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
+from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 
@@ -23,6 +24,12 @@ class Config:
             if aws_account.startswith(AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX):
                 return aws_account
         raise ValueError("No aws account to sync")
+
+    def get_aws_account_that_must_not_have_more_files(self) -> str:
+        for aws_account in self.get_aws_accounts():
+            if aws_account.startswith(AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
+                return aws_account
+        raise ValueError("No aws account that must not have more files")
 
     def get_dict_s3_uris_to_analyze(self) -> dict:
         _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)
