@@ -15,6 +15,7 @@ python = "^3.10"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"
 pre-commit = "3.8.0"
+moto = {version = "5.0.18", extras = ["s3"]}
 
 [build-system]
 requires = ["poetry-core"]
