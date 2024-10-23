@@ -8,8 +8,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+boto3 = "1.35.47"
 pandas = "2.2.3"
+python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.9"

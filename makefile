@@ -9,3 +9,6 @@ ruff-format:
 
 test:
 	poetry run python -m unittest discover
+
+test-filter:
+	poetry run python -m unittest discover -p test_extract.py
