@@ -1,5 +1,6 @@
 import datetime
 import os
+import pathlib
 import unittest
 
 import boto3
@@ -38,7 +39,11 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
     def _upload_file(self, s3_file_path_name):
-        with open("/tmp/foo", "rb") as data:
+        current_path = pathlib.Path(__file__).parent.absolute()
+        s3_files_path = current_path.joinpath("s3-files")
+        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain.csv")
+        # TODO s3_file_path_name must be a name with `cars`
+        with open(cars_file_path, "rb") as data:
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
 
     def tearDown(self):
@@ -50,7 +55,7 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         for key, expected_value in {
             "name": "big-dogs.csv",
             "date": datetime.datetime.now(tzutc()),
-            "size": 5151,
+            "size": 49,
         }.items():
             if key == "date":
                 self.assertEqual(expected_value.date(), result[key].date())
