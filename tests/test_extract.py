@@ -19,7 +19,6 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         self._set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-
         self.s3 = boto3.resource("s3")
         self.s3_client = boto3.client("s3")
         bucket = self.s3.Bucket(self.BUCKET_NAME)
@@ -41,7 +40,7 @@ class TestFuntion_get_s3_data(unittest.TestCase):
     def _upload_file(self, s3_file_path_name):
         current_path = pathlib.Path(__file__).parent.absolute()
         s3_files_path = current_path.joinpath("s3-files")
-        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain.csv")
+        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", "cars.csv")
         # TODO s3_file_path_name must be a name with `cars`
         with open(cars_file_path, "rb") as data:
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
