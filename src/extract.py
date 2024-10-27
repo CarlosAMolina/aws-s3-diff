@@ -14,8 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 def run():
-    if os.path.isdir(MAIN_FOLDER_NAME_EXPORTS):
-        raise FileExistsError(f"The folder '{MAIN_FOLDER_NAME_EXPORTS}' exists, drop it before continue")
     config = _get_config()
     _create_folders_for_buckets_results(bucket_names=list(config.get_dict_s3_uris_to_analyze().keys()))
     s3_queries = config.get_s3_queries()
@@ -34,6 +32,8 @@ def _get_config() -> Config:
 
 
 def _create_folders_for_buckets_results(bucket_names: list[str]):
+    if os.path.isdir(MAIN_FOLDER_NAME_EXPORTS):
+        raise FileExistsError(f"The folder '{MAIN_FOLDER_NAME_EXPORTS}' exists, drop it before continue")
     for bucket_name in bucket_names:
         exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
