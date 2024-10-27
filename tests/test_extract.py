@@ -23,9 +23,10 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         self.s3_client = boto3.client("s3")
         bucket = self.s3.Bucket(self.BUCKET_NAME)
         bucket.create()
-        self.s3_dir_path_name = "/pets/dogs/"
-        s3_file_path_name = f"{self.s3_dir_path_name}big-dogs.csv"
-        self._upload_file(s3_file_path_name)
+        # TODO rename add _cars
+        self.s3_dir_path_name = "/pets/cars/europe/spain/"
+        self.s3_dir_path_name_dogs = "/pets/dogs/big_size/"
+        self._upload_files()
 
     def _set_aws_credentials(self):
         """ "
@@ -37,12 +38,18 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         os.environ["AWS_SESSION_TOKEN"] = "testing"
         os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
-    def _upload_file(self, s3_file_path_name):
+    def _upload_files(self):
         current_path = pathlib.Path(__file__).parent.absolute()
         s3_files_path = current_path.joinpath("s3-files")
         cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", "cars-20241014.csv")
+        dogs_file_name = "dogs-20241019.csv"
+        dogs_file_path = s3_files_path.joinpath("pets", "dogs", "big_size", dogs_file_name)
         # TODO s3_file_path_name must be a name with `cars`
         with open(cars_file_path, "rb") as data:
+            s3_file_path_name = f"{self.s3_dir_path_name}big-dogs.csv"
+            self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
+        with open(dogs_file_path, "rb") as data:
+            s3_file_path_name = f"{self.s3_dir_path_name_dogs}dogs_file_name.csv"
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
 
     def tearDown(self):
@@ -50,13 +57,14 @@ class TestFuntion_get_s3_data(unittest.TestCase):
 
     def test_get_s3_data_returns_expected_result(self):
         s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name)
-        result = m_extract._get_s3_data(s3_query)[0]
+        s3_data = m_extract._get_s3_data(s3_query)
+        result_cars = s3_data[0]
         for key, expected_value in {
             "name": "big-dogs.csv",
             "date": datetime.datetime.now(tzutc()),
             "size": 49,
         }.items():
             if key == "date":
-                self.assertEqual(expected_value.date(), result[key].date())
+                self.assertEqual(expected_value.date(), result_cars[key].date())
             else:
-                self.assertEqual(expected_value, result[key])
+                self.assertEqual(expected_value, result_cars[key])
