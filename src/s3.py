@@ -1,11 +1,7 @@
-from collections import namedtuple
-
 import boto3
 
-# TODO extract to file
-S3Query = namedtuple("S3Query", "bucket prefix")
-S3FileData = dict
-S3Data = list[S3FileData]
+from types_custom import S3Data
+from types_custom import S3Query
 
 
 class S3Client:

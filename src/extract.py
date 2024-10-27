@@ -2,19 +2,14 @@ import csv
 import logging
 import os
 import os.path
-from collections import namedtuple
 from pathlib import Path
 from pathlib import PurePath
 
 from config import Config
 from constants import MAIN_FOLDER_NAME_EXPORTS
 from s3 import S3Client
-
-# TODO move to file
-S3Query = namedtuple("S3Query", "bucket prefix")
-S3FileData = dict
-S3Data = list[S3FileData]
-
+from types_custom import S3Data
+from types_custom import S3Query
 
 logger = logging.getLogger(__name__)
 
