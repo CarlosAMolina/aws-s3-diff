@@ -67,3 +67,15 @@ class TestFuntion_get_s3_data(unittest.TestCase):
                 self.assertEqual(expected_value.date(), result_cars[key].date())
             else:
                 self.assertEqual(expected_value, result_cars[key])
+        s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_dogs)
+        s3_data = m_extract._get_s3_data(s3_query)
+        result_dogs = s3_data[0]
+        for key, expected_value in {
+            "name": self.dogs_file_name,
+            "date": datetime.datetime.now(tzutc()),
+            "size": 20,
+        }.items():
+            if key == "date":
+                self.assertEqual(expected_value.date(), result_dogs[key].date())
+            else:
+                self.assertEqual(expected_value, result_dogs[key])
