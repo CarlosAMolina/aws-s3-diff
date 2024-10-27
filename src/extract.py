@@ -19,7 +19,7 @@ def run():
 
 
 def _run_using_config(config: Config):
-    _create_folders_for_buckets_results(bucket_names=list(config.get_dict_s3_uris_to_analyze().keys()))
+    _create_folders_for_buckets_results(config.get_bucket_names_to_analyze())
     s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")

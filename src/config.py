@@ -39,6 +39,9 @@ class Config:
             for path_name in path_names
         ]
 
+    def get_bucket_names_to_analyze(self) -> list[str]:
+        return list(self.get_dict_s3_uris_to_analyze().keys())
+
     def get_dict_s3_uris_to_analyze(self) -> dict:
         _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)
         result = {}
