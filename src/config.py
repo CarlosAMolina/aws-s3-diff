@@ -6,6 +6,7 @@ from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
+from types_custom import S3Query
 
 
 class Config:
@@ -30,6 +31,13 @@ class Config:
             if aws_account.startswith(AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
                 return aws_account
         raise ValueError("No aws account that must not have more files")
+
+    def get_s3_queries(self) -> list[S3Query]:
+        return [
+            S3Query(bucket, path_name)
+            for bucket, path_names in self.get_dict_s3_uris_to_analyze().items()
+            for path_name in path_names
+        ]
 
     def get_dict_s3_uris_to_analyze(self) -> dict:
         _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)

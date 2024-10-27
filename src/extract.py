@@ -9,7 +9,6 @@ from config import Config
 from constants import MAIN_FOLDER_NAME_EXPORTS
 from s3 import S3Client
 from types_custom import S3Data
-from types_custom import S3Query
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ def run():
         exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
         os.makedirs(exported_files_directory_path)
-    s3_queries = _get_s3_queries(config)
+    s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = S3Client().get_s3_data(s3_query)
@@ -36,14 +35,6 @@ def run():
 
 def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
     return PurePath(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
-
-
-def _get_s3_queries(config: Config) -> list[S3Query]:
-    return [
-        S3Query(bucket, path_name)
-        for bucket, path_names in config.get_dict_s3_uris_to_analyze().items()
-        for path_name in path_names
-    ]
 
 
 def _get_results_exported_file_path(
