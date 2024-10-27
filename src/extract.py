@@ -6,11 +6,11 @@ from collections import namedtuple
 from pathlib import Path
 from pathlib import PurePath
 
-import boto3
-
 from config import Config
 from constants import MAIN_FOLDER_NAME_EXPORTS
+from s3 import S3Client
 
+# TODO move to file
 S3Query = namedtuple("S3Query", "bucket prefix")
 S3FileData = dict
 S3Data = list[S3FileData]
@@ -32,7 +32,7 @@ def run():
     s3_queries = _get_s3_queries(config)
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
-        s3_data = _S3Client().get_s3_data(s3_query)
+        s3_data = S3Client().get_s3_data(s3_query)
         exported_files_directory_path = _get_path_for_bucket_exported_files(s3_query.bucket)
         file_path = _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
         _export_data_to_csv(s3_data, file_path)
@@ -45,47 +45,6 @@ def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
 
 def _get_s3_queries(config: Config) -> list[S3Query]:
     return [S3Query(bucket, path_name) for bucket, path_names in config.items() for path_name in path_names]
-
-
-class _S3Client:
-    def get_s3_data(self, s3_query: S3Query) -> S3Data:
-        session = boto3.Session()
-        s3_client = session.client("s3")
-        query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
-        self._raise_exception_if_subfolders_in_s3(s3_client, s3_query.bucket, query_prefix)
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
-        operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
-        paginator = s3_client.get_paginator("list_objects_v2")
-        page_iterator = paginator.paginate(**operation_parameters)
-        result = []
-        for page in page_iterator:
-            page_files = [
-                {
-                    "name": self._get_file_name_from_response_key(content),
-                    "date": content["LastModified"],
-                    "size": content["Size"],
-                }
-                for content in page["Contents"]
-            ]
-            result += page_files
-        return result
-
-    # TODO s3_client as class attribute
-    def _raise_exception_if_subfolders_in_s3(self, s3_client, bucket: str, query_prefix: str):
-        # https://stackoverflow.com/questions/71577584/python-boto3-s3-list-only-current-directory-file-ignoring-subdirectory-files
-        response = s3_client.list_objects_v2(Bucket=bucket, Prefix=query_prefix, Delimiter="/")
-        if len(response.get("CommonPrefixes", [])) == 0:
-            return
-        folder_path_names = [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
-        error_text = (
-            f"Subfolders detected in bucket {bucket}. This script cannot manage subfolders"
-            f". Subfolders ({len(folder_path_names)}): {', '.join(folder_path_names)}"
-        )
-        raise ValueError(error_text)
-
-    def _get_file_name_from_response_key(self, content: dict) -> str:
-        return content["Key"].split("/")[-1]
 
 
 def _get_results_exported_file_path(

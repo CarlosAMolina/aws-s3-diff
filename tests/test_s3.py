@@ -8,7 +8,7 @@ import boto3
 from dateutil.tz import tzutc
 from moto import mock_aws
 
-from src import extract as m_extract
+from src import s3 as m_s3
 
 FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_name")
 
@@ -61,12 +61,12 @@ class TestS3Client(unittest.TestCase):
         self.mock_aws.stop()
 
     def test_get_s3_data_returns_expected_result(self):
-        s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_cars)
-        s3_client = m_extract._S3Client()
+        s3_query = m_s3.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_cars)
+        s3_client = m_s3.S3Client()
         s3_data = s3_client.get_s3_data(s3_query)
         result_cars = s3_data[0]
         self._test_get_s3_data_returns_expected_result_for_file_name(self.cars_file_name, 49, result_cars)
-        s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_dogs)
+        s3_query = m_s3.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_dogs)
         s3_data = s3_client.get_s3_data(s3_query)
         result_dogs = s3_data[0]
         self._test_get_s3_data_returns_expected_result_for_file_name(self.dogs_file_name, 20, result_dogs)
