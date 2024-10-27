@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 def run():
     config = _get_config()
+    _run_using_config(config)
+
+
+def _run_using_config(config: Config):
     _create_folders_for_buckets_results(bucket_names=list(config.get_dict_s3_uris_to_analyze().keys()))
     s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
