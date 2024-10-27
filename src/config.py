@@ -5,6 +5,7 @@ from pathlib import Path
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
+from constants import MAIN_FOLDER_NAME_EXPORTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
 
@@ -41,6 +42,9 @@ class Config:
 
     def get_bucket_names_to_analyze(self) -> list[str]:
         return list(self._get_dict_s3_uris_to_analyze().keys())
+
+    def get_local_path_for_bucket_results(self, bucket_name: str) -> Path:
+        return Path(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
 
     def _get_dict_s3_uris_to_analyze(self) -> dict:
         _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)

@@ -20,12 +20,12 @@ def run():
 
 
 def _run_using_config(config: Config):
-    _create_folders_for_buckets_results(config.get_bucket_names_to_analyze())
+    _create_folders_for_buckets_results(config)
     s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = S3Client().get_s3_data(s3_query)
-        file_path_for_results = _get_path_for_file_with_query_results(s3_query)
+        file_path_for_results = _get_path_for_file_with_query_results(config, s3_query)
         _export_data_to_csv(s3_data, file_path_for_results)
         print("Extraction done")
 
@@ -35,22 +35,18 @@ def _get_config() -> Config:
     return Config(path_config_files=current_path, path_with_folder_exported_s3_data=current_path)
 
 
-def _create_folders_for_buckets_results(bucket_names: list[str]):
+def _create_folders_for_buckets_results(config: Config):
     if os.path.isdir(MAIN_FOLDER_NAME_EXPORTS):
         raise FileExistsError(f"The folder '{MAIN_FOLDER_NAME_EXPORTS}' exists, drop it before continue")
-    for bucket_name in bucket_names:
-        exported_files_directory_path = _get_path_for_bucket_results(bucket_name)
+    for bucket_name in config.get_bucket_names_to_analyze():
+        exported_files_directory_path = config.get_local_path_for_bucket_results(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
         os.makedirs(exported_files_directory_path)
 
 
-def _get_path_for_file_with_query_results(s3_query: S3Query) -> PurePath:
-    exported_files_directory_path = _get_path_for_bucket_results(s3_query.bucket)
+def _get_path_for_file_with_query_results(config: Config, s3_query: S3Query) -> PurePath:
+    exported_files_directory_path = config.get_local_path_for_bucket_results(s3_query.bucket)
     return _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
-
-
-def _get_path_for_bucket_results(bucket_name: str) -> PurePath:
-    return PurePath(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
 
 
 def _get_results_exported_file_path(
