@@ -9,6 +9,7 @@ from config import Config
 from constants import MAIN_FOLDER_NAME_EXPORTS
 from s3 import S3Client
 from types_custom import S3Data
+from types_custom import S3Query
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +25,8 @@ def _run_using_config(config: Config):
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = S3Client().get_s3_data(s3_query)
-        exported_files_directory_path = _get_path_for_bucket_exported_files(s3_query.bucket)
-        file_path = _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
-        _export_data_to_csv(s3_data, file_path)
+        file_path_for_results = _get_path_for_file_with_query_results(s3_query)
+        _export_data_to_csv(s3_data, file_path_for_results)
         print("Extraction done")
 
 
@@ -46,6 +46,11 @@ def _create_folders_for_buckets_results(bucket_names: list[str]):
 
 def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
     return PurePath(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
+
+
+def _get_path_for_file_with_query_results(s3_query: S3Query) -> PurePath:
+    exported_files_directory_path = _get_path_for_bucket_exported_files(s3_query.bucket)
+    return _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
 
 
 def _get_results_exported_file_path(
