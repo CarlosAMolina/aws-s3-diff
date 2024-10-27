@@ -5,15 +5,17 @@ from types_custom import S3Query
 
 
 class S3Client:
-    def get_s3_data(self, s3_query: S3Query) -> S3Data:
+    def __init__(self):
         session = boto3.Session()
-        s3_client = session.client("s3")
+        self._s3_client = session.client("s3")
+
+    def get_s3_data(self, s3_query: S3Query) -> S3Data:
         query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
-        self._raise_exception_if_subfolders_in_s3(s3_client, s3_query.bucket, query_prefix)
+        self._raise_exception_if_subfolders_in_s3(s3_query.bucket, query_prefix)
         # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
         operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
-        paginator = s3_client.get_paginator("list_objects_v2")
+        paginator = self._s3_client.get_paginator("list_objects_v2")
         page_iterator = paginator.paginate(**operation_parameters)
         result = []
         for page in page_iterator:
@@ -28,10 +30,9 @@ class S3Client:
             result += page_files
         return result
 
-    # TODO s3_client as class attribute
-    def _raise_exception_if_subfolders_in_s3(self, s3_client, bucket: str, query_prefix: str):
+    def _raise_exception_if_subfolders_in_s3(self, bucket: str, query_prefix: str):
         # https://stackoverflow.com/questions/71577584/python-boto3-s3-list-only-current-directory-file-ignoring-subdirectory-files
-        response = s3_client.list_objects_v2(Bucket=bucket, Prefix=query_prefix, Delimiter="/")
+        response = self._s3_client.list_objects_v2(Bucket=bucket, Prefix=query_prefix, Delimiter="/")
         if len(response.get("CommonPrefixes", [])) == 0:
             return
         folder_path_names = [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
