@@ -39,7 +39,11 @@ def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
 
 
 def _get_s3_queries(config: Config) -> list[S3Query]:
-    return [S3Query(bucket, path_name) for bucket, path_names in config.items() for path_name in path_names]
+    return [
+        S3Query(bucket, path_name)
+        for bucket, path_names in config.get_dict_s3_uris_to_analyze().items()
+        for path_name in path_names
+    ]
 
 
 def _get_results_exported_file_path(
