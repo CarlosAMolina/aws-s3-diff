@@ -13,7 +13,7 @@ from src import extract as m_extract
 FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_name")
 
 
-class TestFuntion_get_s3_data(unittest.TestCase):
+class TestS3Client(unittest.TestCase):
     """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
 
     BUCKET_NAME = "test-bucket"
@@ -62,11 +62,12 @@ class TestFuntion_get_s3_data(unittest.TestCase):
 
     def test_get_s3_data_returns_expected_result(self):
         s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_cars)
-        s3_data = m_extract._get_s3_data(s3_query)
+        s3_client = m_extract._S3Client()
+        s3_data = s3_client.get_s3_data(s3_query)
         result_cars = s3_data[0]
         self._test_get_s3_data_returns_expected_result_for_file_name(self.cars_file_name, 49, result_cars)
         s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_dogs)
-        s3_data = m_extract._get_s3_data(s3_query)
+        s3_data = s3_client.get_s3_data(s3_query)
         result_dogs = s3_data[0]
         self._test_get_s3_data_returns_expected_result_for_file_name(self.dogs_file_name, 20, result_dogs)
 

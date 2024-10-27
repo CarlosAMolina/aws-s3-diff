@@ -32,7 +32,7 @@ def run():
     s3_queries = _get_s3_queries(config)
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
-        s3_data = _get_s3_data(s3_query)
+        s3_data = _S3Client().get_s3_data(s3_query)
         exported_files_directory_path = _get_path_for_bucket_exported_files(s3_query.bucket)
         file_path = _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
         _export_data_to_csv(s3_data, file_path)
@@ -47,28 +47,29 @@ def _get_s3_queries(config: Config) -> list[S3Query]:
     return [S3Query(bucket, path_name) for bucket, path_names in config.items() for path_name in path_names]
 
 
-def _get_s3_data(s3_query: S3Query) -> S3Data:
-    session = boto3.Session()
-    s3_client = session.client("s3")
-    query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
-    _raise_exception_if_subfolders_in_s3(s3_client, s3_query.bucket, query_prefix)
-    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
-    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
-    operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
-    paginator = s3_client.get_paginator("list_objects_v2")
-    page_iterator = paginator.paginate(**operation_parameters)
-    result = []
-    for page in page_iterator:
-        page_files = [
-            {
-                "name": _get_file_name_from_response_key(content),
-                "date": content["LastModified"],
-                "size": content["Size"],
-            }
-            for content in page["Contents"]
-        ]
-        result += page_files
-    return result
+class _S3Client:
+    def get_s3_data(self, s3_query: S3Query) -> S3Data:
+        session = boto3.Session()
+        s3_client = session.client("s3")
+        query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
+        _raise_exception_if_subfolders_in_s3(s3_client, s3_query.bucket, query_prefix)
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
+        operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
+        paginator = s3_client.get_paginator("list_objects_v2")
+        page_iterator = paginator.paginate(**operation_parameters)
+        result = []
+        for page in page_iterator:
+            page_files = [
+                {
+                    "name": _get_file_name_from_response_key(content),
+                    "date": content["LastModified"],
+                    "size": content["Size"],
+                }
+                for content in page["Contents"]
+            ]
+            result += page_files
+        return result
 
 
 def _raise_exception_if_subfolders_in_s3(s3_client, bucket: str, query_prefix: str):
