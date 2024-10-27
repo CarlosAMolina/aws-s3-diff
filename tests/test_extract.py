@@ -2,12 +2,15 @@ import datetime
 import os
 import pathlib
 import unittest
+from collections import namedtuple
 
 import boto3
 from dateutil.tz import tzutc
 from moto import mock_aws
 
 from src import extract as m_extract
+
+FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_name")
 
 
 class TestFuntion_get_s3_data(unittest.TestCase):
@@ -42,17 +45,17 @@ class TestFuntion_get_s3_data(unittest.TestCase):
     def _upload_files(self):
         current_path = pathlib.Path(__file__).parent.absolute()
         local_s3_files_path = current_path.joinpath("s3-files")
-        cars_local_file_name_path = local_s3_files_path.joinpath("cars", "europe", "spain", self.cars_file_name)
-        dogs_local_file_name_path = local_s3_files_path.joinpath("pets", "dogs", "big_size", self.dogs_file_name)
-        cars_s3_file_name_path_name = f"{self.s3_dir_path_name_cars}{self.cars_file_name}"
-        dogs_s3_file_name_path_name = f"{self.s3_dir_path_name_dogs}{self.dogs_file_name}"
-        for file_paths in (
-            (cars_local_file_name_path, cars_s3_file_name_path_name),
-            (dogs_local_file_name_path, dogs_s3_file_name_path_name),
-        ):
-            local_file_name_path, s3_file_name_path_name = file_paths
-            with open(local_file_name_path, "rb") as data:
-                self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_name_path_name)
+        cars_file_paths = FilePaths(
+            local_s3_files_path.joinpath("cars", "europe", "spain", self.cars_file_name),
+            f"{self.s3_dir_path_name_cars}{self.cars_file_name}",
+        )
+        dogs_file_paths = FilePaths(
+            local_s3_files_path.joinpath("pets", "dogs", "big_size", self.dogs_file_name),
+            f"{self.s3_dir_path_name_dogs}{self.dogs_file_name}",
+        )
+        for file_paths in (cars_file_paths, dogs_file_paths):
+            with open(file_paths.local_file_name_path, "rb") as data:
+                self.s3_client.upload_fileobj(data, self.BUCKET_NAME, file_paths.s3_file_name_path_name)
 
     def tearDown(self):
         self.mock_aws.stop()
