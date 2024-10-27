@@ -40,7 +40,7 @@ class TestFuntion_get_s3_data(unittest.TestCase):
     def _upload_file(self, s3_file_path_name):
         current_path = pathlib.Path(__file__).parent.absolute()
         s3_files_path = current_path.joinpath("s3-files")
-        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", "cars.csv")
+        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", "cars-20241014.csv")
         # TODO s3_file_path_name must be a name with `cars`
         with open(cars_file_path, "rb") as data:
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
