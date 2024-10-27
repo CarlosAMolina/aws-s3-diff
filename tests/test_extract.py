@@ -23,9 +23,10 @@ class TestFuntion_get_s3_data(unittest.TestCase):
         self.s3_client = boto3.client("s3")
         bucket = self.s3.Bucket(self.BUCKET_NAME)
         bucket.create()
-        # TODO rename add _cars
-        self.s3_dir_path_name = "/pets/cars/europe/spain/"
+        self.s3_dir_path_name_cars = "/pets/cars/europe/spain/"
         self.s3_dir_path_name_dogs = "/pets/dogs/big_size/"
+        self.cars_file_name = "cars-20241014.csv"
+        self.dogs_file_name = "dogs-20241019.csv"
         self._upload_files()
 
     def _set_aws_credentials(self):
@@ -41,26 +42,24 @@ class TestFuntion_get_s3_data(unittest.TestCase):
     def _upload_files(self):
         current_path = pathlib.Path(__file__).parent.absolute()
         s3_files_path = current_path.joinpath("s3-files")
-        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", "cars-20241014.csv")
-        dogs_file_name = "dogs-20241019.csv"
-        dogs_file_path = s3_files_path.joinpath("pets", "dogs", "big_size", dogs_file_name)
-        # TODO s3_file_path_name must be a name with `cars`
+        cars_file_path = s3_files_path.joinpath("cars", "europe", "spain", self.cars_file_name)
+        dogs_file_path = s3_files_path.joinpath("pets", "dogs", "big_size", self.dogs_file_name)
         with open(cars_file_path, "rb") as data:
-            s3_file_path_name = f"{self.s3_dir_path_name}big-dogs.csv"
+            s3_file_path_name = f"{self.s3_dir_path_name_cars}{self.cars_file_name}"
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
         with open(dogs_file_path, "rb") as data:
-            s3_file_path_name = f"{self.s3_dir_path_name_dogs}dogs_file_name.csv"
+            s3_file_path_name = f"{self.s3_dir_path_name_dogs}{self.dogs_file_name}"
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
 
     def tearDown(self):
         self.mock_aws.stop()
 
     def test_get_s3_data_returns_expected_result(self):
-        s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name)
+        s3_query = m_extract.S3Query(self.BUCKET_NAME, self.s3_dir_path_name_cars)
         s3_data = m_extract._get_s3_data(s3_query)
         result_cars = s3_data[0]
         for key, expected_value in {
-            "name": "big-dogs.csv",
+            "name": self.cars_file_name,
             "date": datetime.datetime.now(tzutc()),
             "size": 49,
         }.items():
