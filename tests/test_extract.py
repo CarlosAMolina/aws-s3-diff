@@ -42,12 +42,12 @@ class TestFuntion_get_s3_data(unittest.TestCase):
     def _upload_files(self):
         current_path = pathlib.Path(__file__).parent.absolute()
         local_s3_files_path = current_path.joinpath("s3-files")
-        cars_file_path = local_s3_files_path.joinpath("cars", "europe", "spain", self.cars_file_name)
-        dogs_file_path = local_s3_files_path.joinpath("pets", "dogs", "big_size", self.dogs_file_name)
-        with open(cars_file_path, "rb") as data:
+        local_cars_file_path = local_s3_files_path.joinpath("cars", "europe", "spain", self.cars_file_name)
+        local_dogs_file_path = local_s3_files_path.joinpath("pets", "dogs", "big_size", self.dogs_file_name)
+        with open(local_cars_file_path, "rb") as data:
             s3_file_path_name = f"{self.s3_dir_path_name_cars}{self.cars_file_name}"
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
-        with open(dogs_file_path, "rb") as data:
+        with open(local_dogs_file_path, "rb") as data:
             s3_file_path_name = f"{self.s3_dir_path_name_dogs}{self.dogs_file_name}"
             self.s3_client.upload_fileobj(data, self.BUCKET_NAME, s3_file_path_name)
 
