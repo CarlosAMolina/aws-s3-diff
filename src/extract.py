@@ -19,10 +19,7 @@ def run():
     path_config_files = Path(__file__).parent.absolute()
     path_with_folder_exported_s3_data = path_config_files
     config = Config(path_config_files, path_with_folder_exported_s3_data)
-    for bucket_name in config.get_dict_s3_uris_to_analyze():
-        exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
-        print("Creating folder for bucket results: ", exported_files_directory_path)
-        os.makedirs(exported_files_directory_path)
+    _create_folders_for_buckets_results(bucket_names=list(config.get_dict_s3_uris_to_analyze().keys()))
     s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
@@ -31,6 +28,13 @@ def run():
         file_path = _get_results_exported_file_path(exported_files_directory_path, s3_query.prefix)
         _export_data_to_csv(s3_data, file_path)
         print("Extraction done")
+
+
+def _create_folders_for_buckets_results(bucket_names: list[str]):
+    for bucket_name in bucket_names:
+        exported_files_directory_path = _get_path_for_bucket_exported_files(bucket_name)
+        print("Creating folder for bucket results: ", exported_files_directory_path)
+        os.makedirs(exported_files_directory_path)
 
 
 def _get_path_for_bucket_exported_files(bucket_name: str) -> PurePath:
