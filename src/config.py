@@ -16,7 +16,7 @@ class Config:
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
-        path_to_check = self.get_path_exported_s3_data()
+        path_to_check = self.get_local_path_directory_results_to_compare()
         result = os.listdir(path_to_check)
         result.sort()
         return result
@@ -46,8 +46,7 @@ class Config:
     def get_local_path_directory_bucket_results(self, bucket_name: str) -> Path:
         return self._get_local_path_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
 
-    # TODO rename to get_local_path_directory_results_to_compare
-    def get_path_exported_s3_data(self) -> Path:
+    def get_local_path_directory_results_to_compare(self) -> Path:
         return self._get_local_path_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
     # TODO rename to get_local_path_file_query_results

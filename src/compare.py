@@ -44,13 +44,15 @@ def _get_df_combine_files(config: Config) -> Df:
 
 def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
     aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
-    bucket_names = os.listdir(config.get_path_exported_s3_data().joinpath(aws_account_with_data_to_sync))
+    bucket_names = os.listdir(
+        config.get_local_path_directory_results_to_compare().joinpath(aws_account_with_data_to_sync)
+    )
     bucket_names.sort()
     accounts = config.get_aws_accounts()
     accounts.remove(aws_account_with_data_to_sync)
     accounts.sort()
     for account in accounts:
-        buckets_in_account = os.listdir(config.get_path_exported_s3_data().joinpath(account))
+        buckets_in_account = os.listdir(config.get_local_path_directory_results_to_compare().joinpath(account))
         buckets_in_account.sort()
         if bucket_names != buckets_in_account:
             raise ValueError(
@@ -58,10 +60,14 @@ def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
             )
     result = {}
     for bucket in bucket_names:
-        file_names = os.listdir(config.get_path_exported_s3_data().joinpath(aws_account_with_data_to_sync, bucket))
+        file_names = os.listdir(
+            config.get_local_path_directory_results_to_compare().joinpath(aws_account_with_data_to_sync, bucket)
+        )
         file_names.sort()
         for account in accounts:
-            files_for_bucket_in_account = os.listdir(config.get_path_exported_s3_data().joinpath(account, bucket))
+            files_for_bucket_in_account = os.listdir(
+                config.get_local_path_directory_results_to_compare().joinpath(account, bucket)
+            )
             files_for_bucket_in_account.sort()
             if file_names != files_for_bucket_in_account:
                 raise ValueError(
@@ -76,7 +82,9 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: d
     result = Df()
     for bucket_name, file_names in buckets_and_files.items():
         for file_name in file_names:
-            file_path_name = config.get_path_exported_s3_data().joinpath(aws_account, bucket_name, file_name)
+            file_path_name = config.get_local_path_directory_results_to_compare().joinpath(
+                aws_account, bucket_name, file_name
+            )
             file_df = _get_df_from_file(file_path_name)
             file_df = file_df.add_prefix(f"{aws_account}_value_")
             file_df = file_df.set_index(f"{bucket_name}_path_{file_name}_file_" + file_df.index.astype(str))
