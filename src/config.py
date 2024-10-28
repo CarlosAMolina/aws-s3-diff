@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 from pathlib import Path
@@ -5,15 +6,14 @@ from pathlib import Path
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
-from constants import MAIN_FOLDER_NAME_EXPORTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
 
 
 class Config:
-    def __init__(self, path_config_files: Path, path_with_folder_exported_s3_data: Path):
+    def __init__(self, path_config_files: Path):
         self._path_config_files = path_config_files
-        self._path_with_folder_exported_s3_data = path_with_folder_exported_s3_data
+        self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
         path_to_check = self.get_path_exported_s3_data()
@@ -43,8 +43,26 @@ class Config:
     def get_bucket_names_to_analyze(self) -> list[str]:
         return list(self._get_dict_s3_uris_to_analyze().keys())
 
+    # TODO rename to get_local_path_directory_bucket_results
     def get_local_path_for_bucket_results(self, bucket_name: str) -> Path:
-        return Path(MAIN_FOLDER_NAME_EXPORTS, bucket_name)
+        return self._get_local_path_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
+
+    # TODO rename to get_local_path_directory_results_to_compare
+    def get_path_exported_s3_data(self) -> Path:
+        return self._get_local_path_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+
+    # TODO rename to get_local_path_for_file_query_results
+    def get_path_for_file_with_query_results(self, s3_query: S3Query) -> Path:
+        exported_files_directory_path = self.get_local_path_for_bucket_results(s3_query.bucket)
+        file_name_query_results = self._get_file_name_for_s3_path_name_results(s3_query.prefix)
+        return exported_files_directory_path.joinpath(file_name_query_results)
+
+    def _get_local_path_s3_results(self) -> Path:
+        current_path = Path(__file__).parent.absolute()
+        return current_path.joinpath("../s3-results")
+
+    def _get_folder_name_buckets_results(self) -> str:
+        return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_dict_s3_uris_to_analyze(self) -> dict:
         _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)
@@ -57,8 +75,10 @@ class Config:
                 result[bucket_name].append(file_path_name)
             return result
 
-    def get_path_exported_s3_data(self) -> Path:
-        return self._path_with_folder_exported_s3_data.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+    def _get_file_name_for_s3_path_name_results(self, s3_path_name: str) -> str:
+        s3_path_name_clean = s3_path_name[:-1] if s3_path_name.endswith("/") else s3_path_name
+        exported_file_name = s3_path_name_clean.replace("/", "-")
+        return f"{exported_file_name}.csv"
 
 
 def _get_bucket_and_path_from_s3_uri(s3_uri: str) -> tuple[str, str]:
