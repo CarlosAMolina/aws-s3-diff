@@ -43,17 +43,16 @@ class Config:
     def get_bucket_names_to_analyze(self) -> list[str]:
         return list(self._get_dict_s3_uris_to_analyze().keys())
 
-    # TODO rename to get_local_path_directory_bucket_results
-    def get_local_path_for_bucket_results(self, bucket_name: str) -> Path:
+    def get_local_path_directory_bucket_results(self, bucket_name: str) -> Path:
         return self._get_local_path_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
 
     # TODO rename to get_local_path_directory_results_to_compare
     def get_path_exported_s3_data(self) -> Path:
         return self._get_local_path_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
-    # TODO rename to get_local_path_for_file_query_results
+    # TODO rename to get_local_path_file_query_results
     def get_path_for_file_with_query_results(self, s3_query: S3Query) -> Path:
-        exported_files_directory_path = self.get_local_path_for_bucket_results(s3_query.bucket)
+        exported_files_directory_path = self.get_local_path_directory_bucket_results(s3_query.bucket)
         file_name_query_results = self._get_file_name_for_s3_path_name_results(s3_query.prefix)
         return exported_files_directory_path.joinpath(file_name_query_results)
 

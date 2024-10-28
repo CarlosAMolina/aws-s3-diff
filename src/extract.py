@@ -35,7 +35,7 @@ def _get_config() -> Config:
 
 def _create_folders_for_buckets_results(config: Config):
     for bucket_name in config.get_bucket_names_to_analyze():
-        exported_files_directory_path = config.get_local_path_for_bucket_results(bucket_name)
+        exported_files_directory_path = config.get_local_path_directory_bucket_results(bucket_name)
         print("Creating folder for bucket results: ", exported_files_directory_path)
         os.makedirs(exported_files_directory_path)
 
