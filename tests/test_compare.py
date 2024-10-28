@@ -32,8 +32,7 @@ class TestS3DataComparator(unittest.TestCase):
     def _get_config_for_the_test(self) -> Config:
         path_src = self.current_path.parent.joinpath("src")
         path_config_files = path_src
-        path_with_folder_exported_s3_data = self.current_path
-        return Config(path_config_files, path_with_folder_exported_s3_data)
+        return Config(path_config_files)
 
     def _get_df_from_csv_expected_result(self) -> Df:
         expected_result_file_path = self.current_path.joinpath("expected_result_compare.csv")
