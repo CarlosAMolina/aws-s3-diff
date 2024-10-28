@@ -23,7 +23,7 @@ def _run_using_config(config: Config):
     for query_index, s3_query in enumerate(s3_queries, 1):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = S3Client().get_s3_data(s3_query)
-        file_path_for_results = config.get_path_for_file_with_query_results(s3_query)
+        file_path_for_results = config.get_local_path_file_query_results(s3_query)
         _export_data_to_csv(s3_data, file_path_for_results)
         print("Extraction done")
 
