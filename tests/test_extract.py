@@ -15,7 +15,7 @@ FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_nam
 class TestS3Client(unittest.TestCase):
     """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
 
-    BUCKET_NAME = "test-bucket"
+    BUCKET_NAME_PETS = "pets"
 
     def setUp(self):
         self._set_aws_credentials()
@@ -23,7 +23,7 @@ class TestS3Client(unittest.TestCase):
         self.mock_aws.start()
         self.s3 = boto3.resource("s3")
         self.s3_client = boto3.client("s3")
-        bucket = self.s3.Bucket(self.BUCKET_NAME)
+        bucket = self.s3.Bucket(self.BUCKET_NAME_PETS)
         bucket.create()
         self.s3_dir_path_name_cars = "/pets/cars/europe/spain/"
         self.s3_dir_path_name_dogs = "/pets/dogs/big_size/"
@@ -54,7 +54,7 @@ class TestS3Client(unittest.TestCase):
         )
         for file_paths in (cars_file_paths, dogs_file_paths):
             with open(file_paths.local_file_name_path, "rb") as data:
-                self.s3_client.upload_fileobj(data, self.BUCKET_NAME, file_paths.s3_file_name_path_name)
+                self.s3_client.upload_fileobj(data, self.BUCKET_NAME_PETS, file_paths.s3_file_name_path_name)
 
     def tearDown(self):
         self.mock_aws.stop()
