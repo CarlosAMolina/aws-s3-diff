@@ -3,10 +3,9 @@ import logging
 import os
 import os.path
 from pathlib import Path
-from pathlib import PurePath
 
 from config import Config
-from constants import FILE_NAME_S3_URIS
+from config import get_config
 from s3 import S3Client
 from types_custom import S3Data
 
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def run():
-    config = _get_config()
+    config = get_config()
     _run_using_config(config)
 
 
@@ -29,12 +28,6 @@ def _run_using_config(config: Config):
         print("Extraction done")
 
 
-def _get_config() -> Config:
-    current_path = Path(__file__).parent.absolute()
-    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
-    return Config(file_name_what_to_analyze)
-
-
 def _create_folders_for_buckets_results(config: Config):
     for bucket_name in config.get_bucket_names_to_analyze():
         exported_files_directory_path = config.get_local_path_directory_bucket_results(bucket_name)
@@ -42,7 +35,7 @@ def _create_folders_for_buckets_results(config: Config):
         os.makedirs(exported_files_directory_path)
 
 
-def _export_data_to_csv(s3_data: S3Data, file_path: PurePath):
+def _export_data_to_csv(s3_data: S3Data, file_path: Path):
     print(f"Exporting data to {file_path}")
     with open(file_path, "w", newline="") as f:
         w = csv.DictWriter(f, s3_data[0].keys())

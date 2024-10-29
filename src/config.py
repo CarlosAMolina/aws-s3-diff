@@ -5,6 +5,7 @@ from pathlib import Path
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
+from constants import FILE_NAME_S3_URIS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
 
@@ -64,7 +65,7 @@ class Config:
         result = {}
         with open(self._file_name_what_to_analyze) as f:
             for s3_uri in f.read().splitlines():
-                bucket_name, file_path_name = _get_bucket_and_path_from_s3_uri(s3_uri)
+                bucket_name, file_path_name = self._get_bucket_and_path_from_s3_uri(s3_uri)
                 if bucket_name not in result:
                     result[bucket_name] = []
                 result[bucket_name].append(file_path_name)
@@ -75,11 +76,16 @@ class Config:
         exported_file_name = s3_path_name_clean.replace("/", "-")
         return f"{exported_file_name}.csv"
 
+    def _get_bucket_and_path_from_s3_uri(self, s3_uri: str) -> tuple[str, str]:
+        # https://stackoverflow.com/a/47130367
+        match = re.match(r"s3:\/\/(.+?)\/(.+)", s3_uri)
+        bucket_name = match.group(1)
+        file_path = match.group(2)
+        return bucket_name, file_path
+        # TODO regex_date = r"s3://(?P<year>\d{2})/(?P<month>\d{2}).xlsx"
 
-def _get_bucket_and_path_from_s3_uri(s3_uri: str) -> tuple[str, str]:
-    # https://stackoverflow.com/a/47130367
-    match = re.match(r"s3:\/\/(.+?)\/(.+)", s3_uri)
-    bucket_name = match.group(1)
-    file_path = match.group(2)
-    return bucket_name, file_path
-    # TODO regex_date = r"s3://(?P<year>\d{2})/(?P<month>\d{2}).xlsx"
+
+def get_config() -> Config:
+    current_path = Path(__file__).parent.absolute()
+    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
+    return Config(file_name_what_to_analyze)

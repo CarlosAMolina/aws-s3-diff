@@ -1,25 +1,18 @@
 import os
 from pathlib import Path
-from pathlib import PurePath
 
 import pandas as pd
 from pandas import DataFrame as Df
 
 from config import Config
-from constants import FILE_NAME_S3_URIS
+from config import get_config
 
 FilePathNamesToCompare = tuple[str, str, str]
 
 
 def run():
-    config = _get_config()
+    config = get_config()
     _S3DataComparator().run(config)
-
-
-def _get_config() -> Config:
-    current_path = Path(__file__).parent.absolute()
-    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
-    return Config(file_name_what_to_analyze)
 
 
 class _S3DataComparator:
@@ -97,7 +90,7 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: d
     return result
 
 
-def _get_df_from_file(file_path_name: PurePath) -> Df:
+def _get_df_from_file(file_path_name: Path) -> Df:
     return pd.read_csv(
         file_path_name,
         index_col="name",
