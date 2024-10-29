@@ -7,7 +7,7 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
-from src.config import Config
+from tests.config import get_config_for_the_test
 
 
 class TestS3DataComparator(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestS3DataComparator(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     def test_get_df_s3_data_analyzed(self):
-        config = self._get_config_for_the_test()
+        config = get_config_for_the_test()
         result = m_compare._S3DataComparator()._get_df_s3_data_analyzed(config)
         # m_compare._S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
@@ -28,11 +28,6 @@ class TestS3DataComparator(unittest.TestCase):
         )
         expected_result = self._get_df_from_csv_expected_result()
         assert_frame_equal(expected_result, result_as_csv_export)
-
-    def _get_config_for_the_test(self) -> Config:
-        path_src = self.current_path.parent.joinpath("src")
-        path_config_files = path_src
-        return Config(path_config_files)
 
     def _get_df_from_csv_expected_result(self) -> Df:
         expected_result_file_path = self.current_path.joinpath("expected_result_compare.csv")

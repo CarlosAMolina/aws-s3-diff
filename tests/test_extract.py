@@ -7,7 +7,7 @@ import boto3
 from moto import mock_aws
 
 from src import extract as m_extract
-from src.config import Config
+from tests.config import get_config_for_the_test
 
 FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_name")
 
@@ -60,7 +60,6 @@ class TestS3Client(unittest.TestCase):
         self.mock_aws.stop()
 
     def test_run_using_config_generates_expected_result(self):
-        current_path = Path(__file__).parent.absolute()
-        config = Config(path_config_files=current_path)
+        config = get_config_for_the_test()
         m_extract._run_using_config(config)
         # TODO check results
