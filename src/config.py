@@ -44,17 +44,17 @@ class Config:
         return list(self._get_dict_s3_uris_to_analyze().keys())
 
     def get_local_path_directory_bucket_results(self, bucket_name: str) -> Path:
-        return self._get_local_path_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
+        return self._get_local_path_directory_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
 
     def get_local_path_directory_results_to_compare(self) -> Path:
-        return self._get_local_path_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+        return self._get_local_path_directory_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results(s3_query.bucket)
         file_name_query_results = self._get_file_name_for_s3_path_name_results(s3_query.prefix)
         return exported_files_directory_path.joinpath(file_name_query_results)
 
-    def _get_local_path_s3_results(self) -> Path:
+    def _get_local_path_directory_s3_results(self) -> Path:
         current_path = Path(__file__).parent.absolute()
         return current_path.joinpath("../s3-results")
 
