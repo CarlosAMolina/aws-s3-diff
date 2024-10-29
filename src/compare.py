@@ -6,15 +6,20 @@ import pandas as pd
 from pandas import DataFrame as Df
 
 from config import Config
+from constants import FILE_NAME_S3_URIS
 
 FilePathNamesToCompare = tuple[str, str, str]
 
 
 def run():
-    path_config_files = Path(__file__).parent.absolute()
-    path_with_folder_exported_s3_data = Path(__file__).parent.absolute()
-    config = Config(path_config_files, path_with_folder_exported_s3_data)
+    config = _get_config()
     _S3DataComparator().run(config)
+
+
+def _get_config() -> Config:
+    current_path = Path(__file__).parent.absolute()
+    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
+    return Config(file_name_what_to_analyze)
 
 
 class _S3DataComparator:

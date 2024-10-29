@@ -6,6 +6,7 @@ from pathlib import Path
 from pathlib import PurePath
 
 from config import Config
+from constants import FILE_NAME_S3_URIS
 from s3 import S3Client
 from types_custom import S3Data
 
@@ -30,7 +31,8 @@ def _run_using_config(config: Config):
 
 def _get_config() -> Config:
     current_path = Path(__file__).parent.absolute()
-    return Config(path_config_files=current_path)
+    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
+    return Config(file_name_what_to_analyze)
 
 
 def _create_folders_for_buckets_results(config: Config):

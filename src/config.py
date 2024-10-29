@@ -5,14 +5,13 @@ from pathlib import Path
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
-from constants import FILE_NAME_S3_URIS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
 
 
 class Config:
-    def __init__(self, path_config_files: Path):
-        self._path_config_files = path_config_files
+    def __init__(self, file_name_what_to_analyze: Path):
+        self._file_name_what_to_analyze = file_name_what_to_analyze
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
@@ -62,9 +61,8 @@ class Config:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_dict_s3_uris_to_analyze(self) -> dict:
-        _file_name_what_to_analyze = self._path_config_files.joinpath(FILE_NAME_S3_URIS)
         result = {}
-        with open(_file_name_what_to_analyze) as f:
+        with open(self._file_name_what_to_analyze) as f:
             for s3_uri in f.read().splitlines():
                 bucket_name, file_path_name = _get_bucket_and_path_from_s3_uri(s3_uri)
                 if bucket_name not in result:
