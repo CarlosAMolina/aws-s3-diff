@@ -6,13 +6,15 @@ from pathlib import Path
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
+from constants import FOLDER_NAME_S3_RESULTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
 
 
 class Config:
-    def __init__(self, file_name_what_to_analyze: Path):
-        self._file_name_what_to_analyze = file_name_what_to_analyze
+    def __init__(self, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
+        self._directory_s3_results_path = directory_s3_results_path
+        self._file_name_what_to_analyze = file_what_to_analyze_path
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
@@ -44,19 +46,15 @@ class Config:
         return list(self._get_dict_s3_uris_to_analyze().keys())
 
     def get_local_path_directory_bucket_results(self, bucket_name: str) -> Path:
-        return self._get_local_path_directory_s3_results().joinpath(self._folder_name_buckets_results, bucket_name)
+        return self._directory_s3_results_path.joinpath(self._folder_name_buckets_results, bucket_name)
 
     def get_local_path_directory_results_to_compare(self) -> Path:
-        return self._get_local_path_directory_s3_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+        return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results(s3_query.bucket)
         file_name_query_results = self._get_file_name_for_s3_path_name_results(s3_query.prefix)
         return exported_files_directory_path.joinpath(file_name_query_results)
-
-    def _get_local_path_directory_s3_results(self) -> Path:
-        current_path = Path(__file__).parent.absolute()
-        return current_path.joinpath("../s3-results")
 
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -87,5 +85,6 @@ class Config:
 
 def get_config() -> Config:
     current_path = Path(__file__).parent.absolute()
-    file_name_what_to_analyze = current_path.joinpath(FILE_NAME_S3_URIS)
-    return Config(file_name_what_to_analyze)
+    directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
+    file_what_to_analyze_path = current_path.joinpath(FILE_NAME_S3_URIS)
+    return Config(directory_s3_results_path, file_what_to_analyze_path)
