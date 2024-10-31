@@ -38,7 +38,8 @@ def _create_folders_for_buckets_results(config: Config):
 def _export_data_to_csv(s3_data: S3Data, file_path: Path):
     print(f"Exporting data to {file_path}")
     with open(file_path, "w", newline="") as f:
-        w = csv.DictWriter(f, s3_data[0].keys())
+        # avoid ^M: https://stackoverflow.com/a/17725590
+        w = csv.DictWriter(f, s3_data[0].keys(), lineterminator="\n")
         w.writeheader()
         for file_data in s3_data:
             w.writerow(file_data)

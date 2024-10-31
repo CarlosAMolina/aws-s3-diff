@@ -1,3 +1,0 @@
-pets
-dogs/big/
-cats/europe/

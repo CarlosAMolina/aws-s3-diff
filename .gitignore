@@ -3,6 +3,7 @@ src/exports/
 src/exports-all-aws-accounts/
 src/files-with-paths/paths-to-analyze.txt
 src/s3-uris-to-analyze-custom
+tests/s3-results/202*
 
 # Pycharm
 .idea

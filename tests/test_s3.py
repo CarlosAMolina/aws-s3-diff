@@ -26,7 +26,7 @@ class TestS3Client(unittest.TestCase):
         self.s3_client = boto3.client("s3")
         bucket = self.s3.Bucket(self.BUCKET_NAME)
         bucket.create()
-        self.s3_dir_path_name_cars = "/pets/cars/europe/spain/"
+        self.s3_dir_path_name_cars = "/pets/cars/europe/spain/"  # TODO? change to /cars/europe/spain
         self.s3_dir_path_name_dogs = "/pets/dogs/big_size/"
         self.cars_file_name = "cars-20241014.csv"
         self.dogs_file_name = "dogs-20241019.csv"
