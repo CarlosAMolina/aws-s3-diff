@@ -1,5 +1,4 @@
 import datetime
-import os
 import pathlib
 import unittest
 from collections import namedtuple
@@ -9,6 +8,7 @@ from dateutil.tz import tzutc
 from moto import mock_aws
 
 from src import s3 as m_s3
+from tests.aws import set_aws_credentials
 
 FilePaths = namedtuple("FilePaths", "local_file_name_path, s3_file_name_path_name")
 
@@ -19,7 +19,7 @@ class TestS3Client(unittest.TestCase):
     BUCKET_NAME = "test-bucket"
 
     def setUp(self):
-        self._set_aws_credentials()
+        set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         self.s3 = boto3.resource("s3")
@@ -32,16 +32,7 @@ class TestS3Client(unittest.TestCase):
         self.dogs_file_name = "dogs-20241019.csv"
         self._upload_files()
 
-    def _set_aws_credentials(self):
-        """ "
-        http://docs.getmoto.org/en/latest/docs/getting_started.html#how-do-i-avoid-tests-from-mutating-my-real-infrastructure
-        """
-        os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-        os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-        os.environ["AWS_SECURITY_TOKEN"] = "testing"
-        os.environ["AWS_SESSION_TOKEN"] = "testing"
-        os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
-
+    # TODO use tests.aws.py
     def _upload_files(self):
         current_path = pathlib.Path(__file__).parent.absolute()
         local_s3_files_path = current_path.joinpath("s3-files")
