@@ -1,8 +1,7 @@
 # http://docs.getmoto.org/en/latest/docs/server_mode.html
 
+from aws import S3
 from moto.server import ThreadedMotoServer
-
-from tests.aws import S3
 
 server = ThreadedMotoServer()
 server.start()
