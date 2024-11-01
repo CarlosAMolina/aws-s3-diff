@@ -43,11 +43,7 @@ class S3:
                 self._upload_file(bucket_name, local_file_path, s3_file_path_name)
 
     def _upload_file(self, bucket_name: str, local_file_path: Path, s3_file_path_name: str):
-        # TODO try to use
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/upload_file.html
-        # to avoid the `with open`.
-        with open(local_file_path, "rb") as data:
-            self._s3_client.upload_fileobj(data, bucket_name, s3_file_path_name)
+        self._s3_client.upload_file(local_file_path, bucket_name, s3_file_path_name)
 
     def _get_bucket_names_to_create(self) -> list[str]:
         """https://stackoverflow.com/questions/45870945/use-os-listdir-to-show-directories-only"""
