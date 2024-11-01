@@ -1,10 +1,3 @@
-## Develop
-
-```bash
-poetry install --all-extras
-poetry run pre-commit install
-```
-
 ## How to run the program
 
 ### Export s3 data
@@ -97,4 +90,20 @@ exports-all-aws-accounts
    |  |__ ...
    |__bikes/
       |__ ...
+```
+
+## Develop
+
+```bash
+poetry install --all-extras
+poetry run pre-commit install
+```
+
+## Testing
+
+### Access Moto Server using AWS CLI
+
+```bash
+make moto-run-local-server
+make awscli-local-s3-ls
 ```
