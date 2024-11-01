@@ -36,10 +36,11 @@ class S3:
         bucket.create()
 
     def _upload_files(self):
-        bucket_name = "pets"
-        s3_file_path_name = "dogs/big_size/dogs-20241019.csv"
-        local_file_path = self._local_s3_objects_path.joinpath(bucket_name, s3_file_path_name)
-        self._upload_file(bucket_name, local_file_path, s3_file_path_name)
+        for bucket_name in self._get_bucket_names_to_create():
+            bucket_name_local_path = self._local_s3_objects_path.joinpath(bucket_name)
+            for local_file_path in self._get_file_paths_in_directory_path(bucket_name_local_path):
+                s3_file_path_name = str(local_file_path.relative_to(bucket_name_local_path))
+                self._upload_file(bucket_name, local_file_path, s3_file_path_name)
 
     def _upload_file(self, bucket_name: str, local_file_path: Path, s3_file_path_name: str):
         # TODO try to use
@@ -56,8 +57,6 @@ class S3:
             if os.path.isdir(self._local_s3_objects_path.joinpath(file_name))
         ]
 
-    # TODO def _upload_directory(self, path, bucketname):
-    # TODO     """https://stackoverflow.com/questions/25380774/upload-a-directory-to-s3-with-boto"""
-    # TODO     for root,dirs,files in os.walk(path):
-    # TODO         for file in files:
-    # TODO             s3C.upload_file(os.path.join(root,file),bucketname,file)
+    def _get_file_paths_in_directory_path(self, directory_path: Path) -> list[Path]:
+        """https://stackoverflow.com/questions/25380774/upload-a-directory-to-s3-with-boto"""
+        return [Path(root, file_name) for root, _dirs, files in os.walk(directory_path) for file_name in files]
