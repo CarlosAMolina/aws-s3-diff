@@ -2,6 +2,9 @@
 awscli-local-s3-ls:
 	aws --endpoint-url http://localhost:5000 s3 ls
 
+awscli-local-s3-ls-bucket:
+	aws --endpoint-url http://localhost:5000 s3 ls s3://pets --recursive
+
 moto-run-local-server:
 	poetry run python tests/run_moto_server.py
 
