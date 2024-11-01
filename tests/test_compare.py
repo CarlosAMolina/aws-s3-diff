@@ -1,6 +1,7 @@
 import unittest
 from pathlib import Path
 
+import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas import to_datetime
@@ -27,6 +28,8 @@ class TestS3DataComparator(unittest.TestCase):
             .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})
         )
         expected_result = self._get_df_from_csv_expected_result()
+        expected_result = expected_result.replace({np.nan: None})
+        result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
 
     def _get_df_from_csv_expected_result(self) -> Df:
