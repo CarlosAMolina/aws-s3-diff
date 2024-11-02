@@ -1,7 +1,6 @@
 import datetime
 import unittest
 
-import boto3
 from dateutil.tz import tzutc
 from moto import mock_aws
 
@@ -17,28 +16,36 @@ class TestS3Client(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-        self.s3_client = boto3.client("s3")
         S3().create_objects()
 
     def tearDown(self):
         self.mock_aws.stop()
 
-    def test_get_s3_data_returns_expected_result(self):
+    def test_get_s3_data_returns_expected_result_for_bucket_cars(self):
+        file_name = "cars-20241014.csv"
+        file_size = 49
         s3_query = m_s3.S3Query("cars", "europe/spain/")
+        self._test_get_s3_data_returns_expected_result(file_name, file_size, s3_query)
+
+    def test_get_s3_data_returns_expected_result_for_bucket_pets(self):
+        file_name = "dogs-20241019.csv"
+        file_size = 20
+        s3_query = m_s3.S3Query("pets", "dogs/big_size/")
+        self._test_get_s3_data_returns_expected_result(file_name, file_size, s3_query)
+
+    def _test_get_s3_data_returns_expected_result(self, file_name: str, file_size: int, s3_query: m_s3.S3Query):
         s3_client = m_s3.S3Client()
         s3_data = s3_client.get_s3_data(s3_query)
-        result_cars = s3_data[0]
-        self._test_get_s3_data_returns_expected_result_for_file_name("cars-20241014.csv", 49, result_cars)
-        s3_query = m_s3.S3Query("pets", "dogs/big_size/")
-        s3_data = s3_client.get_s3_data(s3_query)
-        result_dogs = s3_data[0]
-        self._test_get_s3_data_returns_expected_result_for_file_name("dogs-20241019.csv", 20, result_dogs)
+        result = s3_data[0]
+        self._test_get_s3_data_returns_expected_result_for_file_name(file_name, file_size, result)
 
-    def _test_get_s3_data_returns_expected_result_for_file_name(self, file_name: str, size: int, result_to_check: dict):
+    def _test_get_s3_data_returns_expected_result_for_file_name(
+        self, file_name: str, file_size: int, result_to_check: dict
+    ):
         for key, expected_value in {
             "name": file_name,
             "date": datetime.datetime.now(tzutc()),
-            "size": size,
+            "size": file_size,
         }.items():
             if key == "date":
                 self.assertEqual(expected_value.date(), result_to_check[key].date())
