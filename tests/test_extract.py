@@ -1,6 +1,5 @@
 import unittest
 
-import boto3
 from moto import mock_aws
 from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
@@ -17,7 +16,6 @@ class TestFunction_run_using_config(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-        self.s3_client = boto3.client("s3")
         S3().create_objects()
 
     def tearDown(self):
