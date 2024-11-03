@@ -76,11 +76,8 @@ class Config:
 
     def _get_bucket_and_path_from_s3_uri(self, s3_uri: str) -> tuple[str, str]:
         # https://stackoverflow.com/a/47130367
-        match = re.match(r"s3:\/\/(.+?)\/(.+)", s3_uri)
-        bucket_name = match.group(1)
-        file_path = match.group(2)
-        return bucket_name, file_path
-        # TODO regex_date = r"s3://(?P<year>\d{2})/(?P<month>\d{2}).xlsx"
+        match = re.match(r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)", s3_uri)
+        return match.group("bucket_name"), match.group("file_path")
 
 
 def get_config() -> Config:
