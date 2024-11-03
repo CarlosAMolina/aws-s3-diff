@@ -4,7 +4,6 @@ from pathlib import Path
 import boto3
 
 
-# TODO use this in test_s3.py
 def set_aws_credentials():
     """ "
     http://docs.getmoto.org/en/latest/docs/getting_started.html#how-do-i-avoid-tests-from-mutating-my-real-infrastructure
