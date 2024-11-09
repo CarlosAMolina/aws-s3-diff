@@ -76,22 +76,25 @@ def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
     return result
 
 
-def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: dict, config: Config) -> Df:
+def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_local_files: dict, config: Config) -> Df:
     result = Df()
-    for bucket_name, file_names in buckets_and_files.items():
-        for file_name in file_names:
-            file_path_name = config.get_local_path_directory_results_to_compare().joinpath(
-                aws_account, bucket_name, file_name
+    for bucket_name, local_file_names in buckets_and_local_files.items():
+        for local_file_name in local_file_names:
+            local_file_path_name = config.get_local_path_directory_results_to_compare().joinpath(
+                aws_account, bucket_name, local_file_name
             )
-            file_df = _get_df_from_file(file_path_name)
+            file_df = _get_df_from_file(local_file_path_name)
             file_df = file_df.add_prefix(f"{aws_account}_value_")
-            file_df = _get_file_df_set_index(bucket_name, file_df, file_name)
+            file_df = _get_file_df_update_index(bucket_name, file_df, local_file_name)
             result = pd.concat([result, file_df])
     return result
 
 
-def _get_file_df_set_index(bucket_name: str, df: Df, file_name: str) -> Df:
-    return df.set_index(f"{bucket_name}_path_{file_name}_file_" + df.index.astype(str))
+def _get_file_df_update_index(bucket_name: str, df: Df, local_file_name: str) -> Df:
+    local_file_extension = ".csv"
+    assert local_file_name.endswith(local_file_extension)
+    s3_path_name = local_file_name[: -len(local_file_extension)]
+    return df.set_index(f"{bucket_name}_path_{s3_path_name}_file_" + df.index.astype(str))
 
 
 def _get_df_from_file(file_path_name: Path) -> Df:
@@ -118,7 +121,6 @@ def _get_index_multi_index(indexes: list[str]) -> list[tuple[str, str, str]]:
 def _get_tuple_index_multi_index(index: str) -> tuple[str, str, str]:
     bucket_name, path_and_file_name = index.split("_path_")
     path_name, file_name = path_and_file_name.split("_file_")
-    path_name = path_name.replace(".csv", "")
     return bucket_name, path_name, file_name
 
 
