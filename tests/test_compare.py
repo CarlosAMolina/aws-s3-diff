@@ -45,3 +45,16 @@ class TestS3DataComparator(unittest.TestCase):
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
+
+
+# TODO
+# class TestFunction_get_file_df_set_index(unittest.TestCase):
+#    def test_if_no_empty_file_df(self):
+#        df = Df()
+#        result = m_compare._get_file_df_set_index("bucket_a", df, "big_size")
+# TODO class TestFunction_get_df_combine_files_for_aws_account(unittest.TestCase):
+# TODO     def test_s3_path_is_added_if_path_with_files(self):
+# TODO         result = m_compare._get_df_combine_files("aws_account_pro", )
+# TODO
+# TODO     # TODO def test_s3_path_is_added_if_path_without_files(self):
+# TODO     # TODO     pass
