@@ -85,9 +85,13 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_files: d
             )
             file_df = _get_df_from_file(file_path_name)
             file_df = file_df.add_prefix(f"{aws_account}_value_")
-            file_df = file_df.set_index(f"{bucket_name}_path_{file_name}_file_" + file_df.index.astype(str))
+            file_df = _get_file_df_set_index(bucket_name, file_df, file_name)
             result = pd.concat([result, file_df])
     return result
+
+
+def _get_file_df_set_index(bucket_name: str, df: Df, file_name: str) -> Df:
+    return df.set_index(f"{bucket_name}_path_{file_name}_file_" + df.index.astype(str))
 
 
 def _get_df_from_file(file_path_name: Path) -> Df:
