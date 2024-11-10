@@ -87,19 +87,27 @@ class _S3UrisFileReader:
         result = {}
         with open(self._file_what_to_analyze_path) as f:
             for s3_uri in f.read().splitlines():
-                bucket_name, file_path_name = self._get_bucket_and_path_from_s3_uri(s3_uri)
+                bucket_name = self._get_bucket_from_s3_uri(s3_uri)
                 if bucket_name not in result:
                     result[bucket_name] = []
+                file_path_name = self._get_path_from_s3_uri(s3_uri)
                 result[bucket_name].append(file_path_name)
             return result
 
-    def _get_bucket_and_path_from_s3_uri(self, s3_uri: str) -> tuple[str, str]:
-        # https://stackoverflow.com/a/47130367
-        match = re.match(self._regex_bucket_and_file_path_from_uri, s3_uri)
-        return match.group("bucket_name"), match.group("file_path")
+    def _get_bucket_from_s3_uri(self, s3_uri: str) -> str:
+        return self._get_regex_match_s3_uri_parts(s3_uri).group("bucket_name")
+
+    def _get_path_from_s3_uri(self, s3_uri: str) -> str:
+        return self._get_regex_match_s3_uri_parts(s3_uri).group("file_path")
+
+    def _get_regex_match_s3_uri_parts(self, s3_uri: str) -> re.Match:
+        result = re.match(self._regex_bucket_and_file_path_from_uri, s3_uri)
+        assert result is not None
+        return result
 
     @property
     def _regex_bucket_and_file_path_from_uri(self) -> str:
+        """https://stackoverflow.com/a/47130367"""
         return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)"
 
 
