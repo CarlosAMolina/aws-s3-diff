@@ -56,9 +56,7 @@ class Config:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_file_name_for_s3_path_name_results(self, s3_path_name: str) -> str:
-        s3_path_name_clean = s3_path_name[:-1] if s3_path_name.endswith("/") else s3_path_name
-        exported_file_name = s3_path_name_clean.replace("/", "-")
-        return f"{exported_file_name}.csv"
+        return _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_path_name)
 
     # TODO
     def get_s3_path_from_results_local_file(self, local_file_name: str) -> str:
@@ -67,6 +65,13 @@ class Config:
     # TODO
     def _get_map_s3_path_and_local_file_results(self) -> dict[str, str]:
         return {}
+
+
+class _S3KeyConverter:
+    def get_local_file_name_for_results_from_s3_uri_key(self, s3_uri_key: str) -> str:
+        s3_uri_key_clean = s3_uri_key[:-1] if s3_uri_key.endswith("/") else s3_uri_key
+        exported_file_name = s3_uri_key_clean.replace("/", "-")
+        return f"{exported_file_name}.csv"
 
 
 class _S3UrisFileReader:
