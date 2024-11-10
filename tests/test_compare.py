@@ -63,3 +63,19 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
             {"aws_account_1_pro_value_date": {index: date_time}, "aws_account_1_pro_value_size": {index: 33201}}
         )
         assert_frame_equal(expected_result, result)
+
+    def test_if_empty_file_df(self):
+        df = Df(
+            {
+                "aws_account_1_pro_value_date": {},
+                "aws_account_1_pro_value_size": {},
+            }
+        )
+        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
+        index = "pets_path_dogs_big_size_file_dogs_20241014.csv"
+        expected_result = Df(
+            {"aws_account_1_pro_value_date": {index: None}, "aws_account_1_pro_value_size": {index: None}}
+        )
+        print(result)
+        print(expected_result)
+        assert_frame_equal(expected_result, result)
