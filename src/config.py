@@ -55,7 +55,7 @@ class Config:
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # TODO use
+    # TODO use in exported file with results
     def get_s3_key_from_results_local_file(self, local_file_name: str) -> str:
         return _S3KeyConverter().get_s3_uri_key_from_from_local_file_for_results(
             local_file_name, self._s3_uris_file_reader
@@ -109,9 +109,11 @@ class _S3KeyConverter:
     ) -> str:
         for s3_query in s3_uris_file_reader.get_s3_queries():
             local_file_name = self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
-            if local_file_name == s3_query.prefix:
+            if local_file_name == self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix):
                 return s3_query.prefix
-        raise ValueError(local_file_name)
+        raise ValueError(
+            f"No S3 Query in your configuration file with key for the local file results '{local_file_name}'"
+        )
 
 
 def get_config() -> Config:

@@ -86,8 +86,10 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_local_fi
             file_df = _get_df_from_file(local_file_path_name)
             # This `if` avoids Pandas's future warning message: https://github.com/pandas-dev/pandas/issues/55928
             if file_df.empty:
-                # TODO improve log: use s3 path instead of local_file_name
-                print(f"Bucket {bucket_name} without files for {local_file_name}. Omitting")
+                print(
+                    f"Bucket {bucket_name} without files for"
+                    f"{config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
+                )
             else:
                 file_df = file_df.add_prefix(f"{aws_account}_value_")
                 file_df = _get_file_df_update_index(bucket_name, file_df, local_file_name)
