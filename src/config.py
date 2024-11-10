@@ -75,33 +75,34 @@ class _S3UrisFileReader:
 
     def get_s3_queries(self) -> list[S3Query]:
         with open(self._file_what_to_analyze_path) as f:
-            return [
-                S3Query(
-                    self._get_bucket_from_s3_uri(s3_uri),
-                    self._get_path_from_s3_uri(s3_uri),
-                )
-                for s3_uri in f.read().splitlines()
-            ]
+            return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).path) for s3_uri in f.read().splitlines()]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
         with open(self._file_what_to_analyze_path) as f:
-            return list(set(self._get_bucket_from_s3_uri(s3_uri) for s3_uri in f.read().splitlines()))
+            return list(set(_S3UriParts(s3_uri).bucket for s3_uri in f.read().splitlines()))
 
-    def _get_bucket_from_s3_uri(self, s3_uri: str) -> str:
-        return self._get_regex_match_s3_uri_parts(s3_uri).group("bucket_name")
 
-    def _get_path_from_s3_uri(self, s3_uri: str) -> str:
-        return self._get_regex_match_s3_uri_parts(s3_uri).group("file_path")
+class _S3UriParts:
+    def __init__(self, s3_uri: str):
+        self._s3_uri = s3_uri
+
+    @property
+    def bucket(self) -> str:
+        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("bucket_name")
+
+    @property
+    def path(self) -> str:
+        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("object_path")
 
     def _get_regex_match_s3_uri_parts(self, s3_uri: str) -> re.Match:
-        result = re.match(self._regex_bucket_and_file_path_from_uri, s3_uri)
+        result = re.match(self._regex_s3_uri_parts, s3_uri)
         assert result is not None
         return result
 
     @property
-    def _regex_bucket_and_file_path_from_uri(self) -> str:
+    def _regex_s3_uri_parts(self) -> str:
         """https://stackoverflow.com/a/47130367"""
-        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)"
+        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_path>.+)"
 
 
 def get_config() -> Config:
