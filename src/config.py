@@ -55,20 +55,11 @@ class Config:
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # TODO
-    def get_s3_path_from_results_local_file(self, local_file_name: str) -> str:
-        return local_file_name
-
-    # TODO
-    def _get_map_s3_path_and_local_file_results(self) -> dict[str, str]:
-        return {}
-
-
-class _S3KeyConverter:
-    def get_local_file_name_for_results_from_s3_uri_key(self, s3_uri_key: str) -> str:
-        s3_uri_key_clean = s3_uri_key[:-1] if s3_uri_key.endswith("/") else s3_uri_key
-        exported_file_name = s3_uri_key_clean.replace("/", "-")
-        return f"{exported_file_name}.csv"
+    # TODO use
+    def get_s3_key_from_results_local_file(self, local_file_name: str) -> str:
+        return _S3KeyConverter().get_s3_uri_key_from_from_local_file_for_results(
+            local_file_name, self._s3_uris_file_reader
+        )
 
 
 class _S3UrisFileReader:
@@ -105,6 +96,22 @@ class _S3UriParts:
     def _regex_s3_uri_parts(self) -> str:
         """https://stackoverflow.com/a/47130367"""
         return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
+
+
+class _S3KeyConverter:
+    def get_local_file_name_for_results_from_s3_uri_key(self, s3_uri_key: str) -> str:
+        s3_uri_key_clean = s3_uri_key[:-1] if s3_uri_key.endswith("/") else s3_uri_key
+        exported_file_name = s3_uri_key_clean.replace("/", "-")
+        return f"{exported_file_name}.csv"
+
+    def get_s3_uri_key_from_from_local_file_for_results(
+        self, local_file_name: str, s3_uris_file_reader: _S3UrisFileReader
+    ) -> str:
+        for s3_query in s3_uris_file_reader.get_s3_queries():
+            local_file_name = self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
+            if local_file_name == s3_query.prefix:
+                return s3_query.prefix
+        raise ValueError(local_file_name)
 
 
 def get_config() -> Config:
