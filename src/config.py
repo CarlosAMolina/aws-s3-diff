@@ -75,7 +75,7 @@ class _S3UrisFileReader:
 
     def get_s3_queries(self) -> list[S3Query]:
         with open(self._file_what_to_analyze_path) as f:
-            return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).path) for s3_uri in f.read().splitlines()]
+            return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in f.read().splitlines()]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
         with open(self._file_what_to_analyze_path) as f:
@@ -91,8 +91,8 @@ class _S3UriParts:
         return self._get_regex_match_s3_uri_parts(self._s3_uri).group("bucket_name")
 
     @property
-    def path(self) -> str:
-        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("object_path")
+    def key(self) -> str:
+        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("object_key")
 
     def _get_regex_match_s3_uri_parts(self, s3_uri: str) -> re.Match:
         result = re.match(self._regex_s3_uri_parts, s3_uri)
@@ -102,7 +102,7 @@ class _S3UriParts:
     @property
     def _regex_s3_uri_parts(self) -> str:
         """https://stackoverflow.com/a/47130367"""
-        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_path>.+)"
+        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
 
 
 def get_config() -> Config:
