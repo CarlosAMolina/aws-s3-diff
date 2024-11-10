@@ -74,26 +74,23 @@ class _S3UrisFileReader:
         self._file_what_to_analyze_path = file_path
 
     def get_s3_queries(self) -> list[S3Query]:
+        dict_s3_uris_to_analyze = {}
+        with open(self._file_what_to_analyze_path) as f:
+            for s3_uri in f.read().splitlines():
+                bucket_name = self._get_bucket_from_s3_uri(s3_uri)
+                if bucket_name not in dict_s3_uris_to_analyze:
+                    dict_s3_uris_to_analyze[bucket_name] = []
+                file_path_name = self._get_path_from_s3_uri(s3_uri)
+                dict_s3_uris_to_analyze[bucket_name].append(file_path_name)
         return [
             S3Query(bucket, path_name)
-            for bucket, path_names in self._get_dict_s3_uris_to_analyze().items()
+            for bucket, path_names in dict_s3_uris_to_analyze.items()
             for path_name in path_names
         ]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
         with open(self._file_what_to_analyze_path) as f:
             return [self._get_bucket_from_s3_uri(s3_uri) for s3_uri in f.read().splitlines()]
-
-    def _get_dict_s3_uris_to_analyze(self) -> dict:
-        result = {}
-        with open(self._file_what_to_analyze_path) as f:
-            for s3_uri in f.read().splitlines():
-                bucket_name = self._get_bucket_from_s3_uri(s3_uri)
-                if bucket_name not in result:
-                    result[bucket_name] = []
-                file_path_name = self._get_path_from_s3_uri(s3_uri)
-                result[bucket_name].append(file_path_name)
-            return result
 
     def _get_bucket_from_s3_uri(self, s3_uri: str) -> str:
         return self._get_regex_match_s3_uri_parts(s3_uri).group("bucket_name")
