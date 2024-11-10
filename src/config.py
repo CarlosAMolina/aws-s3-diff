@@ -81,7 +81,8 @@ class _S3UrisFileReader:
         ]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
-        return list(self._get_dict_s3_uris_to_analyze().keys())
+        with open(self._file_what_to_analyze_path) as f:
+            return [self._get_bucket_from_s3_uri(s3_uri) for s3_uri in f.read().splitlines()]
 
     def _get_dict_s3_uris_to_analyze(self) -> dict:
         result = {}
