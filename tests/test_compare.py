@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from pathlib import Path
 
@@ -47,14 +48,18 @@ class TestS3DataComparator(unittest.TestCase):
         return result
 
 
-# TODO
-# class TestFunction_get_file_df_set_index(unittest.TestCase):
-#    def test_if_no_empty_file_df(self):
-#        df = Df()
-#        result = m_compare._get_file_df_set_index("bucket_a", df, "big_size")
-# TODO class TestFunction_get_df_combine_files_for_aws_account(unittest.TestCase):
-# TODO     def test_s3_path_is_added_if_path_with_files(self):
-# TODO         result = m_compare._get_df_combine_files("aws_account_pro", )
-# TODO
-# TODO     # TODO def test_s3_path_is_added_if_path_without_files(self):
-# TODO     # TODO     pass
+class TestFunction_get_file_df_set_index(unittest.TestCase):
+    def test_if_no_empty_file_df(self):
+        date_time = datetime.datetime(2024, 10, 14, 8, 49, 1)
+        df = Df(
+            {
+                "aws_account_1_pro_value_date": {"dogs_20241014.csv": date_time},
+                "aws_account_1_pro_value_size": {"dogs_20241014.csv": 33201},
+            }
+        )
+        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
+        index = "pets_path_dogs_big_size_file_dogs_20241014.csv"
+        expected_result = Df(
+            {"aws_account_1_pro_value_date": {index: date_time}, "aws_account_1_pro_value_size": {index: 33201}}
+        )
+        assert_frame_equal(expected_result, result)
