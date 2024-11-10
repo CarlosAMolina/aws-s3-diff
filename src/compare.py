@@ -101,15 +101,17 @@ def _get_file_df_update_index(bucket_name: str, df: Df, local_file_name: str) ->
     s3_path_name = local_file_name[: -len(local_file_extension)]
     result = df.copy()
     index_prefix = f"{bucket_name}_path_{s3_path_name}_file_"
-    # Ensure s3 path appears in the result despite it doesn't have files in any aws account.
+    # TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
     # TODO instead to add paths without files here, do it when all the aws accounts have been
-    # analized and only if the apth doesn't have file for all accounts, in other case it will
-    # add a wrong empty line to the final result
+    # TODO analized and only if the apth doesn't have file for all accounts, in other case it will
+    # TODO add a wrong empty line to the final result
     # TODO in the e2e tests check a s3 path without file in any aws account to assert it
-    # appears in the final result
+    # TODO appears in the final result. This can be added like this:
+    # TODO ```python
     # TODO if result.empty:
     # TODO     data ={column_name: [None] for column_name in result.columns}
     # TODO     return pd.DataFrame(data=data, index=pd.Index([index_prefix]))
+    # TODO ```
     return result.set_index(index_prefix + result.index.astype(str))
 
 
