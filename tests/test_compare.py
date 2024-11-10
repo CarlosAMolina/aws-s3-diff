@@ -71,6 +71,6 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
                 "aws_account_1_pro_value_size": {},
             }
         )
-        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
         expected_result = df.copy()
+        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
         assert_frame_equal(expected_result, result)
