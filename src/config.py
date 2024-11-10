@@ -49,14 +49,11 @@ class Config:
 
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results(s3_query.bucket)
-        file_name_query_results = self._get_file_name_for_s3_path_name_results(s3_query.prefix)
+        file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
         return exported_files_directory_path.joinpath(file_name_query_results)
 
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-
-    def _get_file_name_for_s3_path_name_results(self, s3_path_name: str) -> str:
-        return _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_path_name)
 
     # TODO
     def get_s3_path_from_results_local_file(self, local_file_name: str) -> str:
