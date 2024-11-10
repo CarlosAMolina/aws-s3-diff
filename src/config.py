@@ -79,6 +79,15 @@ class Config:
         match = re.match(r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)", s3_uri)
         return match.group("bucket_name"), match.group("file_path")
 
+    # TODO
+    def get_s3_path_from_results_local_file(self, local_file_name: str) -> str:
+        result = local_file_name
+        return result
+
+    # TODO
+    def _get_map_s3_path_and_local_file_results(self) -> dict[str, str]:
+        return {}
+
 
 def get_config() -> Config:
     current_path = Path(__file__).parent.absolute()
