@@ -95,8 +95,12 @@ class _S3UrisFileReader:
 
     def _get_bucket_and_path_from_s3_uri(self, s3_uri: str) -> tuple[str, str]:
         # https://stackoverflow.com/a/47130367
-        match = re.match(r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)", s3_uri)
+        match = re.match(self._regex_bucket_and_file_path_from_uri, s3_uri)
         return match.group("bucket_name"), match.group("file_path")
+
+    @property
+    def _regex_bucket_and_file_path_from_uri(self) -> str:
+        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<file_path>.+)"
 
 
 def get_config() -> Config:

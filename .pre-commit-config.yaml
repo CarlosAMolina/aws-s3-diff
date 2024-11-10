@@ -10,3 +10,11 @@ repos:
       # Run the formatter.
       - id: ruff-format
         types_or: [ python, pyi ]
+  - repo: local
+    hooks:
+    -   id: tests
+        name: run all tests
+        entry: poetry run python -m unittest discover
+        language: system
+        pass_filenames: false
+        verbose: true
