@@ -19,6 +19,7 @@ class _S3DataComparator:
     def run(self, config: Config):
         s3_analyzed_df = self._get_df_s3_data_analyzed(config)
         _show_summary(config, s3_analyzed_df)
+        # TODO save in this projects instead of in /tmp
         _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
 
     def _get_df_s3_data_analyzed(self, config: Config) -> Df:
@@ -34,6 +35,7 @@ def _get_df_combine_files(config: Config) -> Df:
         result = result.join(account_df, how="outer")
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
+    # TODO instead of s3_path, use file_path_s3
     result.index = pd.MultiIndex.from_tuples(
         _get_index_multi_index(result.index), names=["bucket", "s3_path", "file_name"]
     )
@@ -87,22 +89,20 @@ def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_local_fi
             # This `if` avoids Pandas's future warning message: https://github.com/pandas-dev/pandas/issues/55928
             if file_df.empty:
                 print(
-                    f"Bucket {bucket_name} without files for"
-                    f"{config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
+                    f"Account {aws_account} and bucket {bucket_name} without files for"
+                    f" {config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
                 )
             else:
                 file_df = file_df.add_prefix(f"{aws_account}_value_")
-                file_df = _get_file_df_update_index(bucket_name, file_df, local_file_name)
+                file_df = _get_file_df_update_index(bucket_name, config, file_df, local_file_name)
                 result = pd.concat([result, file_df])
     return result
 
 
-def _get_file_df_update_index(bucket_name: str, df: Df, local_file_name: str) -> Df:
-    local_file_extension = ".csv"
-    assert local_file_name.endswith(local_file_extension)
-    s3_path_name = local_file_name[: -len(local_file_extension)]
+def _get_file_df_update_index(bucket_name: str, config: Config, df: Df, local_file_name: str) -> Df:
+    s3_key = config.get_s3_key_from_results_local_file(local_file_name)
+    index_prefix = f"{bucket_name}_path_{s3_key}_file_"
     result = df.copy()
-    index_prefix = f"{bucket_name}_path_{s3_path_name}_file_"
     # TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
     # TODO instead to add paths without files here, do it when all the aws accounts have been
     # TODO analized and only if the apth doesn't have file for all accounts, in other case it will

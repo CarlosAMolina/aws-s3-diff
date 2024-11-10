@@ -49,6 +49,10 @@ class TestS3DataComparator(unittest.TestCase):
 
 
 class TestFunction_get_file_df_set_index(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.config = get_config_for_the_test()
+
     def test_if_no_empty_file_df(self):
         date_time = datetime.datetime(2024, 10, 14, 8, 49, 1)
         df = Df(
@@ -57,8 +61,8 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
                 "aws_account_1_pro_value_size": {"dogs_20241014.csv": 33201},
             }
         )
-        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
-        index = "pets_path_dogs_big_size_file_dogs_20241014.csv"
+        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs_big_size.csv")
+        index = "pets_path_dogs/big_size_file_dogs_20241014.csv"
         expected_result = Df(
             {"aws_account_1_pro_value_date": {index: date_time}, "aws_account_1_pro_value_size": {index: 33201}}
         )
@@ -72,5 +76,5 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
             }
         )
         expected_result = df.copy()
-        result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
+        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs_big_size.csv")
         assert_frame_equal(expected_result, result)
