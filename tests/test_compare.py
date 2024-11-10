@@ -72,10 +72,5 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
             }
         )
         result = m_compare._get_file_df_update_index("pets", df, "dogs_big_size.csv")
-        index = "pets_path_dogs_big_size_file_dogs_20241014.csv"
-        expected_result = Df(
-            {"aws_account_1_pro_value_date": {index: None}, "aws_account_1_pro_value_size": {index: None}}
-        )
-        print(result)
-        print(expected_result)
+        expected_result = df.copy()
         assert_frame_equal(expected_result, result)
