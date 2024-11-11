@@ -108,7 +108,6 @@ class _S3KeyConverter:
         self, local_file_name: str, s3_uris_file_reader: _S3UrisFileReader
     ) -> str:
         for s3_query in s3_uris_file_reader.get_s3_queries():
-            local_file_name = self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
             if local_file_name == self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix):
                 return s3_query.prefix
         raise ValueError(
