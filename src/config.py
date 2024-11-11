@@ -124,8 +124,12 @@ class _S3KeyConverter:
         )
 
 
+def _get_user_input_aws_account_to_work_with() -> str:
+    return input("Write the aws_account to work with and press enter")
+
+
 def get_config() -> Config:
-    aws_account = input("Write the aws_account to work with and press enter")
+    aws_account = _get_user_input_aws_account_to_work_with()
     current_path = Path(__file__).parent.absolute()
     directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
     file_what_to_analyze_path = current_path.joinpath(FILE_NAME_S3_URIS)
