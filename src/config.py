@@ -3,6 +3,8 @@ import os
 import re
 from pathlib import Path
 
+from pandas import read_csv
+
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FILE_NAME_S3_URIS
@@ -65,14 +67,21 @@ class Config:
 class _S3UrisFileReader:
     def __init__(self, file_path: Path):
         self._file_what_to_analyze_path = file_path
+        self._aws_account = "aws_account_1_pro"  # TODO work with all accounts.
 
     def get_s3_queries(self) -> list[S3Query]:
-        with open(self._file_what_to_analyze_path) as f:
-            return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in f.read().splitlines()]
+        return [
+            S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
+            for s3_uri in read_csv(self._file_what_to_analyze_path)[self._aws_account].to_list()
+        ]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
-        with open(self._file_what_to_analyze_path) as f:
-            return list(set(_S3UriParts(s3_uri).bucket for s3_uri in f.read().splitlines()))
+        return list(
+            set(
+                _S3UriParts(s3_uri).bucket
+                for s3_uri in read_csv(self._file_what_to_analyze_path)[self._aws_account].to_list()
+            )
+        )
 
 
 class _S3UriParts:
