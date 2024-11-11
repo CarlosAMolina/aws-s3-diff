@@ -11,7 +11,7 @@ In your terminal, generate AWS credentials to allow botocore to connect with you
 Run:
 
 ```bash
-python extract.py
+poetry run python src/extract.py
 ```
 
 Now we have the results for the buckets of one account, to work with another account we must execute the following manual steps to save these results:
@@ -28,7 +28,7 @@ Let's create the second AWS account results!
 After update the `s3-uris-to-analyze.txt` file with the second account S3 URIs, we authenticate in the terminal to the second AWS account and run:
 
 ```bash
-python extract.py
+poetry run python src/extract.py
 ```
 
 We save the created files:
