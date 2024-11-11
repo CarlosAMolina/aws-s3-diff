@@ -16,7 +16,7 @@ from types_custom import S3Query
 class Config:
     def __init__(self, aws_account: str, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
         self._directory_s3_results_path = directory_s3_results_path
-        self._s3_uris_file_reader = _S3UrisFileReader(aws_account, file_what_to_analyze_path)
+        self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
@@ -65,12 +65,17 @@ class Config:
 
 
 class _S3UrisFileReader:
-    def __init__(self, aws_account: str, file_path: Path):
-        self._aws_account = aws_account
+    def __init__(self, file_path: Path):
         self._file_what_to_analyze_path = file_path
 
     def get_aws_accounts(self) -> list[str]:
         return read_csv(self._file_what_to_analyze_path).columns.to_list()
+
+
+class _AwsAccountS3UrisFileReader:
+    def __init__(self, aws_account: str, file_path: Path):
+        self._aws_account = aws_account
+        self._file_what_to_analyze_path = file_path
 
     def get_s3_queries(self) -> list[S3Query]:
         return [
@@ -117,7 +122,7 @@ class _S3KeyConverter:
         return f"{exported_file_name}.csv"
 
     def get_s3_uri_key_from_from_local_file_for_results(
-        self, local_file_name: str, s3_uris_file_reader: _S3UrisFileReader
+        self, local_file_name: str, s3_uris_file_reader: _AwsAccountS3UrisFileReader
     ) -> str:
         for s3_query in s3_uris_file_reader.get_s3_queries():
             if local_file_name == self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix):
@@ -127,9 +132,9 @@ class _S3KeyConverter:
         )
 
 
-def _get_user_input_aws_account_to_work_with(s3_uris_file_reader: _S3UrisFileReader) -> str:
+def _get_user_input_aws_account_to_work_with(file_what_to_analyze_path: Path) -> str:
     print("Select an aws account to work with and press enter. Available options:")
-    aws_accounts = s3_uris_file_reader.get_aws_accounts()
+    aws_accounts = _S3UrisFileReader(file_what_to_analyze_path).get_aws_accounts()
     input_options = [f"{index}) {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
     print("\n".join(input_options))
     print("Write one of the previous numbers and press enter")
@@ -145,6 +150,5 @@ def get_config() -> Config:
     current_path = Path(__file__).parent.absolute()
     directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
     file_what_to_analyze_path = current_path.joinpath(FILE_NAME_S3_URIS)
-    s3_uris_file_reader = _S3UrisFileReader(None, file_what_to_analyze_path)  # TODO not use None
-    aws_account = _get_user_input_aws_account_to_work_with(s3_uris_file_reader)
+    aws_account = _get_user_input_aws_account_to_work_with(file_what_to_analyze_path)
     return Config(aws_account, directory_s3_results_path, file_what_to_analyze_path)
