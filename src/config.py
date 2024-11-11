@@ -14,9 +14,8 @@ from types_custom import S3Query
 
 
 class Config:
-    def __init__(self, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
+    def __init__(self, aws_account: str, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
         self._directory_s3_results_path = directory_s3_results_path
-        aws_account = "aws_account_1_pro"  # TODO work with all accounts.
         self._s3_uris_file_reader = _S3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
@@ -126,7 +125,8 @@ class _S3KeyConverter:
 
 
 def get_config() -> Config:
+    aws_account = input("Write the aws_account to work with and press enter")
     current_path = Path(__file__).parent.absolute()
     directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
     file_what_to_analyze_path = current_path.joinpath(FILE_NAME_S3_URIS)
-    return Config(directory_s3_results_path, file_what_to_analyze_path)
+    return Config(aws_account, directory_s3_results_path, file_what_to_analyze_path)
