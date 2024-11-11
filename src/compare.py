@@ -35,9 +35,8 @@ def _get_df_combine_files(config: Config) -> Df:
         result = result.join(account_df, how="outer")
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
-    # TODO instead of s3_path, use file_path_s3
     result.index = pd.MultiIndex.from_tuples(
-        _get_index_multi_index(result.index), names=["bucket", "s3_path", "file_name"]
+        _get_index_multi_index(result.index), names=["bucket", "file_path_in_s3", "file_name"]
     )
     return result
 
