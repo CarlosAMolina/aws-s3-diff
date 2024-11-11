@@ -3,6 +3,7 @@ import os
 import re
 from pathlib import Path
 
+from pandas import DataFrame as Df
 from pandas import read_csv
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
@@ -69,27 +70,27 @@ class _S3UrisFileReader:
         self._file_what_to_analyze_path = file_path
 
     def get_aws_accounts(self) -> list[str]:
-        return read_csv(self._file_what_to_analyze_path).columns.to_list()
+        return self._get_df_file_what_to_analyze().columns.to_list()
+
+    def _get_df_file_what_to_analyze(self) -> Df:
+        return read_csv(self._file_what_to_analyze_path)
 
 
-class _AwsAccountS3UrisFileReader:
+class _AwsAccountS3UrisFileReader(_S3UrisFileReader):
     def __init__(self, aws_account: str, file_path: Path):
         self._aws_account = aws_account
         self._file_what_to_analyze_path = file_path
 
     def get_s3_queries(self) -> list[S3Query]:
         return [
-            S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
-            for s3_uri in read_csv(self._file_what_to_analyze_path)[self._aws_account].to_list()
+            S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in self._get_s3_uris_to_analyze()
         ]
 
     def get_bucket_names_to_analyze(self) -> list[str]:
-        return list(
-            set(
-                _S3UriParts(s3_uri).bucket
-                for s3_uri in read_csv(self._file_what_to_analyze_path)[self._aws_account].to_list()
-            )
-        )
+        return list(set(_S3UriParts(s3_uri).bucket for s3_uri in self._get_s3_uris_to_analyze()))
+
+    def _get_s3_uris_to_analyze(self) -> list[str]:
+        return self._get_df_file_what_to_analyze()[self._aws_account].to_list()
 
 
 class _S3UriParts:
