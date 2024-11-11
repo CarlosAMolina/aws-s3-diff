@@ -16,7 +16,8 @@ from types_custom import S3Query
 class Config:
     def __init__(self, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
         self._directory_s3_results_path = directory_s3_results_path
-        self._s3_uris_file_reader = _S3UrisFileReader(file_what_to_analyze_path)
+        aws_account = "aws_account_1_pro"  # TODO work with all accounts.
+        self._s3_uris_file_reader = _S3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
     def get_aws_accounts(self) -> list[str]:
@@ -65,9 +66,9 @@ class Config:
 
 
 class _S3UrisFileReader:
-    def __init__(self, file_path: Path):
+    def __init__(self, aws_account: str, file_path: Path):
+        self._aws_account = aws_account
         self._file_what_to_analyze_path = file_path
-        self._aws_account = "aws_account_1_pro"  # TODO work with all accounts.
 
     def get_s3_queries(self) -> list[S3Query]:
         return [
