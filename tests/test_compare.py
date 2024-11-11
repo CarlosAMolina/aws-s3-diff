@@ -61,7 +61,7 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
                 "aws_account_1_pro_value_size": {"dogs_20241014.csv": 33201},
             }
         )
-        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs_big_size.csv")
+        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs-big_size.csv")
         index = "pets_path_dogs/big_size_file_dogs_20241014.csv"
         expected_result = Df(
             {"aws_account_1_pro_value_date": {index: date_time}, "aws_account_1_pro_value_size": {index: 33201}}
@@ -76,5 +76,5 @@ class TestFunction_get_file_df_set_index(unittest.TestCase):
             }
         )
         expected_result = df.copy()
-        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs_big_size.csv")
+        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs-big_size.csv")
         assert_frame_equal(expected_result, result)

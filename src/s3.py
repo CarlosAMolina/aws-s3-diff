@@ -19,6 +19,18 @@ class S3Client:
         page_iterator = paginator.paginate(**operation_parameters)
         result = []
         for page in page_iterator:
+            if page["KeyCount"] == 0:
+                if len(result) > 0:
+                    raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
+                # TODO try return empty list[dict] and check if all works ok,
+                # TODO this is better to avoid two dicts to update when the headers change.
+                return [
+                    {
+                        "name": None,
+                        "date": None,
+                        "size": None,
+                    }
+                ]
             page_files = [
                 {
                     "name": self._get_file_name_from_response_key(content),

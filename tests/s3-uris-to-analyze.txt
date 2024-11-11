@@ -1,1 +1,3 @@
+s3://cars/europe/spain
 s3://pets/dogs/big_size
+s3://pets/horses/europe
