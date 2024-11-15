@@ -1,7 +1,7 @@
 bucket,file_path_in_s3,file_name,aws_account_1_pro_date,aws_account_1_pro_size,aws_account_2_release_date,aws_account_2_release_size,aws_account_3_dev_date,aws_account_3_dev_size,is_sync_ok_in_aws_account_2_release,is_sync_ok_in_aws_account_3_dev,must_exist_in_aws_account_2_release
 cars,europe/spain,cars_20241014.csv,2024-10-14 08:49:01+00:00,49,2024-10-19 22:33:01+00:00,49,2024-10-14 08:49:01+00:00,49,True,True,
 pets,dogs/big_size,dogs-20240914.csv,2024-09-14 20:11:33+00:00,23543,2024-09-14 22:01:33+00:00,23543,2024-09-14 22:11:33+00:00,23543,True,True,
-pets,dogs/big_size,dogs-20241015.csv,2024-10-15 10:23:18+00:00,123433,2024-10-15 11:20:18+00:00,123433,2024-10-15 12:29:18+00:00,553433,True,False,
+pets,dogs/big_size,dogs-20241015.csv,2024-10-15 10:23:18+00:00,28,2024-10-15 11:20:18+00:00,28,2024-10-15 12:29:18+00:00,19,True,False,
 pets,dogs/big_size,dogs-20241019.csv,2024-10-19 06:50:08+00:00,20,2024-10-19 07:52:08+00:00,38,2024-10-19 09:55:08+00:00,20,False,True,
 pets,dogs/big_size,dogs-20241020-test.csv,,,2024-10-20 19:31:01+00:00,332,,,No file to sync,No file to sync,False
 pets,dogs/big_size,dogs-20241021.csv,,,,,2024-10-21 10:50:08+00:00,196,No file to sync,No file to sync,
