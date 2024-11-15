@@ -4,5 +4,5 @@ pets,dogs/big_size,dogs-20240914.csv,2024-09-14 20:11:33+00:00,20,2024-09-14 22:
 pets,dogs/big_size,dogs-20241015.csv,2024-10-15 10:23:18+00:00,28,2024-10-15 11:20:18+00:00,28,2024-10-15 12:29:18+00:00,19,True,False,
 pets,dogs/big_size,dogs-20241019.csv,2024-10-19 06:50:08+00:00,20,2024-10-19 07:52:08+00:00,38,2024-10-19 09:55:08+00:00,20,False,True,
 pets,dogs/big_size,dogs-20241020-test.csv,,,2024-10-20 19:31:01+00:00,44,,,No file to sync,No file to sync,False
-pets,dogs/big_size,dogs-20241021.csv,,,,,2024-10-21 10:50:08+00:00,196,No file to sync,No file to sync,
+pets,dogs/big_size,dogs-20241021.csv,,,,,2024-10-21 10:50:08+00:00,28,No file to sync,No file to sync,
 pets,horses/europe,horses-20210219.csv,,,,,2021-02-19 23:15:08+00:00,68,No file to sync,No file to sync,
