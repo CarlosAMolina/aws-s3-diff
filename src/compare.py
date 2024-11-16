@@ -24,7 +24,7 @@ class S3DataComparator:
 def _get_df_combine_files(config: Config) -> Df:
     result = Df()
     buckets_and_files: dict = _get_buckets_and_exported_files(config)
-    for aws_account in config.get_aws_accounts():
+    for aws_account in config.get_aws_accounts_exported():
         account_df = _get_df_combine_files_for_aws_account(aws_account, buckets_and_files, config)
         result = result.join(account_df, how="outer")
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
@@ -41,7 +41,7 @@ def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
         config.get_local_path_directory_results_to_compare().joinpath(aws_account_with_data_to_sync)
     )
     bucket_names.sort()
-    accounts = config.get_aws_accounts()
+    accounts = config.get_aws_accounts_exported()
     accounts.remove(aws_account_with_data_to_sync)
     accounts.sort()
     for account in accounts:
@@ -201,7 +201,7 @@ class _S3DataAnalyzer:
 
 
 def _get_accounts_where_files_must_be_copied(config: Config) -> list[str]:
-    result = config.get_aws_accounts()
+    result = config.get_aws_accounts_exported()
     aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     result.remove(aws_account_with_data_to_sync)
     return result

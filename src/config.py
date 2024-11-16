@@ -20,20 +20,20 @@ class Config:
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
-    def get_aws_accounts(self) -> list[str]:
+    def get_aws_accounts_exported(self) -> list[str]:
         path_to_check = self.get_local_path_directory_results_to_compare()
         result = os.listdir(path_to_check)
         result.sort()
         return result
 
     def get_aws_account_with_data_to_sync(self) -> str:
-        for aws_account in self.get_aws_accounts():
+        for aws_account in self.get_aws_accounts_exported():
             if aws_account.startswith(AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX):
                 return aws_account
         raise ValueError("No aws account to sync")
 
     def get_aws_account_that_must_not_have_more_files(self) -> str:
-        for aws_account in self.get_aws_accounts():
+        for aws_account in self.get_aws_accounts_exported():
             if aws_account.startswith(AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
                 return aws_account
         raise ValueError("No aws account that must not have more files")
