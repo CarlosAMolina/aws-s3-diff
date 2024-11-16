@@ -8,7 +8,6 @@ from pandas import read_csv
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
-from constants import FILE_NAME_S3_URIS
 from constants import FOLDER_NAME_S3_RESULTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from types_custom import S3Query
@@ -65,7 +64,16 @@ class Config:
         )
 
 
-class _S3UrisFileReader:
+class _S3UrisFile:
+    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.txt"
+
+    @property
+    def file_path(self) -> Path:
+        current_path = Path(__file__).parent.absolute()
+        return current_path.joinpath(self._FILE_NAME_S3_URIS)
+
+
+class S3UrisFileReader:
     def __init__(self, file_path: Path):
         self._file_what_to_analyze_path = file_path
 
@@ -76,7 +84,7 @@ class _S3UrisFileReader:
         return read_csv(self._file_what_to_analyze_path)
 
 
-class _AwsAccountS3UrisFileReader(_S3UrisFileReader):
+class _AwsAccountS3UrisFileReader(S3UrisFileReader):
     def __init__(self, aws_account: str, file_path: Path):
         self._aws_account = aws_account
         self._file_what_to_analyze_path = file_path
@@ -135,7 +143,7 @@ class _S3KeyConverter:
 
 def _get_user_input_aws_account_to_work_with(file_what_to_analyze_path: Path) -> str:
     print("Select an aws account to work with and press enter. Available options:")
-    aws_accounts = _S3UrisFileReader(file_what_to_analyze_path).get_aws_accounts()
+    aws_accounts = S3UrisFileReader(file_what_to_analyze_path).get_aws_accounts()
     input_options = [f"{index}) {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
     print("\n".join(input_options))
     print("Write one of the previous numbers and press enter")
@@ -147,9 +155,13 @@ def _get_user_input_aws_account_to_work_with(file_what_to_analyze_path: Path) ->
     return aws_accounts[input_int - 1]
 
 
+def get_s3_uris_file_reader() -> S3UrisFileReader:
+    return S3UrisFileReader(_S3UrisFile().file_path)
+
+
 def get_config() -> Config:
     current_path = Path(__file__).parent.absolute()
     directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
-    file_what_to_analyze_path = current_path.joinpath(FILE_NAME_S3_URIS)
+    file_what_to_analyze_path = _S3UrisFile().file_path
     aws_account = _get_user_input_aws_account_to_work_with(file_what_to_analyze_path)
     return Config(aws_account, directory_s3_results_path, file_what_to_analyze_path)
