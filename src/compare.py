@@ -5,17 +5,11 @@ import pandas as pd
 from pandas import DataFrame as Df
 
 from config import Config
-from config import get_config
 
 FilePathNamesToCompare = tuple[str, str, str]
 
 
-def run():
-    config = get_config()
-    _S3DataComparator().run(config)
-
-
-class _S3DataComparator:
+class S3DataComparator:
     def run(self, config: Config):
         s3_analyzed_df = self._get_df_s3_data_analyzed(config)
         _show_summary(config, s3_analyzed_df)
@@ -243,7 +237,3 @@ class _CsvExporter:
         if column_name.startswith("analysis_"):
             return column_name.replace("analysis_", "", 1)
         return column_name
-
-
-if __name__ == "__main__":
-    run()

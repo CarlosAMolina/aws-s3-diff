@@ -19,8 +19,8 @@ class TestS3DataComparator(unittest.TestCase):
 
     def test_get_df_s3_data_analyzed(self):
         config = get_config_for_the_test()
-        result = m_compare._S3DataComparator()._get_df_s3_data_analyzed(config)
-        # m_compare._S3DataComparator().run(config)
+        result = m_compare.S3DataComparator()._get_df_s3_data_analyzed(config)
+        # m_compare.S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
             m_compare._CsvExporter()
