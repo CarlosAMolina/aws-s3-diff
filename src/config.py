@@ -141,27 +141,12 @@ class _S3KeyConverter:
         )
 
 
-def _get_user_input_aws_account_to_work_with(file_what_to_analyze_path: Path) -> str:
-    print("Select an aws account to work with and press enter. Available options:")
-    aws_accounts = S3UrisFileReader(file_what_to_analyze_path).get_aws_accounts()
-    input_options = [f"{index}) {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
-    print("\n".join(input_options))
-    print("Write one of the previous numbers and press enter")
-    while True:
-        input_int = int(input())
-        if 0 < input_int <= len(input_options):
-            break
-        print("Not valid opcion")
-    return aws_accounts[input_int - 1]
-
-
 def get_s3_uris_file_reader() -> S3UrisFileReader:
     return S3UrisFileReader(_S3UrisFile().file_path)
 
 
-def get_config() -> Config:
+def get_config(aws_account: str) -> Config:
     current_path = Path(__file__).parent.absolute()
     directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
     file_what_to_analyze_path = _S3UrisFile().file_path
-    aws_account = _get_user_input_aws_account_to_work_with(file_what_to_analyze_path)
     return Config(aws_account, directory_s3_results_path, file_what_to_analyze_path)
