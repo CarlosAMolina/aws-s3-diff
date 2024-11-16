@@ -17,6 +17,9 @@ ruff-check-fix:
 ruff-format:
 	poetry run ruff format
 
+run:
+	poetry run python src/main.py
+
 test:
 	poetry run python -m unittest discover
 
