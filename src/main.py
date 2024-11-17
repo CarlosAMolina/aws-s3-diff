@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from config import Config
 from config import get_s3_uris_file_reader
 
 FilePathNamesToCompare = tuple[str, str, str]
@@ -12,9 +11,6 @@ def run():
 
 
 class _IteractiveMenu:
-    def __init__(self, config: Config):
-        self._config = config
-
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
         self._show_aws_accounts_to_analyze()
@@ -24,7 +20,7 @@ class _IteractiveMenu:
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
         aws_accounts = get_s3_uris_file_reader().get_aws_accounts()
-        aws_accounts_list = [f"{index}) {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
+        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
         print("\n".join(aws_accounts_list))
 
 
