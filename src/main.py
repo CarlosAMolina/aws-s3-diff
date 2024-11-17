@@ -1,3 +1,6 @@
+import datetime
+import os
+import sys
 from pathlib import Path
 
 from config import get_s3_uris_file_reader
@@ -7,32 +10,68 @@ FilePathNamesToCompare = tuple[str, str, str]
 
 def run():
     _IteractiveMenu().run()
-    # TODO S3DataComparator().run(config)
 
 
 class _IteractiveMenu:
+    def __init__(self):
+        self._s3_uris_file_reader = get_s3_uris_file_reader()
+
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
         self._show_aws_accounts_to_analyze()
-        print("Checking if any AWS account has been analyzed")
-        # if _LocalResults().has_any_account_been_analyzed():
+        aws_account_to_analyze = self._get_aws_account_to_analyze()
+        print(f"The following AWS account will be analyzed: {aws_account_to_analyze}")
+        self._exit_program_if_no_aws_credentials_in_terminal()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
-        aws_accounts = get_s3_uris_file_reader().get_aws_accounts()
+        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
         print("\n".join(aws_accounts_list))
+
+    def _get_aws_account_to_analyze(self) -> str:
+        aws_account_index_to_analyze = _LocalResults().get_aws_account_index_to_analyze()
+        aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
+        return aws_accounts_to_analyze[aws_account_index_to_analyze]
+
+    def _exit_program_if_no_aws_credentials_in_terminal(self):
+        print("Have you generated in you terminal the AWS credentials to connect with that AWS account?")
+        while True:
+            user_input = input("[y]/n")
+            if user_input == "n":
+                print("Generate the credentials to work with that AWS account and run the program again")
+                sys.exit()
+            elif user_input == "y":
+                return
 
 
 class _LocalResults:
     # TODO remove this file when the 3º account has been analyzed.
     _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
 
-    def has_any_account_been_analyzed(self) -> bool:
-        return Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file()
+    def get_aws_account_index_to_analyze(self) -> int:
+        aws_accounts_analyzed = self._get_aws_accounts_analyzed()
+        if len(aws_accounts_analyzed) > 2:
+            raise ValueError
+        return len(aws_accounts_analyzed) + 1
 
-    @property
-    def analysis_date_time_str(self) -> str:
+    def _get_aws_accounts_analyzed(self) -> list[str]:
+        return os.listdir(self._get_path_analysis_results())
+
+    def _get_path_analysis_results(self) -> Path:
+        return Path("/tmp", self._get_analysis_date_time_str())
+
+    def _get_analysis_date_time_str(self) -> str:
+        if not Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file():
+            self._export_date_time_str()
+        return self._get_date_time_str_stored()
+
+    def _export_date_time_str(self):
+        date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        with open(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME, "w") as file:
+            file.write(date_time_str)
+
+    def _get_date_time_str_stored(self) -> str:
         with open(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME) as file:
             return file.read()
 
