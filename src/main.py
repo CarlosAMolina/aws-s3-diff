@@ -23,6 +23,7 @@ class _IteractiveMenu:
         aws_account_to_analyze = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account_to_analyze}")
         self._exit_program_if_no_aws_credentials_in_terminal()
+        print(f"Analyzing the account: {aws_account_to_analyze}")
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -54,7 +55,7 @@ class _LocalResults:
         number_of_aws_accounts_analyzed = self._get_number_of_aws_accounts_analyzed()
         if number_of_aws_accounts_analyzed > 2:
             raise ValueError
-        return number_of_aws_accounts_analyzed + 1
+        return number_of_aws_accounts_analyzed
 
     def _get_number_of_aws_accounts_analyzed(self) -> int:
         return len(self._get_aws_accounts_analyzed())
