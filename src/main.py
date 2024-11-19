@@ -16,6 +16,7 @@ def run():
 class _IteractiveMenu:
     def __init__(self):
         self._s3_uris_file_reader = get_s3_uris_file_reader()
+        self._local_results = _LocalResults()
 
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
@@ -24,7 +25,7 @@ class _IteractiveMenu:
         print(f"The following AWS account will be analyzed: {aws_account_to_analyze}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         print(f"Analyzing the account: {aws_account_to_analyze}")
-        _LocalResults().create_analysis_results_folder_if_required(
+        self._local_results.create_analysis_results_folder_if_required(
             self._s3_uris_file_reader.get_number_of_aws_accounts()
         )
 
@@ -35,7 +36,7 @@ class _IteractiveMenu:
         print("\n".join(aws_accounts_list))
 
     def _get_aws_account_to_analyze(self) -> str:
-        aws_account_index_to_analyze = _LocalResults().get_aws_account_index_to_analyze()
+        aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
         return aws_accounts_to_analyze[aws_account_index_to_analyze]
 
