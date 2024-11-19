@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from config import get_s3_uris_file_reader
+from constants import FOLDER_NAME_S3_RESULTS
 
 FilePathNamesToCompare = tuple[str, str, str]
 
@@ -50,16 +51,23 @@ class _LocalResults:
     _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
 
     def get_aws_account_index_to_analyze(self) -> int:
-        aws_accounts_analyzed = self._get_aws_accounts_analyzed()
-        if len(aws_accounts_analyzed) > 2:
+        number_of_aws_accounts_analyzed = self._get_number_of_aws_accounts_analyzed()
+        if number_of_aws_accounts_analyzed > 2:
             raise ValueError
-        return len(aws_accounts_analyzed) + 1
+        return number_of_aws_accounts_analyzed + 1
+
+    def _get_number_of_aws_accounts_analyzed(self) -> int:
+        return len(self._get_aws_accounts_analyzed())
 
     def _get_aws_accounts_analyzed(self) -> list[str]:
-        return os.listdir(self._get_path_analysis_results())
+        try:
+            return os.listdir(self._get_path_analysis_results())
+        except FileNotFoundError:
+            return []
 
     def _get_path_analysis_results(self) -> Path:
-        return Path("/tmp", self._get_analysis_date_time_str())
+        current_path = Path(__file__).parent.absolute()
+        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS, self._get_analysis_date_time_str())
 
     def _get_analysis_date_time_str(self) -> str:
         if not Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file():
