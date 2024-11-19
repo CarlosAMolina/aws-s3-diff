@@ -24,6 +24,9 @@ class _IteractiveMenu:
         print(f"The following AWS account will be analyzed: {aws_account_to_analyze}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         print(f"Analyzing the account: {aws_account_to_analyze}")
+        _LocalResults().create_analysis_results_folder_if_required(
+            self._s3_uris_file_reader.get_number_of_aws_accounts()
+        )
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -67,7 +70,7 @@ class _LocalResults:
             self._create_analysis_results_folder()
 
     def _create_analysis_results_folder(self):
-        print(f"Creating results folder: {self._get_path_analysis_results()}")
+        print(f"Creating the results folder: {self._get_path_analysis_results()}")
         self._get_path_analysis_results().mkdir()
 
     def _get_number_of_aws_accounts_analyzed(self) -> int:

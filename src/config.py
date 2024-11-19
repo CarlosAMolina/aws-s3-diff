@@ -80,6 +80,9 @@ class S3UrisFileReader:
     def get_aws_accounts(self) -> list[str]:
         return self._get_df_file_what_to_analyze().columns.to_list()
 
+    def get_number_of_aws_accounts(self) -> int:
+        return len(self.get_aws_accounts())
+
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_what_to_analyze_path)
 
