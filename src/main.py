@@ -56,11 +56,9 @@ class _LocalResults:
     _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
 
     def get_aws_account_index_to_analyze(self) -> int:
-        # TODO inline method
-        number_of_aws_accounts_analyzed = self._get_number_of_aws_accounts_analyzed()
-        if number_of_aws_accounts_analyzed > 2:
-            raise ValueError
-        return number_of_aws_accounts_analyzed
+        if self._get_number_of_aws_accounts_analyzed() > 2:
+            raise ValueError("All AWS accounts have been analyzed")
+        return self._get_number_of_aws_accounts_analyzed()
 
     def create_analysis_results_folder_if_required(self, number_of_aws_accounts_to_analyze: int):
         if (
