@@ -30,8 +30,10 @@ class _IteractiveMenu:
         self._exit_program_if_no_aws_credentials_in_terminal()
         self._analyze_aws_account(aws_account)
 
+    # TODO extract to a class
     def _analyze_aws_account(self, aws_account: str):
         print(f"Analyzing the account: {aws_account}")
+        self._local_results.create_aws_account_results_folder(aws_account)
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -71,6 +73,9 @@ class _LocalResults:
             or self._get_number_of_aws_accounts_analyzed() == number_of_aws_accounts_to_analyze
         ):
             self._create_analysis_results_folder()
+
+    def create_aws_account_results_folder(self, aws_account: str):
+        self._get_path_analysis_results().joinpath(aws_account).mkdir()
 
     def _create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")
