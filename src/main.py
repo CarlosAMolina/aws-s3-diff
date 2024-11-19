@@ -52,19 +52,32 @@ class _LocalResults:
     _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
 
     def get_aws_account_index_to_analyze(self) -> int:
+        # TODO inline method
         number_of_aws_accounts_analyzed = self._get_number_of_aws_accounts_analyzed()
         if number_of_aws_accounts_analyzed > 2:
             raise ValueError
         return number_of_aws_accounts_analyzed
 
+    def create_analysis_results_folder_if_required(self, number_of_aws_accounts_to_analyze: int):
+        if (
+            self._get_number_of_aws_accounts_analyzed() == 0
+            and not self._get_path_analysis_results().is_dir()
+            or self._get_number_of_aws_accounts_analyzed() == number_of_aws_accounts_to_analyze
+        ):
+            self._create_analysis_results_folder()
+
+    def _create_analysis_results_folder(self):
+        print(f"Creating results folder: {self._get_path_analysis_results()}")
+        self._get_path_analysis_results().mkdir()
+
     def _get_number_of_aws_accounts_analyzed(self) -> int:
         return len(self._get_aws_accounts_analyzed())
 
     def _get_aws_accounts_analyzed(self) -> list[str]:
-        try:
+        if self._get_path_analysis_results().is_dir():
+            # TODO use self._get_path_analysis_results().iterdir():
             return os.listdir(self._get_path_analysis_results())
-        except FileNotFoundError:
-            return []
+        return []
 
     def _get_path_analysis_results(self) -> Path:
         current_path = Path(__file__).parent.absolute()
