@@ -1,2 +1,2 @@
 - File s3-uris-to-analyze.txt. Use different paths in each account to test that the paths in the pro account is used.
-- Replace s3-uris-to-analyze-new.txt with s3-uris-to-analyze.txt
+- Replace s3-uris-to-analyze-new.csv with s3-uris-to-analyze.csv

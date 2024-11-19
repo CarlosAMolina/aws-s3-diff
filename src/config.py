@@ -65,7 +65,7 @@ class Config:
 
 
 class _S3UrisFile:
-    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.txt"
+    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.csv"
 
     @property
     def file_path(self) -> Path:
