@@ -38,7 +38,7 @@ class _IteractiveMenu:
     def _exit_program_if_no_aws_credentials_in_terminal(self):
         print("Have you generated in you terminal the AWS credentials to connect with that AWS account?")
         while True:
-            user_input = input("Y/n").lower()
+            user_input = input("Y/n: ").lower()
             if user_input == "n":
                 print("Generate the credentials to work with that AWS account and run the program again")
                 sys.exit()
