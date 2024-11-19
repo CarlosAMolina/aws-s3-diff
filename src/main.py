@@ -28,12 +28,7 @@ class _IteractiveMenu:
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        self._analyze_aws_account(aws_account)
-
-    # TODO extract to a class
-    def _analyze_aws_account(self, aws_account: str):
-        print(f"Analyzing the account: {aws_account}")
-        self._local_results.create_aws_account_results_folder(aws_account)
+        _AccountAnalyzer(aws_account).run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -55,6 +50,16 @@ class _IteractiveMenu:
                 sys.exit()
             if len(user_input) == 0:
                 return
+
+
+class _AccountAnalyzer:
+    def __init__(self, aws_account: str):
+        self._aws_account = aws_account
+        self._local_results = _LocalResults()
+
+    def run(self):
+        print(f"Analyzing the account: {self._aws_account}")
+        self._local_results.create_aws_account_results_folder(self._aws_account)
 
 
 class _LocalResults:
