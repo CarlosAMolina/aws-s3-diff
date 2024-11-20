@@ -40,11 +40,12 @@ def _export_data_to_csv(s3_data: S3Data, s3_query: S3Query, file_path: Path):
     print(f"Exporting data to {file_path}")
     with open(file_path, "w", newline="") as f:
         # avoid ^M: https://stackoverflow.com/a/17725590
-        headers = s3_data[0].keys()
+        headers = {**s3_query._asdict(), **s3_data[0]}.keys()
         w = csv.DictWriter(f, headers, lineterminator="\n")
         w.writeheader()
         for file_data in s3_data:
-            w.writerow(file_data)
+            data = {**s3_query._asdict(), **file_data}
+            w.writerow(data)
 
 
 if __name__ == "__main__":
