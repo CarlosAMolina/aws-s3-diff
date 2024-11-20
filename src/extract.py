@@ -8,6 +8,7 @@ from config import Config
 from config import get_config
 from s3 import S3Client
 from types_custom import S3Data
+from types_custom import S3Query
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ def _run_using_config(config: Config):
         print(f"Working with query {query_index}/{len(s3_queries)}: {s3_query}")
         s3_data = S3Client().get_s3_data(s3_query)
         file_path_for_results = config.get_local_path_file_query_results(s3_query)
-        _export_data_to_csv(s3_data, file_path_for_results)
+        _export_data_to_csv(s3_data, s3_query, file_path_for_results)
         print("Extraction done")
 
 
@@ -35,11 +36,12 @@ def _create_folders_for_buckets_results(config: Config):
         os.makedirs(exported_files_directory_path)
 
 
-def _export_data_to_csv(s3_data: S3Data, file_path: Path):
+def _export_data_to_csv(s3_data: S3Data, s3_query: S3Query, file_path: Path):
     print(f"Exporting data to {file_path}")
     with open(file_path, "w", newline="") as f:
         # avoid ^M: https://stackoverflow.com/a/17725590
-        w = csv.DictWriter(f, s3_data[0].keys(), lineterminator="\n")
+        headers = s3_data[0].keys()
+        w = csv.DictWriter(f, headers, lineterminator="\n")
         w.writeheader()
         for file_data in s3_data:
             w.writerow(file_data)
