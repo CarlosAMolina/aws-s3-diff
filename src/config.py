@@ -15,6 +15,7 @@ from types_custom import S3Query
 
 class Config:
     def __init__(self, aws_account: str, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
+        self._aws_account = aws_account
         self._directory_s3_results_path = directory_s3_results_path
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
@@ -40,18 +41,18 @@ class Config:
     def get_s3_queries(self) -> list[S3Query]:
         return self._s3_uris_file_reader.get_s3_queries()
 
-    def get_bucket_names_to_analyze(self) -> list[str]:
-        return self._s3_uris_file_reader.get_bucket_names_to_analyze()
-
-    def get_local_path_directory_bucket_results(self, bucket_name: str) -> Path:
-        return self._directory_s3_results_path.joinpath(self._folder_name_buckets_results, bucket_name)
+    def get_local_path_directory_bucket_results(self) -> Path:
+        return self._directory_s3_results_path.joinpath(self._folder_name_buckets_results)
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
+    # TODO rm not used arg
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
-        exported_files_directory_path = self.get_local_path_directory_bucket_results(s3_query.bucket)
-        file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
+        exported_files_directory_path = self.get_local_path_directory_bucket_results()
+        # TODO rm next line and deprecated functions
+        # file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
+        file_name_query_results = f"{self._aws_account}.csv"
         return exported_files_directory_path.joinpath(file_name_query_results)
 
     def _get_folder_name_buckets_results(self) -> str:
@@ -96,9 +97,6 @@ class _AwsAccountS3UrisFileReader(S3UrisFileReader):
         return [
             S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in self._get_s3_uris_to_analyze()
         ]
-
-    def get_bucket_names_to_analyze(self) -> list[str]:
-        return list(set(_S3UriParts(s3_uri).bucket for s3_uri in self._get_s3_uris_to_analyze()))
 
     def _get_s3_uris_to_analyze(self) -> list[str]:
         return self._get_df_file_what_to_analyze()[self._aws_account].to_list()

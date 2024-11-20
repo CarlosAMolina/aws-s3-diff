@@ -30,19 +30,22 @@ def _run_using_config(config: Config):
 
 
 def _create_folders_for_buckets_results(config: Config):
-    for bucket_name in config.get_bucket_names_to_analyze():
-        exported_files_directory_path = config.get_local_path_directory_bucket_results(bucket_name)
-        print("Creating folder for bucket results: ", exported_files_directory_path)
+    exported_files_directory_path = config.get_local_path_directory_bucket_results()
+    print("Creating folder for bucket results: ", exported_files_directory_path)
+    # TODO do it better
+    if not Path(exported_files_directory_path).exists():
         os.makedirs(exported_files_directory_path)
 
 
 def _export_data_to_csv(s3_data: S3Data, s3_query: S3Query, file_path: Path):
     print(f"Exporting data to {file_path}")
-    with open(file_path, "w", newline="") as f:
+    file_exists = file_path.exists()
+    with open(file_path, "a", newline="") as f:
         # avoid ^M: https://stackoverflow.com/a/17725590
         headers = {**s3_query._asdict(), **s3_data[0]}.keys()
         w = csv.DictWriter(f, headers, lineterminator="\n")
-        w.writeheader()
+        if not file_exists:
+            w.writeheader()
         for file_data in s3_data:
             data = {**s3_query._asdict(), **file_data}
             w.writerow(data)
