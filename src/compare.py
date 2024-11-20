@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -23,9 +22,8 @@ class S3DataComparator:
 
 def _get_df_combine_files(config: Config) -> Df:
     result = Df()
-    buckets_and_files: dict = _get_buckets_and_exported_files(config)
     for aws_account in config.get_aws_accounts_exported():
-        account_df = _get_df_combine_files_for_aws_account(aws_account, buckets_and_files, config)
+        account_df = _get_df_for_aws_account(aws_account, config)
         result = result.join(account_df, how="outer")
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
@@ -35,66 +33,25 @@ def _get_df_combine_files(config: Config) -> Df:
     return result
 
 
-def _get_buckets_and_exported_files(config: Config) -> dict[str, list[str]]:
-    aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
-    bucket_names = os.listdir(
-        config.get_local_path_directory_results_to_compare().joinpath(aws_account_with_data_to_sync)
-    )
-    bucket_names.sort()
-    accounts = config.get_aws_accounts_exported()
-    accounts.remove(aws_account_with_data_to_sync)
-    accounts.sort()
-    for account in accounts:
-        buckets_in_account = os.listdir(config.get_local_path_directory_results_to_compare().joinpath(account))
-        buckets_in_account.sort()
-        if bucket_names != buckets_in_account:
-            raise ValueError(
-                f"The S3 data has not been exported correctly. Error comparing buckets in account '{account}'"
-            )
-    result = {}
-    for bucket in bucket_names:
-        file_names = os.listdir(
-            config.get_local_path_directory_results_to_compare().joinpath(aws_account_with_data_to_sync, bucket)
-        )
-        file_names.sort()
-        for account in accounts:
-            files_for_bucket_in_account = os.listdir(
-                config.get_local_path_directory_results_to_compare().joinpath(account, bucket)
-            )
-            files_for_bucket_in_account.sort()
-            if file_names != files_for_bucket_in_account:
-                raise ValueError(
-                    "The S3 data has not been exported correctly"
-                    f". Error comparing files in account '{account}' and bucket '{bucket}'"
-                )
-        result[bucket] = file_names
-    return result
+# TODO when reading the uris to check, assert all accounts all paths to analyze.
 
 
-def _get_df_combine_files_for_aws_account(aws_account: str, buckets_and_local_files: dict, config: Config) -> Df:
-    result = Df()
-    for bucket_name, local_file_names in buckets_and_local_files.items():
-        for local_file_name in local_file_names:
-            local_file_path_name = config.get_local_path_directory_results_to_compare().joinpath(
-                aws_account, bucket_name, local_file_name
-            )
-            file_df = _get_df_from_file(local_file_path_name)
-            # This `if` avoids Pandas's future warning message: https://github.com/pandas-dev/pandas/issues/55928
-            if file_df.empty:
-                print(
-                    f"Account {aws_account} and bucket {bucket_name} without files for"
-                    f" {config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
-                )
-            else:
-                file_df = file_df.add_prefix(f"{aws_account}_value_")
-                file_df = _get_file_df_update_index(bucket_name, config, file_df, local_file_name)
-                result = pd.concat([result, file_df])
-    return result
+def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
+    # TODO move to config
+    local_file_path_name = config.get_local_path_directory_results_to_compare().joinpath(f"{aws_account}.csv")
+    result = _get_df_from_file(local_file_path_name)
+    # This `if` avoids Pandas's future warning message: https://github.com/pandas-dev/pandas/issues/55928
+    # TODO print buckets and s3 paths without files
+    # TODO print(
+    # TODO     f"Account {aws_account} and bucket {bucket_name} without files for"
+    # TODO     f" {config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
+    # TODO )
+    result = _get_file_df_update_index(result)
+    return result.add_prefix(f"{aws_account}_value_")
 
 
-def _get_file_df_update_index(bucket_name: str, config: Config, df: Df, local_file_name: str) -> Df:
-    s3_key = config.get_s3_key_from_results_local_file(local_file_name)
-    index_prefix = f"{bucket_name}_path_{s3_key}_file_"
+def _get_file_df_update_index(df: Df) -> Df:
+    index_prefix = f"{df['bucket']}_path_{df['prefix']}_file_"
     result = df.copy()
     # TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
     # TODO instead to add paths without files here, do it when all the aws accounts have been

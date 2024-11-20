@@ -23,6 +23,7 @@ class Config:
     def get_aws_accounts_exported(self) -> list[str]:
         path_to_check = self.get_local_path_directory_results_to_compare()
         result = os.listdir(path_to_check)
+        result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
         return result
 
@@ -57,12 +58,6 @@ class Config:
 
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-
-    # TODO use in exported file with results
-    def get_s3_key_from_results_local_file(self, local_file_name: str) -> str:
-        return _S3KeyConverter().get_s3_uri_key_from_from_local_file_for_results(
-            local_file_name, self._s3_uris_file_reader
-        )
 
 
 class _S3UrisFile:
