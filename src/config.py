@@ -20,6 +20,7 @@ class Config:
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         self._folder_name_buckets_results = self._get_folder_name_buckets_results()
 
+    # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
         path_to_check = self.get_local_path_directory_results_to_compare()
         result = os.listdir(path_to_check)
@@ -49,16 +50,18 @@ class Config:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
     def get_local_path_file_aws_account_results(self) -> Path:
-        file_name_aws_account_result = f"{self._aws_account}.csv"
-        return self.get_local_path_directory_results_to_compare().joinpath(file_name_aws_account_result)
+        return self.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
+
+    @property
+    def _aws_account_results_file_name(self) -> str:
+        return f"{self._aws_account}.csv"
 
     # TODO rm not used arg
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results()
         # TODO rm next line and deprecated functions
         # file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
-        file_name_query_results = f"{self._aws_account}.csv"
-        return exported_files_directory_path.joinpath(file_name_query_results)
+        return exported_files_directory_path.joinpath(self._aws_account_results_file_name)
 
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
