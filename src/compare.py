@@ -37,8 +37,7 @@ def _get_df_combine_files(config: Config) -> Df:
 
 
 def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
-    # TODO move to config
-    local_file_path_name = config.get_local_path_directory_results_to_compare().joinpath(f"{aws_account}.csv")
+    local_file_path_name = config.get_local_path_file_aws_account_results()
     result = _get_df_from_file(local_file_path_name)
     return result.add_prefix(f"{aws_account}_value_")
 

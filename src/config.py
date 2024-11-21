@@ -48,6 +48,10 @@ class Config:
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
+    def get_local_path_file_aws_account_results(self) -> Path:
+        file_name_aws_account_result = f"{self._aws_account}.csv"
+        return self.get_local_path_directory_results_to_compare().joinpath(file_name_aws_account_result)
+
     # TODO rm not used arg
     def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results()
