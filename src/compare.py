@@ -40,12 +40,6 @@ def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
     # TODO move to config
     local_file_path_name = config.get_local_path_directory_results_to_compare().joinpath(f"{aws_account}.csv")
     result = _get_df_from_file(local_file_path_name)
-    # This `if` avoids Pandas's future warning message: https://github.com/pandas-dev/pandas/issues/55928
-    # TODO print buckets and s3 paths without files
-    # TODO print(
-    # TODO     f"Account {aws_account} and bucket {bucket_name} without files for"
-    # TODO     f" {config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
-    # TODO )
     return result.add_prefix(f"{aws_account}_value_")
 
 
