@@ -46,31 +46,26 @@ def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
     # TODO     f"Account {aws_account} and bucket {bucket_name} without files for"
     # TODO     f" {config.get_s3_key_from_results_local_file(local_file_name)}. Omitting"
     # TODO )
-    result = _get_file_df_update_index(result)
     return result.add_prefix(f"{aws_account}_value_")
 
 
-def _get_file_df_update_index(df: Df) -> Df:
-    index_prefix = f"{df['bucket']}_path_{df['prefix']}_file_"
-    result = df.copy()
-    # TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
-    # TODO instead to add paths without files here, do it when all the aws accounts have been
-    # TODO analized and only if the apth doesn't have file for all accounts, in other case it will
-    # TODO add a wrong empty line to the final result
-    # TODO in the e2e tests check a s3 path without file in any aws account to assert it
-    # TODO appears in the final result. This can be added like this:
-    # TODO ```python
-    # TODO if result.empty:
-    # TODO     data ={column_name: [None] for column_name in result.columns}
-    # TODO     return pd.DataFrame(data=data, index=pd.Index([index_prefix]))
-    # TODO ```
-    return result.set_index(index_prefix + result.index.astype(str))
+# TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
+# TODO Maybe, instead to add paths without files here, do it when all the aws accounts have been
+# TODO analized and only if the path doesn't have file for all accounts, in other case it will
+# TODO add a wrong empty line to the final result
+# TODO in the e2e tests check a s3 path without file in any aws account to assert it
+# TODO appears in the final result. This can be added like this:
+# TODO ```python
+# TODO if result.empty:
+# TODO     data ={column_name: [None] for column_name in result.columns}
+# TODO     return pd.DataFrame(data=data, index=pd.Index([index_prefix]))
+# TODO ```
 
 
 def _get_df_from_file(file_path_name: Path) -> Df:
     return pd.read_csv(
         file_path_name,
-        index_col="name",
+        index_col=["bucket", "prefix", "name"],
         parse_dates=["date"],
     ).astype({"size": "Int64"})
 

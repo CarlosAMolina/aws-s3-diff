@@ -1,4 +1,3 @@
-import datetime
 import unittest
 from pathlib import Path
 
@@ -46,35 +45,3 @@ class TestS3DataComparator(unittest.TestCase):
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
-
-
-class TestFunction_get_file_df_set_index(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.config = get_config_for_the_test()
-
-    def test_if_no_empty_file_df(self):
-        date_time = datetime.datetime(2024, 10, 14, 8, 49, 1)
-        df = Df(
-            {
-                "aws_account_1_pro_value_date": {"dogs_20241014.csv": date_time},
-                "aws_account_1_pro_value_size": {"dogs_20241014.csv": 33201},
-            }
-        )
-        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs-big_size.csv")
-        index = "pets_path_dogs/big_size_file_dogs_20241014.csv"
-        expected_result = Df(
-            {"aws_account_1_pro_value_date": {index: date_time}, "aws_account_1_pro_value_size": {index: 33201}}
-        )
-        assert_frame_equal(expected_result, result)
-
-    def test_if_empty_file_df(self):
-        df = Df(
-            {
-                "aws_account_1_pro_value_date": {},
-                "aws_account_1_pro_value_size": {},
-            }
-        )
-        expected_result = df.copy()
-        result = m_compare._get_file_df_update_index("pets", self.config, df, "dogs-big_size.csv")
-        assert_frame_equal(expected_result, result)
