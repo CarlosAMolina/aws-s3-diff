@@ -44,11 +44,12 @@ def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
     local_file_path_name = aws_account_config.get_local_path_file_aws_account_results()
     result = _get_df_from_file(local_file_path_name)
     # TODO use aws_account as multi index column name
-    result = result.add_prefix(f"{aws_account}_value_")
-    result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
-    print(result)  # TODO
-    breakpoint()  # TODO
+    result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
     return result
+
+
+def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
+    return [(aws_account, column_name) for column_name in column_names]
 
 
 # TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
@@ -70,15 +71,6 @@ def _get_df_from_file(file_path_name: Path) -> Df:
         index_col=["bucket", "prefix", "name"],
         parse_dates=["date"],
     ).astype({"size": "Int64"})
-
-
-def _get_column_names_mult_index(column_names: list[str]) -> list[tuple[str, str]]:
-    return [_get_tuple_column_names_multi_index(column_name) for column_name in column_names]
-
-
-def _get_tuple_column_names_multi_index(column_name: str) -> tuple[str, str]:
-    aws_account, file_value = column_name.split("_value_")
-    return aws_account, file_value
 
 
 class _S3DataAnalyzer:
