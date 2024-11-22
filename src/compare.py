@@ -25,7 +25,6 @@ def _get_df_combine_files(config: Config) -> Df:
     result = None
     for aws_account in config.get_aws_accounts_exported():
         account_df = _get_df_for_aws_account(aws_account, config)
-        # TODO try quit if
         if result is None:
             result = account_df.copy()
         else:
