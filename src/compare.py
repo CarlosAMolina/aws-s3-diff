@@ -18,8 +18,6 @@ class S3DataComparator:
 
     def _get_df_s3_data_analyzed(self, config: Config) -> Df:
         s3_data_df = _get_df_combine_files(config)
-        print(s3_data_df)  # TODO
-        breakpoint()  # TODO
         return _S3DataAnalyzer(config).get_df_set_analysis_columns(s3_data_df)
 
 
@@ -27,13 +25,11 @@ def _get_df_combine_files(config: Config) -> Df:
     result = None
     for aws_account in config.get_aws_accounts_exported():
         account_df = _get_df_for_aws_account(aws_account, config)
-        if result is None:
-            result = account_df.copy()
-        else:
-            result = result.join(account_df, how="outer")
-    # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
+        result = account_df.copy() if result is None else result.join(account_df, how="outer")
     assert result is not None
-    return result
+    # TODO not drop only if its the only bucket and prefix, in
+    # TODO order to maintain empty query results. And add this situtation to the tests
+    return result.dropna(axis="index", how="all")
 
 
 # TODO when reading the uris to check, assert all accounts all paths to analyze.
@@ -167,6 +163,7 @@ class _CsvExporter:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
+        result.index.names = ["bucket", "file_path_in_s3", "file_name"]
         return result
 
     def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
