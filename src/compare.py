@@ -22,10 +22,11 @@ class S3DataComparator:
 
 
 def _get_df_combine_files(config: Config) -> Df:
-    result = None
-    for aws_account in config.get_aws_accounts_exported():
+    aws_accounts = config.get_aws_accounts_exported()
+    result = _get_df_for_aws_account(aws_accounts[0], config)
+    for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account, config)
-        result = account_df.copy() if result is None else result.join(account_df, how="outer")
+        result = result.join(account_df, how="outer")
     assert result is not None
     # TODO not drop only if its the only bucket and prefix, in
     # TODO order to maintain empty query results. And add this situtation to the tests
