@@ -27,7 +27,6 @@ def _get_df_combine_files(config: Config) -> Df:
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account, config)
         result = result.join(account_df, how="outer")
-    assert result is not None
     # TODO not drop only if its the only bucket and prefix, in
     # TODO order to maintain empty query results. And add this situtation to the tests
     return result.dropna(axis="index", how="all")
