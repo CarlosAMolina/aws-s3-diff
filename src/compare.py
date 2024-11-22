@@ -18,6 +18,8 @@ class S3DataComparator:
 
     def _get_df_s3_data_analyzed(self, config: Config) -> Df:
         s3_data_df = _get_df_combine_files(config)
+        print(s3_data_df)  # TODO
+        breakpoint()  # TODO
         return _S3DataAnalyzer(config).get_df_set_analysis_columns(s3_data_df)
 
 
@@ -32,11 +34,6 @@ def _get_df_combine_files(config: Config) -> Df:
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
     # TODO try do it in _get_df_for_aws_account
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
-    print(result)  # TODO
-    breakpoint()  # TODO
-    result.index = pd.MultiIndex.from_tuples(
-        _get_index_multi_index(result.index), names=["bucket", "file_path_in_s3", "file_name"]
-    )
     return result
 
 
@@ -79,16 +76,6 @@ def _get_column_names_mult_index(column_names: list[str]) -> list[tuple[str, str
 def _get_tuple_column_names_multi_index(column_name: str) -> tuple[str, str]:
     aws_account, file_value = column_name.split("_value_")
     return aws_account, file_value
-
-
-def _get_index_multi_index(indexes: list[str]) -> list[tuple[str, str, str]]:
-    return [_get_tuple_index_multi_index(index) for index in indexes]
-
-
-def _get_tuple_index_multi_index(index: str) -> tuple[str, str, str]:
-    bucket_name, path_and_file_name = index.split("_path_")
-    path_name, file_name = path_and_file_name.split("_file_")
-    return bucket_name, path_name, file_name
 
 
 class _S3DataAnalyzer:
