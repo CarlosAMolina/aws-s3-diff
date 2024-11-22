@@ -14,6 +14,7 @@ from types_custom import S3Query
 
 
 class Config:
+    # TODO move all aws_account methods to AwsAccountConfig
     def __init__(self, aws_account: str, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
         self._aws_account = aws_account
         self._directory_s3_results_path = directory_s3_results_path
@@ -49,9 +50,6 @@ class Config:
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
-    def get_local_path_file_aws_account_results(self) -> Path:
-        return self.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
-
     @property
     def _aws_account_results_file_name(self) -> str:
         return f"{self._aws_account}.csv"
@@ -65,6 +63,19 @@ class Config:
 
     def _get_folder_name_buckets_results(self) -> str:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+
+class AwsAccountConfig:
+    def __init__(self, aws_account: str, config: Config):
+        self._aws_account = aws_account
+        self._config = config
+
+    def get_local_path_file_aws_account_results(self) -> Path:
+        return self._config.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
+
+    @property
+    def _aws_account_results_file_name(self) -> str:
+        return f"{self._aws_account}.csv"
 
 
 class _S3UrisFile:

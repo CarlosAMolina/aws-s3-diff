@@ -24,4 +24,4 @@ test:
 	poetry run python -m unittest discover
 
 test-filter:
-	poetry run python -m unittest discover -p test_compare.py -k TestFunction_get_file_df_set_index
+	poetry run python -m unittest discover -p test_compare.py -k TestS3DataComparator

@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 from pandas import DataFrame as Df
 
+from config import AwsAccountConfig
 from config import Config
 
 FilePathNamesToCompare = tuple[str, str, str]
@@ -21,11 +22,17 @@ class S3DataComparator:
 
 
 def _get_df_combine_files(config: Config) -> Df:
-    result = Df()
+    result = None
     for aws_account in config.get_aws_accounts_exported():
         account_df = _get_df_for_aws_account(aws_account, config)
-        result = result.join(account_df, how="outer")
+        # TODO try quit if
+        if result is None:
+            result = account_df.copy()
+        else:
+            result = result.join(account_df, how="outer")
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/advanced.html#creating-a-multiindex-hierarchical-index-object
+    print(result)  # TODO
+    breakpoint()  # TODO
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(result.columns))
     result.index = pd.MultiIndex.from_tuples(
         _get_index_multi_index(result.index), names=["bucket", "file_path_in_s3", "file_name"]
@@ -37,8 +44,10 @@ def _get_df_combine_files(config: Config) -> Df:
 
 
 def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
-    local_file_path_name = config.get_local_path_file_aws_account_results()
+    aws_account_config = AwsAccountConfig(aws_account, config)
+    local_file_path_name = aws_account_config.get_local_path_file_aws_account_results()
     result = _get_df_from_file(local_file_path_name)
+    # TODO use aws_account as multi index column name
     return result.add_prefix(f"{aws_account}_value_")
 
 
