@@ -43,7 +43,7 @@ class _IteractiveMenu:
             if user_input == "n":
                 print("Generate the credentials to work with that AWS account and run the program again")
                 sys.exit()
-            if len(user_input) == 0:
+            if user_input == "y" or len(user_input) == 0:
                 return
 
 
