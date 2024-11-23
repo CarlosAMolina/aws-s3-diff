@@ -20,9 +20,6 @@ class LocalResults:
         ):
             self._create_analysis_results_folder()
 
-    def create_aws_account_results_folder(self, aws_account: str):
-        self._get_path_aws_account_analysis_results(aws_account).mkdir()
-
     def _get_path_aws_account_analysis_results(self, aws_account: str):
         return self._get_path_analysis_results().joinpath(aws_account)
 

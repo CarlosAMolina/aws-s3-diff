@@ -56,8 +56,7 @@ class _AccountAnalyzer:
 
     def run(self):
         print(f"Analyzing the account: {self._aws_account}")
-        # TODO create the folder after retrieve aws results to avoid not use the folder if any aws error
-        self._local_results.create_aws_account_results_folder(self._aws_account)
+        # TODO create the results file after retrieve aws results to avoid not use the folder if any aws error
         # TODO continue adding code
 
 
