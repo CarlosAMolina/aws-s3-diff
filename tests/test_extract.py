@@ -12,7 +12,6 @@ from src import extract as m_extract
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 from tests.config import get_config_for_the_test
-from tests.utils import remove_file_with_analysis_date_if_exists
 
 ExpectedResult = list[dict]
 
@@ -27,7 +26,6 @@ class TestAwsAccountExtractor(unittest.TestCase):
 
     def tearDown(self):
         self.mock_aws.stop()
-        remove_file_with_analysis_date_if_exists()
 
     def test_extract_enerates_expected_result(self):
         config = get_config_for_the_test()
