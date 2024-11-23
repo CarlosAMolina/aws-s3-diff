@@ -16,6 +16,8 @@ class _IteractiveMenu:
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
         self._show_aws_accounts_to_analyze()
+        if self._local_results.get_aws_account_index_to_analyze() > 2:
+            raise ValueError("All AWS accounts have been analyzed")
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder_if_required(
                 self._s3_uris_file_reader.get_number_of_aws_accounts()
