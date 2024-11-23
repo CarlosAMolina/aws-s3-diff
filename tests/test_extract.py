@@ -8,6 +8,7 @@ from moto import mock_aws
 from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
+from config import AwsAccountConfig
 from src import extract as m_extract
 from tests.aws import S3
 from tests.aws import set_aws_credentials
@@ -31,7 +32,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         config = get_config_for_the_test()
         # TODO? refactor move to AwsAccountConfig
         file_path_results = config.get_local_path_directory_bucket_results().joinpath(
-            config._aws_account_results_file_name
+            AwsAccountConfig(config._aws_account, config)._aws_account_results_file_name
         )
         # TODO use _LocalResults
         # TODO RM exported_files_directory_path = config.get_local_path_directory_bucket_results()
@@ -39,7 +40,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         if not Path(config.get_local_path_directory_bucket_results()).exists():
             os.makedirs(config.get_local_path_directory_bucket_results())
         s3_queries = config.get_s3_queries()
-        # TODO DEPRECATE file_path_for_results = config.get_local_path_file_query_results()
+
         m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
         expected_result_df = read_csv_as_df("tests/s3-results/expected-results-test_extract/aws_account_1_pro.csv")

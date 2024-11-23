@@ -45,22 +45,12 @@ class Config:
     def get_s3_queries(self) -> list[S3Query]:
         return self._s3_uris_file_reader.get_s3_queries()
 
+    # TODO deprecate
     def get_local_path_directory_bucket_results(self) -> Path:
         return self._directory_s3_results_path.joinpath(self._folder_name_buckets_results)
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
-
-    @property
-    def _aws_account_results_file_name(self) -> str:
-        return f"{self._aws_account}.csv"
-
-    # TODO rm not used arg
-    def get_local_path_file_query_results(self) -> Path:
-        exported_files_directory_path = self.get_local_path_directory_bucket_results()
-        # TODO rm next line and deprecated functions
-        # file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
-        return exported_files_directory_path.joinpath(self._aws_account_results_file_name)
 
 
 class AwsAccountConfig:
@@ -68,6 +58,7 @@ class AwsAccountConfig:
         self._aws_account = aws_account
         self._config = config
 
+    # TODO rename to get_local_path_results
     def get_local_path_file_aws_account_results(self) -> Path:
         return self._config.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
 
