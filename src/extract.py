@@ -19,6 +19,7 @@ def run():
 
 
 def _run_using_config(config: Config):
+    # TODO use _LocalResults
     _create_folders_for_buckets_results(config)
     s3_queries = config.get_s3_queries()
     for query_index, s3_query in enumerate(s3_queries, 1):
