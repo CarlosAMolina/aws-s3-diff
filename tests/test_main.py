@@ -1,13 +1,13 @@
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from moto import mock_aws
 
 from src import main as m_main
+from src.local_results import LocalResults
 from tests.aws import S3
 from tests.aws import set_aws_credentials
-from tests.utils import remove_file_with_analysis_date
-from tests.utils import remove_file_with_analysis_date_if_exists
 
 
 class TestFunction_run(unittest.TestCase):
@@ -27,3 +27,12 @@ class TestFunction_run(unittest.TestCase):
     def test_run(self, mock_input):
         mock_input.side_effect = ["Y"]
         m_main.run()
+
+
+def remove_file_with_analysis_date():
+    Path(LocalResults._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).unlink()
+
+
+def remove_file_with_analysis_date_if_exists():
+    if Path(LocalResults._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_dir():
+        remove_file_with_analysis_date()
