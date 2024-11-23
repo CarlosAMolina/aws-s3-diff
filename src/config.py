@@ -58,8 +58,7 @@ class AwsAccountConfig:
         self._aws_account = aws_account
         self._config = config
 
-    # TODO rename to get_local_path_results
-    def get_local_path_file_aws_account_results(self) -> Path:
+    def get_local_path_file_results(self) -> Path:
         return self._config.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
 
     @property

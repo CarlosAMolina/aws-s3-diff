@@ -35,7 +35,7 @@ def _get_df_combine_files(config: Config) -> Df:
 
 def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
     aws_account_config = AwsAccountConfig(aws_account, config)
-    local_file_path_name = aws_account_config.get_local_path_file_aws_account_results()
+    local_file_path_name = aws_account_config.get_local_path_file_results()
     result = _get_df_from_file(local_file_path_name)
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
     return result
