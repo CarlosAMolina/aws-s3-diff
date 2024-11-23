@@ -16,10 +16,10 @@ class TestFunction_run(unittest.TestCase):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         S3().create_objects()
-        remove_file_with_analysis_date_if_exists()
 
     def tearDown(self):
         self.mock_aws.stop()
+        remove_file_with_analysis_date_if_exists()
 
     @mock.patch("src.main.input", create=True)
     def test_run(self, mock_input):

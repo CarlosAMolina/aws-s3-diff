@@ -24,11 +24,10 @@ class TestAwsAccountExtractor(unittest.TestCase):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         S3().create_objects()
-        # TODO move to tearDown
-        remove_file_with_analysis_date_if_exists()
 
     def tearDown(self):
         self.mock_aws.stop()
+        remove_file_with_analysis_date_if_exists()
 
     def test_extract_enerates_expected_result(self):
         config = get_config_for_the_test()
