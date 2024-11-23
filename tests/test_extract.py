@@ -48,8 +48,6 @@ class TestAwsAccountExtractor(unittest.TestCase):
         expected_result_df = read_csv_as_df("tests/s3-results/expected-results-test_extract/aws_account_1_pro.csv")
         expected_result_df["date"] = result_df["date"]
         assert_frame_equal(result_df, expected_result_df)
-        # TODO move to tearDown
-        file_path_results.unlink()
 
 
 class TestS3Client(unittest.TestCase):
