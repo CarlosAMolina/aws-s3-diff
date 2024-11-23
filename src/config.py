@@ -126,23 +126,6 @@ class _S3UriParts:
         return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
 
 
-class _S3KeyConverter:
-    def get_local_file_name_for_results_from_s3_uri_key(self, s3_uri_key: str) -> str:
-        s3_uri_key_clean = s3_uri_key[:-1] if s3_uri_key.endswith("/") else s3_uri_key
-        exported_file_name = s3_uri_key_clean.replace("/", "-")
-        return f"{exported_file_name}.csv"
-
-    def get_s3_uri_key_from_from_local_file_for_results(
-        self, local_file_name: str, s3_uris_file_reader: _AwsAccountS3UrisFileReader
-    ) -> str:
-        for s3_query in s3_uris_file_reader.get_s3_queries():
-            if local_file_name == self.get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix):
-                return s3_query.prefix
-        raise ValueError(
-            f"No S3 Query in your configuration file with key for the local file results '{local_file_name}'"
-        )
-
-
 def get_s3_uris_file_reader() -> S3UrisFileReader:
     return S3UrisFileReader(_S3UrisFile().file_path)
 
