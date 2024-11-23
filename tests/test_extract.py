@@ -8,6 +8,7 @@ from src import extract as m_extract
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 from tests.config import get_config_for_the_test
+from tests.utils import remove_file_with_analysis_date_if_exists
 
 
 class TestFunction_run_using_config(unittest.TestCase):
@@ -17,6 +18,7 @@ class TestFunction_run_using_config(unittest.TestCase):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         S3().create_objects()
+        remove_file_with_analysis_date_if_exists()
 
     def tearDown(self):
         self.mock_aws.stop()
