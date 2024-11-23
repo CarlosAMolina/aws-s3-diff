@@ -19,6 +19,7 @@ class Config:
         self._aws_account = aws_account
         self._directory_s3_results_path = directory_s3_results_path
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
+        # TODO deprecate as now buckets have not folder, results are saved in file with aws account name.
         self._folder_name_buckets_results = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     # TODO move method to class _LocalResults

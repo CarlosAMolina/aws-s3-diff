@@ -9,7 +9,6 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import extract as m_extract
-from src.config import Config
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 from tests.config import get_config_for_the_test
@@ -25,36 +24,32 @@ class TestAwsAccountExtractor(unittest.TestCase):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         S3().create_objects()
+        # TODO move to tearDown
         remove_file_with_analysis_date_if_exists()
 
     def tearDown(self):
         self.mock_aws.stop()
 
-    def test_run_using_config_generates_expected_result(self):
+    def test_extract_enerates_expected_result(self):
         config = get_config_for_the_test()
-        run_using_config(config)
-        result_df = read_csv_as_df(f"tests/s3-results/{config._folder_name_buckets_results}/aws_account_1_pro.csv")
+        # TODO? refactor move to AwsAccountConfig
+        file_path_results = config.get_local_path_directory_bucket_results().joinpath(
+            config._aws_account_results_file_name
+        )
+        # TODO use _LocalResults
+        # TODO RM exported_files_directory_path = config.get_local_path_directory_bucket_results()
+        # TODO do it better
+        if not Path(config.get_local_path_directory_bucket_results()).exists():
+            os.makedirs(config.get_local_path_directory_bucket_results())
+        s3_queries = config.get_s3_queries()
+        # TODO DEPRECATE file_path_for_results = config.get_local_path_file_query_results()
+        m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
+        result_df = read_csv_as_df(file_path_results)
         expected_result_df = read_csv_as_df("tests/s3-results/expected-results-test_extract/aws_account_1_pro.csv")
         expected_result_df["date"] = result_df["date"]
         assert_frame_equal(result_df, expected_result_df)
-
-
-# TODO deprecate
-def run_using_config(config: Config):
-    # TODO use _LocalResults
-    _create_folders_for_buckets_results(config)
-    s3_queries = config.get_s3_queries()
-    file_path_for_results = config.get_local_path_file_query_results()
-    m_extract.AwsAccountExtractor(file_path_for_results, s3_queries).extract()
-
-
-# TODO move it to _LocalResults
-def _create_folders_for_buckets_results(config: Config):
-    exported_files_directory_path = config.get_local_path_directory_bucket_results()
-    print("Creating folder for bucket results: ", exported_files_directory_path)
-    # TODO do it better
-    if not Path(exported_files_directory_path).exists():
-        os.makedirs(exported_files_directory_path)
+        # TODO move to tearDown
+        file_path_results.unlink()
 
 
 class TestS3Client(unittest.TestCase):
