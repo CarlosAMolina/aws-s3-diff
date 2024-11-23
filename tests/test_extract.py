@@ -15,7 +15,7 @@ from tests.utils import remove_file_with_analysis_date_if_exists
 ExpectedResult = list[dict]
 
 
-class TestFunction_run_using_config(unittest.TestCase):
+class TestAwsAccountExtractor(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
