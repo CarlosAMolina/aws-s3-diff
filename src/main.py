@@ -6,8 +6,6 @@ from pathlib import Path
 from config import get_s3_uris_file_reader
 from constants import FOLDER_NAME_S3_RESULTS
 
-FilePathNamesToCompare = tuple[str, str, str]
-
 
 def run():
     _IteractiveMenu().run()

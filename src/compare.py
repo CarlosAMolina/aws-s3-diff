@@ -6,8 +6,6 @@ from pandas import DataFrame as Df
 from config import AwsAccountConfig
 from config import Config
 
-FilePathNamesToCompare = tuple[str, str, str]
-
 
 class S3DataComparator:
     def run(self, config: Config):
