@@ -13,11 +13,13 @@ from types_custom import S3Query
 logger = logging.getLogger(__name__)
 
 
+# TODO deprecate
 def run():
     config = get_config()
     _run_using_config(config)
 
 
+# TODO deprecate
 def _run_using_config(config: Config):
     # TODO use _LocalResults
     _create_folders_for_buckets_results(config)
@@ -39,6 +41,21 @@ def _create_folders_for_buckets_results(config: Config):
         os.makedirs(exported_files_directory_path)
 
 
+class AwsAccountExtractor:
+    def __init__(self, file_path_results: Path, s3_queries: list[S3Query]) -> None:
+        self._file_path_results = file_path_results
+        self._s3_queries = s3_queries
+
+    def extract(self):
+        print("Extracting AWS Account information")
+        for query_index, s3_query in enumerate(self._s3_queries, 1):
+            print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
+            s3_data = S3Client().get_s3_data(s3_query)
+            _export_data_to_csv(s3_data, s3_query, self._file_path_results)
+        print("Extraction done")
+
+
+# TODO move to AwsAccountExtractor
 def _export_data_to_csv(s3_data: S3Data, s3_query: S3Query, file_path: Path):
     print(f"Exporting data to {file_path}")
     file_exists = file_path.exists()

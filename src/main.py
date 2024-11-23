@@ -1,6 +1,8 @@
 import sys
 
+from config import get_config
 from config import get_s3_uris_file_reader
+from extract import AwsAccountExtractor
 from local_results import LocalResults
 
 
@@ -52,10 +54,15 @@ class _IteractiveMenu:
 class _AccountAnalyzer:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
+        self._config = get_config(aws_account)
         self._local_results = LocalResults()
 
     def run(self):
         print(f"Analyzing the account: {self._aws_account}")
+        AwsAccountExtractor(
+            self._local_results.get_file_path_aws_account_results(self._aws_account), self._config.get_s3_queries()
+        ).extract()
+
         # TODO create the results file after retrieve aws results to avoid not use the folder if any aws error
         # TODO continue adding code
 
