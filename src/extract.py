@@ -1,34 +1,13 @@
 import csv
 import logging
-import os
-import os.path
 from pathlib import Path
 
 import boto3
 
-from config import Config
 from types_custom import S3Data
 from types_custom import S3Query
 
 logger = logging.getLogger(__name__)
-
-
-# TODO deprecate
-def run_using_config(config: Config):
-    # TODO use _LocalResults
-    _create_folders_for_buckets_results(config)
-    s3_queries = config.get_s3_queries()
-    file_path_for_results = config.get_local_path_file_query_results()
-    AwsAccountExtractor(file_path_for_results, s3_queries).extract()
-
-
-# TODO move it to _LocalResults
-def _create_folders_for_buckets_results(config: Config):
-    exported_files_directory_path = config.get_local_path_directory_bucket_results()
-    print("Creating folder for bucket results: ", exported_files_directory_path)
-    # TODO do it better
-    if not Path(exported_files_directory_path).exists():
-        os.makedirs(exported_files_directory_path)
 
 
 class AwsAccountExtractor:

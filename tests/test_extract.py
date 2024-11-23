@@ -1,5 +1,7 @@
 import datetime
+import os
 import unittest
+from pathlib import Path
 
 from dateutil.tz import tzutc
 from moto import mock_aws
@@ -7,6 +9,7 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import extract as m_extract
+from src.config import Config
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 from tests.config import get_config_for_the_test
@@ -29,11 +32,29 @@ class TestAwsAccountExtractor(unittest.TestCase):
 
     def test_run_using_config_generates_expected_result(self):
         config = get_config_for_the_test()
-        m_extract.run_using_config(config)
+        run_using_config(config)
         result_df = read_csv_as_df(f"tests/s3-results/{config._folder_name_buckets_results}/aws_account_1_pro.csv")
         expected_result_df = read_csv_as_df("tests/s3-results/expected-results-test_extract/aws_account_1_pro.csv")
         expected_result_df["date"] = result_df["date"]
         assert_frame_equal(result_df, expected_result_df)
+
+
+# TODO deprecate
+def run_using_config(config: Config):
+    # TODO use _LocalResults
+    _create_folders_for_buckets_results(config)
+    s3_queries = config.get_s3_queries()
+    file_path_for_results = config.get_local_path_file_query_results()
+    m_extract.AwsAccountExtractor(file_path_for_results, s3_queries).extract()
+
+
+# TODO move it to _LocalResults
+def _create_folders_for_buckets_results(config: Config):
+    exported_files_directory_path = config.get_local_path_directory_bucket_results()
+    print("Creating folder for bucket results: ", exported_files_directory_path)
+    # TODO do it better
+    if not Path(exported_files_directory_path).exists():
+        os.makedirs(exported_files_directory_path)
 
 
 class TestS3Client(unittest.TestCase):
