@@ -7,7 +7,6 @@ from pathlib import Path
 import boto3
 
 from config import Config
-from config import get_config
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -15,13 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO deprecate
-def run():
-    config = get_config()
-    _run_using_config(config)
-
-
-# TODO deprecate
-def _run_using_config(config: Config):
+def run_using_config(config: Config):
     # TODO use _LocalResults
     _create_folders_for_buckets_results(config)
     s3_queries = config.get_s3_queries()
@@ -116,7 +109,3 @@ class _S3Client:
 
     def _get_file_name_from_response_key(self, content: dict) -> str:
         return content["Key"].split("/")[-1]
-
-
-if __name__ == "__main__":
-    run()
