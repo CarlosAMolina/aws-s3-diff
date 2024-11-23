@@ -47,7 +47,7 @@ class AwsAccountExtractor:
         self._s3_queries = s3_queries
 
     def extract(self):
-        print("Extracting AWS Account information")
+        print(f"Extracting AWS Account information to {self._file_path_results}")
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             s3_data = S3Client().get_s3_data(s3_query)
@@ -57,7 +57,6 @@ class AwsAccountExtractor:
 
 # TODO move to AwsAccountExtractor
 def _export_data_to_csv(s3_data: S3Data, s3_query: S3Query, file_path: Path):
-    print(f"Exporting data to {file_path}")
     file_exists = file_path.exists()
     with open(file_path, "a", newline="") as f:
         # avoid ^M: https://stackoverflow.com/a/17725590
