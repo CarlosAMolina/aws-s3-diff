@@ -30,6 +30,7 @@ def _run_using_config(config: Config):
         print("Extraction done")
 
 
+# TODO move it to _LocalResults
 def _create_folders_for_buckets_results(config: Config):
     exported_files_directory_path = config.get_local_path_directory_bucket_results()
     print("Creating folder for bucket results: ", exported_files_directory_path)
