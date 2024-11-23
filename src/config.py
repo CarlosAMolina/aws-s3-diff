@@ -55,7 +55,7 @@ class Config:
         return f"{self._aws_account}.csv"
 
     # TODO rm not used arg
-    def get_local_path_file_query_results(self, s3_query: S3Query) -> Path:
+    def get_local_path_file_query_results(self) -> Path:
         exported_files_directory_path = self.get_local_path_directory_bucket_results()
         # TODO rm next line and deprecated functions
         # file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
