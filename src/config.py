@@ -19,7 +19,7 @@ class Config:
         self._aws_account = aws_account
         self._directory_s3_results_path = directory_s3_results_path
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
-        self._folder_name_buckets_results = self._get_folder_name_buckets_results()
+        self._folder_name_buckets_results = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
@@ -60,9 +60,6 @@ class Config:
         # TODO rm next line and deprecated functions
         # file_name_query_results = _S3KeyConverter().get_local_file_name_for_results_from_s3_uri_key(s3_query.prefix)
         return exported_files_directory_path.joinpath(self._aws_account_results_file_name)
-
-    def _get_folder_name_buckets_results(self) -> str:
-        return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
 class AwsAccountConfig:
