@@ -20,7 +20,7 @@ class Config:
         self._directory_s3_results_path = directory_s3_results_path
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         # TODO deprecate as now buckets have not folder, results are saved in file with aws account name.
-        self._folder_name_buckets_results = LocalResults()._get_analysis_date_time_str()  # TODO not use private.
+        self._analysis_date_time = LocalResults()._get_analysis_date_time_str()  # TODO not use private.
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
@@ -47,7 +47,7 @@ class Config:
 
     # TODO deprecate
     def get_local_path_directory_bucket_results(self) -> Path:
-        return self._directory_s3_results_path.joinpath(self._folder_name_buckets_results)
+        return self._directory_s3_results_path.joinpath(self._analysis_date_time)
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
