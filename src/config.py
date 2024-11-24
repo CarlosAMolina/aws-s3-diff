@@ -1,4 +1,3 @@
-import datetime
 import os
 import re
 from pathlib import Path
@@ -10,6 +9,7 @@ from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FOLDER_NAME_S3_RESULTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
+from local_results import LocalResults
 from types_custom import S3Query
 
 
@@ -20,7 +20,7 @@ class Config:
         self._directory_s3_results_path = directory_s3_results_path
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
         # TODO deprecate as now buckets have not folder, results are saved in file with aws account name.
-        self._folder_name_buckets_results = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        self._folder_name_buckets_results = LocalResults()._get_analysis_date_time_str()  # TODO not use private.
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
