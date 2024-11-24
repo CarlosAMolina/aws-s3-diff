@@ -1,6 +1,6 @@
 import sys
 
-from config import get_config
+from config import Config
 from config import get_s3_uris_file_reader
 from extract import AwsAccountExtractor
 from local_results import LocalResults
@@ -54,7 +54,7 @@ class _IteractiveMenu:
 class _AccountAnalyzer:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._config = get_config(aws_account)
+        self._config = Config(aws_account)
         self._local_results = LocalResults()
 
     def run(self):

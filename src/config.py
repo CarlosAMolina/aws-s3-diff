@@ -124,9 +124,6 @@ class _S3UriParts:
         return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
 
 
+# TODO deprecate
 def get_s3_uris_file_reader() -> S3UrisFileReader:
     return S3UrisFileReader(_S3UrisFile().file_path)
-
-
-def get_config(aws_account: str) -> Config:
-    return Config(aws_account)
