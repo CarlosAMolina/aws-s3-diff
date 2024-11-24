@@ -90,7 +90,7 @@ class S3UrisFileReader:
 class _AwsAccountS3UrisFileReader(S3UrisFileReader):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._file_what_to_analyze_path = _S3UrisFile().file_path
+        super().__init__()
 
     def get_s3_queries(self) -> list[S3Query]:
         return [
