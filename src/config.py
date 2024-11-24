@@ -18,7 +18,7 @@ class Config:
         self._aws_account = aws_account
         # TODO not do this in init
         self._directory_s3_results_path = self._get_directory_s3_results_path()
-        self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, _S3UrisFile().file_path)
+        self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
 
     def _get_directory_s3_results_path(self) -> Path:
         current_path = Path(__file__).parent.absolute()
@@ -74,8 +74,8 @@ class _S3UrisFile:
 
 
 class S3UrisFileReader:
-    def __init__(self, file_path: Path):
-        self._file_what_to_analyze_path = file_path
+    def __init__(self):
+        self._file_what_to_analyze_path = _S3UrisFile().file_path
 
     def get_aws_accounts(self) -> list[str]:
         return self._get_df_file_what_to_analyze().columns.to_list()
@@ -88,9 +88,9 @@ class S3UrisFileReader:
 
 
 class _AwsAccountS3UrisFileReader(S3UrisFileReader):
-    def __init__(self, aws_account: str, file_path: Path):
+    def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._file_what_to_analyze_path = file_path
+        self._file_what_to_analyze_path = _S3UrisFile().file_path
 
     def get_s3_queries(self) -> list[S3Query]:
         return [
@@ -122,8 +122,3 @@ class _S3UriParts:
     def _regex_s3_uri_parts(self) -> str:
         """https://stackoverflow.com/a/47130367"""
         return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
-
-
-# TODO deprecate
-def get_s3_uris_file_reader() -> S3UrisFileReader:
-    return S3UrisFileReader(_S3UrisFile().file_path)

@@ -1,7 +1,7 @@
 import sys
 
 from config import Config
-from config import get_s3_uris_file_reader
+from config import S3UrisFileReader
 from extract import AwsAccountExtractor
 from local_results import LocalResults
 
@@ -12,7 +12,7 @@ def run():
 
 class _IteractiveMenu:
     def __init__(self):
-        self._s3_uris_file_reader = get_s3_uris_file_reader()
+        self._s3_uris_file_reader = S3UrisFileReader()
         self._local_results = LocalResults()
 
     def run(self):
