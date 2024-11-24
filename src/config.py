@@ -9,7 +9,6 @@ from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
 from constants import FOLDER_NAME_S3_RESULTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
-from local_results import LocalResults
 from types_custom import S3Query
 
 
@@ -42,11 +41,6 @@ class Config:
 
     def get_s3_queries(self) -> list[S3Query]:
         return self._s3_uris_file_reader.get_s3_queries()
-
-    # TODO deprecate
-    def get_local_path_directory_bucket_results(self) -> Path:
-        # TODO deprecate as now buckets have not folder, results are saved in file with aws account name.
-        return LocalResults()._get_path_analysis_results()  # TODO not use private.
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)

@@ -10,6 +10,7 @@ from pandas.testing import assert_frame_equal
 
 from config import AwsAccountConfig
 from src import extract as m_extract
+from src.local_results import LocalResults
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 from tests.config import get_config_for_the_test
@@ -31,14 +32,14 @@ class TestAwsAccountExtractor(unittest.TestCase):
     def test_extract_enerates_expected_result(self):
         config = get_config_for_the_test()
         # TODO? refactor move to AwsAccountConfig
-        file_path_results = config.get_local_path_directory_bucket_results().joinpath(
-            AwsAccountConfig(config._aws_account, config)._aws_account_results_file_name
+        file_path_results = (
+            LocalResults()
+            ._get_path_analysis_results()
+            .joinpath(AwsAccountConfig(config._aws_account, config)._aws_account_results_file_name)
         )
-        # TODO use _LocalResults
-        # TODO RM exported_files_directory_path = config.get_local_path_directory_bucket_results()
         # TODO do it better
-        if not Path(config.get_local_path_directory_bucket_results()).exists():
-            os.makedirs(config.get_local_path_directory_bucket_results())
+        if not Path(LocalResults()._get_path_analysis_results()).exists():
+            os.makedirs(LocalResults()._get_path_analysis_results())
         s3_queries = config.get_s3_queries()
         m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
