@@ -22,9 +22,8 @@ class Config:
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
-        path_to_check = LocalResults().path_directory_all_results
         # TODO depreate, use LocalResults: self.get_local_path_directory_results_to_compare()
-        result = os.listdir(path_to_check)
+        result = os.listdir(_get_path_directory_all_results())
         result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
         return result
@@ -46,6 +45,11 @@ class Config:
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+
+
+# TODO move inside class Config (the problem is the test mock won't work)
+def _get_path_directory_all_results() -> Path:
+    return LocalResults().path_directory_all_results
 
 
 class AwsAccountConfig:

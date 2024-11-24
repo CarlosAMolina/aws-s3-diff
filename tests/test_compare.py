@@ -18,9 +18,9 @@ class TestS3DataComparator(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch("src.config.LocalResults")
-    def test_get_df_s3_data_analyzed(self, mock_local_results):
-        mock_local_results().path_directory_all_results = self.current_path.joinpath(
+    @patch("src.config._get_path_directory_all_results")
+    def test_get_df_s3_data_analyzed(self, mock_path_directory_all_results):
+        mock_path_directory_all_results.return_value = self.current_path.joinpath(
             "fake-files", FOLDER_NAME_S3_RESULTS, "exports-all-aws-accounts"
         )
         config = get_config_for_the_test()
