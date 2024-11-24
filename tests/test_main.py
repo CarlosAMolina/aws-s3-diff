@@ -17,7 +17,8 @@ class TestFunction_run(unittest.TestCase):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
         S3().create_objects()
-        remove_file_with_analysis_date_if_exists()  # Drop created file by the user when runs the program.
+        # Drop created file when the user runs the main program instead of the tests.
+        remove_file_with_analysis_date_if_exists()
 
     def tearDown(self):
         self.mock_aws.stop()
