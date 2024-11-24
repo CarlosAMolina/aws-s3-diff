@@ -20,7 +20,7 @@ class S3:
         self._s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
         self._s3_client = boto3.client("s3", endpoint_url=endpoint_url)
         current_path = Path(__file__).parent.absolute()
-        self._local_s3_objects_path = current_path.joinpath("s3-files/aws_account_1_pro")
+        self._local_s3_objects_path = current_path.joinpath("fake-files/s3-files/aws_account_1_pro")
 
     def create_objects(self):
         self._create_buckets()
