@@ -42,7 +42,9 @@ class TestAwsAccountExtractor(unittest.TestCase):
         s3_queries = config.get_s3_queries()
         m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
-        expected_result_df = read_csv_as_df("tests/s3-results/exports-all-aws-accounts/aws_account_1_pro.csv")
+        expected_result_df = read_csv_as_df(
+            "tests/fake-files/s3-results/exports-all-aws-accounts/aws_account_1_pro.csv"
+        )
         expected_result_df["date"] = result_df["date"]
         assert_frame_equal(expected_result_df, result_df)
 
