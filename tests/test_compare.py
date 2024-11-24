@@ -33,7 +33,7 @@ class TestS3DataComparator(unittest.TestCase):
         assert_frame_equal(expected_result, result_as_csv_export)
 
     def _get_df_from_csv_expected_result(self) -> Df:
-        expected_result_file_path = self.current_path.joinpath("expected-results", "expected_result_compare.csv")
+        expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")
         result = read_csv(expected_result_file_path).astype(
             {
                 "aws_account_1_pro_size": "Int64",
