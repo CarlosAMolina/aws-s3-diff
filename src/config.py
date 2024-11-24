@@ -14,16 +14,17 @@ from types_custom import S3Query
 
 class Config:
     # TODO move all aws_account methods to AwsAccountConfig
-    def __init__(self, aws_account: str):
+    def __init__(self, aws_account: str, local_results: LocalResults):
         self._aws_account = aws_account
+        self._local_results = local_results
         # TODO not do this in init
-        self._directory_s3_results_path = LocalResults().path_directory_all_results
+        self._directory_s3_results_path = LocalResults().path_directory_all_results()
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
         # TODO depreate, use LocalResults: self.get_local_path_directory_results_to_compare()
-        result = os.listdir(_get_path_directory_all_results())
+        result = os.listdir(self._local_results.path_directory_all_results())
         result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
         return result
@@ -45,11 +46,6 @@ class Config:
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
-
-
-# TODO move inside class Config (the problem is the test mock won't work)
-def _get_path_directory_all_results() -> Path:
-    return LocalResults().path_directory_all_results
 
 
 class AwsAccountConfig:
