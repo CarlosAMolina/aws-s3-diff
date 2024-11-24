@@ -46,8 +46,7 @@ class Config:
     # TODO deprecate
     def get_local_path_directory_bucket_results(self) -> Path:
         # TODO deprecate as now buckets have not folder, results are saved in file with aws account name.
-        analysis_date_time = LocalResults()._get_analysis_date_time_str()  # TODO not use private.
-        return self._directory_s3_results_path.joinpath(analysis_date_time)
+        return LocalResults()._get_path_analysis_results()  # TODO not use private.
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
