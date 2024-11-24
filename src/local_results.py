@@ -38,8 +38,13 @@ class LocalResults:
         return []
 
     def _get_path_analysis_results(self) -> Path:
+        return self.path_directory_all_results.joinpath(self._get_analysis_date_time_str())
+
+    # TODO? make private
+    @property
+    def path_directory_all_results(self) -> Path:
         current_path = Path(__file__).parent.absolute()
-        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS, self._get_analysis_date_time_str())
+        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
 
     def _get_analysis_date_time_str(self) -> str:
         if not Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file():

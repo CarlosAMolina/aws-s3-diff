@@ -7,8 +7,8 @@ from pandas import read_csv
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
-from constants import FOLDER_NAME_S3_RESULTS
 from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
+from local_results import LocalResults
 from types_custom import S3Query
 
 
@@ -17,16 +17,13 @@ class Config:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         # TODO not do this in init
-        self._directory_s3_results_path = self._get_directory_s3_results_path()
+        self._directory_s3_results_path = LocalResults().path_directory_all_results
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
-
-    def _get_directory_s3_results_path(self) -> Path:
-        current_path = Path(__file__).parent.absolute()
-        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
-        path_to_check = self.get_local_path_directory_results_to_compare()
+        path_to_check = LocalResults().path_directory_all_results
+        # TODO depreate, use LocalResults: self.get_local_path_directory_results_to_compare()
         result = os.listdir(path_to_check)
         result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
