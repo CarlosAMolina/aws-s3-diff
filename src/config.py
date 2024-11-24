@@ -14,10 +14,15 @@ from types_custom import S3Query
 
 class Config:
     # TODO move all aws_account methods to AwsAccountConfig
-    def __init__(self, aws_account: str, directory_s3_results_path: Path, file_what_to_analyze_path: Path):
+    def __init__(self, aws_account: str, file_what_to_analyze_path: Path):
         self._aws_account = aws_account
-        self._directory_s3_results_path = directory_s3_results_path
+        # TODO not do this in init
+        self._directory_s3_results_path = self._get_directory_s3_results_path()
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account, file_what_to_analyze_path)
+
+    def _get_directory_s3_results_path(self) -> Path:
+        current_path = Path(__file__).parent.absolute()
+        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
@@ -124,7 +129,5 @@ def get_s3_uris_file_reader() -> S3UrisFileReader:
 
 
 def get_config(aws_account: str) -> Config:
-    current_path = Path(__file__).parent.absolute()
-    directory_s3_results_path = current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
     file_what_to_analyze_path = _S3UrisFile().file_path
-    return Config(aws_account, directory_s3_results_path, file_what_to_analyze_path)
+    return Config(aws_account, file_what_to_analyze_path)
