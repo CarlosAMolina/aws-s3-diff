@@ -34,7 +34,10 @@ class LocalResults:
     def _get_aws_accounts_analyzed(self) -> list[str]:
         if self._get_path_analysis_results().is_dir():
             # TODO use self._get_path_analysis_results().iterdir():
-            return os.listdir(self._get_path_analysis_results())
+            result = os.listdir(self._get_path_analysis_results())
+            result = [file_name[: -len(".csv")] for file_name in result]
+            result.sort()
+            return result
         return []
 
     def _get_path_analysis_results(self) -> Path:

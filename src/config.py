@@ -17,10 +17,7 @@ class Config:
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
-        result = LocalResults()._get_aws_accounts_analyzed()
-        result = [file_name[: -len(".csv")] for file_name in result]
-        result.sort()
-        return result
+        return LocalResults()._get_aws_accounts_analyzed()
 
     def get_aws_account_with_data_to_sync(self) -> str:
         for aws_account in self.get_aws_accounts_exported():
