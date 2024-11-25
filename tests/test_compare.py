@@ -19,14 +19,18 @@ class TestS3DataComparator(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
+    @patch("src.config.LocalResults._get_analysis_date_time_str")
     @patch("src.config.LocalResults.path_directory_all_results")
     @patch("src.config._S3UrisFile.file_path")
-    def test_get_df_s3_data_analyzed(self, mock_file_what_to_analyze_path, mock_path_directory_all_results):
+    def test_get_df_s3_data_analyzed(
+        self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
+    ):
         current_path = Path(__file__).parent.absolute()
         mock_file_what_to_analyze_path.return_value = current_path.joinpath(
             "fake-files", _S3UrisFile._FILE_NAME_S3_URIS
         )
         mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
+        mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
         config = Config("aws_account_1_pro")
         result = m_compare.S3DataComparator()._get_df_s3_data_analyzed(config)
         # m_compare.S3DataComparator().run(config)

@@ -7,7 +7,6 @@ from pandas import read_csv
 
 from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
 from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
-from constants import MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS
 from local_results import LocalResults
 from types_custom import S3Query
 
@@ -41,7 +40,8 @@ class Config:
         return _AwsAccountS3UrisFileReader(self._aws_account).get_s3_queries()
 
     def get_local_path_directory_results_to_compare(self) -> Path:
-        return LocalResults().path_directory_all_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+        # TODO not use private
+        return LocalResults()._get_path_analysis_results()
 
 
 class AwsAccountConfig:
