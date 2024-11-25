@@ -18,8 +18,7 @@ class Config:
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
-        # TODO depreate, use LocalResults: self.get_local_path_directory_results_to_compare()
-        result = os.listdir(self.get_local_path_directory_results_to_compare())
+        result = os.listdir(LocalResults()._get_path_analysis_results())
         result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
         return result
@@ -38,10 +37,6 @@ class Config:
 
     def get_s3_queries(self) -> list[S3Query]:
         return _AwsAccountS3UrisFileReader(self._aws_account).get_s3_queries()
-
-    def get_local_path_directory_results_to_compare(self) -> Path:
-        # TODO not use private
-        return LocalResults()._get_path_analysis_results()
 
 
 class AwsAccountConfig:
