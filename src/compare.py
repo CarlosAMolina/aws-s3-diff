@@ -5,6 +5,7 @@ from pandas import DataFrame as Df
 
 from config import AwsAccountConfig
 from config import Config
+from local_results import LocalResults
 
 
 class S3DataComparator:
@@ -20,7 +21,7 @@ class S3DataComparator:
 
 
 def _get_df_combine_files(config: Config) -> Df:
-    aws_accounts = config.get_aws_accounts_exported()
+    aws_accounts = LocalResults()._get_aws_accounts_analyzed()
     result = _get_df_for_aws_account(aws_accounts[0], config)
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account, config)
@@ -130,7 +131,7 @@ class _S3DataAnalyzer:
 
 
 def _get_accounts_where_files_must_be_copied(config: Config) -> list[str]:
-    result = config.get_aws_accounts_exported()
+    result = LocalResults()._get_aws_accounts_analyzed()
     aws_account_with_data_to_sync = config.get_aws_account_with_data_to_sync()
     result.remove(aws_account_with_data_to_sync)
     return result
