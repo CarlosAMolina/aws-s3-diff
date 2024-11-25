@@ -10,8 +10,8 @@ from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
 from src.config import _S3UrisFile
+from src.config import Config
 from src.constants import FOLDER_NAME_S3_RESULTS
-from tests.config import get_config_for_the_test
 
 
 class TestS3DataComparator(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestS3DataComparator(unittest.TestCase):
             "fake-files", _S3UrisFile._FILE_NAME_S3_URIS
         )
         mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
-        config = get_config_for_the_test()
+        config = Config("aws_account_1_pro")
         result = m_compare.S3DataComparator()._get_df_s3_data_analyzed(config)
         # m_compare.S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.

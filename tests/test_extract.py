@@ -10,10 +10,10 @@ from pandas.testing import assert_frame_equal
 
 from config import AwsAccountConfig
 from src import extract as m_extract
+from src.config import Config
 from src.local_results import LocalResults
 from tests.aws import S3
 from tests.aws import set_aws_credentials
-from tests.config import get_config_for_the_test
 
 ExpectedResult = list[dict]
 
@@ -30,7 +30,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         self.mock_aws.stop()
 
     def test_extract_enerates_expected_result(self):
-        config = get_config_for_the_test()
+        config = Config("aws_account_1_pro")
         # TODO? refactor move to AwsAccountConfig
         file_path_results = (
             LocalResults()
