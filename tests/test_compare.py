@@ -9,6 +9,7 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
+from src.config import _S3UrisFile
 from src.constants import FOLDER_NAME_S3_RESULTS
 from tests.config import get_config_for_the_test
 
@@ -19,8 +20,12 @@ class TestS3DataComparator(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     @patch("src.config.LocalResults.path_directory_all_results")
-    def test_get_df_s3_data_analyzed(self, mock_path_directory_all_results):
+    @patch("src.config._S3UrisFile.file_path")
+    def test_get_df_s3_data_analyzed(self, mock_file_what_to_analyze_path, mock_path_directory_all_results):
         current_path = Path(__file__).parent.absolute()
+        mock_file_what_to_analyze_path.return_value = current_path.joinpath(
+            "fake-files", _S3UrisFile._FILE_NAME_S3_URIS
+        )
         mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
         config = get_config_for_the_test()
         result = m_compare.S3DataComparator()._get_df_s3_data_analyzed(config)
