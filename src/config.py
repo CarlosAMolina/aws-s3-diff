@@ -17,7 +17,6 @@ class Config:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         # TODO not do this in init
-        self._directory_s3_results_path = LocalResults().path_directory_all_results()
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
 
     # TODO move method to class _LocalResults
@@ -44,7 +43,7 @@ class Config:
         return self._s3_uris_file_reader.get_s3_queries()
 
     def get_local_path_directory_results_to_compare(self) -> Path:
-        return self._directory_s3_results_path.joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
+        return LocalResults().path_directory_all_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
 
 
 class AwsAccountConfig:
