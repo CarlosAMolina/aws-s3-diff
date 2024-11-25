@@ -14,9 +14,8 @@ from types_custom import S3Query
 
 class Config:
     # TODO move all aws_account methods to AwsAccountConfig
-    def __init__(self, aws_account: str, local_results: LocalResults):
+    def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._local_results = local_results
         # TODO not do this in init
         self._directory_s3_results_path = LocalResults().path_directory_all_results()
         self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
@@ -24,7 +23,7 @@ class Config:
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
         # TODO depreate, use LocalResults: self.get_local_path_directory_results_to_compare()
-        result = os.listdir(self._local_results.path_directory_all_results())
+        result = os.listdir(self.get_local_path_directory_results_to_compare())
         result = [file_name[: -len(".csv")] for file_name in result]
         result.sort()
         return result

@@ -54,7 +54,7 @@ class _IteractiveMenu:
 class _AccountAnalyzer:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._config = Config(aws_account, LocalResults())
+        self._config = Config(aws_account)
         self._local_results = LocalResults()
 
     def run(self):
