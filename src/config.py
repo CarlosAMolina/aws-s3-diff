@@ -50,7 +50,8 @@ class AwsAccountConfig:
         self._config = config
 
     def get_local_path_file_results(self) -> Path:
-        return self._config.get_local_path_directory_results_to_compare().joinpath(self._aws_account_results_file_name)
+        # TODO not use private
+        return LocalResults()._get_path_analysis_results().joinpath(self._aws_account_results_file_name)
 
     @property
     def _aws_account_results_file_name(self) -> str:
