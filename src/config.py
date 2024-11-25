@@ -16,8 +16,6 @@ class Config:
     # TODO move all aws_account methods to AwsAccountConfig
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        # TODO not do this in init
-        self._s3_uris_file_reader = _AwsAccountS3UrisFileReader(aws_account)
 
     # TODO move method to class _LocalResults
     def get_aws_accounts_exported(self) -> list[str]:
@@ -40,7 +38,7 @@ class Config:
         raise ValueError("No aws account that must not have more files")
 
     def get_s3_queries(self) -> list[S3Query]:
-        return self._s3_uris_file_reader.get_s3_queries()
+        return _AwsAccountS3UrisFileReader(self._aws_account).get_s3_queries()
 
     def get_local_path_directory_results_to_compare(self) -> Path:
         return LocalResults().path_directory_all_results().joinpath(MAIN_FOLDER_NAME_EXPORTS_ALL_AWS_ACCOUNTS)
