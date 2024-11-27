@@ -16,6 +16,10 @@ class S3UrisFileReader:
     def get_number_of_aws_accounts(self) -> int:
         return len(self.get_aws_accounts())
 
+    def get_s3_queries_for_aws_account(self, aws_account: str) -> list[S3Query]:
+        s3_uris_to_analyze = self._get_df_file_what_to_analyze()[aws_account].to_list()
+        return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in s3_uris_to_analyze]
+
     @property
     def _file_what_to_analyze_path(self) -> Path:
         current_path = Path(__file__).parent.absolute()
@@ -25,18 +29,12 @@ class S3UrisFileReader:
         return read_csv(self._file_what_to_analyze_path)
 
 
-class AwsAccountS3UrisFileReader(S3UrisFileReader):
+class AwsAccountS3UrisFileReader:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        super().__init__()
 
     def get_s3_queries(self) -> list[S3Query]:
-        return [
-            S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in self._get_s3_uris_to_analyze()
-        ]
-
-    def _get_s3_uris_to_analyze(self) -> list[str]:
-        return self._get_df_file_what_to_analyze()[self._aws_account].to_list()
+        return S3UrisFileReader().get_s3_queries_for_aws_account(self._aws_account)
 
 
 class _S3UriParts:
