@@ -15,11 +15,11 @@ class S3DataComparator:
         _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
 
     def _get_df_s3_data_analyzed(self, config: Config) -> Df:
-        s3_data_df = _get_df_combine_files(config)
+        s3_data_df = _get_df_combine_files()
         return _S3DataAnalyzer(config).get_df_set_analysis_columns(s3_data_df)
 
 
-def _get_df_combine_files(config: Config) -> Df:
+def _get_df_combine_files() -> Df:
     aws_accounts = LocalResults()._get_aws_accounts_analyzed()
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
