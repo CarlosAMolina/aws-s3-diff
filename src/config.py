@@ -27,9 +27,6 @@ class Config:
                 return aws_account
         raise ValueError("No aws account that must not have more files")
 
-    def get_s3_queries(self) -> list[S3Query]:
-        return AwsAccountS3UrisFileReader(self._aws_account).get_s3_queries()
-
 
 class AwsAccountConfig:
     def __init__(self, aws_account: str, config: Config):
