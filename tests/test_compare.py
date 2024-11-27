@@ -9,8 +9,8 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
-from src.config import _S3UrisFile
 from src.constants import FOLDER_NAME_S3_RESULTS
+from src.s3_uris_to_analyze import _S3UrisFile
 
 
 class TestS3DataComparator(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestS3DataComparator(unittest.TestCase):
 
     @patch("src.analysis.LocalResults._get_analysis_date_time_str")
     @patch("src.analysis.LocalResults.path_directory_all_results")
-    @patch("src.config._S3UrisFile.file_path")
+    @patch("src.s3_uris_to_analyze._S3UrisFile.file_path")
     def test_get_df_s3_data_analyzed(
         self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
     ):

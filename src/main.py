@@ -1,9 +1,9 @@
 import sys
 
-from config import AwsAccountS3UrisFileReader
-from config import S3UrisFileReader
 from extract import AwsAccountExtractor
 from local_results import LocalResults
+from s3_uris_to_analyze import AwsAccountS3UrisFileReader
+from s3_uris_to_analyze import S3UrisFileReader
 
 
 def run():

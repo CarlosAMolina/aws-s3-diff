@@ -9,8 +9,8 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import extract as m_extract
-from src.config import AwsAccountS3UrisFileReader
 from src.local_results import LocalResults
+from src.s3_uris_to_analyze import AwsAccountS3UrisFileReader
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 
