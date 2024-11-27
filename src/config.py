@@ -4,9 +4,8 @@ from pathlib import Path
 from pandas import DataFrame as Df
 from pandas import read_csv
 
-from constants import AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX
-from constants import AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX
-from local_results import LocalResults
+from analysis import get_aws_account_that_must_not_have_more_files
+from analysis import get_aws_account_with_data_to_sync
 from types_custom import S3Query
 
 
@@ -15,16 +14,10 @@ class Config:
         pass
 
     def get_aws_account_with_data_to_sync(self) -> str:
-        for aws_account in LocalResults()._get_aws_accounts_analyzed():
-            if aws_account.startswith(AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX):
-                return aws_account
-        raise ValueError("No aws account to sync")
+        return get_aws_account_with_data_to_sync()
 
     def get_aws_account_that_must_not_have_more_files(self) -> str:
-        for aws_account in LocalResults()._get_aws_accounts_analyzed():
-            if aws_account.startswith(AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
-                return aws_account
-        raise ValueError("No aws account that must not have more files")
+        return get_aws_account_that_must_not_have_more_files()
 
 
 class _S3UrisFile:
