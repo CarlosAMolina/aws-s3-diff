@@ -12,7 +12,7 @@ from local_results import LocalResults
 class S3DataComparator:
     def run(self, config: Config):
         s3_analyzed_df = self._get_df_s3_data_analyzed(config)
-        _show_summary(config, s3_analyzed_df)
+        _show_summary(s3_analyzed_df)
         # TODO save in this projects instead of in /tmp
         _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
 
@@ -78,7 +78,7 @@ class _S3DataAnalyzer:
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
-        for aws_account_to_compare in _get_accounts_where_files_must_be_copied(self._config):
+        for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
             condition_sync_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
                 df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
             )
@@ -130,15 +130,15 @@ class _S3DataAnalyzer:
         return df
 
 
-def _get_accounts_where_files_must_be_copied(config: Config) -> list[str]:
+def _get_accounts_where_files_must_be_copied() -> list[str]:
     result = LocalResults()._get_aws_accounts_analyzed()
     aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
     result.remove(aws_account_with_data_to_sync)
     return result
 
 
-def _show_summary(config: Config, df: Df):
-    for aws_account_to_compare in _get_accounts_where_files_must_be_copied(config):
+def _show_summary(df: Df):
+    for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
         aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
