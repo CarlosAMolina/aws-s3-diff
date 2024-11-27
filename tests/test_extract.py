@@ -10,7 +10,7 @@ from pandas.testing import assert_frame_equal
 
 from src import extract as m_extract
 from src.local_results import LocalResults
-from src.s3_uris_to_analyze import AwsAccountS3UrisFileReader
+from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3
 from tests.aws import set_aws_credentials
 
@@ -38,7 +38,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         # TODO do it better
         if not Path(LocalResults()._get_path_analysis_results()).exists():
             os.makedirs(LocalResults()._get_path_analysis_results())
-        s3_queries = AwsAccountS3UrisFileReader(aws_account).get_s3_queries()
+        s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
         m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
         expected_result_df = read_csv_as_df(

@@ -29,14 +29,6 @@ class S3UrisFileReader:
         return read_csv(self._file_what_to_analyze_path)
 
 
-class AwsAccountS3UrisFileReader:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
-
-    def get_s3_queries(self) -> list[S3Query]:
-        return S3UrisFileReader().get_s3_queries_for_aws_account(self._aws_account)
-
-
 class _S3UriParts:
     def __init__(self, s3_uri: str):
         self._s3_uri = s3_uri

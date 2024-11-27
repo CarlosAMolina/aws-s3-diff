@@ -2,7 +2,6 @@ import sys
 
 from extract import AwsAccountExtractor
 from local_results import LocalResults
-from s3_uris_to_analyze import AwsAccountS3UrisFileReader
 from s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -60,7 +59,7 @@ class _AccountAnalyzer:
         print(f"Analyzing the account: {self._aws_account}")
         AwsAccountExtractor(
             self._local_results.get_file_path_aws_account_results(self._aws_account),
-            AwsAccountS3UrisFileReader(self._aws_account).get_s3_queries(),
+            S3UrisFileReader().get_s3_queries_for_aws_account(self._aws_account),
         ).extract()
 
         # TODO create the results file after retrieve aws results to avoid not use the folder if any aws error
