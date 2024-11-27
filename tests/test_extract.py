@@ -9,7 +9,7 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import extract as m_extract
-from src.config import Config
+from src.config import AwsAccountS3UrisFileReader
 from src.local_results import LocalResults
 from tests.aws import S3
 from tests.aws import set_aws_credentials
@@ -29,17 +29,17 @@ class TestAwsAccountExtractor(unittest.TestCase):
         self.mock_aws.stop()
 
     def test_extract_enerates_expected_result(self):
-        config = Config("aws_account_1_pro")
+        aws_account = "aws_account_1_pro"
         # TODO? refactor move to AwsAccountConfig
         file_path_results = (
             LocalResults()
             ._get_path_analysis_results()
-            .joinpath(LocalResults()._get_file_name_aws_account_results(config._aws_account))
+            .joinpath(LocalResults()._get_file_name_aws_account_results(aws_account))
         )
         # TODO do it better
         if not Path(LocalResults()._get_path_analysis_results()).exists():
             os.makedirs(LocalResults()._get_path_analysis_results())
-        s3_queries = config.get_s3_queries()
+        s3_queries = AwsAccountS3UrisFileReader(aws_account).get_s3_queries()
         m_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
         expected_result_df = read_csv_as_df(
