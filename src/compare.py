@@ -7,14 +7,14 @@ _AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX = "aws_account_1"
 _AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX = "aws_account_2"
 
 
-def get_aws_account_with_data_to_sync() -> str:
+def _get_aws_account_with_data_to_sync() -> str:
     for aws_account in LocalResults()._get_aws_accounts_analyzed():
         if aws_account.startswith(_AWS_ACCOUNT_WITH_DATA_TO_SYNC_PREFIX):
             return aws_account
     raise ValueError("No aws account to sync")
 
 
-def get_aws_account_that_must_not_have_more_files() -> str:
+def _get_aws_account_that_must_not_have_more_files() -> str:
     for aws_account in LocalResults()._get_aws_accounts_analyzed():
         if aws_account.startswith(_AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
             return aws_account
@@ -40,7 +40,7 @@ class _S3DataAnalyzer:
         return self._get_df_set_analysis_must_file_exist(result)
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
-        aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
+        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
             condition_sync_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
                 df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
@@ -71,8 +71,8 @@ class _S3DataAnalyzer:
         return df
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
-        aws_account_without_more_files = get_aws_account_that_must_not_have_more_files()
+        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+        aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
         column_name_result = f"must_exist_in_{aws_account_without_more_files}"
         df[
             [
@@ -95,14 +95,14 @@ class _S3DataAnalyzer:
 
 def _get_accounts_where_files_must_be_copied() -> list[str]:
     result = LocalResults()._get_aws_accounts_analyzed()
-    aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
+    aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
     result.remove(aws_account_with_data_to_sync)
     return result
 
 
 def _show_summary(df: Df):
     for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
-        aws_account_with_data_to_sync = get_aws_account_with_data_to_sync()
+        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
