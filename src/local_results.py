@@ -21,8 +21,10 @@ class LocalResults:
             self._create_analysis_results_folder()
 
     def get_file_path_aws_account_results(self, aws_account: str):
-        file_name = f"{aws_account}.csv"
-        return self._get_path_analysis_results().joinpath(file_name)
+        return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
+
+    def _get_file_name_aws_account_results(self, aws_account: str):
+        return f"{aws_account}.csv"
 
     def _create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")

@@ -37,12 +37,7 @@ class AwsAccountConfig:
         self._config = config
 
     def get_local_path_file_results(self) -> Path:
-        # TODO not use private
-        return LocalResults()._get_path_analysis_results().joinpath(self._aws_account_results_file_name)
-
-    @property
-    def _aws_account_results_file_name(self) -> str:
-        return f"{self._aws_account}.csv"
+        return LocalResults().get_file_path_aws_account_results(self._aws_account)
 
 
 class _S3UrisFile:

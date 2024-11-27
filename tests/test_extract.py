@@ -8,7 +8,6 @@ from moto import mock_aws
 from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
-from config import AwsAccountConfig
 from src import extract as m_extract
 from src.config import Config
 from src.local_results import LocalResults
@@ -35,7 +34,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         file_path_results = (
             LocalResults()
             ._get_path_analysis_results()
-            .joinpath(AwsAccountConfig(config._aws_account, config)._aws_account_results_file_name)
+            .joinpath(LocalResults()._get_file_name_aws_account_results(config._aws_account))
         )
         # TODO do it better
         if not Path(LocalResults()._get_path_analysis_results()).exists():
