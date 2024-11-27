@@ -11,7 +11,6 @@ from types_custom import S3Query
 
 
 class Config:
-    # TODO move all aws_account methods to AwsAccountConfig
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
 
@@ -26,15 +25,6 @@ class Config:
             if aws_account.startswith(AWS_ACCOUNT_WITHOUT_MORE_FILES_PREFIX):
                 return aws_account
         raise ValueError("No aws account that must not have more files")
-
-
-class AwsAccountConfig:
-    def __init__(self, aws_account: str, config: Config):
-        self._aws_account = aws_account
-        self._config = config
-
-    def get_local_path_file_results(self) -> Path:
-        return LocalResults().get_file_path_aws_account_results(self._aws_account)
 
 
 class _S3UrisFile:

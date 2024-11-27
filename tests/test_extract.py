@@ -30,7 +30,6 @@ class TestAwsAccountExtractor(unittest.TestCase):
 
     def test_extract_enerates_expected_result(self):
         aws_account = "aws_account_1_pro"
-        # TODO? refactor move to AwsAccountConfig
         file_path_results = (
             LocalResults()
             ._get_path_analysis_results()
