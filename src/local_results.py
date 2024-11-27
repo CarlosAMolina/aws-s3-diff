@@ -2,12 +2,11 @@ import datetime
 import os
 from pathlib import Path
 
-from constants import FOLDER_NAME_S3_RESULTS
-
 
 class LocalResults:
     # TODO remove this file when the 3º account has been analyzed.
     _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
+    _FOLDER_NAME_S3_RESULTS = "s3-results"
 
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
@@ -49,7 +48,7 @@ class LocalResults:
     # TODO rename to get_path...
     def path_directory_all_results(self) -> Path:
         current_path = Path(__file__).parent.absolute()
-        return current_path.parent.joinpath(FOLDER_NAME_S3_RESULTS)
+        return current_path.parent.joinpath(self._FOLDER_NAME_S3_RESULTS)
 
     def _get_analysis_date_time_str(self) -> str:
         if not Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file():

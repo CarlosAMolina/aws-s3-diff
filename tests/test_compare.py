@@ -8,8 +8,8 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
+from local_results import LocalResults
 from src import compare as m_compare
-from src.constants import FOLDER_NAME_S3_RESULTS
 from src.s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -28,7 +28,9 @@ class TestS3DataComparator(unittest.TestCase):
         mock_file_what_to_analyze_path.return_value = current_path.joinpath(
             "fake-files", S3UrisFileReader._FILE_NAME_S3_URIS
         )
-        mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
+        mock_path_directory_all_results.return_value = current_path.joinpath(
+            "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
+        )
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
         result = m_compare.S3DataComparator()._get_df_s3_data_analyzed()
         # m_compare.S3DataComparator().run(config)
