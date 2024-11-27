@@ -21,9 +21,9 @@ class S3DataComparator:
 
 def _get_df_combine_files(config: Config) -> Df:
     aws_accounts = LocalResults()._get_aws_accounts_analyzed()
-    result = _get_df_for_aws_account(aws_accounts[0], config)
+    result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
-        account_df = _get_df_for_aws_account(aws_account, config)
+        account_df = _get_df_for_aws_account(aws_account)
         result = result.join(account_df, how="outer")
     # TODO not drop only if its the only bucket and prefix, in
     # TODO order to maintain empty query results. And add this situtation to the tests
@@ -33,7 +33,7 @@ def _get_df_combine_files(config: Config) -> Df:
 # TODO when reading the uris to check, assert all accounts all paths to analyze.
 
 
-def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
+def _get_df_for_aws_account(aws_account: str) -> Df:
     local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
     result = _get_df_from_file(local_file_path_name)
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
