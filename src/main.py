@@ -1,7 +1,7 @@
 import sys
 
-from extract import AwsAccountExtractor
 from local_results import LocalResults
+from s3_extract import AwsAccountExtractor
 from s3_uris_to_analyze import S3UrisFileReader
 
 
