@@ -10,8 +10,7 @@ from types_custom import S3Query
 
 
 class Config:
-    def __init__(self):
-        pass
+    pass
 
     def get_aws_account_with_data_to_sync(self) -> str:
         return get_aws_account_with_data_to_sync()
