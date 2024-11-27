@@ -3,7 +3,6 @@ from pathlib import Path
 import pandas as pd
 from pandas import DataFrame as Df
 
-from config import AwsAccountConfig
 from config import Config
 from local_results import LocalResults
 
@@ -35,8 +34,7 @@ def _get_df_combine_files(config: Config) -> Df:
 
 
 def _get_df_for_aws_account(aws_account: str, config: Config) -> Df:
-    aws_account_config = AwsAccountConfig(aws_account, config)
-    local_file_path_name = aws_account_config.get_local_path_file_results()
+    local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
     result = _get_df_from_file(local_file_path_name)
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
     return result
