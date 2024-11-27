@@ -31,7 +31,7 @@ class TestS3DataComparator(unittest.TestCase):
         )
         mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
-        config = Config("aws_account_1_pro")
+        config = Config()
         result = m_compare.S3DataComparator()._get_df_s3_data_analyzed(config)
         # m_compare.S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.

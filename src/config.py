@@ -11,8 +11,8 @@ from types_custom import S3Query
 
 
 class Config:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
+    def __init__(self):
+        pass
 
     def get_aws_account_with_data_to_sync(self) -> str:
         for aws_account in LocalResults()._get_aws_accounts_analyzed():
