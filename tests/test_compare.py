@@ -10,7 +10,7 @@ from pandas.testing import assert_frame_equal
 
 from src import compare as m_compare
 from src.constants import FOLDER_NAME_S3_RESULTS
-from src.s3_uris_to_analyze import _S3UrisFile
+from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class TestS3DataComparator(unittest.TestCase):
@@ -20,13 +20,13 @@ class TestS3DataComparator(unittest.TestCase):
 
     @patch("src.analysis.LocalResults._get_analysis_date_time_str")
     @patch("src.analysis.LocalResults.path_directory_all_results")
-    @patch("src.s3_uris_to_analyze._S3UrisFile.file_path")
+    @patch("src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path")
     def test_get_df_s3_data_analyzed(
         self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
     ):
         current_path = Path(__file__).parent.absolute()
         mock_file_what_to_analyze_path.return_value = current_path.joinpath(
-            "fake-files", _S3UrisFile._FILE_NAME_S3_URIS
+            "fake-files", S3UrisFileReader._FILE_NAME_S3_URIS
         )
         mock_path_directory_all_results.return_value = current_path.joinpath("fake-files", FOLDER_NAME_S3_RESULTS)
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str

@@ -7,24 +7,19 @@ from pandas import read_csv
 from types_custom import S3Query
 
 
-class _S3UrisFile:
-    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.csv"
-
-    @property
-    def file_path(self) -> Path:
-        current_path = Path(__file__).parent.absolute()
-        return current_path.joinpath(self._FILE_NAME_S3_URIS)
-
-
 class S3UrisFileReader:
-    def __init__(self):
-        self._file_what_to_analyze_path = _S3UrisFile().file_path
+    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.csv"
 
     def get_aws_accounts(self) -> list[str]:
         return self._get_df_file_what_to_analyze().columns.to_list()
 
     def get_number_of_aws_accounts(self) -> int:
         return len(self.get_aws_accounts())
+
+    @property
+    def _file_what_to_analyze_path(self) -> Path:
+        current_path = Path(__file__).parent.absolute()
+        return current_path.joinpath(self._FILE_NAME_S3_URIS)
 
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_what_to_analyze_path)
