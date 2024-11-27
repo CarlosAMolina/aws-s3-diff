@@ -4,20 +4,6 @@ from combine import get_df_combine_files
 from local_results import LocalResults
 
 
-def _get_aws_account_with_data_to_sync() -> str:
-    for aws_account in LocalResults()._get_aws_accounts_analyzed():
-        if aws_account.startswith("aws_account_1"):
-            return aws_account
-    raise ValueError("No aws account to sync")
-
-
-def _get_aws_account_that_must_not_have_more_files() -> str:
-    for aws_account in LocalResults()._get_aws_accounts_analyzed():
-        if aws_account.startswith("aws_account_2"):
-            return aws_account
-    raise ValueError("No aws account that must not have more files")
-
-
 class S3DataComparator:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
@@ -88,6 +74,20 @@ class _S3DataAnalyzer:
                 ],
             ] = result
         return df
+
+
+def _get_aws_account_with_data_to_sync() -> str:
+    for aws_account in LocalResults()._get_aws_accounts_analyzed():
+        if aws_account.startswith("aws_account_1"):
+            return aws_account
+    raise ValueError("No aws account to sync")
+
+
+def _get_aws_account_that_must_not_have_more_files() -> str:
+    for aws_account in LocalResults()._get_aws_accounts_analyzed():
+        if aws_account.startswith("aws_account_2"):
+            return aws_account
+    raise ValueError("No aws account that must not have more files")
 
 
 def _get_accounts_where_files_must_be_copied() -> list[str]:
