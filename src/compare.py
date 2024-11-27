@@ -5,20 +5,19 @@ from pandas import DataFrame as Df
 
 from analysis import get_aws_account_that_must_not_have_more_files
 from analysis import get_aws_account_with_data_to_sync
-from config import Config
 from local_results import LocalResults
 
 
 class S3DataComparator:
-    def run(self, config: Config):
-        s3_analyzed_df = self._get_df_s3_data_analyzed(config)
+    def run(self):
+        s3_analyzed_df = self._get_df_s3_data_analyzed()
         _show_summary(s3_analyzed_df)
         # TODO save in this projects instead of in /tmp
         _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
 
-    def _get_df_s3_data_analyzed(self, config: Config) -> Df:
+    def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = _get_df_combine_files()
-        return _S3DataAnalyzer(config).get_df_set_analysis_columns(s3_data_df)
+        return _S3DataAnalyzer().get_df_set_analysis_columns(s3_data_df)
 
 
 def _get_df_combine_files() -> Df:
@@ -68,9 +67,6 @@ def _get_df_from_file(file_path_name: Path) -> Df:
 
 
 class _S3DataAnalyzer:
-    def __init__(self, config: Config):
-        self._config = config
-
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
         result = self._get_df_set_analysis_sync(result)
