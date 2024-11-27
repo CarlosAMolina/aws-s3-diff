@@ -4,17 +4,7 @@ from pathlib import Path
 from pandas import DataFrame as Df
 from pandas import read_csv
 
-from analysis import get_aws_account_that_must_not_have_more_files
-from analysis import get_aws_account_with_data_to_sync
 from types_custom import S3Query
-
-
-class Config:
-    def get_aws_account_with_data_to_sync(self) -> str:
-        return get_aws_account_with_data_to_sync()
-
-    def get_aws_account_that_must_not_have_more_files(self) -> str:
-        return get_aws_account_that_must_not_have_more_files()
 
 
 class _S3UrisFile:
