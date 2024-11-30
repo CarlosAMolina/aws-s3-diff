@@ -16,12 +16,15 @@ class S3DataComparator:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        return _S3DataAnalyzer().get_df_set_analysis_columns(s3_data_df)
+        return _S3DataAnalyzer(self._get_aws_account_with_data_to_sync()).get_df_set_analysis_columns(s3_data_df)
+
+    def _get_aws_account_with_data_to_sync(self) -> str:
+        return _get_aws_account_with_data_to_sync()
 
 
 class _S3DataAnalyzer:
-    def __init__(self):
-        self._aws_account_origin = _get_aws_account_with_data_to_sync()
+    def __init__(self, aws_account_origin: str):
+        self._aws_account_origin = aws_account_origin
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
