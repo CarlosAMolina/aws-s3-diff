@@ -10,21 +10,31 @@ from s3_uris_to_analyze import S3UrisFileReader
 class S3DataComparator:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        _show_summary(self._get_aws_account_with_data_to_sync(), s3_analyzed_df)
+        _show_summary(
+            self._get_aws_account_with_data_to_sync(), self._get_accounts_where_files_must_be_copied(), s3_analyzed_df
+        )
         # TODO save in this projects instead of in /tmp
         AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        return _S3DataAnalyzer(self._get_aws_account_with_data_to_sync()).get_df_set_analysis_columns(s3_data_df)
+        return _S3DataAnalyzer(
+            self._get_aws_account_with_data_to_sync(), self._get_accounts_where_files_must_be_copied()
+        ).get_df_set_analysis_columns(s3_data_df)
 
     def _get_aws_account_with_data_to_sync(self) -> str:
-        return _get_aws_account_with_data_to_sync()
+        return S3UrisFileReader().get_aws_accounts()[0]
+
+    def _get_accounts_where_files_must_be_copied(self) -> list[str]:
+        result = S3UrisFileReader().get_aws_accounts()
+        result.remove(self._get_aws_account_with_data_to_sync())
+        return result
 
 
 class _S3DataAnalyzer:
-    def __init__(self, aws_account_origin: str):
+    def __init__(self, aws_account_origin: str, accounts_where_files_must_be_copied: list[str]):
         self._aws_account_origin = aws_account_origin
+        self._accounts_where_files_must_be_copied = accounts_where_files_must_be_copied
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
@@ -33,7 +43,7 @@ class _S3DataAnalyzer:
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         result = df
-        for aws_account_target in _get_accounts_where_files_must_be_copied():
+        for aws_account_target in self._accounts_where_files_must_be_copied:
             result = _AccountSyncAnalysis(self._aws_account_origin, aws_account_target, result).get_df_set_analysis()
         return result
 
@@ -135,10 +145,6 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         return f"must_exist_in_{self._aws_account_target}"
 
 
-def _get_aws_account_with_data_to_sync() -> str:
-    return S3UrisFileReader().get_aws_accounts()[0]
-
-
 def _get_aws_account_that_must_not_have_more_files() -> str:
     for aws_account in LocalResults()._get_aws_accounts_analyzed():
         if aws_account.startswith("aws_account_2"):
@@ -146,14 +152,8 @@ def _get_aws_account_that_must_not_have_more_files() -> str:
     raise ValueError("No aws account that must not have more files")
 
 
-def _get_accounts_where_files_must_be_copied() -> list[str]:
-    result = S3UrisFileReader().get_aws_accounts()
-    result.remove(_get_aws_account_with_data_to_sync())
-    return result
-
-
-def _show_summary(aws_account_with_data_to_sync: str, df: Df):
-    for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
+def _show_summary(aws_account_with_data_to_sync: str, accounts_where_files_must_be_copied: list[str], df: Df):
+    for aws_account_to_compare in accounts_where_files_must_be_copied:
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
