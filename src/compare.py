@@ -88,7 +88,7 @@ class _AccountSyncAnalysis:
             ]
         ] = None
         for result, condition in {
-            False: self._condition_sync_wrong_in_account,
+            False: self._condition_sync_is_wrong,
             True: condition_sync_ok_in_account,
             "No file to sync": condition_sync_not_required,
         }.items():
@@ -101,7 +101,7 @@ class _AccountSyncAnalysis:
         return df
 
     @property
-    def _condition_sync_wrong_in_account(self) -> Series:
+    def _condition_sync_is_wrong(self) -> Series:
         return (self._df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
             self._df.loc[:, (self._aws_account_origin, "size")] != self._df.loc[:, (self._aws_account_target, "size")]
         )
