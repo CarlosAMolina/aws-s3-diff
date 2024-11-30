@@ -19,7 +19,9 @@ class S3DataComparator:
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
         return _S3DataAnalyzer(
-            self._get_aws_account_with_data_to_sync(), self._get_accounts_where_files_must_be_copied()
+            self._get_aws_account_with_data_to_sync(),
+            self._get_aws_account_that_must_not_have_more_files(),
+            self._get_accounts_where_files_must_be_copied(),
         ).get_df_set_analysis_columns(s3_data_df)
 
     def _get_aws_account_with_data_to_sync(self) -> str:
@@ -30,10 +32,23 @@ class S3DataComparator:
         result.remove(self._get_aws_account_with_data_to_sync())
         return result
 
+    def _get_aws_account_that_must_not_have_more_files(self) -> str:
+        # TODO use S3UrisFileReader instead of LocalResults
+        for aws_account in LocalResults()._get_aws_accounts_analyzed():
+            if aws_account.startswith("aws_account_2"):
+                return aws_account
+        raise ValueError("No aws account that must not have more files")
+
 
 class _S3DataAnalyzer:
-    def __init__(self, aws_account_origin: str, accounts_where_files_must_be_copied: list[str]):
+    def __init__(
+        self,
+        aws_account_origin: str,
+        aws_account_that_must_not_have_more_files: str,
+        accounts_where_files_must_be_copied: list[str],
+    ):
         self._aws_account_origin = aws_account_origin
+        self._aws_account_that_must_not_have_more_files = aws_account_that_must_not_have_more_files
         self._accounts_where_files_must_be_copied = accounts_where_files_must_be_copied
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
@@ -48,9 +63,8 @@ class _S3DataAnalyzer:
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
         return _TargetAccountWithoutMoreFilesAnalysis(
-            self._aws_account_origin, aws_account_without_more_files, df
+            self._aws_account_origin, self._aws_account_that_must_not_have_more_files, df
         ).get_df_set_analysis()
 
 
@@ -143,13 +157,6 @@ class _TargetAccountWithoutMoreFilesAnalysis:
     @property
     def _column_name_result(self) -> str:
         return f"must_exist_in_{self._aws_account_target}"
-
-
-def _get_aws_account_that_must_not_have_more_files() -> str:
-    for aws_account in LocalResults()._get_aws_accounts_analyzed():
-        if aws_account.startswith("aws_account_2"):
-            return aws_account
-    raise ValueError("No aws account that must not have more files")
 
 
 def _show_summary(aws_account_with_data_to_sync: str, accounts_where_files_must_be_copied: list[str], df: Df):
