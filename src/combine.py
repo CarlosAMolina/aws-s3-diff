@@ -7,56 +7,6 @@ from local_results import LocalResults
 
 
 def get_df_combine_files() -> Df:
-    # todo extract: _get_df_files_of_s3_queries()
-    # result = _get_df_from_uris_to_analyze()
-    # result["name"] = None
-    # for aws_account in LocalResults()._get_aws_accounts_analyzed():
-    #    account_df = _get_df_for_aws_account_only_files(aws_account)
-    #    print(result)
-    #    account_df = account_df[list(S3Query._fields) + ["name"]]
-    #    print(account_df)
-    #    result = pd.concat([result, account_df])
-    #    print(result)
-    #    breakpoint()
-    #    result = result.join(account_df, how="outer")
-    #    print(result)
-    #    breakpoint()
-    #    account_df = account_df.reset_index(level="name")
-    #    #account_df = account_df[["name"]]
-    #    result = result.join(account_df, how="left")
-    #    print(result)
-    #    breakpoint()
-    # breakpoint()
-
-    # todo extract: _get_df_files_of_s3_queries()
-    # aws_accounts = LocalResults()._get_aws_accounts_analyzed()
-    # result = _get_df_for_aws_account_only_files(aws_accounts[0])
-    # result = result[list(S3Query._fields) + ["name"]]
-    # for aws_account in aws_accounts:
-    #    account_df = _get_df_for_aws_account_only_files(aws_account)
-    #    account_df = account_df[list(S3Query._fields) + ["name"]]
-    #    result = pd.concat([result, account_df], ignore_index=True)
-    # result = result.drop_duplicates()
-    # result = result.sort_values(list(S3Query._fields) + ["name"], ignore_index=True)
-    # count_files_per_bucket_and_path_df = result.groupby(['bucket','prefix']).count()
-    # count_files_per_bucket_and_path_df = count_files_per_bucket_and_path_df.rename(columns={"name": "count_files_in_bucket_prefix"})
-    # result = result.set_index(["bucket","prefix"])
-    # result = result.join(count_files_per_bucket_and_path_df, how="left")
-    # result = result.loc[(~result["name"].isna()) | (result["count_files_in_bucket_prefix"] == 0)]
-    # result = result.drop(columns=['count_files_in_bucket_prefix'])
-    # result = result.reset_index().set_index(["bucket", "prefix", "name"])
-    # for aws_account in aws_accounts:
-    #    print(result)
-    #    account_df = _get_df_for_aws_account(aws_account)
-    #    print(account_df)
-    #    breakpoint()
-    #    # TODO rename fuction, incorrect name as more columns are retrieved
-    #    result = result.join(account_df, how="left")
-    #    #result = result.merge(account_df, on=["bucket","prefix","name"], how="outer")
-    # print(result)
-    # breakpoint()
-    # return result
-
     aws_accounts = LocalResults()._get_aws_accounts_analyzed()
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
