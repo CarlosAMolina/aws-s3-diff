@@ -84,10 +84,9 @@ class _AccountSyncAnalysis:
         )
         condition_sync_not_required = df.loc[:, (self._aws_account_origin, "size")].isnull()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        column_name_result = f"is_sync_ok_in_{self._aws_account_target}"
         df[
             [
-                ("analysis", column_name_result),
+                ("analysis", self._column_name_result),
             ]
         ] = None
         for result, condition in {
@@ -98,10 +97,14 @@ class _AccountSyncAnalysis:
             df.loc[
                 condition,
                 [
-                    ("analysis", column_name_result),
+                    ("analysis", self._column_name_result),
                 ],
             ] = result
         return df
+
+    @property
+    def _column_name_result(self) -> str:
+        return f"is_sync_ok_in_{self._aws_account_target}"
 
 
 def _get_aws_account_with_data_to_sync() -> str:
