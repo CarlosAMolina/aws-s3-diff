@@ -90,9 +90,8 @@ def _get_aws_account_that_must_not_have_more_files() -> str:
 
 
 def _get_accounts_where_files_must_be_copied() -> list[str]:
-    result = LocalResults()._get_aws_accounts_analyzed()
-    aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
-    result.remove(aws_account_with_data_to_sync)
+    result = S3UrisFileReader().get_aws_accounts()
+    result.remove(_get_aws_account_with_data_to_sync())
     return result
 
 
