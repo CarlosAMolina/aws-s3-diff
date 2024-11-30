@@ -9,8 +9,8 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
-from src import compare as m_compare
 from src.analysis import AnalysisDfToCsv
+from src.analysis import S3DataAnalyzer
 from src.s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -19,8 +19,8 @@ class TestS3DataAnalyzer(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch("src.compare.LocalResults._get_analysis_date_time_str")
-    @patch("src.compare.LocalResults.path_directory_all_results")
+    @patch("src.analysis.LocalResults._get_analysis_date_time_str")
+    @patch("src.analysis.LocalResults.path_directory_all_results")
     @patch("src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path")
     def test_get_df_s3_data_analyzed(
         self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
@@ -33,8 +33,8 @@ class TestS3DataAnalyzer(unittest.TestCase):
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
-        result = m_compare.S3DataAnalyzer()._get_df_s3_data_analyzed()
-        # m_compare.S3DataAnalyzer().run(config)
+        result = S3DataAnalyzer()._get_df_s3_data_analyzed()
+        # S3DataAnalyzer().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
             AnalysisDfToCsv()
