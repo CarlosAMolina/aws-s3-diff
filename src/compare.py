@@ -25,15 +25,15 @@ class _S3DataAnalyzer:
         return self._get_df_set_analysis_must_file_exist(result)
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
-        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+        aws_account_origin = _get_aws_account_with_data_to_sync()
         for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
-            condition_sync_wrong_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
-                df.loc[:, (aws_account_with_data_to_sync, "size")] != df.loc[:, (aws_account_to_compare, "size")]
+            condition_sync_wrong_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
+                df.loc[:, (aws_account_origin, "size")] != df.loc[:, (aws_account_to_compare, "size")]
             )
-            condition_sync_ok_in_account = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
-                df.loc[:, (aws_account_with_data_to_sync, "size")] == df.loc[:, (aws_account_to_compare, "size")]
+            condition_sync_ok_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
+                df.loc[:, (aws_account_origin, "size")] == df.loc[:, (aws_account_to_compare, "size")]
             )
-            condition_sync_not_required = df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()
+            condition_sync_not_required = df.loc[:, (aws_account_origin, "size")].isnull()
             # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
             column_name_result = f"is_sync_ok_in_{aws_account_to_compare}"
             df[
