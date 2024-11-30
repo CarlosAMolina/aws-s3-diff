@@ -3,6 +3,7 @@ from pandas import DataFrame as Df
 from analysis import AnalysisDfToCsv
 from combine import get_df_combine_files
 from local_results import LocalResults
+from s3_uris_to_analyze import S3UrisFileReader
 
 
 class S3DataComparator:
@@ -78,10 +79,7 @@ class _S3DataAnalyzer:
 
 
 def _get_aws_account_with_data_to_sync() -> str:
-    for aws_account in LocalResults()._get_aws_accounts_analyzed():
-        if aws_account.startswith("aws_account_1"):
-            return aws_account
-    raise ValueError("No aws account to sync")
+    return S3UrisFileReader().get_aws_accounts()[0]
 
 
 def _get_aws_account_that_must_not_have_more_files() -> str:
