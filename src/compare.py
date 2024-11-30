@@ -10,7 +10,7 @@ from s3_uris_to_analyze import S3UrisFileReader
 class S3DataComparator:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        _show_summary(s3_analyzed_df)
+        _show_summary(self._get_aws_account_with_data_to_sync(), s3_analyzed_df)
         # TODO save in this projects instead of in /tmp
         AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
 
@@ -152,9 +152,8 @@ def _get_accounts_where_files_must_be_copied() -> list[str]:
     return result
 
 
-def _show_summary(df: Df):
+def _show_summary(aws_account_with_data_to_sync: str, df: Df):
     for aws_account_to_compare in _get_accounts_where_files_must_be_copied():
-        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
