@@ -7,12 +7,17 @@ from local_results import LocalResults
 
 
 def get_df_combine_files() -> Df:
+    result = _get_df_combine_aws_accounts_results()
+    return _get_df_drop_incorrect_empty_rows(result)
+
+
+def _get_df_combine_aws_accounts_results() -> Df:
     aws_accounts = LocalResults()._get_aws_accounts_analyzed()
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account)
         result = result.join(account_df, how="outer")
-    return _get_df_drop_incorrect_empty_rows(result)
+    return result
 
 
 def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
