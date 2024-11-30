@@ -25,34 +25,43 @@ class _S3DataAnalyzer:
         return self._get_df_set_analysis_must_file_exist(result)
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
+        result = df
         aws_account_origin = _get_aws_account_with_data_to_sync()
         for aws_account_target in _get_accounts_where_files_must_be_copied():
-            condition_sync_wrong_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
-                df.loc[:, (aws_account_origin, "size")] != df.loc[:, (aws_account_target, "size")]
+            result = self._get_df_set_analysis_sync_from_account_to_account(
+                result, aws_account_origin, aws_account_target
             )
-            condition_sync_ok_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
-                df.loc[:, (aws_account_origin, "size")] == df.loc[:, (aws_account_target, "size")]
-            )
-            condition_sync_not_required = df.loc[:, (aws_account_origin, "size")].isnull()
-            # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-            column_name_result = f"is_sync_ok_in_{aws_account_target}"
-            df[
+        return result
+
+    def _get_df_set_analysis_sync_from_account_to_account(
+        self, df: Df, aws_account_origin: str, aws_account_target: str
+    ) -> Df:
+        condition_sync_wrong_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
+            df.loc[:, (aws_account_origin, "size")] != df.loc[:, (aws_account_target, "size")]
+        )
+        condition_sync_ok_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
+            df.loc[:, (aws_account_origin, "size")] == df.loc[:, (aws_account_target, "size")]
+        )
+        condition_sync_not_required = df.loc[:, (aws_account_origin, "size")].isnull()
+        # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
+        column_name_result = f"is_sync_ok_in_{aws_account_target}"
+        df[
+            [
+                ("analysis", column_name_result),
+            ]
+        ] = None
+        for condition_and_result in (
+            (condition_sync_wrong_in_account, False),
+            (condition_sync_ok_in_account, True),
+            (condition_sync_not_required, "No file to sync"),
+        ):
+            condition, result = condition_and_result
+            df.loc[
+                condition,
                 [
                     ("analysis", column_name_result),
-                ]
-            ] = None
-            for condition_and_result in (
-                (condition_sync_wrong_in_account, False),
-                (condition_sync_ok_in_account, True),
-                (condition_sync_not_required, "No file to sync"),
-            ):
-                condition, result = condition_and_result
-                df.loc[
-                    condition,
-                    [
-                        ("analysis", column_name_result),
-                    ],
-                ] = result
+                ],
+            ] = result
         return df
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
