@@ -83,7 +83,7 @@ class _AccountSyncAnalysis:
                 ("analysis", self._column_name_result),
             ]
         ] = None
-        for result, condition in {
+        for condition_result, condition in {
             False: self._condition_sync_is_wrong,
             True: self._condition_sync_is_ok,
             "No file to sync": self._condition_sync_is_not_required,
@@ -93,7 +93,7 @@ class _AccountSyncAnalysis:
                 [
                     ("analysis", self._column_name_result),
                 ],
-            ] = result
+            ] = condition_result
         return df
 
     @property
