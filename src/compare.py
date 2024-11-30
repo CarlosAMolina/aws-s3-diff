@@ -35,7 +35,9 @@ class _S3DataAnalyzer:
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
-        column_name_result = f"must_exist_in_{aws_account_without_more_files}"
+        column_name_result = _TargetAccountWithoutMoreFilesAnalysis(
+            aws_account_with_data_to_sync, aws_account_without_more_files, df
+        )._column_name_result
         df[
             [
                 ("analysis", column_name_result),
@@ -123,6 +125,10 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         return (self._df.loc[:, (self._aws_account_origin, "size")].isnull()) & (
             self._df.loc[:, (self._aws_account_target, "size")].notnull()
         )
+
+    @property
+    def _column_name_result(self) -> str:
+        return f"must_exist_in_{self._aws_account_target}"
 
 
 def _get_aws_account_with_data_to_sync() -> str:
