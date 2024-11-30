@@ -29,15 +29,8 @@ class _S3DataAnalyzer:
         result = df
         aws_account_origin = _get_aws_account_with_data_to_sync()
         for aws_account_target in _get_accounts_where_files_must_be_copied():
-            result = self._get_df_set_analysis_sync_from_account_to_account(
-                result, aws_account_origin, aws_account_target
-            )
+            result = _AccountSyncAnalysis(aws_account_origin, aws_account_target, result).get_df_set_analysis()
         return result
-
-    def _get_df_set_analysis_sync_from_account_to_account(
-        self, df: Df, aws_account_origin: str, aws_account_target: str
-    ) -> Df:
-        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis()
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
