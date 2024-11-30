@@ -77,7 +77,7 @@ class _AccountSyncAnalysis:
         self,
         df: Df,
     ) -> Df:
-        condition_sync_ok_in_account = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
+        condition_sync_is_ok = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
             df.loc[:, (self._aws_account_origin, "size")] == df.loc[:, (self._aws_account_target, "size")]
         )
         condition_sync_not_required = df.loc[:, (self._aws_account_origin, "size")].isnull()
@@ -89,7 +89,7 @@ class _AccountSyncAnalysis:
         ] = None
         for result, condition in {
             False: self._condition_sync_is_wrong,
-            True: condition_sync_ok_in_account,
+            True: condition_sync_is_ok,
             "No file to sync": condition_sync_not_required,
         }.items():
             df.loc[
