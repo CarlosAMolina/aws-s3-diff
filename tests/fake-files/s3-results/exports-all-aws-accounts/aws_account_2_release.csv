@@ -5,3 +5,4 @@ pets,dogs/big_size,dogs-20241019.csv,2024-10-19 07:52:08+00:00,38
 pets,dogs/big_size,dogs-20241015.csv,2024-10-15 11:20:18+00:00,28
 pets,dogs/big_size,dogs-20240914.csv,2024-09-14 22:01:33+00:00,20
 pets,horses/europe,,,
+pets,non-existent-prefix,,,
