@@ -36,7 +36,7 @@ class TestS3DataComparator(unittest.TestCase):
         # m_compare.S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
-            m_compare._CsvExporter()
+            m_compare._AnalysisToCsv()
             ._get_df_to_export(result)
             .reset_index()
             .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})

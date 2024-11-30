@@ -9,7 +9,7 @@ class S3DataComparator:
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         _show_summary(s3_analyzed_df)
         # TODO save in this projects instead of in /tmp
-        _CsvExporter().export(s3_analyzed_df, "/tmp/analysis.csv")
+        _AnalysisToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
@@ -109,7 +109,7 @@ def _show_summary(df: Df):
         print(result)
 
 
-class _CsvExporter:
+class _AnalysisToCsv:
     def export(self, df: Df, file_path_name: str):
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path_name)
