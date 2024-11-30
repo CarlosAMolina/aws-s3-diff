@@ -35,25 +35,9 @@ class _S3DataAnalyzer:
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
-        column_name_result = _TargetAccountWithoutMoreFilesAnalysis(
+        return _TargetAccountWithoutMoreFilesAnalysis(
             aws_account_with_data_to_sync, aws_account_without_more_files, df
-        )._column_name_result
-        df[
-            [
-                ("analysis", column_name_result),
-            ]
-        ] = None
-        condition_must_not_exist = _TargetAccountWithoutMoreFilesAnalysis(
-            aws_account_with_data_to_sync, aws_account_without_more_files, df
-        )._condition_must_not_exist
-        for result, condition in {False: condition_must_not_exist}.items():
-            df.loc[
-                condition,
-                [
-                    ("analysis", column_name_result),
-                ],
-            ] = result
-        return df
+        ).get_df_set_analysis()
 
 
 class _AccountSyncAnalysis:
@@ -119,6 +103,22 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         self._aws_account_origin = aws_account_origin
         self._aws_account_target = aws_account_target
         self._df = df
+
+    def get_df_set_analysis(self) -> Df:
+        result = self._df.copy()
+        result[
+            [
+                ("analysis", self._column_name_result),
+            ]
+        ] = None
+        for condition_result, condition in {False: self._condition_must_not_exist}.items():
+            result.loc[
+                condition,
+                [
+                    ("analysis", self._column_name_result),
+                ],
+            ] = condition_result
+        return result
 
     @property
     def _condition_must_not_exist(self) -> Series:
