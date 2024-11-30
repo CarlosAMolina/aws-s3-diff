@@ -45,7 +45,7 @@ def _get_df_from_file(file_path_name: Path) -> Df:
 
 def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
     """
-    Drop null rows provoced by queries without results in some accounts.
+    Drop null rows caused when merging query results without files in some accounts.
     Avoid drop queries without results in any aws account.
     """
     result = df
