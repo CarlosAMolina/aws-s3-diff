@@ -36,9 +36,7 @@ class _S3DataAnalyzer:
     def _get_df_set_analysis_sync_from_account_to_account(
         self, df: Df, aws_account_origin: str, aws_account_target: str
     ) -> Df:
-        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis(
-            aws_account_origin, aws_account_target, df
-        )
+        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis(df)
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
@@ -76,19 +74,17 @@ class _AccountSyncAnalysis:
 
     def get_df_set_analysis(
         self,
-        aws_account_origin: str,
-        aws_account_target: str,
         df: Df,
     ) -> Df:
-        condition_sync_wrong_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
-            df.loc[:, (aws_account_origin, "size")] != df.loc[:, (aws_account_target, "size")]
+        condition_sync_wrong_in_account = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
+            df.loc[:, (self._aws_account_origin, "size")] != df.loc[:, (self._aws_account_target, "size")]
         )
-        condition_sync_ok_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
-            df.loc[:, (aws_account_origin, "size")] == df.loc[:, (aws_account_target, "size")]
+        condition_sync_ok_in_account = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
+            df.loc[:, (self._aws_account_origin, "size")] == df.loc[:, (self._aws_account_target, "size")]
         )
-        condition_sync_not_required = df.loc[:, (aws_account_origin, "size")].isnull()
+        condition_sync_not_required = df.loc[:, (self._aws_account_origin, "size")].isnull()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        column_name_result = f"is_sync_ok_in_{aws_account_target}"
+        column_name_result = f"is_sync_ok_in_{self._aws_account_target}"
         df[
             [
                 ("analysis", column_name_result),
