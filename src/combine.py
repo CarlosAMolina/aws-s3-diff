@@ -20,27 +20,6 @@ def _get_df_combine_aws_accounts_results() -> Df:
     return result
 
 
-def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
-    """
-    Drop null rows provoced by queries without results in some accounts.
-    Avoid drop queries without results in any aws account.
-    """
-    result = df
-    count_files_per_bucket_and_path_df = (
-        Df(result.index.to_list(), columns=result.index.names).groupby(["bucket", "prefix"]).count()
-    )
-    count_files_per_bucket_and_path_df.columns = pd.MultiIndex.from_tuples(
-        [
-            ("count", "files_in_bucket_prefix"),
-        ]
-    )
-    result = result.join(count_files_per_bucket_and_path_df)
-    result = result.reset_index()
-    result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
-    result = result.set_index(["bucket", "prefix", "name"])
-    return result.drop(columns=(("count", "files_in_bucket_prefix")))
-
-
 # TODO when reading the uris to check, assert all accounts all paths to analyze.
 
 
@@ -62,3 +41,24 @@ def _get_df_from_file(file_path_name: Path) -> Df:
         index_col=["bucket", "prefix", "name"],
         parse_dates=["date"],
     ).astype({"size": "Int64"})
+
+
+def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
+    """
+    Drop null rows provoced by queries without results in some accounts.
+    Avoid drop queries without results in any aws account.
+    """
+    result = df
+    count_files_per_bucket_and_path_df = (
+        Df(result.index.to_list(), columns=result.index.names).groupby(["bucket", "prefix"]).count()
+    )
+    count_files_per_bucket_and_path_df.columns = pd.MultiIndex.from_tuples(
+        [
+            ("count", "files_in_bucket_prefix"),
+        ]
+    )
+    result = result.join(count_files_per_bucket_and_path_df)
+    result = result.reset_index()
+    result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
+    result = result.set_index(["bucket", "prefix", "name"])
+    return result.drop(columns=(("count", "files_in_bucket_prefix")))
