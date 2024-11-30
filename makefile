@@ -24,4 +24,4 @@ test:
 	poetry run python -m unittest discover
 
 test-filter:
-	poetry run python -m unittest discover -p test_compare.py -k TestS3DataComparator
+	poetry run python -m unittest discover -p test_compare.py -k TestS3DataAnalyzer

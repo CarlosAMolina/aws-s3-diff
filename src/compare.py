@@ -7,7 +7,7 @@ from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
 
 
-class S3DataComparator:
+class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         _show_summary(

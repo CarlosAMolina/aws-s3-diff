@@ -14,7 +14,7 @@ from src.analysis import AnalysisDfToCsv
 from src.s3_uris_to_analyze import S3UrisFileReader
 
 
-class TestS3DataComparator(unittest.TestCase):
+class TestS3DataAnalyzer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
@@ -33,8 +33,8 @@ class TestS3DataComparator(unittest.TestCase):
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
-        result = m_compare.S3DataComparator()._get_df_s3_data_analyzed()
-        # m_compare.S3DataComparator().run(config)
+        result = m_compare.S3DataAnalyzer()._get_df_s3_data_analyzed()
+        # m_compare.S3DataAnalyzer().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
             AnalysisDfToCsv()
