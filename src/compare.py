@@ -50,12 +50,11 @@ class _S3DataAnalyzer:
                 ("analysis", column_name_result),
             ]
         ] = None
-        for condition_and_result in (
-            (condition_sync_wrong_in_account, False),
-            (condition_sync_ok_in_account, True),
-            (condition_sync_not_required, "No file to sync"),
-        ):
-            condition, result = condition_and_result
+        for result, condition in {
+            False: condition_sync_wrong_in_account,
+            True: condition_sync_ok_in_account,
+            "No file to sync": condition_sync_not_required,
+        }.items():
             df.loc[
                 condition,
                 [
