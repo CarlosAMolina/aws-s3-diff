@@ -18,7 +18,7 @@ class S3DataComparator:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        return _S3DataAnalyzer(
+        return _S3DataSetAnalysis(
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_account_that_must_not_have_more_files(),
             self._get_accounts_where_files_must_be_copied(),
@@ -40,7 +40,7 @@ class S3DataComparator:
         raise ValueError("No aws account that must not have more files")
 
 
-class _S3DataAnalyzer:
+class _S3DataSetAnalysis:
     def __init__(
         self,
         aws_account_origin: str,
