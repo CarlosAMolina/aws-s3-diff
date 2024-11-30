@@ -1,4 +1,5 @@
 from pandas import DataFrame as Df
+from pandas import Series
 
 from analysis import AnalysisDfToCsv
 from combine import get_df_combine_files
@@ -76,9 +77,6 @@ class _AccountSyncAnalysis:
         self,
         df: Df,
     ) -> Df:
-        condition_sync_wrong_in_account = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
-            df.loc[:, (self._aws_account_origin, "size")] != df.loc[:, (self._aws_account_target, "size")]
-        )
         condition_sync_ok_in_account = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
             df.loc[:, (self._aws_account_origin, "size")] == df.loc[:, (self._aws_account_target, "size")]
         )
@@ -90,7 +88,7 @@ class _AccountSyncAnalysis:
             ]
         ] = None
         for result, condition in {
-            False: condition_sync_wrong_in_account,
+            False: self._condition_sync_wrong_in_account,
             True: condition_sync_ok_in_account,
             "No file to sync": condition_sync_not_required,
         }.items():
@@ -101,6 +99,12 @@ class _AccountSyncAnalysis:
                 ],
             ] = result
         return df
+
+    @property
+    def _condition_sync_wrong_in_account(self) -> Series:
+        return (self._df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
+            self._df.loc[:, (self._aws_account_origin, "size")] != self._df.loc[:, (self._aws_account_target, "size")]
+        )
 
     @property
     def _column_name_result(self) -> str:
