@@ -12,6 +12,15 @@ def get_df_combine_files() -> Df:
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account)
         result = result.join(account_df, how="outer")
+    return _get_df_drop_incorrect_empty_rows(result)
+
+
+def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
+    """
+    Drop null rows provoced by queries without results in some accounts.
+    Avoid drop queries without results in any aws account.
+    """
+    result = df
     count_files_per_bucket_and_path_df = (
         Df(result.index.to_list(), columns=result.index.names).groupby(["bucket", "prefix"]).count()
     )
@@ -22,8 +31,6 @@ def get_df_combine_files() -> Df:
     )
     result = result.join(count_files_per_bucket_and_path_df)
     result = result.reset_index()
-    # Drop null rows provoced by queries without results in some accounts.
-    # Avoid drop queries without results in any aws account
     result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
     result = result.set_index(["bucket", "prefix", "name"])
     return result.drop(columns=(("count", "files_in_bucket_prefix")))
