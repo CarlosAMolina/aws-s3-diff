@@ -14,6 +14,8 @@ def get_df_combine_files() -> Df:
         result = result.join(account_df, how="outer")
     # TODO not drop only if its the only bucket and prefix, in
     # TODO order to maintain empty query results. And add this situtation to the tests
+    # TODO: possible query:
+    # TODO result.reset_index(level="name")[["name"]].groupby(["bucket","prefix"]).count() > 0
     return result.dropna(axis="index", how="all")
 
 
