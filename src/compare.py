@@ -41,9 +41,9 @@ class _S3DataAnalyzer:
                 ("analysis", column_name_result),
             ]
         ] = None
-        condition_must_not_exist = (df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()) & (
-            df.loc[:, (aws_account_without_more_files, "size")].notnull()
-        )
+        condition_must_not_exist = _TargetAccountWithoutMoreFilesAnalysis(
+            aws_account_with_data_to_sync, aws_account_without_more_files, df
+        )._condition_must_not_exist
         for condition_and_result in ((condition_must_not_exist, False),):
             condition, result = condition_and_result
             df.loc[
@@ -106,6 +106,24 @@ class _AccountSyncAnalysis:
     @property
     def _column_name_result(self) -> str:
         return f"is_sync_ok_in_{self._aws_account_target}"
+
+
+class _TargetAccountWithoutMoreFilesAnalysis:
+    def __init__(
+        self,
+        aws_account_origin: str,
+        aws_account_target: str,
+        df: Df,
+    ):
+        self._aws_account_origin = aws_account_origin
+        self._aws_account_target = aws_account_target
+        self._df = df
+
+    @property
+    def _condition_must_not_exist(self) -> Series:
+        return (self._df.loc[:, (self._aws_account_origin, "size")].isnull()) & (
+            self._df.loc[:, (self._aws_account_target, "size")].notnull()
+        )
 
 
 def _get_aws_account_with_data_to_sync() -> str:
