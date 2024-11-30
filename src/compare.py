@@ -44,8 +44,7 @@ class _S3DataAnalyzer:
         condition_must_not_exist = _TargetAccountWithoutMoreFilesAnalysis(
             aws_account_with_data_to_sync, aws_account_without_more_files, df
         )._condition_must_not_exist
-        for condition_and_result in ((condition_must_not_exist, False),):
-            condition, result = condition_and_result
+        for result, condition in {False: condition_must_not_exist}.items():
             df.loc[
                 condition,
                 [
