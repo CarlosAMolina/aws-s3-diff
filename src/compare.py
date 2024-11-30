@@ -77,9 +77,6 @@ class _AccountSyncAnalysis:
         self,
         df: Df,
     ) -> Df:
-        condition_sync_is_ok = (df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
-            df.loc[:, (self._aws_account_origin, "size")] == df.loc[:, (self._aws_account_target, "size")]
-        )
         condition_sync_is_not_required = df.loc[:, (self._aws_account_origin, "size")].isnull()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         df[
@@ -89,7 +86,7 @@ class _AccountSyncAnalysis:
         ] = None
         for result, condition in {
             False: self._condition_sync_is_wrong,
-            True: condition_sync_is_ok,
+            True: self._condition_sync_is_ok,
             "No file to sync": condition_sync_is_not_required,
         }.items():
             df.loc[
@@ -104,6 +101,12 @@ class _AccountSyncAnalysis:
     def _condition_sync_is_wrong(self) -> Series:
         return (self._df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
             self._df.loc[:, (self._aws_account_origin, "size")] != self._df.loc[:, (self._aws_account_target, "size")]
+        )
+
+    @property
+    def _condition_sync_is_ok(self) -> Series:
+        return (self._df.loc[:, (self._aws_account_origin, "size")].notnull()) & (
+            self._df.loc[:, (self._aws_account_origin, "size")] == self._df.loc[:, (self._aws_account_target, "size")]
         )
 
     @property
