@@ -20,6 +20,9 @@ class S3DataComparator:
 
 
 class _S3DataAnalyzer:
+    def __init__(self):
+        self._aws_account_origin = _get_aws_account_with_data_to_sync()
+
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
         result = self._get_df_set_analysis_sync(result)
@@ -27,16 +30,14 @@ class _S3DataAnalyzer:
 
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         result = df
-        aws_account_origin = _get_aws_account_with_data_to_sync()
         for aws_account_target in _get_accounts_where_files_must_be_copied():
-            result = _AccountSyncAnalysis(aws_account_origin, aws_account_target, result).get_df_set_analysis()
+            result = _AccountSyncAnalysis(self._aws_account_origin, aws_account_target, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
         aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
         return _TargetAccountWithoutMoreFilesAnalysis(
-            aws_account_with_data_to_sync, aws_account_without_more_files, df
+            self._aws_account_origin, aws_account_without_more_files, df
         ).get_df_set_analysis()
 
 
