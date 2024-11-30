@@ -36,6 +36,50 @@ class _S3DataAnalyzer:
     def _get_df_set_analysis_sync_from_account_to_account(
         self, df: Df, aws_account_origin: str, aws_account_target: str
     ) -> Df:
+        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis(
+            aws_account_origin, aws_account_target, df
+        )
+
+    def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
+        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
+        aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
+        column_name_result = f"must_exist_in_{aws_account_without_more_files}"
+        df[
+            [
+                ("analysis", column_name_result),
+            ]
+        ] = None
+        condition_must_not_exist = (df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()) & (
+            df.loc[:, (aws_account_without_more_files, "size")].notnull()
+        )
+        for condition_and_result in ((condition_must_not_exist, False),):
+            condition, result = condition_and_result
+            df.loc[
+                condition,
+                [
+                    ("analysis", column_name_result),
+                ],
+            ] = result
+        return df
+
+
+class _AccountSyncAnalysis:
+    def __init__(
+        self,
+        aws_account_origin: str,
+        aws_account_target: str,
+        df: Df,
+    ):
+        self._aws_account_origin = aws_account_origin
+        self._aws_account_target = aws_account_target
+        self._df = df
+
+    def get_df_set_analysis(
+        self,
+        aws_account_origin: str,
+        aws_account_target: str,
+        df: Df,
+    ) -> Df:
         condition_sync_wrong_in_account = (df.loc[:, (aws_account_origin, "size")].notnull()) & (
             df.loc[:, (aws_account_origin, "size")] != df.loc[:, (aws_account_target, "size")]
         )
@@ -55,28 +99,6 @@ class _S3DataAnalyzer:
             True: condition_sync_ok_in_account,
             "No file to sync": condition_sync_not_required,
         }.items():
-            df.loc[
-                condition,
-                [
-                    ("analysis", column_name_result),
-                ],
-            ] = result
-        return df
-
-    def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
-        aws_account_without_more_files = _get_aws_account_that_must_not_have_more_files()
-        column_name_result = f"must_exist_in_{aws_account_without_more_files}"
-        df[
-            [
-                ("analysis", column_name_result),
-            ]
-        ] = None
-        condition_must_not_exist = (df.loc[:, (aws_account_with_data_to_sync, "size")].isnull()) & (
-            df.loc[:, (aws_account_without_more_files, "size")].notnull()
-        )
-        for condition_and_result in ((condition_must_not_exist, False),):
-            condition, result = condition_and_result
             df.loc[
                 condition,
                 [
