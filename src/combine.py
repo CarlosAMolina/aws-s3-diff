@@ -55,19 +55,6 @@ def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> l
     return [(aws_account, column_name) for column_name in column_names]
 
 
-# TODO Ensure s3 path appears in the result despite it doesn't have files in any aws account.
-# TODO Maybe, instead to add paths without files here, do it when all the aws accounts have been
-# TODO analized and only if the path doesn't have file for all accounts, in other case it will
-# TODO add a wrong empty line to the final result
-# TODO in the e2e tests check a s3 path without file in any aws account to assert it
-# TODO appears in the final result. This can be added like this:
-# TODO ```python
-# TODO if result.empty:
-# TODO     data ={column_name: [None] for column_name in result.columns}
-# TODO     return pd.DataFrame(data=data, index=pd.Index([index_prefix]))
-# TODO ```
-
-
 # TODO rename specify _aws_account_results_file
 def _get_df_from_file(file_path_name: Path) -> Df:
     return pd.read_csv(
