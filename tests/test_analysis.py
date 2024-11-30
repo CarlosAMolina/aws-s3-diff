@@ -9,7 +9,7 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
-from src.analysis import AnalysisDfToCsv
+from src.analysis import _AnalysisDfToCsv
 from src.analysis import S3DataAnalyzer
 from src.s3_uris_to_analyze import S3UrisFileReader
 
@@ -37,7 +37,7 @@ class TestS3DataAnalyzer(unittest.TestCase):
         # S3DataAnalyzer().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
-            AnalysisDfToCsv()
+            _AnalysisDfToCsv()
             ._get_df_to_export(result)
             .reset_index()
             .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})

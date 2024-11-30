@@ -13,7 +13,7 @@ class S3DataAnalyzer:
             self._get_aws_account_with_data_to_sync(), self._get_accounts_where_files_must_be_copied(), s3_analyzed_df
         )
         # TODO save in this projects instead of in /tmp
-        AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
+        _AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
@@ -169,7 +169,7 @@ def _show_summary(aws_account_with_data_to_sync: str, accounts_where_files_must_
         print(result)
 
 
-class AnalysisDfToCsv:
+class _AnalysisDfToCsv:
     def export(self, df: Df, file_path_name: str):
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path_name)
