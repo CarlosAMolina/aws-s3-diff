@@ -37,7 +37,7 @@ class _S3DataAnalyzer:
     def _get_df_set_analysis_sync_from_account_to_account(
         self, df: Df, aws_account_origin: str, aws_account_target: str
     ) -> Df:
-        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis(df)
+        return _AccountSyncAnalysis(aws_account_origin, aws_account_target, df).get_df_set_analysis()
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_account_with_data_to_sync = _get_aws_account_with_data_to_sync()
@@ -73,12 +73,10 @@ class _AccountSyncAnalysis:
         self._aws_account_target = aws_account_target
         self._df = df
 
-    def get_df_set_analysis(
-        self,
-        df: Df,
-    ) -> Df:
+    def get_df_set_analysis(self) -> Df:
+        result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        df[
+        result[
             [
                 ("analysis", self._column_name_result),
             ]
@@ -88,13 +86,13 @@ class _AccountSyncAnalysis:
             True: self._condition_sync_is_ok,
             "No file to sync": self._condition_sync_is_not_required,
         }.items():
-            df.loc[
+            result.loc[
                 condition,
                 [
                     ("analysis", self._column_name_result),
                 ],
             ] = condition_result
-        return df
+        return result
 
     @property
     def _condition_sync_is_wrong(self) -> Series:
