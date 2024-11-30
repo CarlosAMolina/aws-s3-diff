@@ -10,6 +10,7 @@ from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
 from src import compare as m_compare
+from src.analysis import AnalysisDfToCsv
 from src.s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -36,7 +37,7 @@ class TestS3DataComparator(unittest.TestCase):
         # m_compare.S3DataComparator().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
-            m_compare._AnalysisToCsv()
+            AnalysisDfToCsv()
             ._get_df_to_export(result)
             .reset_index()
             .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})
