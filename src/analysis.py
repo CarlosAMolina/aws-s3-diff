@@ -74,9 +74,8 @@ class _AccountSyncAnalysis:
         aws_account_target: str,
         df: Df,
     ):
-        self._aws_account_origin = aws_account_origin
-        self._aws_account_target = aws_account_target
         self._df = df
+        self._column_name_result = f"is_sync_ok_in_{aws_account_target}"
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
 
     def get_df_set_analysis(self) -> Df:
@@ -99,10 +98,6 @@ class _AccountSyncAnalysis:
                 ],
             ] = condition_result
         return result
-
-    @property
-    def _column_name_result(self) -> str:
-        return f"is_sync_ok_in_{self._aws_account_target}"
 
 
 class _TargetAccountWithoutMoreFilesAnalysis:
