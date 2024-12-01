@@ -110,7 +110,11 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        analysis_config = _AnalysisConfig(
+        analysis_config = self._get_analysis_config(aws_account_target)
+        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
+
+    def _get_analysis_config(self, aws_account_target) -> _AnalysisConfig:
+        return _AnalysisConfig(
             f"is_sync_ok_in_{aws_account_target}",
             {
                 "condition_sync_is_wrong": False,
@@ -118,7 +122,6 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
                 "condition_not_exist_file_to_sync": "No file to sync",
             },
         )
-        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
 
 
 class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
@@ -128,8 +131,11 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        analysis_config = _AnalysisConfig(f"must_exist_in_{aws_account_target}", {"condition_must_not_exist": False})
+        analysis_config = self._get_analysis_config(aws_account_target)
         super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
+
+    def _get_analysis_config(self, aws_account_target) -> _AnalysisConfig:
+        return _AnalysisConfig(f"must_exist_in_{aws_account_target}", {"condition_must_not_exist": False})
 
 
 class _AnalysisCondition:
