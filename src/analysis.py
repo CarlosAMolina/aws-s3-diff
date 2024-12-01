@@ -132,6 +132,7 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         self._aws_account_origin = aws_account_origin
         self._aws_account_target = aws_account_target
         self._df = df
+        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
 
     def get_df_set_analysis(self) -> Df:
         result = self._df.copy()
@@ -140,7 +141,7 @@ class _TargetAccountWithoutMoreFilesAnalysis:
                 ("analysis", self._column_name_result),
             ]
         ] = None
-        for condition_result, condition in {False: self._condition_must_not_exist}.items():
+        for condition_result, condition in {False: self._condition.condition_must_not_exist}.items():
             result.loc[
                 condition,
                 [
@@ -150,7 +151,23 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         return result
 
     @property
-    def _condition_must_not_exist(self) -> Series:
+    def _column_name_result(self) -> str:
+        return f"must_exist_in_{self._aws_account_target}"
+
+
+class _AnalysisCondition:
+    def __init__(
+        self,
+        aws_account_origin: str,
+        aws_account_target: str,
+        df: Df,
+    ):
+        self._aws_account_origin = aws_account_origin
+        self._aws_account_target = aws_account_target
+        self._df = df
+
+    @property
+    def condition_must_not_exist(self) -> Series:
         return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
 
     @property
@@ -160,10 +177,6 @@ class _TargetAccountWithoutMoreFilesAnalysis:
     @property
     def _condition_exists_file_in_target_aws_account(self) -> Series:
         return self._df.loc[:, (self._aws_account_target, "size")].notnull()
-
-    @property
-    def _column_name_result(self) -> str:
-        return f"must_exist_in_{self._aws_account_target}"
 
 
 def _show_summary(aws_account_with_data_to_sync: str, accounts_where_files_must_be_copied: list[str], df: Df):
