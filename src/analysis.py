@@ -22,12 +22,25 @@ _AwsAccountsCompare = namedtuple("_AwsAccountsCompare", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
+class _AwsAccountsAnalysisGenerator:
+    def _get_aws_account_with_data_to_sync(self) -> str:
+        return S3UrisFileReader().get_aws_accounts()[0]
+
+    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+        result = S3UrisFileReader().get_aws_accounts()
+        result.remove(self._get_aws_account_with_data_to_sync())
+        return result
+
+    def _get_aws_account_that_must_not_have_more_files(self) -> str:
+        return S3UrisFileReader().get_aws_accounts()[1]
+
+
 class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         _show_summary(
-            self._get_aws_account_with_data_to_sync(),
-            self._get_aws_accounts_where_files_must_be_copied(),
+            _AwsAccountsAnalysisGenerator()._get_aws_account_with_data_to_sync(),
+            _AwsAccountsAnalysisGenerator()._get_aws_accounts_where_files_must_be_copied(),
             s3_analyzed_df,
         )
         # TODO save in this projects instead of in /tmp
@@ -40,21 +53,10 @@ class S3DataAnalyzer:
 
     def _get_aws_accounts_analysis(self) -> _AwsAccountsAnalysis:
         return _AwsAccountsAnalysis(
-            self._get_aws_account_with_data_to_sync(),
-            self._get_aws_account_that_must_not_have_more_files(),
-            self._get_aws_accounts_where_files_must_be_copied(),
+            _AwsAccountsAnalysisGenerator()._get_aws_account_with_data_to_sync(),
+            _AwsAccountsAnalysisGenerator()._get_aws_account_that_must_not_have_more_files(),
+            _AwsAccountsAnalysisGenerator()._get_aws_accounts_where_files_must_be_copied(),
         )
-
-    def _get_aws_account_with_data_to_sync(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[0]
-
-    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = S3UrisFileReader().get_aws_accounts()
-        result.remove(self._get_aws_account_with_data_to_sync())
-        return result
-
-    def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[1]
 
 
 class _S3DataSetAnalysis:
