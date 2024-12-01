@@ -89,7 +89,7 @@ class _DfAnalysis(ABC):
         for (
             condition_name,
             condition_result,
-        ) in self._condition_and_result_config().items():
+        ) in self._condition_and_result_config.items():
             result.loc[
                 getattr(self._condition, condition_name),
                 [
@@ -98,6 +98,7 @@ class _DfAnalysis(ABC):
             ] = condition_result
         return result
 
+    @property
     @abstractmethod
     def _condition_and_result_config(self) -> dict:
         pass
@@ -113,6 +114,7 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         column_name_result = f"is_sync_ok_in_{aws_account_target}"
         super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
+    @property
     def _condition_and_result_config(self) -> dict:
         return {
             "condition_sync_is_wrong": False,
@@ -131,6 +133,7 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         column_name_result = f"must_exist_in_{aws_account_target}"
         super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
+    @property
     def _condition_and_result_config(self) -> dict:
         return {"condition_must_not_exist": False}
 
