@@ -18,6 +18,7 @@ class _AnalysisAwsAccounts:
         ) = args
 
 
+# TODO replace with _AnalysisAwsAccounts
 class _SummaryAwsAccounts:
     def __init__(self, *args):
         (
