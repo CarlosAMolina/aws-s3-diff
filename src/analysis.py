@@ -101,9 +101,7 @@ class _AccountSyncAnalysis:
 
     @property
     def _condition_sync_is_wrong(self) -> Series:
-        return self._condition_exists_file_to_sync & (
-            self._df.loc[:, (self._aws_account_origin, "size")] != self._df.loc[:, (self._aws_account_target, "size")]
-        )
+        return self._condition_exists_file_to_sync & ~self._condition_file_is_sync
 
     @property
     def _condition_sync_is_ok(self) -> Series:
