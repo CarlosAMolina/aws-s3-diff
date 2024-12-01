@@ -86,11 +86,7 @@ class _AccountSyncDfAnalysis:
                 ("analysis", self._column_name_result),
             ]
         ] = None
-        for condition_result, condition in {
-            False: self._condition.condition_sync_is_wrong,
-            True: self._condition.condition_sync_is_ok,
-            "No file to sync": ~self._condition.condition_exists_file_to_sync,
-        }.items():
+        for condition_result, condition in self._get_result_and_condition().items():
             result.loc[
                 condition,
                 [
@@ -98,6 +94,13 @@ class _AccountSyncDfAnalysis:
                 ],
             ] = condition_result
         return result
+
+    def _get_result_and_condition(self) -> dict:
+        return {
+            False: self._condition.condition_sync_is_wrong,
+            True: self._condition.condition_sync_is_ok,
+            "No file to sync": ~self._condition.condition_exists_file_to_sync,
+        }
 
 
 class _TargetAccountWithoutMoreFilesDfAnalysis:
@@ -118,7 +121,7 @@ class _TargetAccountWithoutMoreFilesDfAnalysis:
                 ("analysis", self._column_name_result),
             ]
         ] = None
-        for condition_result, condition in {False: self._condition.condition_must_not_exist}.items():
+        for condition_result, condition in self._get_result_and_condition().items():
             result.loc[
                 condition,
                 [
@@ -126,6 +129,9 @@ class _TargetAccountWithoutMoreFilesDfAnalysis:
                 ],
             ] = condition_result
         return result
+
+    def _get_result_and_condition(self) -> dict:
+        return {False: self._condition.condition_must_not_exist}
 
 
 class _AnalysisCondition:
