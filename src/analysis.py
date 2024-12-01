@@ -73,8 +73,9 @@ class _S3DataSetAnalysis:
 
 
 class _DfAnalysis(ABC):
-    def __init__(self, column_name_result: str, df: Df):
+    def __init__(self, aws_account_origin: str, aws_account_target: str, column_name_result: str, df: Df):
         self._column_name_result = column_name_result
+        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         self._df = df
 
     def get_df_set_analysis(self) -> Df:
@@ -106,9 +107,8 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         column_name_result = f"is_sync_ok_in_{aws_account_target}"
-        super().__init__(column_name_result, df)
+        super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
     def _get_result_and_condition(self) -> dict:
         return {
@@ -125,10 +125,8 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        self._df = df
-        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         column_name_result = f"must_exist_in_{aws_account_target}"
-        super().__init__(column_name_result, df)
+        super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
     def _get_result_and_condition(self) -> dict:
         return {False: self._condition.condition_must_not_exist}
