@@ -18,6 +18,14 @@ class _AnalysisAwsAccounts:
         ) = args
 
 
+class _SummaryAwsAccounts:
+    def __init__(self, *args):
+        (
+            self.aws_account_origin,
+            self.aws_accounts_where_files_must_be_copied,
+        ) = args
+
+
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
@@ -42,12 +50,28 @@ class _AnalysisAwsAccountsGenerator:
         return S3UrisFileReader().get_aws_accounts()[1]
 
 
+class _SummaryAwsAccountsGenerator:
+    def get_aws_accounts(self) -> _SummaryAwsAccounts:
+        return _SummaryAwsAccounts(
+            self._get_aws_account_with_data_to_sync(),
+            self._get_aws_accounts_where_files_must_be_copied(),
+        )
+
+    def _get_aws_account_with_data_to_sync(self) -> str:
+        return S3UrisFileReader().get_aws_accounts()[0]
+
+    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+        result = S3UrisFileReader().get_aws_accounts()
+        result.remove(self._get_aws_account_with_data_to_sync())
+        return result
+
+
 class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
+        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
         _show_summary(
-            _AnalysisAwsAccountsGenerator()._get_aws_account_with_data_to_sync(),
-            _AnalysisAwsAccountsGenerator()._get_aws_accounts_where_files_must_be_copied(),
+            aws_accounts_summary,
             s3_analyzed_df,
         )
         # TODO save in this projects instead of in /tmp
@@ -192,10 +216,10 @@ class _AnalysisCondition:
         return self._df.loc[:, (self._aws_account_target, "size")].notnull()
 
 
-def _show_summary(aws_account_with_data_to_sync: str, aws_accounts_where_files_must_be_copied: list[str], df: Df):
-    for aws_account_to_compare in aws_accounts_where_files_must_be_copied:
+def _show_summary(aws_accounts: _SummaryAwsAccounts, df: Df):
+    for aws_account_to_compare in aws_accounts.aws_accounts_where_files_must_be_copied:
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
-        condition = (df.loc[:, (aws_account_with_data_to_sync, "size")].notnull()) & (
+        condition = (df.loc[:, (aws_accounts.aws_account_origin, "size")].notnull()) & (
             df.loc[:, ("analysis", column_name_compare_result)].eq(False)
         )
         result = df[condition]
