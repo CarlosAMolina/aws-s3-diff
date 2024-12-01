@@ -77,6 +77,7 @@ class _AccountSyncAnalysis:
         self._aws_account_origin = aws_account_origin
         self._aws_account_target = aws_account_target
         self._df = df
+        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
 
     def get_df_set_analysis(self) -> Df:
         result = self._df.copy()
@@ -87,9 +88,9 @@ class _AccountSyncAnalysis:
             ]
         ] = None
         for condition_result, condition in {
-            False: self._condition_sync_is_wrong,
-            True: self._condition_sync_is_ok,
-            "No file to sync": ~self._condition_exists_file_to_sync,
+            False: self._condition.condition_sync_is_wrong,
+            True: self._condition.condition_sync_is_ok,
+            "No file to sync": ~self._condition.condition_exists_file_to_sync,
         }.items():
             result.loc[
                 condition,
@@ -98,24 +99,6 @@ class _AccountSyncAnalysis:
                 ],
             ] = condition_result
         return result
-
-    @property
-    def _condition_sync_is_wrong(self) -> Series:
-        return self._condition_exists_file_to_sync & ~self._condition_file_is_sync
-
-    @property
-    def _condition_sync_is_ok(self) -> Series:
-        return self._condition_exists_file_to_sync & self._condition_file_is_sync
-
-    @property
-    def _condition_exists_file_to_sync(self) -> Series:
-        return self._df.loc[:, (self._aws_account_origin, "size")].notnull()
-
-    @property
-    def _condition_file_is_sync(self) -> Series:
-        return (
-            self._df.loc[:, (self._aws_account_origin, "size")] == self._df.loc[:, (self._aws_account_target, "size")]
-        )
 
     @property
     def _column_name_result(self) -> str:
@@ -162,12 +145,26 @@ class _AnalysisCondition:
         self._df = df
 
     @property
-    def condition_must_not_exist(self) -> Series:
-        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+    def condition_sync_is_wrong(self) -> Series:
+        return self.condition_exists_file_to_sync & ~self._condition_file_is_sync
 
     @property
-    def _condition_exists_file_to_sync(self) -> Series:
+    def condition_sync_is_ok(self) -> Series:
+        return self.condition_exists_file_to_sync & self._condition_file_is_sync
+
+    @property
+    def condition_must_not_exist(self) -> Series:
+        return ~self.condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+
+    @property
+    def condition_exists_file_to_sync(self) -> Series:
         return self._df.loc[:, (self._aws_account_origin, "size")].notnull()
+
+    @property
+    def _condition_file_is_sync(self) -> Series:
+        return (
+            self._df.loc[:, (self._aws_account_origin, "size")] == self._df.loc[:, (self._aws_account_target, "size")]
+        )
 
     @property
     def _condition_exists_file_in_target_aws_account(self) -> Series:
