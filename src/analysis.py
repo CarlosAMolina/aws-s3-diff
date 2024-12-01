@@ -87,22 +87,20 @@ class _DfAnalysis:
     def get_df_set_analysis(self) -> Df:
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        result[
-            [
-                ("analysis", self._analysis_config.column_name_result),
-            ]
-        ] = None
+        result[[self._result_column_multi_index]] = None
         for (
             condition_name,
             condition_result,
         ) in self._analysis_config.condition_config.items():
             result.loc[
                 getattr(self._condition, condition_name),
-                [
-                    ("analysis", self._analysis_config.column_name_result),
-                ],
+                [self._result_column_multi_index],
             ] = condition_result
         return result
+
+    @property
+    def _result_column_multi_index(self) -> tuple[str, str]:
+        return ("analysis", self._analysis_config.column_name_result)
 
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
