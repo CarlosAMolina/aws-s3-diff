@@ -26,7 +26,12 @@ class TestFunction_run(unittest.TestCase):
 
     @mock.patch("src.main.input", create=True)
     def test_run(self, mock_input):
-        mock_input.side_effect = ["Y"]
+        mock_input.return_value = "Y"
+        # Extract account 1
+        m_main.run()
+        # Extract account 2
+        m_main.run()
+        # Extract account 3
         m_main.run()
 
 
