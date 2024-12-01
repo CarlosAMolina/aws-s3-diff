@@ -1,3 +1,6 @@
+from abc import ABC
+from abc import abstractmethod
+
 from pandas import DataFrame as Df
 from pandas import Series
 
@@ -67,7 +70,13 @@ class _S3DataSetAnalysis:
         ).get_df_set_analysis()
 
 
-class _AccountSyncDfAnalysis:
+class _AccountDfAnalysis(ABC):
+    @abstractmethod
+    def get_df_set_analysis(self) -> Df:
+        pass
+
+
+class _AccountSyncDfAnalysis(_AccountDfAnalysis):
     def __init__(
         self,
         aws_account_origin: str,
@@ -103,7 +112,7 @@ class _AccountSyncDfAnalysis:
         }
 
 
-class _TargetAccountWithoutMoreFilesDfAnalysis:
+class _TargetAccountWithoutMoreFilesDfAnalysis(_AccountDfAnalysis):
     def __init__(
         self,
         aws_account_origin: str,
