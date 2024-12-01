@@ -32,7 +32,7 @@ class TestS3DataAnalyzer(unittest.TestCase):
         mock_get_path_directory_all_results.return_value = current_path.joinpath(
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
-        mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
+        mock_get_analysis_date_time_str.return_value = "20241201180132"
         result = S3DataAnalyzer()._get_df_s3_data_analyzed()
         # S3DataAnalyzer().run(config)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
