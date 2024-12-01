@@ -104,6 +104,9 @@ class _DfAnalysis(ABC):
         pass
 
 
+_ConditionConfig = dict[str, bool | str]
+
+
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
     def __init__(
         self,
@@ -115,7 +118,7 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
     @property
-    def _condition_and_result_config(self) -> dict:
+    def _condition_and_result_config(self) -> _ConditionConfig:
         return {
             "condition_sync_is_wrong": False,
             "condition_sync_is_ok": True,
@@ -134,7 +137,7 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
     @property
-    def _condition_and_result_config(self) -> dict:
+    def _condition_and_result_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
 
 
