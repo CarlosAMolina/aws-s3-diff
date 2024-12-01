@@ -89,7 +89,7 @@ class _AccountSyncAnalysis:
         for condition_result, condition in {
             False: self._condition_sync_is_wrong,
             True: self._condition_sync_is_ok,
-            "No file to sync": self._condition_sync_is_not_required,
+            "No file to sync": ~self._condition_exists_file_to_sync,
         }.items():
             result.loc[
                 condition,
@@ -116,10 +116,6 @@ class _AccountSyncAnalysis:
         return (
             self._df.loc[:, (self._aws_account_origin, "size")] == self._df.loc[:, (self._aws_account_target, "size")]
         )
-
-    @property
-    def _condition_sync_is_not_required(self) -> Series:
-        return ~self._condition_exists_file_to_sync
 
     @property
     def _column_name_result(self) -> str:
