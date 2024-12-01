@@ -18,6 +18,9 @@ class LocalResults:
         ):
             self._create_analysis_results_folder()
 
+    def get_file_path_analysis_result(self):
+        return self._get_path_analysis_results().joinpath("analysis.csv")
+
     def get_file_path_aws_account_results(self, aws_account: str):
         return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
 

@@ -1,11 +1,13 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
+from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Series
 
 from combine import get_df_combine_files
+from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -13,8 +15,7 @@ class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._show_summary(s3_analyzed_df)
-        # TODO save in this projects instead of in /tmp
-        _AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
+        _AnalysisDfToCsv().export(s3_analyzed_df, LocalResults().get_file_path_analysis_result())
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
@@ -222,9 +223,9 @@ def _show_summary(aws_accounts: _SummaryAwsAccounts, df: Df):
 
 
 class _AnalysisDfToCsv:
-    def export(self, df: Df, file_path_name: str):
+    def export(self, df: Df, file_path: Path):
         csv_df = self._get_df_to_export(df)
-        csv_df.to_csv(file_path_name)
+        csv_df.to_csv(file_path)
 
     def _get_df_to_export(self, df: Df) -> Df:
         result = df.copy()
