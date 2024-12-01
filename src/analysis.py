@@ -12,11 +12,7 @@ from s3_uris_to_analyze import S3UrisFileReader
 class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
-        _show_summary(
-            aws_accounts_summary,
-            s3_analyzed_df,
-        )
+        self._show_summary(s3_analyzed_df)
         # TODO save in this projects instead of in /tmp
         _AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
 
@@ -24,6 +20,10 @@ class S3DataAnalyzer:
         s3_data_df = get_df_combine_files()
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
+
+    def _show_summary(self, df: Df):
+        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
+        _show_summary(aws_accounts_summary, df)
 
 
 class _AnalysisAwsAccounts:
