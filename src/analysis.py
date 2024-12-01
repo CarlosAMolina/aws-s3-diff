@@ -106,28 +106,42 @@ class _DfAnalysis(ABC):
         return ("analysis", self._analysis_config.column_name_result)
 
     @property
-    @abstractmethod
     def _analysis_config(self) -> _AnalysisConfig:
+        return _AnalysisConfig(self._column_name_result, self._condition_config)
+
+    @property
+    @abstractmethod
+    def _column_name_result(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def _condition_config(self) -> _ConditionConfig:
         pass
 
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
     @property
-    def _analysis_config(self) -> _AnalysisConfig:
-        return _AnalysisConfig(
-            f"is_sync_ok_in_{self._aws_account_target}",
-            {
-                "condition_sync_is_wrong": False,
-                "condition_sync_is_ok": True,
-                "condition_not_exist_file_to_sync": "No file to sync",
-            },
-        )
+    def _column_name_result(self) -> str:
+        return f"is_sync_ok_in_{self._aws_account_target}"
+
+    @property
+    def _condition_config(self) -> _ConditionConfig:
+        return {
+            "condition_sync_is_wrong": False,
+            "condition_sync_is_ok": True,
+            "condition_not_exist_file_to_sync": "No file to sync",
+        }
 
 
 class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
     @property
-    def _analysis_config(self) -> _AnalysisConfig:
-        return _AnalysisConfig(f"must_exist_in_{self._aws_account_target}", {"condition_must_not_exist": False})
+    def _column_name_result(self) -> str:
+        return f"must_exist_in_{self._aws_account_target}"
+
+    @property
+    def _condition_config(self) -> _ConditionConfig:
+        return {"condition_must_not_exist": False}
 
 
 class _AnalysisCondition:
