@@ -114,7 +114,7 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         return {
             False: self._condition.condition_sync_is_wrong,
             True: self._condition.condition_sync_is_ok,
-            "No file to sync": ~self._condition.condition_exists_file_to_sync,
+            "No file to sync": self._condition.condition_not_exist_file_to_sync,
         }
 
 
@@ -158,6 +158,10 @@ class _AnalysisCondition:
     @property
     def condition_exists_file_to_sync(self) -> Series:
         return self._df.loc[:, (self._aws_account_origin, "size")].notnull()
+
+    @property
+    def condition_not_exist_file_to_sync(self) -> Series:
+        return ~self.condition_exists_file_to_sync
 
     @property
     def _condition_file_is_sync(self) -> Series:
