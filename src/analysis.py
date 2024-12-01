@@ -6,7 +6,6 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from combine import get_df_combine_files
-from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -36,11 +35,7 @@ class S3DataAnalyzer:
         return result
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        # TODO use S3UrisFileReader instead of LocalResults
-        for aws_account in LocalResults()._get_aws_accounts_analyzed():
-            if aws_account.startswith("aws_account_2"):
-                return aws_account
-        raise ValueError("No aws account that must not have more files")
+        return S3UrisFileReader().get_aws_accounts()[1]
 
 
 class _S3DataSetAnalysis:

@@ -19,8 +19,8 @@ class TestS3DataAnalyzer(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch("src.analysis.LocalResults._get_analysis_date_time_str")
-    @patch("src.analysis.LocalResults.path_directory_all_results")
+    @patch("src.combine.LocalResults._get_analysis_date_time_str")
+    @patch("src.combine.LocalResults.path_directory_all_results")
     @patch("src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path")
     def test_get_df_s3_data_analyzed(
         self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
