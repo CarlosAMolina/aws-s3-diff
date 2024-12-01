@@ -9,6 +9,23 @@ from combine import get_df_combine_files
 from s3_uris_to_analyze import S3UrisFileReader
 
 
+class S3DataAnalyzer:
+    def run(self):
+        s3_analyzed_df = self._get_df_s3_data_analyzed()
+        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
+        _show_summary(
+            aws_accounts_summary,
+            s3_analyzed_df,
+        )
+        # TODO save in this projects instead of in /tmp
+        _AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
+
+    def _get_df_s3_data_analyzed(self) -> Df:
+        s3_data_df = get_df_combine_files()
+        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
+
+
 class _AnalysisAwsAccounts:
     def __init__(self, *args):
         (
@@ -63,23 +80,6 @@ class _SummaryAwsAccountsGenerator(_AwsAccountsGenerator):
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_accounts_where_files_must_be_copied(),
         )
-
-
-class S3DataAnalyzer:
-    def run(self):
-        s3_analyzed_df = self._get_df_s3_data_analyzed()
-        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
-        _show_summary(
-            aws_accounts_summary,
-            s3_analyzed_df,
-        )
-        # TODO save in this projects instead of in /tmp
-        _AnalysisDfToCsv().export(s3_analyzed_df, "/tmp/analysis.csv")
-
-    def _get_df_s3_data_analyzed(self) -> Df:
-        s3_data_df = get_df_combine_files()
-        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
 
 
 class _S3DataSetAnalysis:
