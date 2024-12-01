@@ -77,22 +77,6 @@ class _DfAnalysis(ABC):
         self._column_name_result = column_name_result
         self._df = df
 
-    @abstractmethod
-    def get_df_set_analysis(self) -> Df:
-        pass
-
-
-class _OriginFileSyncDfAnalysis(_DfAnalysis):
-    def __init__(
-        self,
-        aws_account_origin: str,
-        aws_account_target: str,
-        df: Df,
-    ):
-        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
-        column_name_result = f"is_sync_ok_in_{aws_account_target}"
-        super().__init__(column_name_result, df)
-
     def get_df_set_analysis(self) -> Df:
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
@@ -109,6 +93,22 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
                 ],
             ] = condition_result
         return result
+
+    @abstractmethod
+    def _get_result_and_condition(self) -> dict:
+        pass
+
+
+class _OriginFileSyncDfAnalysis(_DfAnalysis):
+    def __init__(
+        self,
+        aws_account_origin: str,
+        aws_account_target: str,
+        df: Df,
+    ):
+        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
+        column_name_result = f"is_sync_ok_in_{aws_account_target}"
+        super().__init__(column_name_result, df)
 
     def _get_result_and_condition(self) -> dict:
         return {
@@ -129,22 +129,6 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         column_name_result = f"must_exist_in_{aws_account_target}"
         super().__init__(column_name_result, df)
-
-    def get_df_set_analysis(self) -> Df:
-        result = self._df.copy()
-        result[
-            [
-                ("analysis", self._column_name_result),
-            ]
-        ] = None
-        for condition_result, condition in self._get_result_and_condition().items():
-            result.loc[
-                condition,
-                [
-                    ("analysis", self._column_name_result),
-                ],
-            ] = condition_result
-        return result
 
     def _get_result_and_condition(self) -> dict:
         return {False: self._condition.condition_must_not_exist}
