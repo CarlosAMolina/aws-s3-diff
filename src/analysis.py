@@ -20,11 +20,12 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        return _S3DataSetAnalysis(
+        aws_accounts_analysis = _AwsAccountsAnalysis(
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_account_that_must_not_have_more_files(),
             self._get_accounts_where_files_must_be_copied(),
-        ).get_df_set_analysis_columns(s3_data_df)
+        )
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
 
     def _get_aws_account_with_data_to_sync(self) -> str:
         return S3UrisFileReader().get_aws_accounts()[0]
@@ -38,16 +39,26 @@ class S3DataAnalyzer:
         return S3UrisFileReader().get_aws_accounts()[1]
 
 
+class _AwsAccountsAnalysis:
+    def __init__(self, *args):
+        (
+            self.aws_account_origin,
+            self.aws_account_that_must_not_have_more_files,
+            self.accounts_where_files_must_be_copied,
+        ) = args
+
+
+_AwsAccountsCompare = namedtuple("_AwsAccountsCompare", "origin target")
+_ConditionConfig = dict[str, bool | str]
+
+
 class _S3DataSetAnalysis:
-    def __init__(
-        self,
-        aws_account_origin: str,
-        aws_account_that_must_not_have_more_files: str,
-        accounts_where_files_must_be_copied: list[str],
-    ):
-        self._aws_account_origin = aws_account_origin
-        self._aws_account_that_must_not_have_more_files = aws_account_that_must_not_have_more_files
-        self._accounts_where_files_must_be_copied = accounts_where_files_must_be_copied
+    def __init__(self, aws_accounts_analysis: _AwsAccountsAnalysis):
+        self._aws_account_origin = aws_accounts_analysis.aws_account_origin
+        self._aws_account_that_must_not_have_more_files = (
+            aws_accounts_analysis.aws_account_that_must_not_have_more_files
+        )
+        self._accounts_where_files_must_be_copied = aws_accounts_analysis.accounts_where_files_must_be_copied
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
@@ -66,10 +77,6 @@ class _S3DataSetAnalysis:
         analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_that_must_not_have_more_files)
         aws_accounts = _AwsAccountsCompare(self._aws_account_origin, self._aws_account_that_must_not_have_more_files)
         return _DfAnalysis(analysis_config, aws_accounts, df).get_df_set_analysis()
-
-
-_AwsAccountsCompare = namedtuple("_AwsAccountsCompare", "origin target")
-_ConditionConfig = dict[str, bool | str]
 
 
 class _AnalysisConfig(ABC):
