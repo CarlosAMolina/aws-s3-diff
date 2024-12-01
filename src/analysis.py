@@ -83,12 +83,8 @@ class S3DataAnalyzer:
 
 
 class _S3DataSetAnalysis:
-    def __init__(self, aws_accounts_analysis: _AnalysisAwsAccounts):
-        self._aws_account_origin = aws_accounts_analysis.aws_account_origin
-        self._aws_account_that_must_not_have_more_files = (
-            aws_accounts_analysis.aws_account_that_must_not_have_more_files
-        )
-        self._aws_accounts_where_files_must_be_copied = aws_accounts_analysis.aws_accounts_where_files_must_be_copied
+    def __init__(self, aws_accounts: _AnalysisAwsAccounts):
+        self._aws_accounts = aws_accounts
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
@@ -97,15 +93,19 @@ class _S3DataSetAnalysis:
 
     def _get_df_set_analysis_file_has_been_copied(self, df: Df) -> Df:
         result = df
-        for aws_account_target in self._aws_accounts_where_files_must_be_copied:
-            aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
+        for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
+            aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
             analysis_config = _OriginFileSyncAnalysisConfig(aws_account_target)
             result = _DfAnalysis(analysis_config, aws_accounts, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_that_must_not_have_more_files)
-        aws_accounts = _CompareAwsAccounts(self._aws_account_origin, self._aws_account_that_must_not_have_more_files)
+        analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(
+            self._aws_accounts.aws_account_that_must_not_have_more_files
+        )
+        aws_accounts = _CompareAwsAccounts(
+            self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
+        )
         return _DfAnalysis(analysis_config, aws_accounts, df).get_df_set_analysis()
 
 
@@ -175,13 +175,8 @@ class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
 
 
 class _AnalysisCondition:
-    def __init__(
-        self,
-        aws_accounts: _CompareAwsAccounts,
-        df: Df,
-    ):
-        self._aws_account_origin = aws_accounts.origin
-        self._aws_account_target = aws_accounts.target
+    def __init__(self, aws_accounts: _CompareAwsAccounts, df: Df):
+        self._aws_accounts = aws_accounts
         self._df = df
 
     @property
@@ -198,7 +193,7 @@ class _AnalysisCondition:
 
     @property
     def condition_exists_file_to_sync(self) -> Series:
-        return self._df.loc[:, (self._aws_account_origin, "size")].notnull()
+        return self._df.loc[:, (self._aws_accounts.origin, "size")].notnull()
 
     @property
     def condition_not_exist_file_to_sync(self) -> Series:
@@ -207,12 +202,12 @@ class _AnalysisCondition:
     @property
     def _condition_file_is_sync(self) -> Series:
         return (
-            self._df.loc[:, (self._aws_account_origin, "size")] == self._df.loc[:, (self._aws_account_target, "size")]
+            self._df.loc[:, (self._aws_accounts.origin, "size")] == self._df.loc[:, (self._aws_accounts.target, "size")]
         )
 
     @property
     def _condition_exists_file_in_target_aws_account(self) -> Series:
-        return self._df.loc[:, (self._aws_account_target, "size")].notnull()
+        return self._df.loc[:, (self._aws_accounts.target, "size")].notnull()
 
 
 def _show_summary(aws_accounts: _SummaryAwsAccounts, df: Df):
