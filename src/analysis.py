@@ -56,10 +56,10 @@ class _S3DataSetAnalysis:
 
     def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
-        result = self._get_df_set_analysis_sync(result)
+        result = self._get_df_set_analysis_file_has_been_copied(result)
         return self._get_df_set_analysis_must_file_exist(result)
 
-    def _get_df_set_analysis_sync(self, df: Df) -> Df:
+    def _get_df_set_analysis_file_has_been_copied(self, df: Df) -> Df:
         result = df
         for aws_account_target in self._accounts_where_files_must_be_copied:
             aws_accounts = _AwsAccountsAnalysis(self._aws_account_origin, aws_account_target)
