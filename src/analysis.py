@@ -18,7 +18,7 @@ class _AnalysisAwsAccounts:
         ) = args
 
 
-_AwsAccountsCompare = namedtuple("_AwsAccountsCompare", "origin target")
+_CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
@@ -75,14 +75,14 @@ class _S3DataSetAnalysis:
     def _get_df_set_analysis_file_has_been_copied(self, df: Df) -> Df:
         result = df
         for aws_account_target in self._aws_accounts_where_files_must_be_copied:
-            aws_accounts = _AwsAccountsCompare(self._aws_account_origin, aws_account_target)
+            aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
             analysis_config = _OriginFileSyncAnalysisConfig(aws_account_target)
             result = _DfAnalysis(analysis_config, aws_accounts, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_that_must_not_have_more_files)
-        aws_accounts = _AwsAccountsCompare(self._aws_account_origin, self._aws_account_that_must_not_have_more_files)
+        aws_accounts = _CompareAwsAccounts(self._aws_account_origin, self._aws_account_that_must_not_have_more_files)
         return _DfAnalysis(analysis_config, aws_accounts, df).get_df_set_analysis()
 
 
@@ -102,7 +102,7 @@ class _AnalysisConfig(ABC):
 
 
 class _DfAnalysis:
-    def __init__(self, analysis_config: _AnalysisConfig, aws_accounts: _AwsAccountsCompare, df: Df):
+    def __init__(self, analysis_config: _AnalysisConfig, aws_accounts: _CompareAwsAccounts, df: Df):
         self._analysis_config = analysis_config
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
@@ -154,7 +154,7 @@ class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
 class _AnalysisCondition:
     def __init__(
         self,
-        aws_accounts: _AwsAccountsCompare,
+        aws_accounts: _CompareAwsAccounts,
         df: Df,
     ):
         self._aws_account_origin = aws_accounts.origin
