@@ -129,8 +129,7 @@ class _TargetAccountWithoutMoreFilesAnalysis:
         aws_account_target: str,
         df: Df,
     ):
-        self._aws_account_origin = aws_account_origin
-        self._aws_account_target = aws_account_target
+        self._column_name_result = f"must_exist_in_{aws_account_target}"
         self._df = df
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
 
@@ -149,10 +148,6 @@ class _TargetAccountWithoutMoreFilesAnalysis:
                 ],
             ] = condition_result
         return result
-
-    @property
-    def _column_name_result(self) -> str:
-        return f"must_exist_in_{self._aws_account_target}"
 
 
 class _AnalysisCondition:
