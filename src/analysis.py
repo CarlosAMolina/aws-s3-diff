@@ -119,7 +119,7 @@ class _AccountSyncAnalysis:
 
     @property
     def _condition_sync_is_not_required(self) -> Series:
-        return self._df.loc[:, (self._aws_account_origin, "size")].isnull()
+        return ~self._condition_exists_file_to_sync
 
     @property
     def _column_name_result(self) -> str:
