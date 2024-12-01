@@ -86,9 +86,9 @@ class _DfAnalysis(ABC):
                 ("analysis", self._column_name_result),
             ]
         ] = None
-        for condition_result, condition in self._get_result_and_condition().items():
+        for condition_result, condition_name in self._get_result_and_condition().items():
             result.loc[
-                condition,
+                getattr(self._condition, condition_name),
                 [
                     ("analysis", self._column_name_result),
                 ],
@@ -112,9 +112,9 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
 
     def _get_result_and_condition(self) -> dict:
         return {
-            False: self._condition.condition_sync_is_wrong,
-            True: self._condition.condition_sync_is_ok,
-            "No file to sync": self._condition.condition_not_exist_file_to_sync,
+            False: "condition_sync_is_wrong",
+            True: "condition_sync_is_ok",
+            "No file to sync": "condition_not_exist_file_to_sync",
         }
 
 
@@ -129,7 +129,7 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
 
     def _get_result_and_condition(self) -> dict:
-        return {False: self._condition.condition_must_not_exist}
+        return {False: "condition_must_not_exist"}
 
 
 class _AnalysisCondition:
