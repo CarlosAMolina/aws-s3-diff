@@ -1,3 +1,6 @@
+from abc import ABC
+from abc import abstractmethod
+
 from pandas import DataFrame as Df
 from pandas import Series
 
@@ -78,9 +81,9 @@ class _AnalysisConfig:
         self.condition_config = condition_config
 
 
-class _DfAnalysis:
-    def __init__(self, analysis_config: _AnalysisConfig, aws_account_origin: str, aws_account_target: str, df: Df):
-        self._analysis_config = analysis_config
+class _DfAnalysis(ABC):
+    def __init__(self, aws_account_origin: str, aws_account_target: str, df: Df):
+        self._aws_account_target = aws_account_target
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         self._df = df
 
@@ -102,6 +105,11 @@ class _DfAnalysis:
     def _result_column_multi_index(self) -> tuple[str, str]:
         return ("analysis", self._analysis_config.column_name_result)
 
+    @property
+    @abstractmethod
+    def _analysis_config(self) -> _AnalysisConfig:
+        pass
+
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
     def __init__(
@@ -110,12 +118,12 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        analysis_config = self._get_analysis_config(aws_account_target)
-        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
+        super().__init__(aws_account_origin, aws_account_target, df)
 
-    def _get_analysis_config(self, aws_account_target) -> _AnalysisConfig:
+    @property
+    def _analysis_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
-            f"is_sync_ok_in_{aws_account_target}",
+            f"is_sync_ok_in_{self._aws_account_target}",
             {
                 "condition_sync_is_wrong": False,
                 "condition_sync_is_ok": True,
@@ -131,11 +139,11 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        analysis_config = self._get_analysis_config(aws_account_target)
-        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
+        super().__init__(aws_account_origin, aws_account_target, df)
 
-    def _get_analysis_config(self, aws_account_target) -> _AnalysisConfig:
-        return _AnalysisConfig(f"must_exist_in_{aws_account_target}", {"condition_must_not_exist": False})
+    @property
+    def _analysis_config(self) -> _AnalysisConfig:
+        return _AnalysisConfig(f"must_exist_in_{self._aws_account_target}", {"condition_must_not_exist": False})
 
 
 class _AnalysisCondition:
