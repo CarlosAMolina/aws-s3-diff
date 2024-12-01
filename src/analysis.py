@@ -23,6 +23,13 @@ _ConditionConfig = dict[str, bool | str]
 
 
 class _AwsAccountsAnalysisGenerator:
+    def get_aws_accounts(self) -> _AwsAccountsAnalysis:
+        return _AwsAccountsAnalysis(
+            self._get_aws_account_with_data_to_sync(),
+            self._get_aws_account_that_must_not_have_more_files(),
+            self._get_aws_accounts_where_files_must_be_copied(),
+        )
+
     def _get_aws_account_with_data_to_sync(self) -> str:
         return S3UrisFileReader().get_aws_accounts()[0]
 
@@ -48,15 +55,8 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        aws_accounts_analysis = self._get_aws_accounts_analysis()
+        aws_accounts_analysis = _AwsAccountsAnalysisGenerator().get_aws_accounts()
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
-
-    def _get_aws_accounts_analysis(self) -> _AwsAccountsAnalysis:
-        return _AwsAccountsAnalysis(
-            _AwsAccountsAnalysisGenerator()._get_aws_account_with_data_to_sync(),
-            _AwsAccountsAnalysisGenerator()._get_aws_account_that_must_not_have_more_files(),
-            _AwsAccountsAnalysisGenerator()._get_aws_accounts_where_files_must_be_copied(),
-        )
 
 
 class _S3DataSetAnalysis:
