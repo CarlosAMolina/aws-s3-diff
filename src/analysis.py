@@ -61,28 +61,40 @@ class _S3DataSetAnalysis:
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         result = df
         for aws_account_target in self._accounts_where_files_must_be_copied:
-            result = _OriginFileSyncDfAnalysis(
-                self._aws_account_origin, aws_account_target, result
+            analysis_config = _OriginFileSyncAnalysisConfig(aws_account_target)
+            result = _DfAnalysis(
+                analysis_config, self._aws_account_origin, aws_account_target, result
             ).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        return _TargetAccountWithoutMoreFilesDfAnalysis(
-            self._aws_account_origin, self._aws_account_that_must_not_have_more_files, df
+        analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_that_must_not_have_more_files)
+        return _DfAnalysis(
+            analysis_config, self._aws_account_origin, self._aws_account_that_must_not_have_more_files, df
         ).get_df_set_analysis()
 
 
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AnalysisConfig:
-    def __init__(self, column_name_result: str, condition_config: _ConditionConfig):
-        self.column_name_result = column_name_result
-        self.condition_config = condition_config
+class _AnalysisConfig(ABC):
+    def __init__(self, aws_account_target: str):
+        self._aws_account_target = aws_account_target
+
+    @property
+    @abstractmethod
+    def column_name_result(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def condition_config(self) -> _ConditionConfig:
+        pass
 
 
-class _DfAnalysis(ABC):
-    def __init__(self, aws_account_origin: str, aws_account_target: str, df: Df):
+class _DfAnalysis:
+    def __init__(self, analysis_config: _AnalysisConfig, aws_account_origin: str, aws_account_target: str, df: Df):
+        self._analysis_config = analysis_config
         self._aws_account_target = aws_account_target
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         self._df = df
@@ -105,28 +117,14 @@ class _DfAnalysis(ABC):
     def _result_column_multi_index(self) -> tuple[str, str]:
         return ("analysis", self._analysis_config.column_name_result)
 
-    @property
-    def _analysis_config(self) -> _AnalysisConfig:
-        return _AnalysisConfig(self._column_name_result, self._condition_config)
 
+class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
     @property
-    @abstractmethod
-    def _column_name_result(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def _condition_config(self) -> _ConditionConfig:
-        pass
-
-
-class _OriginFileSyncDfAnalysis(_DfAnalysis):
-    @property
-    def _column_name_result(self) -> str:
+    def column_name_result(self) -> str:
         return f"is_sync_ok_in_{self._aws_account_target}"
 
     @property
-    def _condition_config(self) -> _ConditionConfig:
+    def condition_config(self) -> _ConditionConfig:
         return {
             "condition_sync_is_wrong": False,
             "condition_sync_is_ok": True,
@@ -134,13 +132,13 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         }
 
 
-class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
+class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
     @property
-    def _column_name_result(self) -> str:
+    def column_name_result(self) -> str:
         return f"must_exist_in_{self._aws_account_target}"
 
     @property
-    def _condition_config(self) -> _ConditionConfig:
+    def condition_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
 
 
