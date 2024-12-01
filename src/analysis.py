@@ -151,9 +151,15 @@ class _TargetAccountWithoutMoreFilesAnalysis:
 
     @property
     def _condition_must_not_exist(self) -> Series:
-        return (self._df.loc[:, (self._aws_account_origin, "size")].isnull()) & (
-            self._df.loc[:, (self._aws_account_target, "size")].notnull()
-        )
+        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+
+    @property
+    def _condition_exists_file_to_sync(self) -> Series:
+        return self._df.loc[:, (self._aws_account_origin, "size")].notnull()
+
+    @property
+    def _condition_exists_file_in_target_aws_account(self) -> Series:
+        return self._df.loc[:, (self._aws_account_target, "size")].notnull()
 
     @property
     def _column_name_result(self) -> str:
