@@ -1,5 +1,4 @@
 import datetime
-import os
 from pathlib import Path
 
 
@@ -34,9 +33,7 @@ class LocalResults:
 
     def _get_aws_accounts_analyzed(self) -> list[str]:
         if self._get_path_analysis_results().is_dir():
-            # TODO use self._get_path_analysis_results().iterdir():
-            result = os.listdir(self._get_path_analysis_results())
-            result = [file_name[: -len(".csv")] for file_name in result]
+            result = [file_path.stem for file_path in self._get_path_analysis_results().iterdir()]
             result.sort()
             return result
         return []
