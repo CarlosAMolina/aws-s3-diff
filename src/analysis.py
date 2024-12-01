@@ -1,6 +1,3 @@
-from abc import ABC
-from abc import abstractmethod
-
 from pandas import DataFrame as Df
 from pandas import Series
 
@@ -72,9 +69,18 @@ class _S3DataSetAnalysis:
         ).get_df_set_analysis()
 
 
-class _DfAnalysis(ABC):
-    def __init__(self, aws_account_origin: str, aws_account_target: str, column_name_result: str, df: Df):
-        self._column_name_result = column_name_result
+_ConditionConfig = dict[str, bool | str]
+
+
+class _AnalysisConfig:
+    def __init__(self, column_name_result: str, condition_config: _ConditionConfig):
+        self.column_name_result = column_name_result
+        self.condition_config = condition_config
+
+
+class _DfAnalysis:
+    def __init__(self, analysis_config: _AnalysisConfig, aws_account_origin: str, aws_account_target: str, df: Df):
+        self._analysis_config = analysis_config
         self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
         self._df = df
 
@@ -83,28 +89,20 @@ class _DfAnalysis(ABC):
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[
             [
-                ("analysis", self._column_name_result),
+                ("analysis", self._analysis_config.column_name_result),
             ]
         ] = None
         for (
             condition_name,
             condition_result,
-        ) in self._condition_and_result_config.items():
+        ) in self._analysis_config.condition_config.items():
             result.loc[
                 getattr(self._condition, condition_name),
                 [
-                    ("analysis", self._column_name_result),
+                    ("analysis", self._analysis_config.column_name_result),
                 ],
             ] = condition_result
         return result
-
-    @property
-    @abstractmethod
-    def _condition_and_result_config(self) -> dict:
-        pass
-
-
-_ConditionConfig = dict[str, bool | str]
 
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
@@ -114,16 +112,15 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        column_name_result = f"is_sync_ok_in_{aws_account_target}"
-        super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
-
-    @property
-    def _condition_and_result_config(self) -> _ConditionConfig:
-        return {
-            "condition_sync_is_wrong": False,
-            "condition_sync_is_ok": True,
-            "condition_not_exist_file_to_sync": "No file to sync",
-        }
+        analysis_config = _AnalysisConfig(
+            f"is_sync_ok_in_{aws_account_target}",
+            {
+                "condition_sync_is_wrong": False,
+                "condition_sync_is_ok": True,
+                "condition_not_exist_file_to_sync": "No file to sync",
+            },
+        )
+        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
 
 
 class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
@@ -133,12 +130,8 @@ class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
         aws_account_target: str,
         df: Df,
     ):
-        column_name_result = f"must_exist_in_{aws_account_target}"
-        super().__init__(aws_account_origin, aws_account_target, column_name_result, df)
-
-    @property
-    def _condition_and_result_config(self) -> _ConditionConfig:
-        return {"condition_must_not_exist": False}
+        analysis_config = _AnalysisConfig(f"must_exist_in_{aws_account_target}", {"condition_must_not_exist": False})
+        super().__init__(analysis_config, aws_account_origin, aws_account_target, df)
 
 
 class _AnalysisCondition:
