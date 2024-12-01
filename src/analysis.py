@@ -112,14 +112,6 @@ class _DfAnalysis(ABC):
 
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
-    def __init__(
-        self,
-        aws_account_origin: str,
-        aws_account_target: str,
-        df: Df,
-    ):
-        super().__init__(aws_account_origin, aws_account_target, df)
-
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
@@ -133,14 +125,6 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
 
 
 class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
-    def __init__(
-        self,
-        aws_account_origin: str,
-        aws_account_target: str,
-        df: Df,
-    ):
-        super().__init__(aws_account_origin, aws_account_target, df)
-
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(f"must_exist_in_{self._aws_account_target}", {"condition_must_not_exist": False})
