@@ -4,6 +4,7 @@ import pandas as pd
 from pandas import DataFrame as Df
 
 from local_results import LocalResults
+from s3_uris_to_analyze import S3UrisFileReader
 
 
 def get_df_combine_files() -> Df:
@@ -12,7 +13,7 @@ def get_df_combine_files() -> Df:
 
 
 def _get_df_combine_aws_accounts_results() -> Df:
-    aws_accounts = LocalResults()._get_aws_accounts_analyzed()
+    aws_accounts = S3UrisFileReader().get_aws_accounts()
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account)
