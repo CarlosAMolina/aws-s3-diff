@@ -9,7 +9,7 @@ from combine import get_df_combine_files
 from s3_uris_to_analyze import S3UrisFileReader
 
 
-class _AwsAccountsAnalysis:
+class _AnalysisAwsAccounts:
     def __init__(self, *args):
         (
             self.aws_account_origin,
@@ -22,9 +22,9 @@ _AwsAccountsCompare = namedtuple("_AwsAccountsCompare", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AwsAccountsAnalysisGenerator:
-    def get_aws_accounts(self) -> _AwsAccountsAnalysis:
-        return _AwsAccountsAnalysis(
+class _AnalysisAwsAccountsGenerator:
+    def get_aws_accounts(self) -> _AnalysisAwsAccounts:
+        return _AnalysisAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_account_that_must_not_have_more_files(),
             self._get_aws_accounts_where_files_must_be_copied(),
@@ -46,8 +46,8 @@ class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         _show_summary(
-            _AwsAccountsAnalysisGenerator()._get_aws_account_with_data_to_sync(),
-            _AwsAccountsAnalysisGenerator()._get_aws_accounts_where_files_must_be_copied(),
+            _AnalysisAwsAccountsGenerator()._get_aws_account_with_data_to_sync(),
+            _AnalysisAwsAccountsGenerator()._get_aws_accounts_where_files_must_be_copied(),
             s3_analyzed_df,
         )
         # TODO save in this projects instead of in /tmp
@@ -55,12 +55,12 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
-        aws_accounts_analysis = _AwsAccountsAnalysisGenerator().get_aws_accounts()
+        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
 
 
 class _S3DataSetAnalysis:
-    def __init__(self, aws_accounts_analysis: _AwsAccountsAnalysis):
+    def __init__(self, aws_accounts_analysis: _AnalysisAwsAccounts):
         self._aws_account_origin = aws_accounts_analysis.aws_account_origin
         self._aws_account_that_must_not_have_more_files = (
             aws_accounts_analysis.aws_account_that_must_not_have_more_files
