@@ -61,7 +61,7 @@ class _S3DataSetAnalysis:
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         result = df
         for aws_account_target in self._accounts_where_files_must_be_copied:
-            result = _OriginFileSyncAccountDfAnalysis(
+            result = _OriginFileSyncDfAnalysis(
                 self._aws_account_origin, aws_account_target, result
             ).get_df_set_analysis()
         return result
@@ -72,13 +72,13 @@ class _S3DataSetAnalysis:
         ).get_df_set_analysis()
 
 
-class _AccountDfAnalysis(ABC):
+class _DfAnalysis(ABC):
     @abstractmethod
     def get_df_set_analysis(self) -> Df:
         pass
 
 
-class _OriginFileSyncAccountDfAnalysis(_AccountDfAnalysis):
+class _OriginFileSyncDfAnalysis(_DfAnalysis):
     def __init__(
         self,
         aws_account_origin: str,
@@ -114,7 +114,7 @@ class _OriginFileSyncAccountDfAnalysis(_AccountDfAnalysis):
         }
 
 
-class _TargetAccountWithoutMoreFilesDfAnalysis(_AccountDfAnalysis):
+class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
     def __init__(
         self,
         aws_account_origin: str,
