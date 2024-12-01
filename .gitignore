@@ -1,5 +1,6 @@
 __pycache__
 s3-results/202*
+s3-results/aws_s3_diff_analysis_date_time.txt
 src/exports/
 src/exports-all-aws-accounts/
 src/files-with-paths/paths-to-analyze.txt

@@ -31,9 +31,9 @@ class TestFunction_run(unittest.TestCase):
 
 
 def remove_file_with_analysis_date():
-    Path(LocalResults._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).unlink()
+    Path(LocalResults()._get_file_path_accounts_analysis_date_time()).unlink()
 
 
 def remove_file_with_analysis_date_if_exists():
-    if Path(LocalResults._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_dir():
+    if Path(LocalResults()._get_file_path_accounts_analysis_date_time()).is_dir():
         remove_file_with_analysis_date()

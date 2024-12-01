@@ -4,7 +4,7 @@ from pathlib import Path
 
 class LocalResults:
     # TODO remove this file when the 3º account has been analyzed.
-    _FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "/tmp/aws_s3_diff_analysis_date_time.txt"
+    _FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "aws_s3_diff_analysis_date_time.txt"
     _FOLDER_NAME_S3_RESULTS = "s3-results"
 
     def get_aws_account_index_to_analyze(self) -> int:
@@ -49,15 +49,18 @@ class LocalResults:
         return current_path.parent.joinpath(self._FOLDER_NAME_S3_RESULTS)
 
     def _get_analysis_date_time_str(self) -> str:
-        if not Path(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME).is_file():
+        if not Path(self._get_file_path_accounts_analysis_date_time()).is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
         date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        with open(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME, "w") as file:
+        with open(self._get_file_path_accounts_analysis_date_time(), "w") as file:
             file.write(date_time_str)
 
     def _get_date_time_str_stored(self) -> str:
-        with open(self._FILE_PATH_NAME_ACCOUNTS_ANALYSIS_DATE_TIME) as file:
+        with open(self._get_file_path_accounts_analysis_date_time()) as file:
             return file.read()
+
+    def _get_file_path_accounts_analysis_date_time(self) -> Path:
+        return self._get_path_directory_all_results().joinpath(self._FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME)
