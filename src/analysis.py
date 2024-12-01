@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from collections import namedtuple
 
 from pandas import DataFrame as Df
 from pandas import Series
@@ -61,19 +62,18 @@ class _S3DataSetAnalysis:
     def _get_df_set_analysis_sync(self, df: Df) -> Df:
         result = df
         for aws_account_target in self._accounts_where_files_must_be_copied:
+            aws_accounts = _AwsAccountsAnalysis(self._aws_account_origin, aws_account_target)
             analysis_config = _OriginFileSyncAnalysisConfig(aws_account_target)
-            result = _DfAnalysis(
-                analysis_config, self._aws_account_origin, aws_account_target, result
-            ).get_df_set_analysis()
+            result = _DfAnalysis(analysis_config, aws_accounts, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_that_must_not_have_more_files)
-        return _DfAnalysis(
-            analysis_config, self._aws_account_origin, self._aws_account_that_must_not_have_more_files, df
-        ).get_df_set_analysis()
+        aws_accounts = _AwsAccountsAnalysis(self._aws_account_origin, self._aws_account_that_must_not_have_more_files)
+        return _DfAnalysis(analysis_config, aws_accounts, df).get_df_set_analysis()
 
 
+_AwsAccountsAnalysis = namedtuple("_AwsAccountsAnalysis", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
@@ -93,10 +93,10 @@ class _AnalysisConfig(ABC):
 
 
 class _DfAnalysis:
-    def __init__(self, analysis_config: _AnalysisConfig, aws_account_origin: str, aws_account_target: str, df: Df):
+    def __init__(self, analysis_config: _AnalysisConfig, aws_accounts: _AwsAccountsAnalysis, df: Df):
         self._analysis_config = analysis_config
-        self._aws_account_target = aws_account_target
-        self._condition = _AnalysisCondition(aws_account_origin, aws_account_target, df)
+        self._aws_account_target = aws_accounts.target
+        self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
 
     def get_df_set_analysis(self) -> Df:
@@ -145,12 +145,11 @@ class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
 class _AnalysisCondition:
     def __init__(
         self,
-        aws_account_origin: str,
-        aws_account_target: str,
+        aws_accounts: _AwsAccountsAnalysis,
         df: Df,
     ):
-        self._aws_account_origin = aws_account_origin
-        self._aws_account_target = aws_account_target
+        self._aws_account_origin = aws_accounts.origin
+        self._aws_account_target = aws_accounts.target
         self._df = df
 
     @property
