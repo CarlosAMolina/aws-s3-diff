@@ -30,7 +30,21 @@ _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AnalysisAwsAccountsGenerator:
+class _AwsAccountsGenerator(ABC):
+    @abstractmethod
+    def get_aws_accounts(self) -> _AnalysisAwsAccounts | _SummaryAwsAccounts:
+        pass
+
+    def _get_aws_account_with_data_to_sync(self) -> str:
+        return S3UrisFileReader().get_aws_accounts()[0]
+
+    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+        result = S3UrisFileReader().get_aws_accounts()
+        result.remove(self._get_aws_account_with_data_to_sync())
+        return result
+
+
+class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
     def get_aws_accounts(self) -> _AnalysisAwsAccounts:
         return _AnalysisAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
@@ -38,32 +52,16 @@ class _AnalysisAwsAccountsGenerator:
             self._get_aws_accounts_where_files_must_be_copied(),
         )
 
-    def _get_aws_account_with_data_to_sync(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[0]
-
-    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = S3UrisFileReader().get_aws_accounts()
-        result.remove(self._get_aws_account_with_data_to_sync())
-        return result
-
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
         return S3UrisFileReader().get_aws_accounts()[1]
 
 
-class _SummaryAwsAccountsGenerator:
+class _SummaryAwsAccountsGenerator(_AwsAccountsGenerator):
     def get_aws_accounts(self) -> _SummaryAwsAccounts:
         return _SummaryAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_accounts_where_files_must_be_copied(),
         )
-
-    def _get_aws_account_with_data_to_sync(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[0]
-
-    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = S3UrisFileReader().get_aws_accounts()
-        result.remove(self._get_aws_account_with_data_to_sync())
-        return result
 
 
 class S3DataAnalyzer:
