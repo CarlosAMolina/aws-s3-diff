@@ -20,16 +20,16 @@ class TestS3DataAnalyzer(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     @patch("src.combine.LocalResults._get_analysis_date_time_str")
-    @patch("src.combine.LocalResults.path_directory_all_results")
+    @patch("src.combine.LocalResults._get_path_directory_all_results")
     @patch("src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path")
     def test_get_df_s3_data_analyzed(
-        self, mock_file_what_to_analyze_path, mock_path_directory_all_results, mock_get_analysis_date_time_str
+        self, mock_file_what_to_analyze_path, mock_get_path_directory_all_results, mock_get_analysis_date_time_str
     ):
         current_path = Path(__file__).parent.absolute()
         mock_file_what_to_analyze_path.return_value = current_path.joinpath(
             "fake-files", S3UrisFileReader._FILE_NAME_S3_URIS
         )
-        mock_path_directory_all_results.return_value = current_path.joinpath(
+        mock_get_path_directory_all_results.return_value = current_path.joinpath(
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
         mock_get_analysis_date_time_str.return_value = "exports-all-aws-accounts"  # TODO use datetime str
