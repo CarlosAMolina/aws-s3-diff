@@ -18,27 +18,16 @@ class TestFunction_run(unittest.TestCase):
         self.mock_aws.start()
         S3().create_objects()
         # Drop created file when the user runs the main program instead of the tests.
-        remove_file_with_analysis_date_if_exists()
+        if Path(LocalResults()._get_file_path_accounts_analysis_date_time()).is_dir():
+            LocalResults().remove_file_with_analysis_date()
 
     def tearDown(self):
         self.mock_aws.stop()
-        remove_file_with_analysis_date()
+        LocalResults().remove_file_with_analysis_date()
 
     @mock.patch("src.main.input", create=True)
     def test_run(self, mock_input):
-        mock_input.return_value = "Y"
-        # Extract account 1
-        m_main.run()
-        # Extract account 2
-        m_main.run()
-        # Extract account 3
-        m_main.run()
-
-
-def remove_file_with_analysis_date():
-    Path(LocalResults()._get_file_path_accounts_analysis_date_time()).unlink()
-
-
-def remove_file_with_analysis_date_if_exists():
-    if Path(LocalResults()._get_file_path_accounts_analysis_date_time()).is_dir():
-        remove_file_with_analysis_date()
+        number_of_accounts_to_analyze = 3
+        mock_input.side_effect = ["Y"] * number_of_accounts_to_analyze
+        for _ in range(number_of_accounts_to_analyze):
+            m_main.run()

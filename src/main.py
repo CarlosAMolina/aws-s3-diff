@@ -1,5 +1,6 @@
 import sys
 
+from analysis import S3DataAnalyzer
 from local_results import LocalResults
 from s3_extract import AwsAccountExtractor
 from s3_uris_to_analyze import S3UrisFileReader
@@ -17,16 +18,17 @@ class _IteractiveMenu:
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
         self._show_aws_accounts_to_analyze()
-        if self._local_results.get_aws_account_index_to_analyze() > 2:
-            raise ValueError("All AWS accounts have been analyzed")
+        if self._have_all_aws_account_been_analyzed():
+            print("All AWS accounts has been analyzed. Starting a new analysis")
+            self._local_results.remove_file_with_analysis_date()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
-            self._local_results.create_analysis_results_folder_if_required(
-                self._s3_uris_file_reader.get_number_of_aws_accounts()
-            )
+            self._local_results.create_analysis_results_folder()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        _AccountAnalyzer(aws_account).run()
+        self._extract_aws_account_information(aws_account)
+        if self._have_all_aws_account_been_analyzed():
+            S3DataAnalyzer().run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -49,21 +51,17 @@ class _IteractiveMenu:
             if user_input == "y" or len(user_input) == 0:
                 return
 
-
-class _AccountAnalyzer:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
-        self._local_results = LocalResults()
-
-    def run(self):
-        print(f"Analyzing the account: {self._aws_account}")
+    def _extract_aws_account_information(self, aws_account: str):
         AwsAccountExtractor(
-            self._local_results.get_file_path_aws_account_results(self._aws_account),
-            S3UrisFileReader().get_s3_queries_for_aws_account(self._aws_account),
+            self._local_results.get_file_path_aws_account_results(aws_account),
+            S3UrisFileReader().get_s3_queries_for_aws_account(aws_account),
         ).extract()
 
-        # TODO create the results file after retrieve aws results to avoid not use the folder if any aws error
-        # TODO continue adding code
+    def _have_all_aws_account_been_analyzed(self) -> bool:
+        return (
+            self._local_results.get_aws_account_index_to_analyze()
+            == self._s3_uris_file_reader.get_number_of_aws_accounts()
+        )
 
 
 if __name__ == "__main__":

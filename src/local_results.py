@@ -10,26 +10,21 @@ class LocalResults:
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
 
-    def create_analysis_results_folder_if_required(self, number_of_aws_accounts_to_analyze: int):
-        if (
-            self._get_number_of_aws_accounts_analyzed() == 0
-            and not self._get_path_analysis_results().is_dir()
-            or self._get_number_of_aws_accounts_analyzed() == number_of_aws_accounts_to_analyze
-        ):
-            self._create_analysis_results_folder()
-
     def get_file_path_analysis_result(self):
         return self._get_path_analysis_results().joinpath("analysis.csv")
 
     def get_file_path_aws_account_results(self, aws_account: str):
         return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
 
-    def _get_file_name_aws_account_results(self, aws_account: str):
-        return f"{aws_account}.csv"
+    def remove_file_with_analysis_date(self):
+        self._get_file_path_accounts_analysis_date_time().unlink()
 
-    def _create_analysis_results_folder(self):
+    def create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")
         self._get_path_analysis_results().mkdir()
+
+    def _get_file_name_aws_account_results(self, aws_account: str):
+        return f"{aws_account}.csv"
 
     def _get_number_of_aws_accounts_analyzed(self) -> int:
         return len(self._get_aws_accounts_analyzed())
@@ -37,7 +32,7 @@ class LocalResults:
     def _get_aws_accounts_analyzed(self) -> list[str]:
         if self._get_path_analysis_results().is_dir():
             result = [file_path.stem for file_path in self._get_path_analysis_results().iterdir()]
-            result.sort()
+            result.sort()  # TODO remove sort, maybe the accounts name sorted changes the order.
             return result
         return []
 
