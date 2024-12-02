@@ -23,7 +23,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-        S3().create_objects()
+        S3(aws_account="aws_account_1_pro").create_objects()
 
     def tearDown(self):
         self.mock_aws.stop()
@@ -53,7 +53,7 @@ class TestS3Client(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-        S3().create_objects()
+        S3(aws_account="aws_account_1_pro").create_objects()
 
     def tearDown(self):
         self.mock_aws.stop()

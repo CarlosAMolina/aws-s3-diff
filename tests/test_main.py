@@ -15,7 +15,7 @@ class TestFunction_run(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         self.mock_aws.start()
-        S3().create_objects()
+        S3(aws_account="aws_account_1_pro").create_objects()
         # Drop created file when the user runs the main program instead of the tests.
         if LocalResults()._get_file_path_accounts_analysis_date_time().is_file():
             LocalResults().remove_file_with_analysis_date()

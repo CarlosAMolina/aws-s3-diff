@@ -16,8 +16,7 @@ def set_aws_credentials():
 
 
 class S3:
-    def __init__(self, endpoint_url: str | None = None):
-        aws_account = "aws_account_1_pro"
+    def __init__(self, aws_account: str, endpoint_url: str | None = None):
         self._s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
         self._s3_client = boto3.client("s3", endpoint_url=endpoint_url)
         current_path = Path(__file__).parent.absolute()
