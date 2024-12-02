@@ -1,5 +1,4 @@
 import unittest
-from pathlib import Path
 from unittest import mock
 
 from moto import mock_aws
@@ -18,7 +17,7 @@ class TestFunction_run(unittest.TestCase):
         self.mock_aws.start()
         S3().create_objects()
         # Drop created file when the user runs the main program instead of the tests.
-        if Path(LocalResults()._get_file_path_accounts_analysis_date_time()).is_dir():
+        if LocalResults()._get_file_path_accounts_analysis_date_time().is_file():
             LocalResults().remove_file_with_analysis_date()
 
     def tearDown(self):
