@@ -3,7 +3,6 @@ from pathlib import Path
 
 
 class LocalResults:
-    # TODO remove this file when the 3º account has been analyzed.
     _FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "aws_s3_diff_analysis_date_time.txt"
     _FOLDER_NAME_S3_RESULTS = "s3-results"
 
@@ -31,9 +30,7 @@ class LocalResults:
 
     def _get_aws_accounts_analyzed(self) -> list[str]:
         if self._get_path_analysis_results().is_dir():
-            result = [file_path.stem for file_path in self._get_path_analysis_results().iterdir()]
-            result.sort()  # TODO remove sort, maybe the accounts name sorted changes the order.
-            return result
+            return [file_path.stem for file_path in self._get_path_analysis_results().iterdir()]
         return []
 
     def _get_path_analysis_results(self) -> Path:
