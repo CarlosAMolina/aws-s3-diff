@@ -65,21 +65,21 @@ class _S3UriDfModifier:
         return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
 
     def _get_new_multi_index(self, multi_index_old: MultiIndex, s3_uris_map_df: Df) -> MultiIndex:
-        # TODO for s3_uri_accounts_map in s3_uris_map_df.itertuples():
-        # TODO     query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
-        # TODO     query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
-        # TODO         self._aws_account_target, s3_uri_accounts_map
-        # TODO     )
-        # TODO     if query_to_use == query_to_replace:
-        # TODO         continue
-        # TODO     print(query_to_use)  # TODO
-        # TODO     print(query_to_replace)  # TODO
-        # TODO     print(result)  # TODO
-        # TODO     # TODO replace index
-        # TODO     breakpoint()
-        # TODO     result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
-        # TODO     result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
-        # TODO return result
+        for s3_uri_accounts_map in s3_uris_map_df.itertuples():
+            query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
+            query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
+                self._aws_account_target, s3_uri_accounts_map
+            )
+            if query_to_use == query_to_replace:
+                continue
+            print(query_to_use)  # TODO
+            print(query_to_replace)  # TODO
+            print(result)  # TODO
+            # TODO replace index
+            breakpoint()
+            result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
+            result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
+        return result
         # TODO not mock
         return MultiIndex.from_tuples(
             [
