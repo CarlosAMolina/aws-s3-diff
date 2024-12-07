@@ -1,5 +1,6 @@
 import unittest
 
+from pandas import DataFrame as Df
 from pandas import MultiIndex
 from pandas.testing import assert_index_equal
 
@@ -20,7 +21,23 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             names=["bucket", "prefix", "name"],
         )
-        result = _S3UriDfModifier("foo", "bar", "TODO")._get_new_multi_index(multi_index_old, "TODO")
+        s3_uris_map_df = Df(
+            {
+                "aws_account_1_pro": {
+                    0: "s3://cars/europe/spain",
+                    1: "s3://pets/dogs/big_size",
+                    2: "s3://pets/horses/europe",
+                    3: "s3://pets/non-existent-prefix",
+                },
+                "aws_account_3_dev": {
+                    0: "s3://cars_dev/europe/spain",
+                    1: "s3://pets_dev/dogs/size/heavy",
+                    2: "s3://pets_dev/horses/europe",
+                    3: "s3://pets_dev/non-existent-prefix",
+                },
+            }
+        )
+        result = _S3UriDfModifier("foo", "bar", "TODO")._get_new_multi_index(multi_index_old, s3_uris_map_df)
         expected_result = MultiIndex.from_tuples(
             [
                 ("cars", "europe/spain", "cars-20241014.csv"),

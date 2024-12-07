@@ -45,6 +45,9 @@ class _S3UriDfModifier:
         print(result.index)  # TODO
         # TODO rm
         if self._aws_account_target == "aws_account_3_dev":
+            print(s3_uris_map_df)  # TODO
+            breakpoint()  # TODO
+
             multi_index_new = self._get_new_multi_index(result.index, s3_uris_map_df)
             print(multi_index_new)  # TODO
             result.index = multi_index_new
