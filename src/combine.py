@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame as Df
+from pandas import MultiIndex
 
 from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
@@ -29,7 +30,7 @@ def _get_df_combine_aws_accounts_results() -> Df:
 def _get_df_for_aws_account(aws_account: str) -> Df:
     local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
     result = _get_df_from_file(local_file_path_name)
-    result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
+    result.columns = MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
     return result
 
 
@@ -39,23 +40,16 @@ class _S3UriDfModifier:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
-        # TODO rm
-        if self._aws_account_target != "aws_account_3_dev":
-            return self._df
-        s3_uris_df = self._get_df_s3_uris_map_between_accounts()
+        s3_uris_map_df = self._get_df_s3_uris_map_between_accounts()
         result = self._df.copy()
-        for s3_uri_accounts_map in s3_uris_df.itertuples():
-            query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
-            query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
-                self._aws_account_target, s3_uri_accounts_map
-            )
-            if query_to_use == query_to_replace:
-                continue
-            print(query_to_use)  # TODO
-            print(query_to_replace)  # TODO
+        print(result.index)  # TODO
+        # TODO rm
+        if self._aws_account_target == "aws_account_3_dev":
+            multi_index_new = self._get_new_multi_index(result.index, s3_uris_map_df)
+            print(multi_index_new)  # TODO
+            result.index = multi_index_new
             print(result)  # TODO
-            # TODO replace index
-            breakpoint()
+            print("TODO")  # TODO
         return result
 
     def _get_df_s3_uris_map_between_accounts(self) -> Df:
@@ -66,6 +60,36 @@ class _S3UriDfModifier:
     def _get_s3_query_from_s3_uri_accounts_map(self, aws_account: str, s3_uri_accounts_map: tuple) -> S3Query:
         s3_uri = getattr(s3_uri_accounts_map, aws_account)
         return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
+
+    def _get_new_multi_index(self, multi_index_old: MultiIndex, s3_uris_map_df: Df) -> MultiIndex:
+        # TODO not mock
+        return MultiIndex.from_tuples(
+            [
+                ("cars", "europe/spain", "cars-20241014.csv"),
+                ("pets", "dogs/big_size", "dogs-20240914.csv"),
+                ("pets", "dogs/big_size", "dogs-20241015.csv"),
+                ("pets", "dogs/big_size", "dogs-20241019.csv"),
+                ("pets", "dogs/big_size", "dogs-20241021.csv"),
+                ("pets", "horses/europe", "horses-20210219.csv"),
+                ("pets", "non-existent-prefix", None),
+            ],
+            names=["bucket", "prefix", "name"],
+        )
+        # TODO for s3_uri_accounts_map in s3_uris_map_df.itertuples():
+        # TODO     query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
+        # TODO     query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
+        # TODO         self._aws_account_target, s3_uri_accounts_map
+        # TODO     )
+        # TODO     if query_to_use == query_to_replace:
+        # TODO         continue
+        # TODO     print(query_to_use)  # TODO
+        # TODO     print(query_to_replace)  # TODO
+        # TODO     print(result)  # TODO
+        # TODO     # TODO replace index
+        # TODO     breakpoint()
+        # TODO     result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
+        # TODO     result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
+        # TODO return result
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
@@ -90,7 +114,7 @@ def _get_df_drop_incorrect_empty_rows(df: Df) -> Df:
     count_files_per_bucket_and_path_df = (
         Df(result.index.to_list(), columns=result.index.names).groupby(["bucket", "prefix"]).count()
     )
-    count_files_per_bucket_and_path_df.columns = pd.MultiIndex.from_tuples(
+    count_files_per_bucket_and_path_df.columns = MultiIndex.from_tuples(
         [
             ("count", "files_in_bucket_prefix"),
         ]
