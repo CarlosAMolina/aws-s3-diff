@@ -25,10 +25,12 @@ class TestS3UrisFileReader(unittest.TestCase):
     def test_get_s3_queries_for_aws_account_for_account_3(self, mock_directory_path_what_to_analyze):
         aws_account = "aws_account_3_dev"
         mock_directory_path_what_to_analyze.return_value = Path(__file__).parent.absolute().joinpath("fake-files")
-        expected_result = [
-            S3Query("cars_dev", "europe/spain"),
-            S3Query("pets_dev", "dogs/big_size"),
-            S3Query("pets_dev", "horses/europe"),
-        ]
-        result = m_uris_to_analyze.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
-        self.assertEqual(expected_result, result)
+        for aws_account, expected_result in {
+            "aws_account_3_dev": [
+                S3Query("cars_dev", "europe/spain"),
+                S3Query("pets_dev", "dogs/big_size"),
+                S3Query("pets_dev", "horses/europe"),
+            ]
+        }.items():
+            result = m_uris_to_analyze.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
+            self.assertEqual(expected_result, result)
