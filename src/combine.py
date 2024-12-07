@@ -34,19 +34,19 @@ def _get_df_for_aws_account(aws_account: str) -> Df:
 
 class _S3UriDfModifier:
     def __init__(self, *args):
-        self._aws_account_origin, self._aws_account_to_replace, self._df = args
+        self._aws_account_origin, self._aws_account_target, self._df = args
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         # TODO rm
-        if self._aws_account_to_replace != "aws_account_3_dev":
+        if self._aws_account_target != "aws_account_3_dev":
             return self._df
         queries_df = S3UrisFileReader().get_df_file_what_to_analyze()[
-            [self._aws_account_origin, self._aws_account_to_replace]
+            [self._aws_account_origin, self._aws_account_target]
         ]
         result = self._df.copy()
         for row in queries_df.itertuples():
             query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_origin))
-            query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_to_replace))
+            query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_target))
             if query_to_use == query_to_replace:
                 continue
             print(query_to_use)  # TODO
