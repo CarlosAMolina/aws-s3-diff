@@ -26,6 +26,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
+            "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
         }.items():
             self.mock_aws.start()
             S3(aws_account=aws_account).create_objects()
