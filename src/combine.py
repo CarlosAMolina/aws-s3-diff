@@ -5,6 +5,7 @@ from pandas import DataFrame as Df
 
 from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
+from types_custom import S3Query
 
 
 def get_df_combine_files() -> Df:
@@ -35,6 +36,7 @@ def _get_df_for_aws_account(aws_account: str) -> Df:
 class _S3UriDfModifier:
     def __init__(self, *args):
         self._aws_account_origin, self._aws_account_target, self._df = args
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         # TODO rm
@@ -42,9 +44,11 @@ class _S3UriDfModifier:
             return self._df
         s3_uris_df = self._get_df_s3_uris_map_between_accounts()
         result = self._df.copy()
-        for s3_uri in s3_uris_df.itertuples():
-            query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(s3_uri, self._aws_account_origin))
-            query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(s3_uri, self._aws_account_target))
+        for s3_uri_accounts_map in s3_uris_df.itertuples():
+            query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
+            query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
+                self._aws_account_target, s3_uri_accounts_map
+            )
             if query_to_use == query_to_replace:
                 continue
             print(query_to_use)  # TODO
@@ -55,7 +59,13 @@ class _S3UriDfModifier:
         return result
 
     def _get_df_s3_uris_map_between_accounts(self) -> Df:
-        return S3UrisFileReader().get_df_file_what_to_analyze()[[self._aws_account_origin, self._aws_account_target]]
+        return self._s3_uris_file_reader.get_df_file_what_to_analyze()[
+            [self._aws_account_origin, self._aws_account_target]
+        ]
+
+    def _get_s3_query_from_s3_uri_accounts_map(self, aws_account: str, s3_uri_accounts_map: tuple) -> S3Query:
+        s3_uri = getattr(s3_uri_accounts_map, aws_account)
+        return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
