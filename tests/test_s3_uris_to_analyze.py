@@ -32,16 +32,19 @@ class TestS3UrisFileReader(unittest.TestCase):
                 S3Query("cars", "europe/spain"),
                 S3Query("pets", "dogs/big_size"),
                 S3Query("pets", "horses/europe"),
+                S3Query("pets", "non-existent-prefix"),
             ],
             "aws_account_2_release": [
                 S3Query("cars", "europe/spain"),
                 S3Query("pets", "dogs/big_size"),
                 S3Query("pets", "horses/europe"),
+                S3Query("pets", "non-existent-prefix"),
             ],
             "aws_account_3_dev": [
                 S3Query("cars_dev", "europe/spain"),
                 S3Query("pets_dev", "dogs/big_size"),
                 S3Query("pets_dev", "horses/europe"),
+                S3Query("pets_dev", "non-existent-prefix"),
             ],
         }.items():
             result = m_uris_to_analyze.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)

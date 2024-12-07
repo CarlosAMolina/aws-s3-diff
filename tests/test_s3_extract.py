@@ -1,5 +1,7 @@
 import datetime
 import unittest
+from pathlib import Path
+from unittest import mock
 
 from dateutil.tz import tzutc
 from moto import mock_aws
@@ -21,7 +23,12 @@ class TestAwsAccountExtractor(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
 
-    def test_extract_generates_expected_result(self):
+    @mock.patch(
+        "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=mock.PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
+    )
+    def test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze):
         LocalResults().create_analysis_results_folder()
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",

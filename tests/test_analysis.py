@@ -21,15 +21,12 @@ class TestS3DataAnalyzer(unittest.TestCase):
 
     @patch("src.combine.LocalResults._get_analysis_date_time_str")
     @patch("src.combine.LocalResults._get_path_directory_all_results")
-    @patch("src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path")
+    @patch("src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze")
     def test_get_df_s3_data_analyzed(
-        self, mock_file_what_to_analyze_path, mock_get_path_directory_all_results, mock_get_analysis_date_time_str
+        self, mock_directory_path_what_to_analyze, mock_get_path_directory_all_results, mock_get_analysis_date_time_str
     ):
-        current_path = Path(__file__).parent.absolute()
-        mock_file_what_to_analyze_path.return_value = current_path.joinpath(
-            "fake-files", S3UrisFileReader._FILE_NAME_S3_URIS
-        )
-        mock_get_path_directory_all_results.return_value = current_path.joinpath(
+        mock_directory_path_what_to_analyze.return_value = self.current_path.joinpath("fake-files")
+        mock_get_path_directory_all_results.return_value = self.current_path.joinpath(
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
         mock_get_analysis_date_time_str.return_value = "20241201180132"
