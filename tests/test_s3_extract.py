@@ -28,7 +28,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
     def tearDown(self):
         self.mock_aws.stop()
 
-    def test_extract_enerates_expected_result(self):
+    def test_extract_generates_expected_result(self):
         aws_account = "aws_account_1_pro"
         file_path_results = (
             LocalResults()
