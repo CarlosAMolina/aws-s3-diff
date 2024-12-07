@@ -22,7 +22,9 @@ class TestS3UrisFileReader(unittest.TestCase):
     @mock.patch(
         "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze", new_callable=mock.PropertyMock
     )
-    def test_get_s3_queries_for_aws_account_returns_expected_results(self, mock_directory_path_what_to_analyze):
+    def test_get_s3_queries_for_aws_account_returns_if_accounts_with_different_buckets(
+        self, mock_directory_path_what_to_analyze
+    ):
         mock_directory_path_what_to_analyze.return_value = Path(__file__).parent.absolute().joinpath("fake-files")
         for aws_account, expected_result in {
             "aws_account_1_pro": [
