@@ -1,6 +1,7 @@
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from unittest.mock import PropertyMock
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -11,7 +12,6 @@ from pandas.testing import assert_frame_equal
 from local_results import LocalResults
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import S3DataAnalyzer
-from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class TestS3DataAnalyzer(unittest.TestCase):
@@ -21,11 +21,14 @@ class TestS3DataAnalyzer(unittest.TestCase):
 
     @patch("src.combine.LocalResults._get_analysis_date_time_str")
     @patch("src.combine.LocalResults._get_path_directory_all_results")
-    @patch("src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze")
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
+    )
     def test_get_df_s3_data_analyzed(
         self, mock_directory_path_what_to_analyze, mock_get_path_directory_all_results, mock_get_analysis_date_time_str
     ):
-        mock_directory_path_what_to_analyze.return_value = self.current_path.joinpath("fake-files")
         mock_get_path_directory_all_results.return_value = self.current_path.joinpath(
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )

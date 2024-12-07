@@ -17,6 +17,7 @@ def _get_df_combine_aws_accounts_results() -> Df:
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account)
+        account_df = _get_df_for_aws_account_set_aws_account_1_queries(account_df, aws_account)
         result = result.join(account_df, how="outer")
     return result
 
@@ -28,6 +29,28 @@ def _get_df_for_aws_account(aws_account: str) -> Df:
     local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
     result = _get_df_from_file(local_file_path_name)
     result.columns = pd.MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
+    return result
+
+
+def _get_df_for_aws_account_set_aws_account_1_queries(account_df: Df, aws_account_to_replace: str) -> Df:
+    # TODO rm
+    if aws_account_to_replace != "aws_account_3_dev":
+        return account_df
+    aws_account_with_values_to_use = S3UrisFileReader().get_aws_accounts()[0]
+    queries_df = S3UrisFileReader().get_df_file_what_to_analyze()[
+        [aws_account_with_values_to_use, aws_account_to_replace]
+    ]
+    result = account_df.copy()
+    for row in queries_df.itertuples():
+        query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, aws_account_with_values_to_use))
+        query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, aws_account_to_replace))
+        if query_to_use == query_to_replace:
+            continue
+        print(query_to_use)  # TODO
+        print(query_to_replace)  # TODO
+        print(result)  # TODO
+        # TODO replace index
+        breakpoint()
     return result
 
 
