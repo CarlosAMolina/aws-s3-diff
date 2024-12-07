@@ -40,9 +40,9 @@ class _S3UriDfModifier:
         # TODO rm
         if self._aws_account_target != "aws_account_3_dev":
             return self._df
-        queries_df = self._get_df_s3_uris_map_between_accounts()
+        s3_uris_df = self._get_df_s3_uris_map_between_accounts()
         result = self._df.copy()
-        for row in queries_df.itertuples():
+        for row in s3_uris_df.itertuples():
             query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_origin))
             query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_target))
             if query_to_use == query_to_replace:
