@@ -17,8 +17,7 @@ def _get_df_combine_aws_accounts_results() -> Df:
     result = _get_df_for_aws_account(aws_accounts[0])
     for aws_account in aws_accounts[1:]:
         account_df = _get_df_for_aws_account(aws_account)
-        account_df = _S3UriDfModifier().get_df_set_s3_uris_in_origin_account(aws_accounts[0], aws_account, account_df)
-        account_df = _get_df_for_aws_account_set_aws_account_1_queries(account_df, aws_account)
+        account_df = _S3UriDfModifier(aws_accounts[0], aws_account, account_df).get_df_set_s3_uris_in_origin_account()
         result = result.join(account_df, how="outer")
     return result
 
@@ -34,19 +33,22 @@ def _get_df_for_aws_account(aws_account: str) -> Df:
 
 
 class _S3UriDfModifier:
-    def get_df_set_s3_uris_in_origin_account(
-        self, aws_account_with_values_to_use: str, aws_account_to_replace: str, df: Df
-    ) -> Df:
+    def __init__(self, *args):
+        self._aws_account_with_values_to_use, self._aws_account_to_replace, self._df = args
+
+    def get_df_set_s3_uris_in_origin_account(self) -> Df:
         # TODO rm
-        if aws_account_to_replace != "aws_account_3_dev":
-            return df
+        if self._aws_account_to_replace != "aws_account_3_dev":
+            return self._df
         queries_df = S3UrisFileReader().get_df_file_what_to_analyze()[
-            [aws_account_with_values_to_use, aws_account_to_replace]
+            [self._aws_account_with_values_to_use, self._aws_account_to_replace]
         ]
-        result = df.copy()
+        result = self._df.copy()
         for row in queries_df.itertuples():
-            query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, aws_account_with_values_to_use))
-            query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, aws_account_to_replace))
+            query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(
+                getattr(row, self._aws_account_with_values_to_use)
+            )
+            query_to_replace = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_to_replace))
             if query_to_use == query_to_replace:
                 continue
             print(query_to_use)  # TODO
