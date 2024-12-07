@@ -27,9 +27,9 @@ class TestAwsAccountExtractor(unittest.TestCase):
         self.mock_aws.stop()
 
     def test_extract_generates_expected_result(self):
+        LocalResults().create_analysis_results_folder()
         aws_account = "aws_account_1_pro"
         file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
-        LocalResults().create_analysis_results_folder()
         s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
         m_s3_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
         result_df = read_csv_as_df(file_path_results)
