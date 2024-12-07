@@ -40,9 +40,7 @@ class _S3UriDfModifier:
         # TODO rm
         if self._aws_account_target != "aws_account_3_dev":
             return self._df
-        queries_df = S3UrisFileReader().get_df_file_what_to_analyze()[
-            [self._aws_account_origin, self._aws_account_target]
-        ]
+        queries_df = self._get_df_s3_uris_map_between_accounts()
         result = self._df.copy()
         for row in queries_df.itertuples():
             query_to_use = S3UrisFileReader().get_s3_query_from_s3_uri(getattr(row, self._aws_account_origin))
@@ -55,6 +53,9 @@ class _S3UriDfModifier:
             # TODO replace index
             breakpoint()
         return result
+
+    def _get_df_s3_uris_map_between_accounts(self) -> Df:
+        return S3UrisFileReader().get_df_file_what_to_analyze()[[self._aws_account_origin, self._aws_account_target]]
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
