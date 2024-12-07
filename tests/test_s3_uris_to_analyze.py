@@ -1,6 +1,9 @@
 import unittest
+from pathlib import Path
+from unittest import mock
 
 from src import s3_uris_to_analyze as m_uris_to_analyze
+from types_custom import S3Query
 
 
 class TestS3UriParts(unittest.TestCase):
@@ -13,3 +16,19 @@ class TestS3UriParts(unittest.TestCase):
         uri = "s3://my-bucket/my-folder/my-object.png"
         result = m_uris_to_analyze._S3UriParts(uri).key
         self.assertEqual("my-folder/my-object.png", result)
+
+
+class TestS3UrisFileReader(unittest.TestCase):
+    @mock.patch(
+        "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze", new_callable=mock.PropertyMock
+    )
+    def test_get_s3_queries_for_aws_account_for_account_3(self, mock_directory_path_what_to_analyze):
+        aws_account = "aws_account_3_dev"
+        mock_directory_path_what_to_analyze.return_value = Path(__file__).parent.absolute().joinpath("fake-files")
+        expected_result = [
+            S3Query("cars_dev", "europe/spain"),
+            S3Query("pets_dev", "dogs/big_size"),
+            S3Query("pets_dev", "horses/europe"),
+        ]
+        result = m_uris_to_analyze.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
+        self.assertEqual(expected_result, result)

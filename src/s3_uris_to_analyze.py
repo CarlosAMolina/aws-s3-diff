@@ -20,10 +20,14 @@ class S3UrisFileReader:
         s3_uris_to_analyze = self._get_df_file_what_to_analyze()[aws_account].to_list()
         return [S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key) for s3_uri in s3_uris_to_analyze]
 
+    # TODO rename to _file_path_what_to_analyze
     @property
     def _file_what_to_analyze_path(self) -> Path:
-        current_path = Path(__file__).parent.absolute()
-        return current_path.joinpath(self._FILE_NAME_S3_URIS)
+        return self._directory_path_what_to_analyze.joinpath(self._FILE_NAME_S3_URIS)
+
+    @property
+    def _directory_path_what_to_analyze(self) -> Path:
+        return Path(__file__).parent.absolute()
 
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_what_to_analyze_path)
