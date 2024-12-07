@@ -40,7 +40,6 @@ class _S3UriDfModifier:
         # TODO rm
         if aws_account_to_replace != "aws_account_3_dev":
             return df
-        aws_account_with_values_to_use = S3UrisFileReader().get_aws_accounts()[0]
         queries_df = S3UrisFileReader().get_df_file_what_to_analyze()[
             [aws_account_with_values_to_use, aws_account_to_replace]
         ]
