@@ -65,19 +65,6 @@ class _S3UriDfModifier:
         return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
 
     def _get_new_multi_index(self, multi_index_old: MultiIndex, s3_uris_map_df: Df) -> MultiIndex:
-        # TODO not mock
-        return MultiIndex.from_tuples(
-            [
-                ("cars", "europe/spain", "cars-20241014.csv"),
-                ("pets", "dogs/big_size", "dogs-20240914.csv"),
-                ("pets", "dogs/big_size", "dogs-20241015.csv"),
-                ("pets", "dogs/big_size", "dogs-20241019.csv"),
-                ("pets", "dogs/big_size", "dogs-20241021.csv"),
-                ("pets", "horses/europe", "horses-20210219.csv"),
-                ("pets", "non-existent-prefix", None),
-            ],
-            names=["bucket", "prefix", "name"],
-        )
         # TODO for s3_uri_accounts_map in s3_uris_map_df.itertuples():
         # TODO     query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
         # TODO     query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
@@ -93,6 +80,19 @@ class _S3UriDfModifier:
         # TODO     result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
         # TODO     result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
         # TODO return result
+        # TODO not mock
+        return MultiIndex.from_tuples(
+            [
+                ("cars", "europe/spain", "cars-20241014.csv"),
+                ("pets", "dogs/big_size", "dogs-20240914.csv"),
+                ("pets", "dogs/big_size", "dogs-20241015.csv"),
+                ("pets", "dogs/big_size", "dogs-20241019.csv"),
+                ("pets", "dogs/big_size", "dogs-20241021.csv"),
+                ("pets", "horses/europe", "horses-20210219.csv"),
+                ("pets", "non-existent-prefix", None),
+            ],
+            names=["bucket", "prefix", "name"],
+        )
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
