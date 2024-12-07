@@ -28,11 +28,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
 
     def test_extract_generates_expected_result(self):
         aws_account = "aws_account_1_pro"
-        file_path_results = (
-            LocalResults()
-            ._get_path_analysis_results()
-            .joinpath(LocalResults()._get_file_name_aws_account_results(aws_account))
-        )
+        file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
         LocalResults().create_analysis_results_folder()
         s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
         m_s3_extract.AwsAccountExtractor(file_path_results, s3_queries).extract()
