@@ -20,7 +20,7 @@ class TestFunction_run(unittest.TestCase):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
         self.mock_aws = mock_aws()
-        # Drop created file when the user runs the main program instead of the tests.
+        # Drop file created by the user or by other tests.
         if LocalResults()._get_file_path_accounts_analysis_date_time().is_file():
             LocalResults().remove_file_with_analysis_date()
 
