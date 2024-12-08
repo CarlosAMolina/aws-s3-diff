@@ -6,7 +6,6 @@ from pandas import MultiIndex
 
 from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
-from types_custom import S3Query
 
 
 def get_df_combine_files() -> Df:
@@ -50,45 +49,28 @@ class _S3UriDfModifier:
             [self._aws_account_origin, self._aws_account_target]
         ]
 
-    def _get_s3_query_from_s3_uri_accounts_map(self, aws_account: str, s3_uri_accounts_map: tuple) -> S3Query:
-        s3_uri = getattr(s3_uri_accounts_map, aws_account)
-        return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
-
     def _get_df_modify_buckets_and_paths(self, df: Df, s3_uris_map_df: Df) -> Df:
-        if False:
-            for s3_uri_accounts_map in s3_uris_map_df.itertuples():
-                query_to_use = self._get_s3_query_from_s3_uri_accounts_map(
-                    self._aws_account_origin, s3_uri_accounts_map
-                )
-                query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
-                    self._aws_account_target, s3_uri_accounts_map
-                )
-                if query_to_use == query_to_replace:
-                    continue
-                print(query_to_use)  # TODO
-                print(query_to_replace)  # TODO
-                print(result)  # TODO
-                # TODO replace index
-                breakpoint()
-                result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
-                result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
-            return result
         result = df.copy()
-        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(df.index.tolist())
+        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(df.index.tolist(), s3_uris_map_df)
         result.index = MultiIndex.from_tuples(new_multi_index_as_tuples, names=df.index.names)
         return result
 
-    def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples) -> list[tuple]:
-        # TODO not mock
-        return [
-            ("cars", "europe/spain", "cars-20241014.csv"),
-            ("pets", "dogs/big_size", "dogs-20240914.csv"),
-            ("pets", "dogs/big_size", "dogs-20241015.csv"),
-            ("pets", "dogs/big_size", "dogs-20241019.csv"),
-            ("pets", "dogs/big_size", "dogs-20241021.csv"),
-            ("pets", "horses/europe", "horses-20210219.csv"),
-            ("pets", "non-existent-prefix", None),
-        ]
+    def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples: list[tuple], s3_uris_map_df: Df) -> list[tuple]:
+        result = []
+        # TODO use pandas join instead of foor loop
+        for old_multi_index_as_tuple in old_multi_index_as_tuples:
+            old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
+            # TODO add test for url ending with and without `/`.
+            # TODO required `r` string?
+            s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
+                s3_uris_map_df[self._aws_account_target].str.contains(rf"s3://{old_bucket}/{old_prefix}/?")
+            ]
+            if s3_uris_map_for_current_index_df.empty:
+                raise ValueError("Unmatched value")
+            s3_uri_to_use = s3_uris_map_for_current_index_df[self._aws_account_origin].values[0]
+            query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
+            result += [(query_to_use.bucket, query_to_use.prefix, old_file_name)]
+        return result
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:

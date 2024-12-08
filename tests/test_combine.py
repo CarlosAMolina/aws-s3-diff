@@ -11,7 +11,7 @@ class TestS3UriDfModifier(unittest.TestCase):
     def test_get_df_modify_buckets_and_paths(self):
         old_multi_index = MultiIndex.from_tuples(
             [
-                ("cars", "europe/spain", "cars-20241014.csv"),
+                ("cars_dev", "europe/spain", "cars-20241014.csv"),
                 ("pets_dev", "dogs/size/heavy", "dogs-20240914.csv"),
                 ("pets_dev", "dogs/size/heavy", "dogs-20241015.csv"),
                 ("pets_dev", "dogs/size/heavy", "dogs-20241019.csv"),
@@ -38,7 +38,9 @@ class TestS3UriDfModifier(unittest.TestCase):
                 },
             }
         )
-        result = _S3UriDfModifier("foo", "bar", "TODO")._get_df_modify_buckets_and_paths(df, s3_uris_map_df)
+        result = _S3UriDfModifier("aws_account_1_pro", "aws_account_3_dev", "TODO")._get_df_modify_buckets_and_paths(
+            df, s3_uris_map_df
+        )
         expected_result = Df(
             index=MultiIndex.from_tuples(
                 [
