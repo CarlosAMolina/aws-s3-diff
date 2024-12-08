@@ -56,21 +56,24 @@ class _S3UriDfModifier:
         return result
 
     def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples: list[tuple], s3_uris_map_df: Df) -> list[tuple]:
-        result = []
         # TODO use pandas join instead of foor loop
-        for old_multi_index_as_tuple in old_multi_index_as_tuples:
-            old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
-            # TODO add test for url ending with and without `/`.
-            # TODO required `r` string?
-            s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
-                s3_uris_map_df[self._aws_account_target].str.contains(rf"s3://{old_bucket}/{old_prefix}/?")
-            ]
-            if s3_uris_map_for_current_index_df.empty:
-                raise ValueError("Unmatched value")
-            s3_uri_to_use = s3_uris_map_for_current_index_df[self._aws_account_origin].values[0]
-            query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
-            result += [(query_to_use.bucket, query_to_use.prefix, old_file_name)]
-        return result
+        return [
+            self._get_new_multi_index_as_tuple(old_multi_index_as_tuple, s3_uris_map_df)
+            for old_multi_index_as_tuple in old_multi_index_as_tuples
+        ]
+
+    def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
+        old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
+        # TODO add test for url ending with and without `/`.
+        # TODO required `r` string?
+        s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
+            s3_uris_map_df[self._aws_account_target].str.contains(rf"s3://{old_bucket}/{old_prefix}/?")
+        ]
+        if s3_uris_map_for_current_index_df.empty:
+            raise ValueError("Unmatched value")
+        s3_uri_to_use = s3_uris_map_for_current_index_df[self._aws_account_origin].values[0]
+        query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
+        return (query_to_use.bucket, query_to_use.prefix, old_file_name)
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
