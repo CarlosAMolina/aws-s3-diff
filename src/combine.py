@@ -42,17 +42,7 @@ class _S3UriDfModifier:
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         s3_uris_map_df = self._get_df_s3_uris_map_between_accounts()
         result = self._df.copy()
-        print(result.index)  # TODO
-        # TODO rm
-        if self._aws_account_target == "aws_account_3_dev":
-            print(s3_uris_map_df)  # TODO
-            breakpoint()  # TODO
-
-            multi_index_new = self._get_new_multi_index(result.index, s3_uris_map_df)
-            print(multi_index_new)  # TODO
-            result.index = multi_index_new
-            print(result)  # TODO
-            print("TODO")  # TODO
+        result.index = self._get_df_modify_buckets_and_paths(result, s3_uris_map_df)
         return result
 
     def _get_df_s3_uris_map_between_accounts(self) -> Df:
@@ -64,35 +54,41 @@ class _S3UriDfModifier:
         s3_uri = getattr(s3_uri_accounts_map, aws_account)
         return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri)
 
-    def _get_new_multi_index(self, multi_index_old: MultiIndex, s3_uris_map_df: Df) -> MultiIndex:
-        for s3_uri_accounts_map in s3_uris_map_df.itertuples():
-            query_to_use = self._get_s3_query_from_s3_uri_accounts_map(self._aws_account_origin, s3_uri_accounts_map)
-            query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
-                self._aws_account_target, s3_uri_accounts_map
-            )
-            if query_to_use == query_to_replace:
-                continue
-            print(query_to_use)  # TODO
-            print(query_to_replace)  # TODO
-            print(result)  # TODO
-            # TODO replace index
-            breakpoint()
-            result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
-            result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
+    def _get_df_modify_buckets_and_paths(self, df: Df, s3_uris_map_df: Df) -> Df:
+        if False:
+            for s3_uri_accounts_map in s3_uris_map_df.itertuples():
+                query_to_use = self._get_s3_query_from_s3_uri_accounts_map(
+                    self._aws_account_origin, s3_uri_accounts_map
+                )
+                query_to_replace = self._get_s3_query_from_s3_uri_accounts_map(
+                    self._aws_account_target, s3_uri_accounts_map
+                )
+                if query_to_use == query_to_replace:
+                    continue
+                print(query_to_use)  # TODO
+                print(query_to_replace)  # TODO
+                print(result)  # TODO
+                # TODO replace index
+                breakpoint()
+                result = self._get_df_modify_prefix(query_to_replace, query_to_use, result)
+                result = self._get_df_modify_bucket(query_to_replace, query_to_use, result)
+            return result
+        result = df.copy()
+        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(df.index.tolist())
+        result.index = MultiIndex.from_tuples(new_multi_index_as_tuples, names=df.index.names)
         return result
+
+    def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples) -> list[tuple]:
         # TODO not mock
-        return MultiIndex.from_tuples(
-            [
-                ("cars", "europe/spain", "cars-20241014.csv"),
-                ("pets", "dogs/big_size", "dogs-20240914.csv"),
-                ("pets", "dogs/big_size", "dogs-20241015.csv"),
-                ("pets", "dogs/big_size", "dogs-20241019.csv"),
-                ("pets", "dogs/big_size", "dogs-20241021.csv"),
-                ("pets", "horses/europe", "horses-20210219.csv"),
-                ("pets", "non-existent-prefix", None),
-            ],
-            names=["bucket", "prefix", "name"],
-        )
+        return [
+            ("cars", "europe/spain", "cars-20241014.csv"),
+            ("pets", "dogs/big_size", "dogs-20240914.csv"),
+            ("pets", "dogs/big_size", "dogs-20241015.csv"),
+            ("pets", "dogs/big_size", "dogs-20241019.csv"),
+            ("pets", "dogs/big_size", "dogs-20241021.csv"),
+            ("pets", "horses/europe", "horses-20210219.csv"),
+            ("pets", "non-existent-prefix", None),
+        ]
 
 
 def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
