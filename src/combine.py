@@ -40,19 +40,17 @@ class _S3UriDfModifier:
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         s3_uris_map_df = self._get_df_s3_uris_map_between_accounts()
-        result = self._df.copy()
-        result.index = self._get_df_modify_buckets_and_paths(result, s3_uris_map_df)
-        return result
+        return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
 
     def _get_df_s3_uris_map_between_accounts(self) -> Df:
         return self._s3_uris_file_reader.get_df_file_what_to_analyze()[
             [self._aws_account_origin, self._aws_account_target]
         ]
 
-    def _get_df_modify_buckets_and_paths(self, df: Df, s3_uris_map_df: Df) -> Df:
-        result = df.copy()
-        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(df.index.tolist(), s3_uris_map_df)
-        result.index = MultiIndex.from_tuples(new_multi_index_as_tuples, names=df.index.names)
+    def _get_df_modify_buckets_and_paths(self, s3_uris_map_df: Df) -> Df:
+        result = self._df.copy()
+        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(result.index.tolist(), s3_uris_map_df)
+        result.index = MultiIndex.from_tuples(new_multi_index_as_tuples, names=result.index.names)
         return result
 
     def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples: list[tuple], s3_uris_map_df: Df) -> list[tuple]:

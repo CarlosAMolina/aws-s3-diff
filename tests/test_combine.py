@@ -38,8 +38,8 @@ class TestS3UriDfModifier(unittest.TestCase):
                 },
             }
         )
-        result = _S3UriDfModifier("aws_account_1_pro", "aws_account_3_dev", "TODO")._get_df_modify_buckets_and_paths(
-            df, s3_uris_map_df
+        result = _S3UriDfModifier("aws_account_1_pro", "aws_account_3_dev", df)._get_df_modify_buckets_and_paths(
+            s3_uris_map_df
         )
         expected_result = Df(
             index=MultiIndex.from_tuples(
