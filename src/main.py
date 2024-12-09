@@ -21,14 +21,15 @@ class _IteractiveMenu:
         if self._have_all_aws_account_been_analyzed():
             print("All AWS accounts has been analyzed. Starting a new analysis")
             self._local_results.remove_file_with_analysis_date()
-        if self._local_results.get_aws_account_index_to_analyze() == 0:
-            self._local_results.create_analysis_results_folder()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
+        if self._local_results.get_aws_account_index_to_analyze() == 0:
+            self._local_results.create_analysis_results_folder()
         self._extract_aws_account_information(aws_account)
         if self._have_all_aws_account_been_analyzed():
             S3DataAnalyzer().run()
+            LocalResults().remove_file_with_analysis_date()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -42,7 +43,7 @@ class _IteractiveMenu:
         return aws_accounts_to_analyze[aws_account_index_to_analyze]
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
-        print("Have you generated in you terminal the AWS credentials to connect with that AWS account?")
+        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
         while True:
             user_input = input("Y/n: ").lower()
             if user_input == "n":
