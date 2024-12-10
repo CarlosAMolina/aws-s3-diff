@@ -1,1 +1,1 @@
-- Test. File s3-uris-to-analyze.csv. Use different paths in each account to test that the paths in the pro account is used in final result.
+- Test. Drop src/s3-uris-to-analyze.csv and run the tests to check that is mocked correctly. 
