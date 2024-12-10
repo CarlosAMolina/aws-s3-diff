@@ -30,7 +30,8 @@ class TestFunction_run(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
     @patch("src.main.input", create=True)
-    def test_run(self, mock_input, mock_directory_path_what_to_analyze):
+    @patch.object(m_main.LocalResults, "remove_file_with_analysis_date")
+    def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
         for aws_account in S3UrisFileReader().get_aws_accounts():
             self.mock_aws.start()
@@ -41,6 +42,7 @@ class TestFunction_run(unittest.TestCase):
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
+        mock_local_results.assert_called_once()
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
