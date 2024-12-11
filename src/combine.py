@@ -23,9 +23,6 @@ def _get_df_combine_aws_accounts_results() -> Df:
     return result
 
 
-# TODO when reading the uris to check, assert all accounts have defined the same number of paths to analyze.
-
-
 def _get_df_for_aws_account(aws_account: str) -> Df:
     local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
     result = _get_df_from_file(local_file_path_name)

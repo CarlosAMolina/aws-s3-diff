@@ -50,7 +50,6 @@ class S3UrisFileReader:
     def get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
 
-    # TODO rename to _file_path_what_to_analyze
     @property
     def _file_path_what_to_analyze(self) -> Path:
         return self._directory_path_what_to_analyze.joinpath(self._FILE_NAME_S3_URIS)
