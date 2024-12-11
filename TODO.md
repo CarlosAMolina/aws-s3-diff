@@ -1,1 +1,4 @@
 - Test. Drop src/s3-uris-to-analyze.csv and run the tests to check that is mocked correctly. 
+- s3 uris to analyze:
+  - assert no empty values
+  - assert no duplicated uris
