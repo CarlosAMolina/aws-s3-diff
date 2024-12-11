@@ -101,6 +101,12 @@ poetry run pre-commit install
 
 ## Testing
 
+### Run all tests
+
+```bash
+make test
+```
+
 ### Access Moto Server using AWS CLI
 
 ```bash
