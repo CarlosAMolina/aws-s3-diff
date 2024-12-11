@@ -1,96 +1,42 @@
 ## How to run the program
 
-### Export s3 data
+To install the project dependencies, run `poetry install`.
 
-In this example we will compare multiple buckets of three different AWS accounts.
+After that, we need to configure the `s3-uris-to-analyze.csv` file. Once it is done, execute `make run` and follow the instructions.
 
-Update the `s3-uris-to-analyze.txt` file with your data.
+### s3-uris-to-analyze.csv file configuration
 
-In your terminal, generate AWS credentials to allow botocore to connect with your AWS account.
+The file to configure [is here](src/s3-uris-to-analyze.csv).
 
-Run:
+File structure:
 
-```bash
-poetry run python src/extract.py
-```
+- It is a `.csv` file separated by `,`.
+- Each column represents an AWS account configuration.
+- The first row is special, it is where to specify the account names.
+- The other rows are the S3 URIs to be analyzed.
 
-Now we have the results for the buckets of one account, to work with another account we must execute the following manual steps to save these results:
+The order in which the AWS accounts are specified is the order in which they will be analyzed.
 
-```bash
-mkdir exports-all-aws-accounts
-mv exports exports-all-aws-accounts/aws-account-1
-```
+### Run the program
 
-As you can see, now the `exports` folder does not exists, this is required to generate new results for the other AWS accounts.
+In this step we have already configured the `s3-uris-to-analyze.csv` file.
 
-Let's create the second AWS account results!
-
-After update the `s3-uris-to-analyze.txt` file with the second account S3 URIs, we authenticate in the terminal to the second AWS account and run:
+Authenticate in the terminal to the first AWS account that will be analyzed, this is required in order to allow botocore to connect with your AWS account. Execute:
 
 ```bash
-poetry run python src/extract.py
+make run
 ```
 
-We save the created files:
+Now, we have the results for the buckets of the first account. Let's create the second AWS account results!
 
-```bash
-mv exports exports-all-aws-accounts/aws-account-2
-```
+We authenticate in the terminal to the second AWS account and run `make run` again. The script will detect that the first account results exist and will analyze the second account.
 
-We repeat the steps for the third account:
+We repeat the previous steps per each configured AWS account:
 
-1. Update the `s3-uris-to-analyze.txt` file with the account S3 URIs to analyze.
-2. Authenticate in the terminal to the second AWS account.
-3. Generate the URIs results running: `python extract.py`
-4. Save the created files: `mv exports exports-all-aws-accounts/aws-account-3`
+1. Authenticate in the terminal to the AWS account to analyze.
+2. Execute `make run`
 
-### Prepare s3 data
-
-If the bucket names to compare between each account are different, we must set the same name. The file names must be equal too
-
-You don't need to review it manually, if the values are different, the script will raise an exception and you can modify the wrong names.
-
-For example, if I have these:
-
-```bash
-exports-all-aws-accounts
-|__aws-account-1/
-|  |__cars_pro/
-|  |  |__path_foo_old_file_1.txt
-|  |__bikes_pro/
-|     |__path_foo_old_file_bar.txt
-|__aws-account-2
-|  |__cars_release/
-|  |  |__ ...
-|  |__bikes_release/
-|     |__ ...
-|__aws-account-3/
-   |__cars_dev/
-   | |__ ...
-   |__bikes_dev/
-     |__ ...
-```
-
-I set the following names:
-
-```bash
-exports-all-aws-accounts
-|__aws-account-1/
-|  |__cars/
-|  |  |__path_foo_file_1.txt
-|  |__bikes/
-|     |__path_foo_file_bar.txt
-|__aws-account-2/
-|  |__cars/
-|  |  |__ ...
-|  |__bikes/
-|     |__ ...
-|__aws-account-3/
-   |__cars/
-   |  |__ ...
-   |__bikes/
-      |__ ...
-```
+The analysis results are stored in the [s3-results](s3-results) folder, a folder with the current analysis timestamp is created and all the accounts results are stored in that folder. The final file with all the results and the analysis is called `analysis.csv`, you can open and examine that file.
 
 ## Develop
 
