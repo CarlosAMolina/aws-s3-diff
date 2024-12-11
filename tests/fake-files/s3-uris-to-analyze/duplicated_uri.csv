@@ -1,0 +1,3 @@
+foo,bar
+s3://foo/bar,s3://foo/bar
+s3://foo/bar,s3://foo2/bar2

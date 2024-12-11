@@ -3,6 +3,7 @@ import sys
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
 from s3_extract import AwsAccountExtractor
+from s3_uris_to_analyze import S3UrisFileChecker
 from s3_uris_to_analyze import S3UrisFileReader
 
 
@@ -17,6 +18,8 @@ class _IteractiveMenu:
 
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
+        print("Checking if the URIs to analyze configuration file is correct")
+        S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
         if self._have_all_aws_account_been_analyzed():
             print("All AWS accounts has been analyzed. Starting a new analysis")
