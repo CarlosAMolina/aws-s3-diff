@@ -1,3 +1,9 @@
+# AWS S3 Diff
+
+## Introduction
+
+This project allows you to compare AWS S3 files between different AWS accounts.
+
 ## How to run the program
 
 To install the project dependencies, run `poetry install`.
