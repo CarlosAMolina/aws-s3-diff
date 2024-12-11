@@ -25,7 +25,7 @@ def _get_df_combine_aws_accounts_results() -> Df:
 
 def _get_df_for_aws_account(aws_account: str) -> Df:
     local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
-    result = _get_df_from_file(local_file_path_name)
+    result = _get_df_aws_account_from_file(local_file_path_name)
     result.columns = MultiIndex.from_tuples(_get_column_names_mult_index(aws_account, list(result.columns)))
     return result
 
@@ -75,8 +75,7 @@ def _get_column_names_mult_index(aws_account: str, column_names: list[str]) -> l
     return [(aws_account, column_name) for column_name in column_names]
 
 
-# TODO rename specify _aws_account_results_file
-def _get_df_from_file(file_path_name: Path) -> Df:
+def _get_df_aws_account_from_file(file_path_name: Path) -> Df:
     return pd.read_csv(
         file_path_name,
         index_col=["bucket", "prefix", "name"],
