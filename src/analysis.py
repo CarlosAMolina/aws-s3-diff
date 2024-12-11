@@ -234,7 +234,8 @@ class _AnalysisDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        result.index.names = ["bucket", "file_path_in_s3", "file_name"]
+        aws_account_1 = S3UrisFileReader().get_aws_accounts()[0]
+        result.index.names = [f"bucket_{aws_account_1}", f"file_path_in_s3_{aws_account_1}", "file_name"]
         return result
 
     def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
