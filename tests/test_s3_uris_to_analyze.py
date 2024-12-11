@@ -53,31 +53,31 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 class TestS3UrisFileChecker(unittest.TestCase):
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path",
+        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/empty_aws_account.csv"),
     )
-    def test_assert_file_is_correct_raises_exception_if_empty_aws_account(self, mock_file_what_to_analyze_path):
+    def test_assert_file_is_correct_raises_exception_if_empty_aws_account(self, mock_file_path_what_to_analyze):
         with self.assertRaises(ValueError) as exception:
             m_uris_to_analyze.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Some AWS account names are empty", str(exception.exception))
 
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path",
+        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/empty_uri.csv"),
     )
-    def test_assert_file_is_correct_raises_exception_if_empty_uri(self, mock_file_what_to_analyze_path):
+    def test_assert_file_is_correct_raises_exception_if_empty_uri(self, mock_file_path_what_to_analyze):
         with self.assertRaises(ValueError) as exception:
             m_uris_to_analyze.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Some URIs are empty", str(exception.exception))
 
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_what_to_analyze_path",
+        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/duplicated_uri.csv"),
     )
-    def test_assert_file_is_correct_raises_exception_if_duplicated_aws_account(self, mock_file_what_to_analyze_path):
+    def test_assert_file_is_correct_raises_exception_if_duplicated_aws_account(self, mock_file_path_what_to_analyze):
         with self.assertRaises(ValueError) as exception:
             m_uris_to_analyze.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("The AWS account foo has duplicated URIs", str(exception.exception))

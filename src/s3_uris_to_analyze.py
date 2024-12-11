@@ -48,11 +48,11 @@ class S3UrisFileReader:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
     def get_df_file_what_to_analyze(self) -> Df:
-        return read_csv(self._file_what_to_analyze_path)
+        return read_csv(self._file_path_what_to_analyze)
 
     # TODO rename to _file_path_what_to_analyze
     @property
-    def _file_what_to_analyze_path(self) -> Path:
+    def _file_path_what_to_analyze(self) -> Path:
         return self._directory_path_what_to_analyze.joinpath(self._FILE_NAME_S3_URIS)
 
     @property
