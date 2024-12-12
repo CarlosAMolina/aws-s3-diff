@@ -130,7 +130,7 @@ class _AnalysisConfig(ABC):
 
 class _DfAnalysis:
     def __init__(self, analysis_config: _AnalysisConfig, aws_accounts: _CompareAwsAccounts, df: Df):
-        self._analysis_config = analysis_config
+        self._analysis_config_TODO_DELETE = analysis_config
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
@@ -152,6 +152,17 @@ class _DfAnalysis:
     @property
     def _result_column_multi_index(self) -> tuple[str, str]:
         return ("analysis", self._analysis_config.column_name_result)
+
+    @property
+    # TODO @abstractmethod
+    def _analysis_config(self) -> _AnalysisConfig:
+        return self._analysis_config_TODO_DELETE
+
+
+# TODO class _OriginFileDfAnalysis(_DfAnalysis):
+# TODO     @property
+# TODO     def _analysis_config(self) -> _AnalysisConfig:
+# TODO         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
 
 
 class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
