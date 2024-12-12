@@ -99,8 +99,7 @@ class _S3DataSetAnalysis:
         result = df
         for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
             aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
-            analysis_config = _OriginFileSyncAnalysisConfig(aws_account_target)
-            result = _DfAnalysis(analysis_config, aws_accounts, result).get_df_set_analysis()
+            result = _OriginFileSyncDfAnalysis("TODO RM", aws_accounts, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
@@ -159,10 +158,10 @@ class _DfAnalysis:
         return self._analysis_config_TODO_DELETE
 
 
-# TODO class _OriginFileDfAnalysis(_DfAnalysis):
-# TODO     @property
-# TODO     def _analysis_config(self) -> _AnalysisConfig:
-# TODO         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
+class _OriginFileSyncDfAnalysis(_DfAnalysis):
+    @property
+    def _analysis_config(self) -> _AnalysisConfig:
+        return _OriginFileSyncAnalysisConfig(self._aws_account_target)
 
 
 class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
