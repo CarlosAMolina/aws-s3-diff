@@ -19,8 +19,11 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
+        return self._get_df_set_analysis(s3_data_df)
+
+    def _get_df_set_analysis(self, df: Df) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(s3_data_df)
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
     def _show_summary(self, df: Df):
         aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
