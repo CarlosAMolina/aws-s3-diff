@@ -99,14 +99,14 @@ class _S3DataSetAnalysis:
         result = df
         for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
             aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
-            result = _OriginFileSyncDfAnalysis("TODO RM", aws_accounts, result).get_df_set_analysis()
+            result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_accounts = _CompareAwsAccounts(
             self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
         )
-        return _TargetAccountWithoutMoreFilesDfAnalysis("TODO RM", aws_accounts, df).get_df_set_analysis()
+        return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
 
 
 class _AnalysisConfig(ABC):
@@ -125,8 +125,7 @@ class _AnalysisConfig(ABC):
 
 
 class _DfAnalysis:
-    def __init__(self, analysis_config: _AnalysisConfig, aws_accounts: _CompareAwsAccounts, df: Df):
-        self._analysis_config_TODO_DELETE = analysis_config
+    def __init__(self, aws_accounts: _CompareAwsAccounts, df: Df):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
@@ -150,9 +149,9 @@ class _DfAnalysis:
         return ("analysis", self._analysis_config.column_name_result)
 
     @property
-    # TODO @abstractmethod
+    @abstractmethod
     def _analysis_config(self) -> _AnalysisConfig:
-        return self._analysis_config_TODO_DELETE
+        pass
 
 
 class _OriginFileSyncDfAnalysis(_DfAnalysis):
