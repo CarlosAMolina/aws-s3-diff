@@ -103,13 +103,10 @@ class _S3DataSetAnalysis:
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        analysis_config = _TargetAccountWithoutMoreFilesAnalysisConfig(
-            self._aws_accounts.aws_account_that_must_not_have_more_files
-        )
         aws_accounts = _CompareAwsAccounts(
             self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
         )
-        return _DfAnalysis(analysis_config, aws_accounts, df).get_df_set_analysis()
+        return _TargetAccountWithoutMoreFilesDfAnalysis("TODO RM", aws_accounts, df).get_df_set_analysis()
 
 
 class _AnalysisConfig(ABC):
@@ -162,6 +159,12 @@ class _OriginFileSyncDfAnalysis(_DfAnalysis):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
+
+
+class _TargetAccountWithoutMoreFilesDfAnalysis(_DfAnalysis):
+    @property
+    def _analysis_config(self) -> _AnalysisConfig:
+        return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)
 
 
 class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
