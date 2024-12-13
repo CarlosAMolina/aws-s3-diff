@@ -51,6 +51,20 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         )
         assert_frame_equal(expected_result, result)
 
+    def test_get_df_set_analysis_result_if_no_file_to_sync(self):
+        df = Df(array([[None, 2]]))
+        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
+        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
+        expected_result = Df({"foo": [None], "bar": [2], "baz": ["No file to sync"]}).astype({"bar": "object"})
+        expected_result.columns = MultiIndex.from_tuples(
+            [
+                (self.aws_accounts.origin, "size"),
+                (self.aws_accounts.target, "size"),
+                ("analysis", "is_sync_ok_in_account_2"),
+            ]
+        )
+        assert_frame_equal(expected_result, result)
+
 
 class TestS3DataAnalyzer(unittest.TestCase):
     @classmethod
