@@ -26,7 +26,7 @@ class S3DataAnalyzer:
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
     def _show_summary(self, df: Df):
-        aws_accounts_summary = _SummaryAwsAccountsGenerator().get_aws_accounts()
+        aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         _show_summary(aws_accounts_summary, df)
 
 
@@ -39,22 +39,13 @@ class _AnalysisAwsAccounts:
         ) = args
 
 
-# TODO replace with _AnalysisAwsAccounts
-class _SummaryAwsAccounts:
-    def __init__(self, *args):
-        (
-            self.aws_account_origin,
-            self.aws_accounts_where_files_must_be_copied,
-        ) = args
-
-
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
 class _AwsAccountsGenerator(ABC):
     @abstractmethod
-    def get_aws_accounts(self) -> _AnalysisAwsAccounts | _SummaryAwsAccounts:
+    def get_aws_accounts(self) -> _AnalysisAwsAccounts:
         pass
 
     def _get_aws_account_with_data_to_sync(self) -> str:
@@ -76,14 +67,6 @@ class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
         return S3UrisFileReader().get_aws_accounts()[1]
-
-
-class _SummaryAwsAccountsGenerator(_AwsAccountsGenerator):
-    def get_aws_accounts(self) -> _SummaryAwsAccounts:
-        return _SummaryAwsAccounts(
-            self._get_aws_account_with_data_to_sync(),
-            self._get_aws_accounts_where_files_must_be_copied(),
-        )
 
 
 class _S3DataSetAnalysis:
@@ -226,7 +209,7 @@ class _AnalysisCondition:
         return self._df.loc[:, (self._aws_accounts.target, "size")].notnull()
 
 
-def _show_summary(aws_accounts: _SummaryAwsAccounts, df: Df):
+def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
     for aws_account_to_compare in aws_accounts.aws_accounts_where_files_must_be_copied:
         column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
         condition = (df.loc[:, (aws_accounts.aws_account_origin, "size")].notnull()) & (
