@@ -24,7 +24,7 @@ test:
 	poetry run python -m unittest discover
 
 test-filter:
-	poetry run python -m unittest discover -p test_s3_uris_to_analyze.py -k TestS3UrisFileChecker
+	#poetry run python -m unittest discover -p test_s3_uris_to_analyze.py -k TestS3UrisFileChecker
 	#poetry run python -m unittest discover -p test_combine.py -k TestS3UriDfModifier
-	#poetry run python -m unittest discover -p test_analysis.py -k TestS3DataAnalyzer
+	poetry run python -m unittest discover -p test_analysis.py -k TestOriginFileSyncDfAnalysis
 	#poetry run python -m unittest discover -p test_main.py -k TestFunction_run

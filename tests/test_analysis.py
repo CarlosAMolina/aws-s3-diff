@@ -4,14 +4,38 @@ from unittest.mock import patch
 from unittest.mock import PropertyMock
 
 import numpy as np
+from numpy import array
 from pandas import DataFrame as Df
+from pandas import MultiIndex
 from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
 from src.analysis import _AnalysisDfToCsv
+from src.analysis import _CompareAwsAccounts
+from src.analysis import _OriginFileSyncDfAnalysis
 from src.analysis import S3DataAnalyzer
+
+
+class TestOriginFileSyncDfAnalysis(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.aws_accounts = _CompareAwsAccounts("account_1", "account_2")
+
+    def test_get_df_set_analysis_result_if_file_sync_is_ok(self):
+        df = Df(array([[1, 1]]))
+        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
+        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
+        expected_result = Df({"foo": [1], "bar": [1], "baz": [True]}).astype({"baz": "object"})
+        expected_result.columns = MultiIndex.from_tuples(
+            [
+                (self.aws_accounts.origin, "size"),
+                (self.aws_accounts.target, "size"),
+                ("analysis", "is_sync_ok_in_account_2"),
+            ]
+        )
+        assert_frame_equal(expected_result, result)
 
 
 class TestS3DataAnalyzer(unittest.TestCase):
