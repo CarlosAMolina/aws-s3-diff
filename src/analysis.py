@@ -1,7 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
-from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Series
@@ -15,7 +14,7 @@ class S3DataAnalyzer:
     def run(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._show_summary(s3_analyzed_df)
-        _AnalysisDfToCsv().export(s3_analyzed_df, LocalResults().get_file_path_analysis_result())
+        _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()
@@ -221,7 +220,8 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
 
 
 class _AnalysisDfToCsv:
-    def export(self, df: Df, file_path: Path):
+    def export(self, df: Df):
+        file_path = LocalResults().get_file_path_analysis_result()
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path)
 
