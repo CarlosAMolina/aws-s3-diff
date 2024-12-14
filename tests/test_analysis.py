@@ -92,10 +92,8 @@ class TestS3DataAnalyzer(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
-    @patch("src.analysis.S3DataAnalyzer._export_files_combination")  # TODO rm
     def test_get_df_s3_data_analyzed(
         self,
-        mock_export_files_combination,
         mock_directory_path_what_to_analyze,
         mock_get_path_directory_all_results,
         mock_get_analysis_date_time_str,
@@ -117,6 +115,7 @@ class TestS3DataAnalyzer(unittest.TestCase):
         expected_result = expected_result.replace({np.nan: None})
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
+        LocalResults().get_file_path_s3_all_accounts().unlink()  # TODO rm
 
     def _get_df_from_csv_expected_result(self) -> Df:
         expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")
