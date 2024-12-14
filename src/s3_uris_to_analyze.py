@@ -79,4 +79,4 @@ class _S3UriParts:
     @property
     def _regex_s3_uri_parts(self) -> str:
         """https://stackoverflow.com/a/47130367"""
-        return r"s3:\/\/(?P<bucket_name>.+?)\/(?P<object_key>.+)"
+        return r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"
