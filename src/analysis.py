@@ -197,7 +197,7 @@ class _AnalysisCondition:
 
     @property
     def condition_exists_file_to_sync(self) -> Series:
-        return self._df.loc[:, (self._aws_accounts.origin, "size")].notnull()
+        return self._df.loc[:, self._column_index_size_origin].notnull()
 
     @property
     def condition_not_exist_file_to_sync(self) -> Series:
@@ -205,13 +205,19 @@ class _AnalysisCondition:
 
     @property
     def _condition_file_is_sync(self) -> Series:
-        return (
-            self._df.loc[:, (self._aws_accounts.origin, "size")] == self._df.loc[:, (self._aws_accounts.target, "size")]
-        )
+        return self._df.loc[:, self._column_index_size_origin] == self._df.loc[:, self._column_index_size_target]
 
     @property
     def _condition_exists_file_in_target_aws_account(self) -> Series:
-        return self._df.loc[:, (self._aws_accounts.target, "size")].notnull()
+        return self._df.loc[:, self._column_index_size_target].notnull()
+
+    @property
+    def _column_index_size_origin(self) -> tuple:
+        return (self._aws_accounts.origin, "size")
+
+    @property
+    def _column_index_size_target(self) -> tuple:
+        return (self._aws_accounts.target, "size")
 
 
 def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
