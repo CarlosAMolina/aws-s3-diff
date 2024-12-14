@@ -1,11 +1,7 @@
-import logging
-
 import boto3
 
 from types_custom import S3Data
 from types_custom import S3Query
-
-logger = logging.getLogger(__name__)
 
 
 class S3Client:

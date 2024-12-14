@@ -15,7 +15,6 @@ def extract_s3_data_of_account(aws_account: str):
     ).extract()
 
 
-# TODO private
 class _AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
