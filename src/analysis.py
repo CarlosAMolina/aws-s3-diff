@@ -293,9 +293,9 @@ class _CombineCsvToDf:
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
         for aws_account in S3UrisFileReader().get_aws_accounts():
-            if column_name.startswith(aws_account):
-                key = re.match(rf"{aws_account}_(?P<key>.*)", column_name).group("key")
-                return aws_account, key
+            regex_result = re.match(rf"{aws_account}_(?P<key>.*)", column_name)
+            if regex_result is not None:
+                return aws_account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
 
 
