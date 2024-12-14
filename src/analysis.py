@@ -10,8 +10,8 @@ from pandas import MultiIndex
 from pandas import read_csv
 from pandas import Series
 
-from combine import get_df_combine_files
 from local_results import LocalResults
+from s3_data import export_s3_data_of_all_accounts
 from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
 
@@ -23,7 +23,7 @@ class S3DataAnalyzer:
         _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
-        _export_s3_data_of_all_accounts()
+        export_s3_data_of_all_accounts()
         all_accounts_s3_data_df = self._get_df_all_accounts_s3_data()
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
@@ -233,41 +233,6 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
         result = df[condition]
         print(f"Files not copied in {aws_account_to_compare} ({len(result)}):")
         print(result)
-
-
-# TODO move to combine.py
-def _export_s3_data_of_all_accounts():
-    s3_data_df = get_df_combine_files()  # TODO move to combine.py
-    _CombineDfToCsv().export(s3_data_df)
-
-
-# TODO move to combine.py
-class _CombineDfToCsv:
-    def export(self, df: Df):
-        file_path = LocalResults().get_file_path_s3_data_all_accounts()
-        print(f"Exporting all AWS accounts S3 files information to {file_path}")
-        csv_df = self._get_df_to_export(df)
-        csv_df.to_csv(file_path)
-
-    def _get_df_to_export(self, df: Df) -> Df:
-        result = df.copy()
-        csv_column_names = ["_".join(values) for values in result.columns]
-        csv_column_names = [
-            self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
-        ]
-        result.columns = csv_column_names
-        aws_account_1 = S3UrisFileReader().get_aws_accounts()[0]
-        result.index.names = [
-            f"bucket_{aws_account_1}",
-            f"file_path_in_s3_{aws_account_1}",
-            "file_name_all_aws_accounts",
-        ]
-        return result
-
-    def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
-        if column_name.startswith("analysis_"):
-            return column_name.replace("analysis_", "", 1)
-        return column_name
 
 
 class _CombineCsvToDf:
