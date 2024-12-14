@@ -3,7 +3,6 @@ from abc import abstractmethod
 from collections import namedtuple
 
 from pandas import DataFrame as Df
-from pandas import read_csv
 from pandas import Series
 
 from combine import get_df_combine_files
@@ -18,14 +17,17 @@ class S3DataAnalyzer:
         _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
-        s3_data_df = get_df_combine_files()
+        s3_data_df = self._get_s3_data_of_all_accounts()
         self._export_files_combination(s3_data_df)
         return self._get_df_set_analysis(s3_data_df)
 
+    def _get_s3_data_of_all_accounts(self) -> Df:
+        return get_df_combine_files()
+        # TODO df_ = read_csv(LocalResults().get_file_path_s3_all_accounts())  # TODO use this instead of the argument
+
     def _get_df_set_analysis(self, df: Df) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        df_ = read_csv(LocalResults().get_file_path_s3_all_accounts())  # TODO use this instead of the argument
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df, df_)
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
@@ -78,7 +80,7 @@ class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
 
-    def get_df_set_analysis_columns(self, df: Df, df_: Df) -> Df:
+    def get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df.copy()
         result = self._get_df_set_analysis_file_has_been_copied(result)
         return self._get_df_set_analysis_must_file_exist(result)
