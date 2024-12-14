@@ -2,7 +2,6 @@ import sys
 
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
-from s3_client import AwsAccountExtractor
 from s3_data import extract_s3_data_of_account
 from s3_uris_to_analyze import S3UrisFileChecker
 from s3_uris_to_analyze import S3UrisFileReader
@@ -55,12 +54,6 @@ class _IteractiveMenu:
                 sys.exit()
             if user_input == "y" or len(user_input) == 0:
                 return
-
-    def _extract_aws_account_information(self, aws_account: str):
-        AwsAccountExtractor(
-            self._local_results.get_file_path_aws_account_results(aws_account),
-            S3UrisFileReader().get_s3_queries_for_aws_account(aws_account),
-        ).extract()
 
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
