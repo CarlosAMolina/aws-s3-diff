@@ -115,7 +115,7 @@ class TestS3DataAnalyzer(unittest.TestCase):
         expected_result = expected_result.replace({np.nan: None})
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
-        LocalResults().get_file_path_s3_all_accounts().unlink()  # TODO rm
+        LocalResults().get_file_path_s3_data_all_accounts().unlink()  # TODO rm
 
     def _get_df_from_csv_expected_result(self) -> Df:
         expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")

@@ -22,8 +22,8 @@ class S3DataAnalyzer:
         return self._get_df_set_analysis(s3_data_df)
 
     def _get_s3_data_of_all_accounts(self) -> Df:
+        # TODO df_ = read_csv(LocalResults().get_file_path_s3_data_all_accounts())  # TODO use
         return get_df_combine_files()
-        # TODO df_ = read_csv(LocalResults().get_file_path_s3_all_accounts())  # TODO use this instead of the argument
 
     def _get_df_set_analysis(self, df: Df) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
@@ -236,7 +236,7 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
 # TODO move to combine.py
 class _CombineDfToCsv:
     def export(self, df: Df):
-        file_path = LocalResults().get_file_path_s3_all_accounts()
+        file_path = LocalResults().get_file_path_s3_data_all_accounts()
         print(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path)
