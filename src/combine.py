@@ -10,10 +10,10 @@ from types_custom import AllAccoutsS3DataDf
 
 
 def get_df_s3_data_all_accounts_from_individual_results() -> AllAccoutsS3DataDf:
-    return _CombineCsvsToDf().get_df()
+    return _IndividualAccountsS3DataCsvFilesToDf().get_df()
 
 
-class _CombineCsvsToDf:
+class _IndividualAccountsS3DataCsvFilesToDf:
     def get_df(self) -> AllAccoutsS3DataDf:
         result = self._get_df_combine_aws_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
