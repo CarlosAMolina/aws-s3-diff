@@ -23,8 +23,7 @@ class S3DataAnalyzer:
         _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
-        s3_data_df = get_df_combine_files()  # TODO move to combine.py
-        _export_s3_data_of_all_accounts(s3_data_df)  # TODO move to combine.py
+        _export_s3_data_of_all_accounts()
         all_accounts_s3_data_df = self._get_df_all_accounts_s3_data()
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
@@ -236,8 +235,10 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
         print(result)
 
 
-def _export_s3_data_of_all_accounts(df: Df):
-    _CombineDfToCsv().export(df)
+# TODO move to combine.py
+def _export_s3_data_of_all_accounts():
+    s3_data_df = get_df_combine_files()  # TODO move to combine.py
+    _CombineDfToCsv().export(s3_data_df)
 
 
 # TODO move to combine.py
