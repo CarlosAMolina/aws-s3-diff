@@ -92,8 +92,13 @@ class TestS3DataAnalyzer(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
+    @patch("src.analysis.S3DataAnalyzer._export_files_combination")  # TODO rm
     def test_get_df_s3_data_analyzed(
-        self, mock_directory_path_what_to_analyze, mock_get_path_directory_all_results, mock_get_analysis_date_time_str
+        self,
+        mock_export_files_combination,
+        mock_directory_path_what_to_analyze,
+        mock_get_path_directory_all_results,
+        mock_get_analysis_date_time_str,
     ):
         mock_get_path_directory_all_results.return_value = self.current_path.joinpath(
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS

@@ -12,6 +12,9 @@ class LocalResults:
     def get_file_path_analysis_result(self):
         return self._get_path_analysis_results().joinpath("analysis.csv")
 
+    def get_file_path_s3_all_accounts(self):
+        return self._get_path_analysis_results().joinpath("s3-files-all-accounts.csv")
+
     def get_file_path_aws_account_results(self, aws_account: str):
         return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
 
