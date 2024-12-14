@@ -24,7 +24,7 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()  # TODO move to combine.py
-        self._export_files_combination(s3_data_df)  # TODO move to combine.py
+        _export_s3_data_of_all_accounts(s3_data_df)  # TODO move to combine.py
         all_accounts_s3_data_df = self._get_df_all_accounts_s3_data()
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
@@ -38,9 +38,6 @@ class S3DataAnalyzer:
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         _show_summary(aws_accounts_summary, df)
-
-    def _export_files_combination(self, df: Df):
-        _CombineDfToCsv().export(df)
 
 
 class _AnalysisAwsAccounts:
@@ -237,6 +234,10 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
         result = df[condition]
         print(f"Files not copied in {aws_account_to_compare} ({len(result)}):")
         print(result)
+
+
+def _export_s3_data_of_all_accounts(df: Df):
+    _CombineDfToCsv().export(df)
 
 
 # TODO move to combine.py
