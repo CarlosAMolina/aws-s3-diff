@@ -28,7 +28,7 @@ def export_s3_data_of_all_accounts():
     _CombineDfToCsv().export(s3_data_df)  # TODO move to combine.py
 
 
-def get_df_s3_data_all_accounts() -> AllAccoutsS3DataDf:
+def get_df_s3_data_all_accounts_from_accounts_combined_results() -> AllAccoutsS3DataDf:
     return _CombineCsvToDf().get_df()
 
 
