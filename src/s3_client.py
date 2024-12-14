@@ -19,7 +19,7 @@ class AwsAccountExtractor:
         print(f"Extracting AWS Account information to {self._file_path_results}")
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
-            s3_data = _S3Client().get_s3_data(s3_query)
+            s3_data = S3Client().get_s3_data(s3_query)
             self._export_data_to_csv(s3_data, s3_query)
         print("Extraction done")
 
@@ -36,7 +36,7 @@ class AwsAccountExtractor:
                 w.writerow(data)
 
 
-class _S3Client:
+class S3Client:
     def __init__(self):
         session = boto3.Session()
         self._s3_client = session.client("s3")

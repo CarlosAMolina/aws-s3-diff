@@ -80,7 +80,7 @@ class TestS3Client(unittest.TestCase):
         return datetime.datetime.now(tzutc())
 
     def _test_get_s3_data_returns_expected_result(self, expected_result: ExpectedResult, s3_query: m_s3_client.S3Query):
-        s3_client = m_s3_client._S3Client()
+        s3_client = m_s3_client.S3Client()
         result = s3_client.get_s3_data(s3_query)
         self._test_get_s3_data_returns_expected_result_for_file_name(expected_result, result)
 
