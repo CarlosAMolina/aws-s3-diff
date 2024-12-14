@@ -7,7 +7,7 @@ from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
 
-from combine import get_df_s3_data_all_accounts_from_accounts_individual_results
+from combine import get_df_s3_data_all_accounts_from_individual_results
 from local_results import LocalResults
 from s3_client import S3Client
 from s3_uris_to_analyze import S3UrisFileReader
@@ -24,11 +24,11 @@ def export_s3_data_of_account(aws_account: str):
 
 
 def export_s3_data_of_all_accounts():
-    s3_data_df = get_df_s3_data_all_accounts_from_accounts_individual_results()  # TODO move to combine.py
+    s3_data_df = get_df_s3_data_all_accounts_from_individual_results()  # TODO move to combine.py
     _CombineDfToCsv().export(s3_data_df)  # TODO move to combine.py
 
 
-def get_df_s3_data_all_accounts_from_accounts_combined_results() -> AllAccoutsS3DataDf:
+def get_df_s3_data_all_accounts_from_combined_results() -> AllAccoutsS3DataDf:
     return _CombineCsvToDf().get_df()
 
 

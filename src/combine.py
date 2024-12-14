@@ -9,7 +9,7 @@ from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
 
 
-def get_df_s3_data_all_accounts_from_accounts_individual_results() -> AllAccoutsS3DataDf:
+def get_df_s3_data_all_accounts_from_individual_results() -> AllAccoutsS3DataDf:
     result = _get_df_combine_aws_accounts_results()
     return _get_df_drop_incorrect_empty_rows(result)
 
