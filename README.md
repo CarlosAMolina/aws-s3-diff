@@ -12,7 +12,7 @@ After that, we need to configure the `s3-uris-to-analyze.csv` file. Once it is d
 
 ### s3-uris-to-analyze.csv file configuration
 
-The file to configure [is here](src/s3-uris-to-analyze.csv).
+The file to configure [is here](config/s3-uris-to-analyze.csv).
 
 File structure:
 

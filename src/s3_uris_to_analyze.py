@@ -56,7 +56,7 @@ class S3UrisFileReader:
 
     @property
     def _directory_path_what_to_analyze(self) -> Path:
-        return Path(__file__).parent.absolute()
+        return Path(__file__).parent.parent.joinpath("config")
 
 
 class _S3UriParts:
