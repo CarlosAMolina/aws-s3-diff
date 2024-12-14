@@ -29,7 +29,7 @@ def export_s3_data_of_all_accounts():
 
 
 def get_df_s3_data_all_accounts_from_combined_results() -> AllAccoutsS3DataDf:
-    return _CombineCsvToDf().get_df()
+    return _CombinedAccountsS3DataCsvToDf().get_df()
 
 
 class _AwsAccountExtractor:
@@ -86,7 +86,7 @@ class _CombinedAccountsS3DataDfToCsv:
         return column_name
 
 
-class _CombineCsvToDf:
+class _CombinedAccountsS3DataCsvToDf:
     def get_df(self) -> AllAccoutsS3DataDf:
         file_path = LocalResults().get_file_path_s3_data_all_accounts()
         result = self._get_df_from_file(file_path)
