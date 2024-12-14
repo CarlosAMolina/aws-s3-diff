@@ -1,8 +1,13 @@
+import re
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
+from pathlib import Path
 
 from pandas import DataFrame as Df
+from pandas import Index
+from pandas import MultiIndex
+from pandas import read_csv
 from pandas import Series
 
 from combine import get_df_combine_files
@@ -17,13 +22,13 @@ class S3DataAnalyzer:
         _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
+        s3_data_df = get_df_combine_files()  # TODO move to combine.py
+        self._export_files_combination(s3_data_df)  # TODO move to combine.py
         s3_data_df = self._get_s3_data_of_all_accounts()
-        self._export_files_combination(s3_data_df)
         return self._get_df_set_analysis(s3_data_df)
 
     def _get_s3_data_of_all_accounts(self) -> Df:
-        # TODO df_ = read_csv(LocalResults().get_file_path_s3_data_all_accounts())  # TODO use
-        return get_df_combine_files()
+        return _CombineCsvToDf().get_df()
 
     def _get_df_set_analysis(self, df: Df) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
@@ -262,6 +267,39 @@ class _CombineDfToCsv:
         return column_name
 
 
+class _CombineCsvToDf:
+    def get_df(self) -> Df:
+        file_path = LocalResults().get_file_path_s3_data_all_accounts()
+        result = self._get_df_from_file(file_path)
+        return self._get_df_set_multi_index_columns(result)
+
+    # TODO extract common code with combine.py._get_df_aws_account_from_file
+    # TODO use in all scripts `file_path_in_s3_` instead of `file_path_`
+    def _get_df_from_file(self, file_path_name: Path) -> Df:
+        aws_accounts = S3UrisFileReader().get_aws_accounts()
+        return read_csv(
+            file_path_name,
+            index_col=[f"bucket_{aws_accounts[0]}", f"file_path_in_s3_{aws_accounts[0]}", "file_name_all_aws_accounts"],
+            parse_dates=[f"{aws_account}_date" for aws_account in aws_accounts],
+        ).astype({f"{aws_account}_size": "Int64" for aws_account in aws_accounts})
+
+    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
+        result = df
+        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
+        return result
+
+    def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
+        return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
+
+    def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
+        for aws_account in S3UrisFileReader().get_aws_accounts():
+            if column_name.startswith(aws_account):
+                key = re.match(rf"{aws_account}_(?P<key>.*)", column_name).group("key")
+                return aws_account, key
+        raise ValueError(f"Not managed column name: {column_name}")
+
+
+# TODO refactor extract common code with  _CombineCsvTo
 class _AnalysisDfToCsv:
     def export(self, df: Df):
         file_path = LocalResults().get_file_path_analysis_result()
