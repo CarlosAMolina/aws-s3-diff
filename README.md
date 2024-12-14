@@ -12,13 +12,13 @@ After that, we need to configure the `s3-uris-to-analyze.csv` file. Once it is d
 
 ### s3-uris-to-analyze.csv file configuration
 
-The file to configure [is here](config/s3-uris-to-analyze.csv).
+The file to configure with your AWS information to analyze [is here](config/s3-uris-to-analyze.csv).
 
 File structure:
 
 - It is a `.csv` file separated by `,`.
 - Each column represents an AWS account configuration.
-- The first row is special, it is where to specify the account names.
+- The first row is special, is where the account names are specified.
 - The other rows are the S3 URIs to be analyzed.
 
 The order in which the AWS accounts are specified is the order in which they will be analyzed.
