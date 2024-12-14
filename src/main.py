@@ -2,8 +2,8 @@ import sys
 
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
+from s3_client import AwsAccountExtractor
 from s3_data import extract_s3_data_of_account
-from s3_extract import AwsAccountExtractor
 from s3_uris_to_analyze import S3UrisFileChecker
 from s3_uris_to_analyze import S3UrisFileReader
 
