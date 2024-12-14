@@ -13,6 +13,7 @@ from pandas import Series
 from combine import get_df_combine_files
 from local_results import LocalResults
 from s3_uris_to_analyze import S3UrisFileReader
+from types_custom import AllAccoutsS3DataDf
 
 
 class S3DataAnalyzer:
@@ -24,13 +25,13 @@ class S3DataAnalyzer:
     def _get_df_s3_data_analyzed(self) -> Df:
         s3_data_df = get_df_combine_files()  # TODO move to combine.py
         self._export_files_combination(s3_data_df)  # TODO move to combine.py
-        s3_data_df = self._get_s3_data_of_all_accounts()
-        return self._get_df_set_analysis(s3_data_df)
+        all_accounts_s3_data_df = self._get_df_all_accounts_s3_data()
+        return self._get_df_set_analysis(all_accounts_s3_data_df)
 
-    def _get_s3_data_of_all_accounts(self) -> Df:
+    def _get_df_all_accounts_s3_data(self) -> AllAccoutsS3DataDf:
         return _CombineCsvToDf().get_df()
 
-    def _get_df_set_analysis(self, df: Df) -> Df:
+    def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
@@ -268,7 +269,7 @@ class _CombineDfToCsv:
 
 
 class _CombineCsvToDf:
-    def get_df(self) -> Df:
+    def get_df(self) -> AllAccoutsS3DataDf:
         file_path = LocalResults().get_file_path_s3_data_all_accounts()
         result = self._get_df_from_file(file_path)
         return self._get_df_set_multi_index_columns(result)
