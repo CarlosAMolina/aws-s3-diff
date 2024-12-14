@@ -25,7 +25,7 @@ def export_s3_data_of_account(aws_account: str):
 
 def export_s3_data_of_all_accounts():
     s3_data_df = get_df_s3_data_all_accounts_from_individual_results()  # TODO move to combine.py
-    _CombineDfToCsv().export(s3_data_df)  # TODO move to combine.py
+    _CombinedAccountsS3DataDfToCsv().export(s3_data_df)  # TODO move to combine.py
 
 
 def get_df_s3_data_all_accounts_from_combined_results() -> AllAccoutsS3DataDf:
@@ -58,8 +58,7 @@ class _AwsAccountExtractor:
                 w.writerow(data)
 
 
-# TODO move to combine.py
-class _CombineDfToCsv:
+class _CombinedAccountsS3DataDfToCsv:
     def export(self, df: Df):
         file_path = LocalResults().get_file_path_s3_data_all_accounts()
         print(f"Exporting all AWS accounts S3 files information to {file_path}")
