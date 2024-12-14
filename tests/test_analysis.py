@@ -85,8 +85,8 @@ class TestS3DataAnalyzer(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch("src.combine.LocalResults._get_analysis_date_time_str")
-    @patch("src.combine.LocalResults._get_path_directory_all_results")
+    @patch("src.analysis.LocalResults._get_analysis_date_time_str")
+    @patch("src.analysis.LocalResults._get_path_directory_all_results")
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
         new_callable=PropertyMock,
