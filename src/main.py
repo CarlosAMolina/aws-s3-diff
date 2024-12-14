@@ -2,7 +2,7 @@ import sys
 
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
-from s3_data import extract_s3_data_of_account
+from s3_data import export_s3_data_of_account
 from s3_uris_to_analyze import S3UrisFileChecker
 from s3_uris_to_analyze import S3UrisFileReader
 
@@ -29,7 +29,7 @@ class _IteractiveMenu:
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
-        extract_s3_data_of_account(aws_account)
+        export_s3_data_of_account(aws_account)
         if self._have_all_aws_account_been_analyzed():
             S3DataAnalyzer().run()
             LocalResults().remove_file_with_analysis_date()
