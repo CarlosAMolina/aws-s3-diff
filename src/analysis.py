@@ -3,6 +3,7 @@ from abc import abstractmethod
 from collections import namedtuple
 
 from pandas import DataFrame as Df
+from pandas import read_csv
 from pandas import Series
 
 from combine import get_df_combine_files
@@ -23,7 +24,8 @@ class S3DataAnalyzer:
 
     def _get_df_set_analysis(self, df: Df) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
+        df_ = read_csv(LocalResults().get_file_path_s3_all_accounts())  # TODO use this instead of the argument
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df, df_)
 
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
@@ -76,7 +78,7 @@ class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
 
-    def get_df_set_analysis_columns(self, df: Df) -> Df:
+    def get_df_set_analysis_columns(self, df: Df, df_: Df) -> Df:
         result = df.copy()
         result = self._get_df_set_analysis_file_has_been_copied(result)
         return self._get_df_set_analysis_must_file_exist(result)
