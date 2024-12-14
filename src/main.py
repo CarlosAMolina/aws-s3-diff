@@ -22,7 +22,7 @@ class _IteractiveMenu:
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
         if self._have_all_aws_account_been_analyzed():
-            print("All AWS accounts has been analyzed. Starting a new analysis")
+            print("All AWS accounts have been analyzed. Starting a new analysis")
             self._local_results.remove_file_with_analysis_date()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
