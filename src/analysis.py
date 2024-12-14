@@ -24,10 +24,10 @@ class S3DataAnalyzer:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         export_s3_data_of_all_accounts()
-        all_accounts_s3_data_df = self._get_df_all_accounts_s3_data()
+        all_accounts_s3_data_df = self._get_df_s3_data_all_accounts()
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
-    def _get_df_all_accounts_s3_data(self) -> AllAccoutsS3DataDf:
+    def _get_df_s3_data_all_accounts(self) -> AllAccoutsS3DataDf:
         return _CombineCsvToDf().get_df()
 
     def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
