@@ -9,14 +9,14 @@ from types_custom import S3Query
 
 
 def extract_s3_data_of_account(aws_account: str):
-    AwsAccountExtractor(
+    _AwsAccountExtractor(
         LocalResults().get_file_path_aws_account_results(aws_account),
         S3UrisFileReader().get_s3_queries_for_aws_account(aws_account),
     ).extract()
 
 
 # TODO private
-class AwsAccountExtractor:
+class _AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
         self._s3_queries = s3_queries
