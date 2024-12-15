@@ -22,10 +22,6 @@ class S3DataAnalyzer:
     def _get_df_s3_data_analyzed(self) -> Df:
         return _AnalysisGenerator()._get_df_s3_data_analyzed()
 
-    def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        # TODO not use private method
-        return _AnalysisGenerator()._get_df_set_analysis(df)
-
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         _show_summary(aws_accounts_summary, df)
