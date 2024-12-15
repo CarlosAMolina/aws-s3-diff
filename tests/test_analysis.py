@@ -86,7 +86,7 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         aws_accounts = _CompareAwsAccounts(*all_aws_accounts[:2])
         result = _OriginFileSyncDfAnalysis(aws_accounts, df).get_df_set_analysis()
         result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
-        expected_result = [None]  # TODO correct result is [False]
+        expected_result = [False]
         self.assertEqual(expected_result, result_to_check)
 
 

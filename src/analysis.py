@@ -145,10 +145,10 @@ class _DfAnalysis:
         result[[self._result_column_multi_index]] = None
         for (
             condition_name,
-            condition_result,
+            condition_result_to_set,
         ) in self._analysis_config.condition_config.items():
             condition_results: Series = getattr(self._condition, condition_name)
-            result.loc[condition_results, [self._result_column_multi_index]] = condition_result
+            result.loc[condition_results, [self._result_column_multi_index]] = condition_result_to_set
         return result
 
     @property
@@ -224,7 +224,13 @@ class _AnalysisCondition:
 
     @property
     def _condition_file_is_sync(self) -> Series:
-        return self._df.loc[:, self._column_index_size_origin] == self._df.loc[:, self._column_index_size_target]
+        # Replace nan results to avoid incorrect values due to equality compaisons between null values.
+        # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
+        return (
+            self._df.loc[:, self._column_index_size_origin]
+            .eq(self._df.loc[:, self._column_index_size_target])
+            .fillna(False)
+        )
 
     @property
     def _condition_exists_file_in_target_aws_account(self) -> Series:
