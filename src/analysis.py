@@ -13,9 +13,11 @@ from types_custom import AllAccoutsS3DataDf
 
 class S3DataAnalyzer:
     def run(self):
+        _AnalysisGenerator().export_analysis_file()
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._show_summary(s3_analyzed_df)
-        _AnalysisDfToCsv().export(s3_analyzed_df)
+        # TODO not use private method
+        _AnalysisGenerator()._export_analyzed_df_to_file(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
@@ -28,6 +30,14 @@ class S3DataAnalyzer:
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         _show_summary(aws_accounts_summary, df)
+
+
+class _AnalysisGenerator:
+    def export_analysis_file(self):
+        pass
+
+    def _export_analyzed_df_to_file(self, df: Df):
+        _AnalysisDfToCsv().export(df)
 
 
 class _AnalysisAwsAccounts:
