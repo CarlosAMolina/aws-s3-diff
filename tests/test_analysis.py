@@ -4,9 +4,7 @@ from unittest.mock import patch
 from unittest.mock import PropertyMock
 
 import numpy as np
-from numpy import array
 from pandas import DataFrame as Df
-from pandas import MultiIndex
 from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
@@ -21,51 +19,66 @@ from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class TestOriginFileSyncDfAnalysis(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.aws_accounts = _CompareAwsAccounts("account_1", "account_2")
+    # TODO refactor extract common patchs.
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-sync-ok.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_file_sync_is_ok(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+        expected_result = [True]
+        self.assertEqual(expected_result, result_to_check)
 
-    def test_get_df_set_analysis_result_if_file_sync_is_ok(self):
-        df = Df(array([[1, 1]]))
-        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
-        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
-        expected_result = Df({"foo": [1], "bar": [1], "baz": [True]}).astype({"baz": "object"})
-        expected_result.columns = MultiIndex.from_tuples(
-            [
-                (self.aws_accounts.origin, "size"),
-                (self.aws_accounts.target, "size"),
-                ("analysis", "is_sync_ok_in_account_2"),
-            ]
-        )
-        assert_frame_equal(expected_result, result)
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-sync-wrong.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_file_sync_is_wrong(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+        expected_result = [False]
+        self.assertEqual(expected_result, result_to_check)
 
-    def test_get_df_set_analysis_result_if_file_sync_is_wrong(self):
-        df = Df(array([[1, 2]]))
-        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
-        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
-        expected_result = Df({"foo": [1], "bar": [2], "baz": [False]}).astype({"baz": "object"})
-        expected_result.columns = MultiIndex.from_tuples(
-            [
-                (self.aws_accounts.origin, "size"),
-                (self.aws_accounts.target, "size"),
-                ("analysis", "is_sync_ok_in_account_2"),
-            ]
-        )
-        assert_frame_equal(expected_result, result)
-
-    def test_get_df_set_analysis_result_if_no_file_to_sync(self):
-        df = Df(array([[None, 2]]))
-        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
-        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
-        expected_result = Df({"foo": [None], "bar": [2], "baz": ["No file to sync"]}).astype({"bar": "object"})
-        expected_result.columns = MultiIndex.from_tuples(
-            [
-                (self.aws_accounts.origin, "size"),
-                (self.aws_accounts.target, "size"),
-                ("analysis", "is_sync_ok_in_account_2"),
-            ]
-        )
-        assert_frame_equal(expected_result, result)
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-not-in-origin.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_no_file_to_sync(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+        expected_result = ["No file to sync"]
+        self.assertEqual(expected_result, result_to_check)
 
     @patch(
         "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
@@ -82,12 +95,15 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
     ):
         df = get_df_s3_data_all_accounts()
-        all_aws_accounts = S3UrisFileReader().get_aws_accounts()
-        aws_accounts = _CompareAwsAccounts(*all_aws_accounts[:2])
-        result = _OriginFileSyncDfAnalysis(aws_accounts, df).get_df_set_analysis()
+        result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
         result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
         expected_result = [False]
         self.assertEqual(expected_result, result_to_check)
+
+    @property
+    def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
+        all_aws_accounts = S3UrisFileReader().get_aws_accounts()
+        return _CompareAwsAccounts(*all_aws_accounts[:2])
 
 
 class TestAnalysisGenerator(unittest.TestCase):
