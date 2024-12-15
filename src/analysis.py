@@ -183,7 +183,8 @@ class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
         return {
             "condition_sync_is_wrong": False,
             "condition_sync_is_ok": True,
-            "condition_not_exist_file_to_sync": "No file to sync",
+            "condition_no_file_at_origin_but_at_target": False,
+            "condition_no_file_at_origin_or_target": True,
         }
 
 
@@ -204,23 +205,31 @@ class _AnalysisCondition:
 
     @property
     def condition_sync_is_wrong(self) -> Series:
-        return self.condition_exists_file_to_sync & ~self._condition_file_is_sync
+        return self._condition_exists_file_to_sync & ~self._condition_file_is_sync
 
     @property
     def condition_sync_is_ok(self) -> Series:
-        return self.condition_exists_file_to_sync & self._condition_file_is_sync
+        return self._condition_exists_file_to_sync & self._condition_file_is_sync
+
+    @property
+    def condition_no_file_at_origin_but_at_target(self) -> Series:
+        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+
+    @property
+    def condition_no_file_at_origin_or_target(self) -> Series:
+        return ~self._condition_exists_file_to_sync & ~self._condition_exists_file_in_target_aws_account
 
     @property
     def condition_must_not_exist(self) -> Series:
-        return ~self.condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
-
-    @property
-    def condition_exists_file_to_sync(self) -> Series:
-        return self._df.loc[:, self._column_index_size_origin].notnull()
+        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
 
     @property
     def condition_not_exist_file_to_sync(self) -> Series:
-        return ~self.condition_exists_file_to_sync
+        return ~self._condition_exists_file_to_sync
+
+    @property
+    def _condition_exists_file_to_sync(self) -> Series:
+        return self._df.loc[:, self._column_index_size_origin].notnull()
 
     @property
     def _condition_file_is_sync(self) -> Series:

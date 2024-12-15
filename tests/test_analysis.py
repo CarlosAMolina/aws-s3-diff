@@ -72,13 +72,13 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
     )
-    def test_get_df_set_analysis_result_if_no_file_to_sync(
+    def test_get_df_set_analysis_result_if_file_not_in_origin_but_in_target(
         self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
     ):
         df = get_df_s3_data_all_accounts()
         result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
         result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
-        expected_result = ["No file to sync"]
+        expected_result = [False]
         self.assertEqual(expected_result, result_to_check)
 
     @patch(
@@ -105,6 +105,26 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
     def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
         all_aws_accounts = S3UrisFileReader().get_aws_accounts()
         return _CompareAwsAccounts(*all_aws_accounts[:2])
+
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-not-in-origin-target.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_no_file_in_origin_target_account(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+        expected_result = [True]
+        self.assertEqual(expected_result, result_to_check)
 
 
 class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
@@ -169,6 +189,26 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
         expected_result = [None]
         self.assertEqual(expected_result, result_to_check)
 
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-not-in-origin-target.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_no_file_in_origin_target_account(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "can_exist_in_aws_account_2_release")].tolist()
+        expected_result = [None]
+        self.assertEqual(expected_result, result_to_check)
+
     @property
     def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
         all_aws_accounts = S3UrisFileReader().get_aws_accounts()
@@ -199,14 +239,12 @@ class TestAnalysisGenerator(unittest.TestCase):
         mock_get_analysis_date_time_str.return_value = "20241201180132"
         result = _AnalysisGenerator()._get_df_s3_data_analyzed()
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        result_as_csv_export = (
-            _AnalysisDfToCsv()
-            ._get_df_to_export(result)
-            .reset_index()
-            .astype({"is_sync_ok_in_aws_account_2_release": "str", "is_sync_ok_in_aws_account_3_dev": "str"})
-        )
+        result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
+        expected_result = expected_result.astype(
+            {"is_sync_ok_in_aws_account_2_release": "object", "is_sync_ok_in_aws_account_3_dev": "object"}
+        )
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
 
