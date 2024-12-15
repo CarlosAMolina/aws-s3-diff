@@ -27,11 +27,16 @@ class _AnalysisGenerator:
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
     def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
+        return _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(df)
 
     def _export_analyzed_df_to_file(self, df: Df):
         _AnalysisDfToCsv().export(df)
+
+
+class _AllAccoutsS3DataDfAnalyzer:
+    def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
+        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
 
 class _AnalysisSummary:
