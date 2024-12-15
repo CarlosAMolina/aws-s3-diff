@@ -20,12 +20,11 @@ class S3DataAnalyzer:
         _AnalysisGenerator()._export_analyzed_df_to_file(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
-        all_accounts_s3_data_df = get_df_s3_data_all_accounts()
-        return self._get_df_set_analysis(all_accounts_s3_data_df)
+        return _AnalysisGenerator()._get_df_s3_data_analyzed()
 
     def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
+        # TODO not use private method
+        return _AnalysisGenerator()._get_df_set_analysis(df)
 
     def _show_summary(self, df: Df):
         aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
@@ -35,6 +34,14 @@ class S3DataAnalyzer:
 class _AnalysisGenerator:
     def export_analysis_file(self):
         pass
+
+    def _get_df_s3_data_analyzed(self) -> Df:
+        all_accounts_s3_data_df = get_df_s3_data_all_accounts()
+        return self._get_df_set_analysis(all_accounts_s3_data_df)
+
+    def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
+        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
+        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
 
     def _export_analyzed_df_to_file(self, df: Df):
         _AnalysisDfToCsv().export(df)
