@@ -13,9 +13,9 @@ from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
 from src.analysis import _AnalysisDfToCsv
+from src.analysis import _AnalysisGenerator
 from src.analysis import _CompareAwsAccounts
 from src.analysis import _OriginFileSyncDfAnalysis
-from src.analysis import S3DataAnalyzer
 
 
 class TestOriginFileSyncDfAnalysis(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         assert_frame_equal(expected_result, result)
 
 
-class TestS3DataAnalyzer(unittest.TestCase):
+class TestAnalysisGenerator(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
@@ -102,8 +102,7 @@ class TestS3DataAnalyzer(unittest.TestCase):
             "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
         )
         mock_get_analysis_date_time_str.return_value = "20241201180132"
-        result = S3DataAnalyzer()._get_df_s3_data_analyzed()
-        # S3DataAnalyzer().run(config)
+        result = _AnalysisGenerator()._get_df_s3_data_analyzed()
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = (
             _AnalysisDfToCsv()
