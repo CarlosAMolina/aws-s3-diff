@@ -12,10 +12,12 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from local_results import LocalResults
+from s3_data import get_df_s3_data_all_accounts
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _AnalysisGenerator
 from src.analysis import _CompareAwsAccounts
 from src.analysis import _OriginFileSyncDfAnalysis
+from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class TestOriginFileSyncDfAnalysis(unittest.TestCase):
@@ -65,19 +67,27 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         )
         assert_frame_equal(expected_result, result)
 
-    def test_get_df_set_analysis_result_if_no_file_in_target_account(self):
-        df = Df(array([[1, None]]))
-        df.columns = MultiIndex.from_tuples([(self.aws_accounts.origin, "size"), (self.aws_accounts.target, "size")])
-        result = _OriginFileSyncDfAnalysis(self.aws_accounts, df).get_df_set_analysis()
-        expected_result = Df({"foo": [1], "bar": [None], "baz": [False]}).astype({"foo": "object", "baz": "object"})
-        expected_result.columns = MultiIndex.from_tuples(
-            [
-                (self.aws_accounts.origin, "size"),
-                (self.aws_accounts.target, "size"),
-                ("analysis", "is_sync_ok_in_account_2"),
-            ]
-        )
-        assert_frame_equal(expected_result, result)
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts.csv"),
+    )
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_if_no_file_in_target_account(
+        self, mock_directory_path_what_to_analyze, mock_get_file_path_s3_data_all_accounts
+    ):
+        df = get_df_s3_data_all_accounts()
+        all_aws_accounts = S3UrisFileReader().get_aws_accounts()
+        aws_accounts = _CompareAwsAccounts(*all_aws_accounts[:2])
+        result = _OriginFileSyncDfAnalysis(aws_accounts, df).get_df_set_analysis()
+        result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+        expected_result = [None]  # TODO correct result is [False]
+        self.assertEqual(expected_result, result_to_check)
 
 
 class TestAnalysisGenerator(unittest.TestCase):

@@ -9,6 +9,7 @@ from local_results import LocalResults
 from s3_data import get_df_s3_data_all_accounts
 from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
+from types_custom import AnalysisS3DataDf
 
 
 class S3DataAnalyzer:
@@ -22,11 +23,11 @@ class _AnalysisGenerator:
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._export_analyzed_df_to_file(s3_analyzed_df)
 
-    def _get_df_s3_data_analyzed(self) -> Df:
+    def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
         return _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(all_accounts_s3_data_df)
 
-    def _export_analyzed_df_to_file(self, df: Df):
+    def _export_analyzed_df_to_file(self, df: AnalysisS3DataDf):
         _AnalysisDfToCsv().export(df)
 
 
@@ -138,7 +139,7 @@ class _DfAnalysis:
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
 
-    def get_df_set_analysis(self) -> Df:
+    def get_df_set_analysis(self) -> AnalysisS3DataDf:
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[self._result_column_multi_index]] = None
@@ -146,10 +147,8 @@ class _DfAnalysis:
             condition_name,
             condition_result,
         ) in self._analysis_config.condition_config.items():
-            result.loc[
-                getattr(self._condition, condition_name),
-                [self._result_column_multi_index],
-            ] = condition_result
+            condition_results: Series = getattr(self._condition, condition_name)
+            result.loc[condition_results, [self._result_column_multi_index]] = condition_result
         return result
 
     @property
@@ -253,12 +252,12 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
 class _AnalysisDfToCsv:
-    def export(self, df: Df):
+    def export(self, df: AnalysisS3DataDf):
         file_path = LocalResults().get_file_path_analysis_result()
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path)
 
-    def _get_df_to_export(self, df: Df) -> Df:
+    def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
         result = df.copy()
         csv_column_names = ["_".join(values) for values in result.columns]
         csv_column_names = [
