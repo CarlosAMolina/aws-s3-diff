@@ -6,7 +6,6 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from local_results import LocalResults
-from s3_data import export_s3_data_of_all_accounts
 from s3_data import get_df_s3_data_all_accounts
 from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
@@ -19,7 +18,6 @@ class S3DataAnalyzer:
         _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
-        export_s3_data_of_all_accounts()
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
         return self._get_df_set_analysis(all_accounts_s3_data_df)
 
