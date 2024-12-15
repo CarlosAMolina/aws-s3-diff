@@ -86,23 +86,34 @@ class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
 
-    def get_df_set_analysis_columns(self, df: Df) -> Df:
+    def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
         result = df.copy()
         result = self._get_df_set_analysis_file_has_been_copied(result)
         return self._get_df_set_analysis_must_file_exist(result)
 
-    def _get_df_set_analysis_file_has_been_copied(self, df: Df) -> Df:
-        result = df
-        for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
-            aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
-            result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
-        return result
+    def _get_df_set_analysis_file_has_been_copied(self, df: AllAccoutsS3DataDf) -> Df:
+        return _OriginFileSyncDfAnalysisSetter(
+            self._aws_accounts.aws_account_origin, self._aws_accounts.aws_accounts_where_files_must_be_copied
+        ).get_df_set_analysis(df)
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_accounts = _CompareAwsAccounts(
             self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
         )
         return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
+
+
+class _OriginFileSyncDfAnalysisSetter:
+    def __init__(self, aws_account_origin: str, aws_accounts_target: list[str]):
+        self._aws_account_origin = aws_account_origin
+        self._aws_accounts_target = aws_accounts_target
+
+    def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
+        result = df
+        for aws_account_target in self._aws_accounts_target:
+            aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
+            result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
+        return result
 
 
 class _AnalysisConfig(ABC):
