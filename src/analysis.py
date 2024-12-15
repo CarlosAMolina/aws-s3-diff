@@ -226,7 +226,7 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
         print(result)
 
 
-# TODO refactor extract common code with  _CombineCsvTo
+# TODO refactor extract common code with classes ..CsvToDf (in other files)
 class _AnalysisDfToCsv:
     def export(self, df: Df):
         file_path = LocalResults().get_file_path_analysis_result()
