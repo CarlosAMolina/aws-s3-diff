@@ -82,6 +82,7 @@ class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
         return S3UrisFileReader().get_aws_accounts()[1]
 
 
+# TODO rename all SetAnalysis to AnalysisSetter
 class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
