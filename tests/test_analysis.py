@@ -71,7 +71,7 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
         return_value=Path(__file__)
         .parent.absolute()
-        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts.csv"),
+        .joinpath("fake-files/test-origin-file-sync/s3-files-all-accounts/file-not-in-target.csv"),
     )
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
