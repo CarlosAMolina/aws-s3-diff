@@ -23,7 +23,7 @@ def export_s3_data_of_account(aws_account: str):
     ).extract()
 
 
-def export_s3_data_of_all_accounts():
+def export_s3_data_all_accounts_to_one_file():
     s3_data_df = _IndividualAccountsS3DataCsvFilesToDf().get_df()
     _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
 
