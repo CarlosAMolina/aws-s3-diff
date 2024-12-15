@@ -15,7 +15,7 @@ from types_custom import AnalysisS3DataDf
 class S3DataAnalyzer:
     def run(self):
         _AnalysisGenerator().export_analysis_file()
-        _AnalysisSummary().show_summary()
+        # TODO _AnalysisSummary().show_summary()
 
 
 class _AnalysisGenerator:
