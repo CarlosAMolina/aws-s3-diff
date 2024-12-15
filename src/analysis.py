@@ -190,7 +190,7 @@ class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
 class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
     @property
     def column_name_result(self) -> str:
-        return f"should_exist_in_{self._aws_account_target}"
+        return f"can_exist_in_{self._aws_account_target}"
 
     @property
     def condition_config(self) -> _ConditionConfig:

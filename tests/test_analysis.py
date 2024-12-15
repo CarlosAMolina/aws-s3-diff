@@ -125,7 +125,7 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
     ):
         df = get_df_s3_data_all_accounts()
         result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-        result_to_check = result.loc[:, ("analysis", "should_exist_in_aws_account_2_release")].tolist()
+        result_to_check = result.loc[:, ("analysis", "can_exist_in_aws_account_2_release")].tolist()
         expected_result = [None]
         self.assertEqual(expected_result, result_to_check)
 
@@ -145,7 +145,7 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
     ):
         df = get_df_s3_data_all_accounts()
         result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-        result_to_check = result.loc[:, ("analysis", "should_exist_in_aws_account_2_release")].tolist()
+        result_to_check = result.loc[:, ("analysis", "can_exist_in_aws_account_2_release")].tolist()
         expected_result = [False]
         self.assertEqual(expected_result, result_to_check)
 
@@ -165,7 +165,7 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
     ):
         df = get_df_s3_data_all_accounts()
         result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-        result_to_check = result.loc[:, ("analysis", "should_exist_in_aws_account_2_release")].tolist()
+        result_to_check = result.loc[:, ("analysis", "can_exist_in_aws_account_2_release")].tolist()
         expected_result = [None]
         self.assertEqual(expected_result, result_to_check)
 
