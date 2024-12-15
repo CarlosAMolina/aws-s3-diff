@@ -24,10 +24,7 @@ class _AnalysisGenerator:
 
     def _get_df_s3_data_analyzed(self) -> Df:
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
-        return self._get_df_set_analysis(all_accounts_s3_data_df)
-
-    def _get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        return _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(df)
+        return _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(all_accounts_s3_data_df)
 
     def _export_analyzed_df_to_file(self, df: Df):
         _AnalysisDfToCsv().export(df)
