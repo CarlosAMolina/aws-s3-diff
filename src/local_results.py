@@ -4,7 +4,9 @@ from pathlib import Path
 
 class LocalResults:
     _FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "aws_s3_diff_analysis_date_time.txt"
-    _FOLDER_NAME_S3_RESULTS = "s3-results"
+
+    def __init__(self):
+        self._paths = _Paths()
 
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
@@ -40,8 +42,7 @@ class LocalResults:
         return self._get_path_directory_all_results().joinpath(self._get_analysis_date_time_str())
 
     def _get_path_directory_all_results(self) -> Path:
-        current_path = Path(__file__).parent.absolute()
-        return current_path.parent.joinpath(self._FOLDER_NAME_S3_RESULTS)
+        return self._paths.directory_all_results
 
     def _get_analysis_date_time_str(self) -> str:
         if not Path(self._get_file_path_accounts_analysis_date_time()).is_file():
@@ -59,3 +60,12 @@ class LocalResults:
 
     def _get_file_path_accounts_analysis_date_time(self) -> Path:
         return self._get_path_directory_all_results().joinpath(self._FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME)
+
+
+class _Paths:
+    def __init__(self) -> None:
+        self._current_path = Path(__file__).parent.absolute()
+
+    @property
+    def directory_all_results(self) -> Path:
+        return self._current_path.parent.joinpath("s3-results")

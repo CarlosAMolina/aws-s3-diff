@@ -9,7 +9,6 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from local_results import LocalResults
 from s3_data import get_df_s3_data_all_accounts
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _AnalysisGenerator
@@ -233,9 +232,7 @@ class TestAnalysisGenerator(unittest.TestCase):
         mock_get_path_directory_all_results,
         mock_get_analysis_date_time_str,
     ):
-        mock_get_path_directory_all_results.return_value = self.current_path.joinpath(
-            "fake-files", LocalResults._FOLDER_NAME_S3_RESULTS
-        )
+        mock_get_path_directory_all_results.return_value = self.current_path.joinpath("fake-files", "s3-results")
         mock_get_analysis_date_time_str.return_value = "20241201180132"
         result = _AnalysisGenerator()._get_df_s3_data_analyzed()
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
