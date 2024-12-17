@@ -39,7 +39,7 @@ class TestFunction_run(unittest.TestCase):
             S3(aws_account).create_objects()
             m_main.run()
             self.mock_aws.stop()
-        result = self._get_df_from_csv(LocalResults().get_file_path_analysis_result())
+        result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))

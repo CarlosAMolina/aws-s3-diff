@@ -7,31 +7,28 @@ class LocalResults:
         self._main_paths = _MainPaths()
         # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
         analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
-        self._analysis_paths = _AnalysisPaths(analysis_date_time_str)
+        self.analysis_paths = _AnalysisPaths(analysis_date_time_str)
 
     def get_aws_account_index_to_analyze(self) -> int:
         aws_accounts_analyzed = (
-            [file_path.stem for file_path in self._analysis_paths.directory_analysis.iterdir()]
-            if self._analysis_paths.directory_analysis.is_dir()
+            [file_path.stem for file_path in self.analysis_paths.directory_analysis.iterdir()]
+            if self.analysis_paths.directory_analysis.is_dir()
             else []
         )
         return len(aws_accounts_analyzed)
 
-    def get_file_path_analysis_result(self):
-        return self._analysis_paths.file_analysis
-
     def get_file_path_s3_data_all_accounts(self):
-        return self._analysis_paths.file_s3_data_all_accounts
+        return self.analysis_paths.file_s3_data_all_accounts
 
     def get_file_path_aws_account_results(self, aws_account: str):
-        return self._analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
+        return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
     def remove_file_with_analysis_date(self):
         self._main_paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
-        print(f"Creating the results folder: {self._analysis_paths.directory_analysis}")
-        self._analysis_paths.directory_analysis.mkdir()
+        print(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
+        self.analysis_paths.directory_analysis.mkdir()
 
 
 class _AnalysisDateTime:
