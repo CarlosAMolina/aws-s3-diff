@@ -9,7 +9,7 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import s3_data as m_s3_data
-from src.local_results import _Paths
+from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3
@@ -24,7 +24,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         # Drop file created by the user or by other tests.
-        if _Paths().file_analysis_date_time.is_file():
+        if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
 
     @mock.patch(

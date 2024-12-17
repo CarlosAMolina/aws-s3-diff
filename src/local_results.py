@@ -4,7 +4,7 @@ from pathlib import Path
 
 class LocalResults:
     def __init__(self):
-        self._paths = _Paths()
+        self._main_paths = _MainPaths()
 
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
@@ -19,7 +19,7 @@ class LocalResults:
         return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
 
     def remove_file_with_analysis_date(self):
-        self._paths.file_analysis_date_time.unlink()
+        self._main_paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")
@@ -40,21 +40,21 @@ class LocalResults:
         return _AnalysisPaths(self._get_analysis_date_time_str()).directory_analysis
 
     def _get_analysis_date_time_str(self) -> str:
-        if not self._paths.file_analysis_date_time.is_file():
+        if not self._main_paths.file_analysis_date_time.is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
         date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        with open(self._paths.file_analysis_date_time, "w") as file:
+        with open(self._main_paths.file_analysis_date_time, "w") as file:
             file.write(date_time_str)
 
     def _get_date_time_str_stored(self) -> str:
-        with open(self._paths.file_analysis_date_time) as file:
+        with open(self._main_paths.file_analysis_date_time) as file:
             return file.read()
 
 
-class _Paths:
+class _MainPaths:
     def __init__(self):
         self._current_path = Path(__file__).parent.absolute()
 
@@ -70,8 +70,8 @@ class _Paths:
 class _AnalysisPaths:
     def __init__(self, analysis_date_time_str: str):
         self._analysis_date_time_str = analysis_date_time_str
-        self._paths = _Paths()
+        self._main_paths = _MainPaths()
 
     @property
     def directory_analysis(self) -> Path:
-        return self._paths.directory_all_results.joinpath(self._analysis_date_time_str)
+        return self._main_paths.directory_all_results.joinpath(self._analysis_date_time_str)
