@@ -54,7 +54,7 @@ class LocalResults:
             return file.read()
 
     def _get_file_path_accounts_analysis_date_time(self) -> Path:
-        return self._paths.directory_all_results.joinpath("aws_s3_diff_analysis_date_time.txt")
+        return self._paths.directory_all_results.joinpath("analysis_date_time.txt")
 
 
 class _Paths:
