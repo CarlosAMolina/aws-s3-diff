@@ -3,8 +3,6 @@ from pathlib import Path
 
 
 class LocalResults:
-    _FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME = "aws_s3_diff_analysis_date_time.txt"
-
     def __init__(self):
         self._paths = _Paths()
 
@@ -56,7 +54,7 @@ class LocalResults:
             return file.read()
 
     def _get_file_path_accounts_analysis_date_time(self) -> Path:
-        return self._paths.directory_all_results.joinpath(self._FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME)
+        return self._paths.directory_all_results.joinpath("aws_s3_diff_analysis_date_time.txt")
 
 
 class _Paths:
