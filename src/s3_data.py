@@ -39,7 +39,7 @@ class _AwsAccountExtractor:
         self._s3_queries = s3_queries
 
     def extract(self):
-        print(f"Extracting AWS Account information to {self._file_path_results}")
+        print(f"Extracting AWS account information to {self._file_path_results}")
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             s3_data = S3Client().get_s3_data(s3_query)
