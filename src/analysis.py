@@ -270,6 +270,7 @@ class _AnalysisDfToCsv:
     def export(self, df: AnalysisS3DataDf):
         file_path = LocalResults().analysis_paths.file_analysis
         csv_df = self._get_df_to_export(df)
+        print(f"Exporting analysis to {file_path}")
         csv_df.to_csv(file_path)
 
     def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
