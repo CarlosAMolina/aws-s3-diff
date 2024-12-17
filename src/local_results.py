@@ -10,7 +10,12 @@ class LocalResults:
         self._analysis_paths = _AnalysisPaths(analysis_date_time_str)
 
     def get_aws_account_index_to_analyze(self) -> int:
-        return len(self._get_aws_accounts_analyzed())
+        aws_accounts_analyzed = (
+            [file_path.stem for file_path in self._analysis_paths.directory_analysis.iterdir()]
+            if self._analysis_paths.directory_analysis.is_dir()
+            else []
+        )
+        return len(aws_accounts_analyzed)
 
     def get_file_path_analysis_result(self):
         return self._analysis_paths.file_analysis
@@ -27,11 +32,6 @@ class LocalResults:
     def create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._analysis_paths.directory_analysis}")
         self._analysis_paths.directory_analysis.mkdir()
-
-    def _get_aws_accounts_analyzed(self) -> list[str]:
-        if self._analysis_paths.directory_analysis.is_dir():
-            return [file_path.stem for file_path in self._analysis_paths.directory_analysis.iterdir()]
-        return []
 
 
 class _AnalysisDateTime:
