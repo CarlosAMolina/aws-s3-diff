@@ -29,7 +29,8 @@ def export_s3_data_all_accounts_to_one_file():
 
 
 def get_df_s3_data_all_accounts() -> AllAccoutsS3DataDf:
-    return _CombinedAccountsS3DataCsvToDf().get_df()
+    file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
+    return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
 
 class _AwsAccountExtractor:
@@ -60,7 +61,7 @@ class _AwsAccountExtractor:
 
 class _CombinedAccountsS3DataDfToCsv:
     def export(self, df: Df):
-        file_path = LocalResults().get_file_path_s3_data_all_accounts()
+        file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
         print(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path)
@@ -87,9 +88,8 @@ class _CombinedAccountsS3DataDfToCsv:
 
 
 class _CombinedAccountsS3DataCsvToDf:
-    def get_df(self) -> AllAccoutsS3DataDf:
-        file_path = LocalResults().get_file_path_s3_data_all_accounts()
-        result = self._get_df_from_file(file_path)
+    def get_df(self, file_path_s3_data_all_accounts: Path) -> AllAccoutsS3DataDf:
+        result = self._get_df_from_file(file_path_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
 
     # TODO extract common code with _get_df_aws_account_from_file

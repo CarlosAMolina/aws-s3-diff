@@ -17,9 +17,6 @@ class LocalResults:
         )
         return len(aws_accounts_analyzed)
 
-    def get_file_path_s3_data_all_accounts(self):
-        return self.analysis_paths.file_s3_data_all_accounts
-
     def get_file_path_aws_account_results(self, aws_account: str):
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
