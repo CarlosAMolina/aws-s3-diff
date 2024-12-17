@@ -44,7 +44,8 @@ class _AnalysisDateTime:
 
     def _get_date_time_str_stored(self) -> str:
         with open(self._main_paths.file_analysis_date_time) as file:
-            return file.read()
+            # `strip()` to avoid errors if the file is modified manually by te user.
+            return file.read().strip()
 
 
 class _MainPaths:
