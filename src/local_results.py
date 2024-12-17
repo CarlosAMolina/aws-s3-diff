@@ -19,7 +19,7 @@ class LocalResults:
         return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
 
     def remove_file_with_analysis_date(self):
-        self._get_file_path_accounts_analysis_date_time().unlink()
+        self._paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")
@@ -40,21 +40,21 @@ class LocalResults:
         return self._paths.directory_all_results.joinpath(self._get_analysis_date_time_str())
 
     def _get_analysis_date_time_str(self) -> str:
-        if not Path(self._get_file_path_accounts_analysis_date_time()).is_file():
+        if not Path(self._paths.file_analysis_date_time).is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
         date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        with open(self._get_file_path_accounts_analysis_date_time(), "w") as file:
+        with open(self._paths.file_analysis_date_time, "w") as file:
             file.write(date_time_str)
 
     def _get_date_time_str_stored(self) -> str:
-        with open(self._get_file_path_accounts_analysis_date_time()) as file:
+        with open(self._paths.file_analysis_date_time) as file:
             return file.read()
 
     def _get_file_path_accounts_analysis_date_time(self) -> Path:
-        return self._paths.directory_all_results.joinpath("analysis_date_time.txt")
+        return self._paths.file_analysis_date_time
 
 
 class _Paths:
@@ -64,3 +64,7 @@ class _Paths:
     @property
     def directory_all_results(self) -> Path:
         return self._current_path.parent.joinpath("s3-results")
+
+    @property
+    def file_analysis_date_time(self) -> Path:
+        return self.directory_all_results.joinpath("analysis_date_time.txt")
