@@ -5,15 +5,17 @@ from pathlib import Path
 class LocalResults:
     def __init__(self):
         self._main_paths = _MainPaths()
+        # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
+        self._analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
 
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
 
     def get_file_path_analysis_result(self):
-        return _AnalysisPaths(self._get_analysis_date_time_str()).file_analysis
+        return self._analysis_paths.file_analysis
 
     def get_file_path_s3_data_all_accounts(self):
-        return _AnalysisPaths(self._get_analysis_date_time_str()).file_s3_data_all_accounts
+        return self._analysis_paths.file_s3_data_all_accounts
 
     def get_file_path_aws_account_results(self, aws_account: str):
         return self._get_path_analysis_results().joinpath(f"{aws_account}.csv")
@@ -34,7 +36,7 @@ class LocalResults:
         return []
 
     def _get_path_analysis_results(self) -> Path:
-        return _AnalysisPaths(self._get_analysis_date_time_str()).directory_analysis
+        return self._analysis_paths.directory_analysis
 
     def _get_analysis_date_time_str(self) -> str:
         if not self._main_paths.file_analysis_date_time.is_file():
