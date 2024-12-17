@@ -53,9 +53,6 @@ class LocalResults:
         with open(self._paths.file_analysis_date_time) as file:
             return file.read()
 
-    def _get_file_path_accounts_analysis_date_time(self) -> Path:
-        return self._paths.file_analysis_date_time
-
 
 class _Paths:
     def __init__(self) -> None:

@@ -9,6 +9,7 @@ from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
 from src import main as m_main
+from src.local_results import _Paths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3
@@ -21,7 +22,7 @@ class TestFunction_run(unittest.TestCase):
         set_aws_credentials()
         self.mock_aws = mock_aws()
         # Drop file created by the user or by other tests.
-        if LocalResults()._get_file_path_accounts_analysis_date_time().is_file():
+        if _Paths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
 
     @patch(
