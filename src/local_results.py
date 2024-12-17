@@ -40,8 +40,7 @@ class LocalResults:
         return _AnalysisPaths(self._get_analysis_date_time_str()).directory_analysis
 
     def _get_analysis_date_time_str(self) -> str:
-        # TODO `Path` is not required
-        if not Path(self._paths.file_analysis_date_time).is_file():
+        if not self._paths.file_analysis_date_time.is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
