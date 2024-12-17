@@ -19,6 +19,22 @@ from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class TestOriginFileSyncDfAnalysis(unittest.TestCase):
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_for_several_cases(self, mock_directory_path_what_to_analyze):
+        for file_name, expected_result in {"file-sync-ok.csv": [True]}.items():
+            df = self._get_df_combine_accounts_s3_data_csv(file_name)
+            result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
+            result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+            self.assertEqual(expected_result, result_to_check)
+
+    def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
+        path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
+        return get_df_combine_accounts_s3_data_csv(path_name)
+
     # TODO refactor extract common patchs.
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
@@ -201,5 +217,6 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
         return result
 
 
-def get_df_combine_accounts_s3_data_csv(path_str: str) -> Df:
-    return _CombinedAccountsS3DataCsvToDf().get_df(Path(__file__).parent.absolute().joinpath(path_str))
+# TODO deprecate
+def get_df_combine_accounts_s3_data_csv(path_name: str) -> Df:
+    return _CombinedAccountsS3DataCsvToDf().get_df(Path(__file__).parent.absolute().joinpath(path_name))
