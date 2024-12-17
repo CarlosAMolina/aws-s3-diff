@@ -37,9 +37,10 @@ class LocalResults:
         return []
 
     def _get_path_analysis_results(self) -> Path:
-        return self._paths.directory_all_results.joinpath(self._get_analysis_date_time_str())
+        return _AnalysisPaths(self._get_analysis_date_time_str()).directory_analysis
 
     def _get_analysis_date_time_str(self) -> str:
+        # TODO `Path` is not required
         if not Path(self._paths.file_analysis_date_time).is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
@@ -55,7 +56,7 @@ class LocalResults:
 
 
 class _Paths:
-    def __init__(self) -> None:
+    def __init__(self):
         self._current_path = Path(__file__).parent.absolute()
 
     @property
@@ -65,3 +66,13 @@ class _Paths:
     @property
     def file_analysis_date_time(self) -> Path:
         return self.directory_all_results.joinpath("analysis_date_time.txt")
+
+
+class _AnalysisPaths:
+    def __init__(self, analysis_date_time_str: str):
+        self._analysis_date_time_str = analysis_date_time_str
+        self._paths = _Paths()
+
+    @property
+    def directory_analysis(self) -> Path:
+        return self._paths.directory_all_results.joinpath(self._analysis_date_time_str)
