@@ -19,25 +19,22 @@ class LocalResults:
         return self._analysis_paths.file_s3_data_all_accounts
 
     def get_file_path_aws_account_results(self, aws_account: str):
-        return self._get_path_analysis_results().joinpath(f"{aws_account}.csv")
+        return self._analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
     def remove_file_with_analysis_date(self):
         self._main_paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
-        print(f"Creating the results folder: {self._get_path_analysis_results()}")
-        self._get_path_analysis_results().mkdir()
+        print(f"Creating the results folder: {self._analysis_paths.directory_analysis}")
+        self._analysis_paths.directory_analysis.mkdir()
 
     def _get_number_of_aws_accounts_analyzed(self) -> int:
         return len(self._get_aws_accounts_analyzed())
 
     def _get_aws_accounts_analyzed(self) -> list[str]:
-        if self._get_path_analysis_results().is_dir():
-            return [file_path.stem for file_path in self._get_path_analysis_results().iterdir()]
+        if self._analysis_paths.directory_analysis.is_dir():
+            return [file_path.stem for file_path in self._analysis_paths.directory_analysis.iterdir()]
         return []
-
-    def _get_path_analysis_results(self) -> Path:
-        return self._analysis_paths.directory_analysis
 
 
 class _AnalysisDateTime:
