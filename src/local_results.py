@@ -16,7 +16,7 @@ class LocalResults:
         return self._get_path_analysis_results().joinpath("s3-files-all-accounts.csv")
 
     def get_file_path_aws_account_results(self, aws_account: str):
-        return self._get_path_analysis_results().joinpath(self._get_file_name_aws_account_results(aws_account))
+        return self._get_path_analysis_results().joinpath(f"{aws_account}.csv")
 
     def remove_file_with_analysis_date(self):
         self._main_paths.file_analysis_date_time.unlink()
@@ -24,9 +24,6 @@ class LocalResults:
     def create_analysis_results_folder(self):
         print(f"Creating the results folder: {self._get_path_analysis_results()}")
         self._get_path_analysis_results().mkdir()
-
-    def _get_file_name_aws_account_results(self, aws_account: str):
-        return f"{aws_account}.csv"
 
     def _get_number_of_aws_accounts_analyzed(self) -> int:
         return len(self._get_aws_accounts_analyzed())
