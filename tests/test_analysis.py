@@ -219,7 +219,6 @@ class TestAnalysisGenerator(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch("src.analysis.LocalResults._get_analysis_date_time_str")
     @patch(
         "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
         return_value=Path(__file__)
@@ -235,9 +234,7 @@ class TestAnalysisGenerator(unittest.TestCase):
         self,
         mock_directory_path_what_to_analyze,
         mock_get_file_path_s3_data_all_accounts,
-        mock_get_analysis_date_time_str,
     ):
-        mock_get_analysis_date_time_str.return_value = "20241201180132"
         result = _AnalysisGenerator()._get_df_s3_data_analyzed()
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()

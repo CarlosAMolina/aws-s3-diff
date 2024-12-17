@@ -6,7 +6,8 @@ class LocalResults:
     def __init__(self):
         self._main_paths = _MainPaths()
         # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
-        self._analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
+        self._analysis_paths = _AnalysisPaths(analysis_date_time_str)
 
     def get_aws_account_index_to_analyze(self) -> int:
         return self._get_number_of_aws_accounts_analyzed()
@@ -38,7 +39,12 @@ class LocalResults:
     def _get_path_analysis_results(self) -> Path:
         return self._analysis_paths.directory_analysis
 
-    def _get_analysis_date_time_str(self) -> str:
+
+class _AnalysisDateTime:
+    def __init__(self):
+        self._main_paths = _MainPaths()
+
+    def get_analysis_date_time_str(self) -> str:
         if not self._main_paths.file_analysis_date_time.is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
