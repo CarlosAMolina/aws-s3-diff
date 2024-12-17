@@ -39,10 +39,7 @@ class LocalResults:
         return []
 
     def _get_path_analysis_results(self) -> Path:
-        return self._get_path_directory_all_results().joinpath(self._get_analysis_date_time_str())
-
-    def _get_path_directory_all_results(self) -> Path:
-        return self._paths.directory_all_results
+        return self._paths.directory_all_results.joinpath(self._get_analysis_date_time_str())
 
     def _get_analysis_date_time_str(self) -> str:
         if not Path(self._get_file_path_accounts_analysis_date_time()).is_file():
@@ -59,7 +56,7 @@ class LocalResults:
             return file.read()
 
     def _get_file_path_accounts_analysis_date_time(self) -> Path:
-        return self._get_path_directory_all_results().joinpath(self._FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME)
+        return self._paths.directory_all_results.joinpath(self._FILE_NAME_ACCOUNTS_ANALYSIS_DATE_TIME)
 
 
 class _Paths:

@@ -220,7 +220,12 @@ class TestAnalysisGenerator(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     @patch("src.analysis.LocalResults._get_analysis_date_time_str")
-    @patch("src.analysis.LocalResults._get_path_directory_all_results")
+    @patch(
+        "src.analysis.LocalResults.get_file_path_s3_data_all_accounts",
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files", "s3-results", "20241201180132", "s3-files-all-accounts.csv"),
+    )
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
         new_callable=PropertyMock,
@@ -229,10 +234,9 @@ class TestAnalysisGenerator(unittest.TestCase):
     def test_get_df_s3_data_analyzed(
         self,
         mock_directory_path_what_to_analyze,
-        mock_get_path_directory_all_results,
+        mock_get_file_path_s3_data_all_accounts,
         mock_get_analysis_date_time_str,
     ):
-        mock_get_path_directory_all_results.return_value = self.current_path.joinpath("fake-files", "s3-results")
         mock_get_analysis_date_time_str.return_value = "20241201180132"
         result = _AnalysisGenerator()._get_df_s3_data_analyzed()
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
