@@ -10,7 +10,7 @@ class LocalResults:
         return self._get_number_of_aws_accounts_analyzed()
 
     def get_file_path_analysis_result(self):
-        return self._get_path_analysis_results().joinpath("analysis.csv")
+        return _AnalysisPaths(self._get_analysis_date_time_str()).file_analysis
 
     def get_file_path_s3_data_all_accounts(self):
         return self._get_path_analysis_results().joinpath("s3-files-all-accounts.csv")
@@ -72,3 +72,7 @@ class _AnalysisPaths:
     @property
     def directory_analysis(self) -> Path:
         return self._main_paths.directory_all_results.joinpath(self._analysis_date_time_str)
+
+    @property
+    def file_analysis(self):
+        return self.directory_analysis.joinpath("analysis.csv")
