@@ -84,11 +84,11 @@ class TestDfAnalysis(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
     )
-    def test_get_df_set_analysis_result_for_several_cases(self, mock_directory_path_what_to_analyze):
+    def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_directory_path_what_to_analyze):
         for analysis_config in [_OriginFileSyncDfAnalysisConfig(), _TargetAccountWithoutMoreFilesDfAnalysisConfig()]:
-            self._test_analysis_config(analysis_config)
+            self._test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
-    def _test_analysis_config(self, config: _DfAnalysisConfig):
+    def _test_get_df_set_analysis_for_several_file_cases(self, config: _DfAnalysisConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()
