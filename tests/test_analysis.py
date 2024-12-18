@@ -29,7 +29,7 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         for file_name, expected_result in self._file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-            result_to_check = result.loc[:, ("analysis", "is_sync_ok_in_aws_account_2_release")].tolist()
+            result_to_check = result.loc[:, ("analysis", self._column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
 
     @property
@@ -41,6 +41,10 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
             "file-not-in-target.csv": [False],
             "file-not-in-origin-target.csv": [True],
         }
+
+    @property
+    def _column_name_to_check(self) -> str:
+        return "is_sync_ok_in_aws_account_2_release"
 
     def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
         path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
@@ -63,7 +67,7 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
         for file_name, expected_result in self._file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-            result_to_check = result.loc[:, ("analysis", "can_exist_in_aws_account_2_release")].tolist()
+            result_to_check = result.loc[:, ("analysis", self._column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
 
     @property
@@ -74,6 +78,10 @@ class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
             "file-not-in-target.csv": [None],
             "file-not-in-origin-target.csv": [None],
         }
+
+    @property
+    def _column_name_to_check(self) -> str:
+        return "can_exist_in_aws_account_2_release"
 
     def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
         path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
