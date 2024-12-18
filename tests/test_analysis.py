@@ -56,7 +56,7 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         return _CompareAwsAccounts(*all_aws_accounts[:2])
 
 
-class TestTargetAccountWithoutMoreFilesAnalysisConfig(unittest.TestCase):
+class TestTargetAccountWithoutMoreFilesDfAnalysis(unittest.TestCase):
     # TODO rename folder `test-origin-file-sync`
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
