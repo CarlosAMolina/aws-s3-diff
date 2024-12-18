@@ -1,9 +1,11 @@
 import sys
+from abc import ABC
+from abc import abstractmethod
 
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
-from s3_data import export_s3_data_of_account
 from s3_data import export_s3_data_all_accounts_to_one_file
+from s3_data import export_s3_data_of_account
 from s3_uris_to_analyze import S3UrisFileChecker
 from s3_uris_to_analyze import S3UrisFileReader
 
@@ -33,8 +35,7 @@ class _IteractiveMenu:
         export_s3_data_of_account(aws_account)
         if self._have_all_aws_account_been_analyzed():
             export_s3_data_all_accounts_to_one_file()
-            S3DataAnalyzer().run()
-            LocalResults().remove_file_with_analysis_date()
+            _get_analysis_process().run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -62,6 +63,22 @@ class _IteractiveMenu:
             self._local_results.get_aws_account_index_to_analyze()
             == self._s3_uris_file_reader.get_number_of_aws_accounts()
         )
+
+
+class _Process(ABC):
+    @abstractmethod
+    def run(self):
+        pass
+
+
+class _AnalysisProcess(_Process):
+    def run(self):
+        S3DataAnalyzer().run()
+        LocalResults().remove_file_with_analysis_date()
+
+
+def _get_analysis_process() -> _Process:
+    return _AnalysisProcess()
 
 
 if __name__ == "__main__":
