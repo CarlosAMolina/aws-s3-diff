@@ -34,7 +34,7 @@ class _IteractiveMenu:
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
         if self._have_all_aws_account_been_analyzed():
-            export_s3_data_all_accounts_to_one_file()
+            _get_aws_accounts_combination_process().run()
             _get_analysis_process().run()
 
     def _show_aws_accounts_to_analyze(self):
@@ -71,10 +71,19 @@ class _Process(ABC):
         pass
 
 
+class _AwsAccountsCombinationProcess(_Process):
+    def run(self):
+        export_s3_data_all_accounts_to_one_file()
+
+
 class _AnalysisProcess(_Process):
     def run(self):
         S3DataAnalyzer().run()
         LocalResults().remove_file_with_analysis_date()
+
+
+def _get_aws_accounts_combination_process() -> _Process:
+    return _AwsAccountsCombinationProcess()
 
 
 def _get_analysis_process() -> _Process:
