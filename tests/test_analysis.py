@@ -1,4 +1,6 @@
 import unittest
+from abc import ABC
+from abc import abstractmethod
 from pathlib import Path
 from unittest.mock import patch
 from unittest.mock import PropertyMock
@@ -13,27 +15,36 @@ from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AllAccoutsS3DataDfAnalyzer
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CompareAwsAccounts
+from src.analysis import _DfAnalysis
 from src.analysis import _OriginFileSyncDfAnalysis
 from src.analysis import _TargetAccountWithoutMoreFilesDfAnalysis
 from src.s3_uris_to_analyze import S3UrisFileReader
 
 
-class TestOriginFileSyncDfAnalysis(unittest.TestCase):
-    # TODO rename folder `test-origin-file-sync`
-    @patch(
-        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
-    )
-    def test_get_df_set_analysis_result_for_several_cases(self, mock_directory_path_what_to_analyze):
-        for file_name, expected_result in self._file_name_and_expected_result.items():
-            df = self._get_df_combine_accounts_s3_data_csv(file_name)
-            result = _OriginFileSyncDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-            result_to_check = result.loc[:, ("analysis", self._column_name_to_check)].tolist()
-            self.assertEqual(expected_result, result_to_check)
+class DfAnalysisConfig(ABC):
+    @property
+    @abstractmethod
+    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+        pass
 
     @property
-    def _file_name_and_expected_result(self) -> dict[str, list]:
+    @abstractmethod
+    def file_name_and_expected_result(self) -> dict[str, list]:
+        pass
+
+    @property
+    @abstractmethod
+    def column_name_to_check(self) -> str:
+        pass
+
+
+class OriginFileSyncDfAnalysisConfig(DfAnalysisConfig):
+    @property
+    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+        return _OriginFileSyncDfAnalysis
+
+    @property
+    def file_name_and_expected_result(self) -> dict[str, list]:
         return {
             "file-sync-ok.csv": [True],
             "file-sync-wrong.csv": [False],
@@ -43,35 +54,17 @@ class TestOriginFileSyncDfAnalysis(unittest.TestCase):
         }
 
     @property
-    def _column_name_to_check(self) -> str:
+    def column_name_to_check(self) -> str:
         return "is_sync_ok_in_aws_account_2_release"
 
-    def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
-        path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
-        return get_df_combine_accounts_s3_data_csv(path_name)
+
+class TargetAccountWithoutMoreFilesDfAnalysisConfig(DfAnalysisConfig):
+    @property
+    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+        return _TargetAccountWithoutMoreFilesDfAnalysis
 
     @property
-    def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
-        all_aws_accounts = S3UrisFileReader().get_aws_accounts()
-        return _CompareAwsAccounts(*all_aws_accounts[:2])
-
-
-class TestTargetAccountWithoutMoreFilesDfAnalysis(unittest.TestCase):
-    # TODO rename folder `test-origin-file-sync`
-    @patch(
-        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
-    )
-    def test_get_df_set_analysis_result_for_several_cases(self, mock_directory_path_what_to_analyze):
-        for file_name, expected_result in self._file_name_and_expected_result.items():
-            df = self._get_df_combine_accounts_s3_data_csv(file_name)
-            result = _TargetAccountWithoutMoreFilesDfAnalysis(self._aws_accounts_to_compare, df).get_df_set_analysis()
-            result_to_check = result.loc[:, ("analysis", self._column_name_to_check)].tolist()
-            self.assertEqual(expected_result, result_to_check)
-
-    @property
-    def _file_name_and_expected_result(self) -> dict[str, list]:
+    def file_name_and_expected_result(self) -> dict[str, list]:
         return {
             "file-sync-ok.csv": [None],
             "file-not-in-origin.csv": [False],
@@ -80,12 +73,31 @@ class TestTargetAccountWithoutMoreFilesDfAnalysis(unittest.TestCase):
         }
 
     @property
-    def _column_name_to_check(self) -> str:
+    def column_name_to_check(self) -> str:
         return "can_exist_in_aws_account_2_release"
 
+
+class TestDfAnalysis(unittest.TestCase):
+    # TODO rename folder `test-origin-file-sync`
+    @patch(
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+    )
+    def test_get_df_set_analysis_result_for_several_cases(self, mock_directory_path_what_to_analyze):
+        for analysis_config in [OriginFileSyncDfAnalysisConfig(), TargetAccountWithoutMoreFilesDfAnalysisConfig()]:
+            self._test_analysis_config(analysis_config)
+
+    def _test_analysis_config(self, config: DfAnalysisConfig):
+        for file_name, expected_result in config.file_name_and_expected_result.items():
+            df = self._get_df_combine_accounts_s3_data_csv(file_name)
+            result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()
+            result_to_check = result.loc[:, ("analysis", config.column_name_to_check)].tolist()
+            self.assertEqual(expected_result, result_to_check)
+
     def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
-        path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
-        return get_df_combine_accounts_s3_data_csv(path_name)
+        file_path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
+        return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
     def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
@@ -107,7 +119,7 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
         self,
         mock_directory_path_what_to_analyze,
     ):
-        df = get_df_combine_accounts_s3_data_csv("fake-files/s3-results/20241201180132/s3-files-all-accounts.csv")
+        df = _get_df_combine_accounts_s3_data_csv("fake-files/s3-results/20241201180132/s3-files-all-accounts.csv")
         result = _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
@@ -134,6 +146,5 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
         return result
 
 
-# TODO deprecate
-def get_df_combine_accounts_s3_data_csv(path_name: str) -> Df:
-    return _CombinedAccountsS3DataCsvToDf().get_df(Path(__file__).parent.absolute().joinpath(path_name))
+def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
+    return _CombinedAccountsS3DataCsvToDf().get_df(Path(__file__).parent.absolute().joinpath(file_path_name))
