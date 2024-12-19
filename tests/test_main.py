@@ -3,7 +3,6 @@ from pathlib import Path
 from unittest.mock import patch
 from unittest.mock import PropertyMock
 
-from moto import mock_aws
 from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas.testing import assert_frame_equal
@@ -13,6 +12,7 @@ from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3
+from tests.aws import S3Server
 from tests.aws import set_aws_credentials
 
 
@@ -20,7 +20,8 @@ class TestFunction_run(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
-        self.mock_aws = mock_aws()
+        # TODO Not use private
+        self.mock_aws = S3Server()._mock_aws
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()

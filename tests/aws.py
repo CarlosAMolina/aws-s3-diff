@@ -2,6 +2,12 @@ import os
 from pathlib import Path
 
 import boto3
+from moto import mock_aws
+
+
+class S3Server:
+    def __init__(self):
+        self._mock_aws = mock_aws()
 
 
 def set_aws_credentials():
