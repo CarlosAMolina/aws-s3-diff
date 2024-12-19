@@ -64,7 +64,7 @@ make test
 Start the local server:
 
 ```bash
-make run-local-s3-server
+make start-local-s3-server
 ```
 
 After that, you can:
