@@ -1,8 +1,10 @@
 # http://docs.getmoto.org/en/latest/docs/server_mode.html
 
 from aws import S3
+from aws import set_aws_credentials
 from moto.server import ThreadedMotoServer
 
+set_aws_credentials()
 server = ThreadedMotoServer()
 server.start()
 ENDPOINT_URL = "http://localhost:5000"
