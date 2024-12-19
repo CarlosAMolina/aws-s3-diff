@@ -37,7 +37,7 @@ class TestFunction_run(unittest.TestCase):
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
         for aws_account in S3UrisFileReader().get_aws_accounts():
-            self.mock_aws.start()
+            self._mock_s3_server.start()
             S3(aws_account).create_objects()
             m_main.run()
             self._mock_s3_server.stop()
