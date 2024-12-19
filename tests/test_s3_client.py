@@ -6,7 +6,7 @@ from dateutil.tz import tzutc
 from src import s3_client as m_s3_client
 from tests.aws import S3Server
 
-ExpectedResult = list[dict]
+_ExpectedResult = list[dict]
 
 
 class TestS3Client(unittest.TestCase):
@@ -39,13 +39,15 @@ class TestS3Client(unittest.TestCase):
     def _datetime_now(self) -> datetime.datetime:
         return datetime.datetime.now(tzutc())
 
-    def _test_get_s3_data_returns_expected_result(self, expected_result: ExpectedResult, s3_query: m_s3_client.S3Query):
+    def _test_get_s3_data_returns_expected_result(
+        self, expected_result: _ExpectedResult, s3_query: m_s3_client.S3Query
+    ):
         s3_client = m_s3_client.S3Client()
         result = s3_client.get_s3_data(s3_query)
         self._test_get_s3_data_returns_expected_result_for_file_name(expected_result, result)
 
     def _test_get_s3_data_returns_expected_result_for_file_name(
-        self, expected_result: ExpectedResult, result_to_check: list[dict]
+        self, expected_result: _ExpectedResult, result_to_check: list[dict]
     ):
         for file_expected_result in expected_result:
             # https://stackoverflow.com/questions/8653516/search-a-list-of-dictionaries-in-python
