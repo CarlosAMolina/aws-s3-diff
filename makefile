@@ -5,9 +5,6 @@ awscli-local-s3-ls:
 awscli-local-s3-ls-bucket:
 	aws --endpoint-url http://localhost:5000 s3 ls s3://pets --recursive
 
-moto-run-local-server:
-	poetry run python tests/run_moto_server.py
-
 ruff-check:
 	poetry run ruff check
 
@@ -19,6 +16,9 @@ ruff-format:
 
 run:
 	poetry run python src/main.py
+
+run-local-s3-server:
+	poetry run python tests/run_moto_server.py
 
 test:
 	poetry run python -m unittest discover
