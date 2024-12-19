@@ -20,8 +20,9 @@ class TestFunction_run(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
+        self._mock_s3_serves = S3Server()
         # TODO Not use private
-        self.mock_aws = S3Server()._mock_aws
+        self.mock_aws = self._mock_s3_serves._mock_aws
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()

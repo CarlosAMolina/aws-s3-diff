@@ -9,6 +9,9 @@ class S3Server:
     def __init__(self):
         self._mock_aws = mock_aws()
 
+    def stop(self):
+        self._mock_aws.stop()
+
 
 def set_aws_credentials():
     """ "
