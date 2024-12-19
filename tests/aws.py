@@ -5,6 +5,7 @@ import boto3
 from moto import mock_aws
 
 
+# TODO use with open for mock_aws
 class S3Server:
     def __init__(self):
         set_aws_credentials()
