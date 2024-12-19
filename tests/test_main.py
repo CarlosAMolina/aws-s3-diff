@@ -15,7 +15,8 @@ from tests.aws import S3Server
 
 
 class TestFunction_run(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
