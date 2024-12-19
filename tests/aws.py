@@ -8,6 +8,7 @@ from moto import mock_aws
 # TODO use with open for mock_aws
 class S3Server:
     def __init__(self):
+        """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
         self._mock_aws = mock_aws()
 

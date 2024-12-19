@@ -17,12 +17,17 @@ ExpectedResult = list[dict]
 
 
 class TestAwsAccountExtractor(unittest.TestCase):
-    def setUp(self):
-        """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        self._s3_server = S3Server()
+    @classmethod
+    def setUpClass(cls):
+        cls._s3_server = S3Server()
+        cls._s3_server.start()
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._s3_server.stop()
 
     @mock.patch(
         "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze",
@@ -31,7 +36,6 @@ class TestAwsAccountExtractor(unittest.TestCase):
     )
     def test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze):
         LocalResults().create_analysis_results_folder()
-        self._s3_server.start()
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
@@ -45,7 +49,6 @@ class TestAwsAccountExtractor(unittest.TestCase):
             expected_result_df = read_csv_as_df(file_path_name_expected_result)
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
-        self._s3_server.stop()
 
 
 class TestS3UriDfModifier(unittest.TestCase):
