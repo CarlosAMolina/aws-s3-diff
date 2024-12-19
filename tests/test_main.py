@@ -18,10 +18,16 @@ class TestFunction_run(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        cls._mock_s3_server = S3Server()
+        # TODO rename in all files _s3_server to _mock_s3_server
+        cls._s3_server = S3Server()
+        cls._s3_server.start()
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._s3_server.stop()
 
     @patch(
         "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
@@ -32,11 +38,9 @@ class TestFunction_run(unittest.TestCase):
     @patch.object(m_main.LocalResults, "remove_file_with_analysis_date")
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
-        self._mock_s3_server.start()
         for aws_account in S3UrisFileReader().get_aws_accounts():
-            self._mock_s3_server.create_objects(aws_account)
+            self._s3_server.create_objects(aws_account)
             m_main.run()
-        self._mock_s3_server.stop()
         result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
