@@ -20,9 +20,9 @@ class TestFunction_run(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
-        self._mock_s3_serves = S3Server()
+        self._mock_s3_server = S3Server()
         # TODO Not use private
-        self.mock_aws = self._mock_s3_serves._mock_aws
+        self.mock_aws = self._mock_s3_server._mock_aws
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
@@ -40,7 +40,7 @@ class TestFunction_run(unittest.TestCase):
             self.mock_aws.start()
             S3(aws_account).create_objects()
             m_main.run()
-            self.mock_aws.stop()
+            self._mock_s3_server.stop()
         result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
