@@ -2,7 +2,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from moto import mock_aws
 from pandas import DataFrame as Df
 from pandas import MultiIndex
 from pandas import read_csv as read_csv_as_df
@@ -12,8 +11,7 @@ from src import s3_data as m_s3_data
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
-from tests.aws import S3
-from tests.aws import set_aws_credentials
+from tests.aws import S3Server
 
 ExpectedResult = list[dict]
 
@@ -21,8 +19,7 @@ ExpectedResult = list[dict]
 class TestAwsAccountExtractor(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        set_aws_credentials()
-        self.mock_aws = mock_aws()
+        self._s3_server = S3Server()
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
@@ -39,8 +36,8 @@ class TestAwsAccountExtractor(unittest.TestCase):
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
             "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
         }.items():
-            self.mock_aws.start()
-            S3(aws_account=aws_account).create_objects()
+            self._s3_server.start()
+            self._s3_server.create_objects(aws_account)
             file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
             s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
             m_s3_data._AwsAccountExtractor(file_path_results, s3_queries).extract()
@@ -48,7 +45,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
             expected_result_df = read_csv_as_df(file_path_name_expected_result)
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
-            self.mock_aws.stop()
+            self._s3_server.stop()
 
 
 class TestS3UriDfModifier(unittest.TestCase):
