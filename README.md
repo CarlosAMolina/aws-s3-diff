@@ -59,9 +59,24 @@ poetry run pre-commit install
 make test
 ```
 
-### Access Moto Server using AWS CLI
+### Run local S3 server to make requests
+
+Start the local server:
 
 ```bash
-make moto-run-local-server
-make awscli-local-s3-ls
+make run-local-s3-server
 ```
+
+After that, you can:
+
+    - List files:
+
+    ```bash
+    make awscli-local-s3-ls
+    ```
+
+    - Run the CLI:
+
+    ```bash
+    make run
+    ```
