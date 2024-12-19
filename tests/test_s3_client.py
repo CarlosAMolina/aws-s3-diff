@@ -14,14 +14,16 @@ ExpectedResult = list[dict]
 class TestS3Client(unittest.TestCase):
     """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         set_aws_credentials()
-        self.mock_aws = mock_aws()
-        self.mock_aws.start()
+        cls.mock_aws = mock_aws()
+        cls.mock_aws.start()
         S3(aws_account="aws_account_1_pro").create_objects()
 
-    def tearDown(self):
-        self.mock_aws.stop()
+    @classmethod
+    def tearDownClass(cls):
+        cls.mock_aws.stop()
 
     def test_get_s3_data_returns_expected_result_for_bucket_cars(self):
         expected_result = [{"name": "cars-20241014.csv", "date": self._datetime_now, "size": 49}]
