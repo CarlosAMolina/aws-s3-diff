@@ -31,7 +31,10 @@ class _IteractiveMenu:
             self._local_results.create_analysis_results_folder()
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
-            _get_aws_accounts_combination_process().run()
+            # This condition avoids generating the combination file if it exists.
+            # For example: the user drops the analysis file in order to run the program and generate the analysis again.
+            if not self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
+                _get_aws_accounts_combination_process().run()
             _get_analysis_process().run()
 
     def _show_aws_accounts_to_analyze(self):
