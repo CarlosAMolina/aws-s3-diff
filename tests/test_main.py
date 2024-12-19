@@ -13,13 +13,11 @@ from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3
 from tests.aws import S3Server
-from tests.aws import set_aws_credentials
 
 
 class TestFunction_run(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        set_aws_credentials()
         self._mock_s3_server = S3Server()
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
