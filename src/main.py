@@ -24,10 +24,6 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
-        # TODO move to the final of this function
-        if self._have_all_aws_account_been_analyzed():
-            print("All AWS accounts have been analyzed. Starting a new analysis")
-            self._local_results.remove_file_with_analysis_date()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
