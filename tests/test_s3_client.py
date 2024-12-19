@@ -2,11 +2,9 @@ import datetime
 import unittest
 
 from dateutil.tz import tzutc
-from moto import mock_aws
 
 from src import s3_client as m_s3_client
-from tests.aws import S3
-from tests.aws import set_aws_credentials
+from tests.aws import S3Server
 
 ExpectedResult = list[dict]
 
@@ -16,14 +14,13 @@ class TestS3Client(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        set_aws_credentials()
-        cls.mock_aws = mock_aws()
-        cls.mock_aws.start()
-        S3(aws_account="aws_account_1_pro").create_objects()
+        cls._s3_server = S3Server()
+        cls._s3_server.start()
+        cls._s3_server.create_objects("aws_account_1_pro")
 
     @classmethod
     def tearDownClass(cls):
-        cls.mock_aws.stop()
+        cls._s3_server.stop()
 
     def test_get_s3_data_returns_expected_result_for_bucket_cars(self):
         expected_result = [{"name": "cars-20241014.csv", "date": self._datetime_now, "size": 49}]
