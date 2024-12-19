@@ -11,7 +11,6 @@ from src import main as m_main
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileReader
-from tests.aws import S3
 from tests.aws import S3Server
 
 
@@ -34,7 +33,7 @@ class TestFunction_run(unittest.TestCase):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
         for aws_account in S3UrisFileReader().get_aws_accounts():
             self._mock_s3_server.start()
-            S3(aws_account).create_objects()
+            self._mock_s3_server.create_objects(aws_account)
             m_main.run()
             self._mock_s3_server.stop()
         result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)

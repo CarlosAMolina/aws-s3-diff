@@ -13,6 +13,9 @@ class S3Server:
     def start(self):
         self._mock_aws.start()
 
+    def create_objects(self, aws_account):
+        S3(aws_account).create_objects()
+
     def stop(self):
         self._mock_aws.stop()
 
