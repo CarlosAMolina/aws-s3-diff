@@ -17,7 +17,6 @@ from tests.aws import S3Server
 class TestFunction_run(unittest.TestCase):
     def setUp(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        self._mock_s3_server = S3Server()
         # Drop file created by the user or by other tests.
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
@@ -32,6 +31,7 @@ class TestFunction_run(unittest.TestCase):
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
         for aws_account in S3UrisFileReader().get_aws_accounts():
+            self._mock_s3_server = S3Server()
             self._mock_s3_server.start()
             self._mock_s3_server.create_objects(aws_account)
             m_main.run()
