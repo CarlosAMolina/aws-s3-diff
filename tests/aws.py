@@ -9,7 +9,7 @@ from moto import mock_aws
 class S3Server:
     def __init__(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
-        set_aws_credentials()
+        self._set_aws_credentials()
         self._mock_aws = mock_aws()
 
     def start(self):
@@ -21,20 +21,17 @@ class S3Server:
     def stop(self):
         self._mock_aws.stop()
 
-
-# TODO private
-def set_aws_credentials():
-    """ "
-    http://docs.getmoto.org/en/latest/docs/getting_started.html#how-do-i-avoid-tests-from-mutating-my-real-infrastructure
-    """
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-    os.environ["AWS_SECURITY_TOKEN"] = "testing"
-    os.environ["AWS_SESSION_TOKEN"] = "testing"
-    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+    def _set_aws_credentials(self):
+        """ "
+        http://docs.getmoto.org/en/latest/docs/getting_started.html#how-do-i-avoid-tests-from-mutating-my-real-infrastructure
+        """
+        os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+        os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+        os.environ["AWS_SECURITY_TOKEN"] = "testing"
+        os.environ["AWS_SESSION_TOKEN"] = "testing"
+        os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
-# TODO private
 class S3:
     def __init__(self, aws_account: str, endpoint_url: str | None = None):
         self._s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
