@@ -78,5 +78,5 @@ After that, you can:
     - Run the CLI:
 
     ```bash
-    make run
+    make run-using-local-s3-server
     ```

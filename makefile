@@ -17,6 +17,9 @@ ruff-format:
 run:
 	poetry run python src/main.py
 
+run-using-local-s3-server:
+	export AWS_ENDPOINT=http://localhost:5000 && poetry run python src/main.py
+
 run-local-s3-server:
 	poetry run python tests/run_local_s3_server.py
 

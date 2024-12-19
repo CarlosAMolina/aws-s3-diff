@@ -1,3 +1,5 @@
+import os
+
 import boto3
 
 from types_custom import S3Data
@@ -7,7 +9,7 @@ from types_custom import S3Query
 class S3Client:
     def __init__(self):
         session = boto3.Session()
-        self._s3_client = session.client("s3")
+        self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> S3Data:
         query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
