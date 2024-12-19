@@ -31,12 +31,12 @@ class TestAwsAccountExtractor(unittest.TestCase):
     )
     def test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze):
         LocalResults().create_analysis_results_folder()
+        self._s3_server.start()
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
             "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
         }.items():
-            self._s3_server.start()
             self._s3_server.create_objects(aws_account)
             file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
             s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
@@ -45,7 +45,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
             expected_result_df = read_csv_as_df(file_path_name_expected_result)
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
-            self._s3_server.stop()
+        self._s3_server.stop()
 
 
 class TestS3UriDfModifier(unittest.TestCase):
