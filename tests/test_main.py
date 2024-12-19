@@ -31,11 +31,11 @@ class TestFunction_run(unittest.TestCase):
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
         for aws_account in S3UrisFileReader().get_aws_accounts():
-            self._mock_s3_server = S3Server()
-            self._mock_s3_server.start()
-            self._mock_s3_server.create_objects(aws_account)
+            mock_s3_server = S3Server()
+            mock_s3_server.start()
+            mock_s3_server.create_objects(aws_account)
             m_main.run()
-            self._mock_s3_server.stop()
+            mock_s3_server.stop()
         result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
