@@ -174,10 +174,10 @@ class _IndividualAccountsS3DataCsvFilesToDf:
 class _S3UriDfModifier:
     def __init__(self, *args):
         self._aws_account_origin, self._aws_account_target, self._df = args
-        self._s3_uris_file_reader = S3UrisFileAnalyzer()
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
-        s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
+        s3_uris_map_df = self._s3_uris_file_analyzer.get_df_s3_uris_map_between_accounts(
             self._aws_account_origin, self._aws_account_target
         )
         return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
@@ -205,5 +205,5 @@ class _S3UriDfModifier:
         if s3_uris_map_for_current_index_df.empty:
             raise ValueError("Unmatched value")
         s3_uri_to_use = s3_uris_map_for_current_index_df[self._aws_account_origin].values[0]
-        query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
+        query_to_use = self._s3_uris_file_analyzer.get_s3_query_from_s3_uri(s3_uri_to_use)
         return (query_to_use.bucket, query_to_use.prefix, old_file_name)
