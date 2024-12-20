@@ -82,13 +82,11 @@ class _AwsAccountProcess(_Process):
                 return
 
 
-# TODO drop
-class _AwsAccountExportProcess(_Process):
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
-
+class _LastAwsAccountProcess(_AwsAccountProcess):
     def run(self):
-        export_s3_data_of_account(self._aws_account)
+        super().run()
+        export_s3_data_of_account(self._s3_uris_file_reader.get_aws_accounts()[-1])
+        _AnalysisProcess().run()
 
 
 class _AwsAccountsCombinationProcess(_Process):
@@ -104,11 +102,6 @@ class _AnalysisProcess(_Process):
 
 def _get_aws_account_process() -> _Process:
     return _AwsAccountProcess()
-
-
-# TODO drop
-def _get_aws_account_export_process(aws_account: str) -> _Process:
-    return _AwsAccountExportProcess(aws_account)
 
 
 def _get_aws_accounts_combination_process() -> _Process:
