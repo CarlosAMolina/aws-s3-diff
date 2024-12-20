@@ -74,10 +74,22 @@ class _AwsAccountProcess(_Process):
 
     # TODO? move to _InteractiveMenu
     def _get_aws_account_to_analyze(self) -> str:
+        aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
+        last_aws_account_analyzed = self._get_last_aws_account_analyzed()
+        if last_aws_account_analyzed is None:
+            return aws_accounts_to_analyze[0]
+        if last_aws_account_analyzed == aws_accounts_to_analyze[-1]:
+            # Unexpected situation. This method cannot be called if all accounts have been analyzed.
+            raise RuntimeError("All AWS accounts have been analyzed")
+        return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
+
+    def _get_last_aws_account_analyzed(self) -> str | None:
+        result = None
         for aws_account in self._s3_uris_file_reader.get_aws_accounts():
             if not self._local_results.has_this_aws_account_been_analyzed(aws_account):
-                return aws_account
-        sys.exit("All AWS accounts have been analyzed")
+                return result
+            result = aws_account
+        return result
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
         # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
