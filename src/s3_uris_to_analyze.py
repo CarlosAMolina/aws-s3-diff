@@ -53,6 +53,9 @@ class S3UrisFileAnalyzer:
     def get_s3_query_from_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
+    def get_df_s3_uris_map_between_accounts(self, aws_account_origin: str, aws_account_target: str) -> Df:
+        return self.df_file_what_to_analyze[[aws_account_origin, aws_account_target]]
+
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
 
