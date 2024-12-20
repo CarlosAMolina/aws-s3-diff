@@ -85,15 +85,13 @@ class _AnalyzedAwsAccounts:
 
 
 class _AwsAccountProcess(_Process):
-    def __init__(self):
-        self._local_results = LocalResults()
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+    def __init__(self, aws_account: str):
+        self._aws_account = aws_account
 
     def run(self):
-        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
-        print(f"The following AWS account will be analyzed: {aws_account}")
+        print(f"The following AWS account will be analyzed: {self._aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        export_s3_data_of_account(aws_account)
+        export_s3_data_of_account(self._aws_account)
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
         # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
@@ -115,13 +113,17 @@ class _AwsAccountProcessFactory:
     def get_process(self) -> _AwsAccountProcess:
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         if aws_account == self._s3_uris_file_reader.get_first_aws_account():
-            return _FirstAwsAccountProcess()
+            return _FirstAwsAccountProcess(aws_account)
         if aws_account == self._s3_uris_file_reader.get_last_aws_account():
-            return _LastAwsAccountProcess()
-        return _IntermediateAccountProcess()
+            return _LastAwsAccountProcess(aws_account)
+        return _IntermediateAccountProcess(aws_account)
 
 
 class _FirstAwsAccountProcess(_AwsAccountProcess):
+    def __init__(self, aws_account: str):
+        super().__init__(aws_account)
+        self._local_results = LocalResults()
+
     def run(self):
         # The folder may exist but not the result file if an error occurred in the previous run,
         # e.g. errors interacting with S3.
