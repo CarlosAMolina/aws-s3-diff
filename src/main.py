@@ -61,7 +61,7 @@ class _ProcessFactory:
             return _FirstAwsAccountProcess()
         if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess()
-        return _AwsAccountProcess()
+        return _IntermediateAccountProcess()
 
 
 class _AnalyzedAwsAccounts:
@@ -120,6 +120,11 @@ class _FirstAwsAccountProcess(_AwsAccountProcess):
         # e.g. errors interacting with S3.
         if not self._local_results.analysis_paths.directory_analysis.is_dir():
             self._local_results.create_analysis_results_folder()
+        super().run()
+
+
+class _IntermediateAccountProcess(_AwsAccountProcess):
+    def run(self):
         super().run()
 
 
