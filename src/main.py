@@ -24,8 +24,8 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         _get_aws_account_process()._show_aws_accounts_to_analyze()  # TODO move to class
-        aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
         _get_aws_account_process().run()
+        aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating the combination file if it exists.
