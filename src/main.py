@@ -80,7 +80,7 @@ class _AnalyzedAwsAccounts:
         return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
 
     def have_all_aws_accounts_been_analyzed(self) -> bool:
-        return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_aws_accounts()[-1]
+        return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_last_aws_account()
 
     def _get_last_aws_account_analyzed(self) -> str | None:
         result = None
