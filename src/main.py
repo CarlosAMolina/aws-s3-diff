@@ -30,11 +30,12 @@ class _IteractiveMenu:
         else:
             _get_aws_account_process().run()
         if self._have_all_aws_account_been_analyzed():
-            # This condition avoids generating the combination file if it exists.
+            # This condition avoids generating a file if it exists.
             # For example: the user drops the analysis file in order to run the program and generate the analysis again.
-            if not self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
-                _get_combine_s3_data_process().run()
-            _get_analysis_process().run()
+            if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
+                _get_analysis_process().run()
+            else:
+                _get_no_combined_s3_data_process().run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -76,6 +77,7 @@ class _AwsAccountProcess(_Process):
         return aws_accounts_to_analyze[aws_account_index_to_analyze]
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
+        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
         print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
         while True:
             user_input = input("Y/n: ").lower()
@@ -115,10 +117,6 @@ def _get_aws_account_process() -> _Process:
 
 def _get_last_aws_account_process() -> _Process:
     return _LastAwsAccountProcess()
-
-
-def _get_combine_s3_data_process() -> _Process:
-    return _CombinesS3DataProcess()
 
 
 def _get_no_combined_s3_data_process() -> _Process:
