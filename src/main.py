@@ -24,6 +24,7 @@ class _InteractiveMenu:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
         self._local_results = LocalResults()
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
 
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
@@ -45,17 +46,17 @@ class _InteractiveMenu:
         """
         if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
             return _AnalysisProcess()
-        if self._have_all_aws_account_been_analyzed():
+        if self._analyzed_aws_accounts.have_all_aws_account_been_analyzed():
             return _NoCombinedS3DataProcess()
         if _AnalyzedAwsAccounts().get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
 
-    def _have_all_aws_account_been_analyzed(self) -> bool:
-        return (
-            self._local_results.get_aws_account_index_to_analyze()
-            == self._s3_uris_file_reader.get_number_of_aws_accounts()
-        )
+    # TODO DEPRECATE def _have_all_aws_account_been_analyzed(self) -> bool:
+    # TODO DEPRECATE     return (
+    # TODO DEPRECATE         self._local_results.get_aws_account_index_to_analyze()
+    # TODO DEPRECATE         == self._s3_uris_file_reader.get_number_of_aws_accounts()
+    # TODO DEPRECATE     )
 
 
 class _AwsAccountProcess(_Process):
@@ -102,6 +103,9 @@ class _AnalyzedAwsAccounts:
 
     def has_any_account_been_analyzed(self) -> bool:
         return self._get_last_aws_account_analyzed() is not None
+
+    def have_all_aws_account_been_analyzed(self) -> bool:
+        return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_aws_accounts()[-1]
 
     def _get_last_aws_account_analyzed(self) -> str | None:
         result = None
