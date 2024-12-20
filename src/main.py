@@ -25,8 +25,6 @@ class _IteractiveMenu:
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
         _get_aws_account_process().run()
-        aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
-        _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating the combination file if it exists.
             # For example: the user drops the analysis file in order to run the program and generate the analysis again.
@@ -64,6 +62,7 @@ class _AwsAccountProcess(_Process):
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
+        _get_aws_account_export_process(aws_account).run()
 
     def _get_aws_account_to_analyze(self) -> str:
         aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
