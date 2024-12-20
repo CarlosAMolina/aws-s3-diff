@@ -64,29 +64,6 @@ class _ProcessFactory:
         return _AwsAccountProcess()
 
 
-class _AwsAccountProcess(_Process):
-    def __init__(self):
-        self._local_results = LocalResults()
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
-
-    def run(self):
-        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
-        print(f"The following AWS account will be analyzed: {aws_account}")
-        self._exit_program_if_no_aws_credentials_in_terminal()
-        export_s3_data_of_account(aws_account)
-
-    def _exit_program_if_no_aws_credentials_in_terminal(self):
-        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
-        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
-        while True:
-            user_input = input("Y/n: ").lower()
-            if user_input == "n":
-                print("Generate the credentials to work with that AWS account and run the program again")
-                sys.exit()
-            if user_input == "y" or len(user_input) == 0:
-                return
-
-
 class _AnalyzedAwsAccounts:
     def __init__(self):
         self._local_results = LocalResults()
@@ -112,6 +89,29 @@ class _AnalyzedAwsAccounts:
                 return result
             result = aws_account
         return result
+
+
+class _AwsAccountProcess(_Process):
+    def __init__(self):
+        self._local_results = LocalResults()
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+
+    def run(self):
+        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
+        print(f"The following AWS account will be analyzed: {aws_account}")
+        self._exit_program_if_no_aws_credentials_in_terminal()
+        export_s3_data_of_account(aws_account)
+
+    def _exit_program_if_no_aws_credentials_in_terminal(self):
+        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
+        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
+        while True:
+            user_input = input("Y/n: ").lower()
+            if user_input == "n":
+                print("Generate the credentials to work with that AWS account and run the program again")
+                sys.exit()
+            if user_input == "y" or len(user_input) == 0:
+                return
 
 
 class _FirstAwsAccountProcess(_AwsAccountProcess):
