@@ -24,6 +24,15 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
+        self._run_process()
+
+    def _show_aws_accounts_to_analyze(self):
+        print("AWS accounts configured to be analyzed:")
+        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
+        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
+        print("\n".join(aws_accounts_list))
+
+    def _run_process(self):
         # TODO not use this class and private method for the check.
         if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
             _get_last_aws_account_process().run()
@@ -36,12 +45,6 @@ class _IteractiveMenu:
                 _get_analysis_process().run()
             else:
                 _get_no_combined_s3_data_process().run()
-
-    def _show_aws_accounts_to_analyze(self):
-        print("AWS accounts configured to be analyzed:")
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
-        print("\n".join(aws_accounts_list))
 
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
