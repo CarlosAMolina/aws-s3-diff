@@ -48,7 +48,7 @@ class _InteractiveMenu:
             return _AnalysisProcess()
         if self._analyzed_aws_accounts.have_all_aws_account_been_analyzed():
             return _NoCombinedS3DataProcess()
-        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
 
@@ -89,7 +89,7 @@ class _AnalyzedAwsAccounts:
         last_aws_account_analyzed = self._get_last_aws_account_analyzed()
         if last_aws_account_analyzed is None:
             return aws_accounts_to_analyze[0]
-        if last_aws_account_analyzed == aws_accounts_to_analyze[-1]:
+        if last_aws_account_analyzed == self._s3_uris_file_reader.get_last_aws_account():
             # Unexpected situation. This method cannot be called if all accounts have been analyzed.
             raise RuntimeError("All AWS accounts have been analyzed")
         return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]

@@ -37,6 +37,9 @@ class S3UrisFileReader:
     def get_aws_accounts(self) -> list[str]:
         return self.get_df_file_what_to_analyze().columns.to_list()
 
+    def get_last_aws_account(self) -> str:
+        return self.get_aws_accounts()[-1]
+
     def get_s3_queries_for_aws_account(self, aws_account: str) -> list[S3Query]:
         s3_uris_to_analyze = self.get_df_file_what_to_analyze()[aws_account].to_list()
         return [self.get_s3_query_from_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
