@@ -26,7 +26,6 @@ class _IteractiveMenu:
         self._show_aws_accounts_to_analyze()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
-        self._exit_program_if_no_aws_credentials_in_terminal()
         _get_aws_account_process().run()
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
@@ -47,16 +46,6 @@ class _IteractiveMenu:
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
         return aws_accounts_to_analyze[aws_account_index_to_analyze]
 
-    def _exit_program_if_no_aws_credentials_in_terminal(self):
-        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
-        while True:
-            user_input = input("Y/n: ").lower()
-            if user_input == "n":
-                print("Generate the credentials to work with that AWS account and run the program again")
-                sys.exit()
-            if user_input == "y" or len(user_input) == 0:
-                return
-
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
             self._local_results.get_aws_account_index_to_analyze()
@@ -75,8 +64,19 @@ class _AwsAccountProcess(_Process):
         self._local_results = LocalResults()
 
     def run(self):
+        self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
+
+    def _exit_program_if_no_aws_credentials_in_terminal(self):
+        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
+        while True:
+            user_input = input("Y/n: ").lower()
+            if user_input == "n":
+                print("Generate the credentials to work with that AWS account and run the program again")
+                sys.exit()
+            if user_input == "y" or len(user_input) == 0:
+                return
 
 
 class _AwsAccountExportProcess(_Process):
