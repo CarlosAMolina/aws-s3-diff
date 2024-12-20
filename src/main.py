@@ -52,12 +52,6 @@ class _InteractiveMenu:
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
 
-    # TODO DEPRECATE def _have_all_aws_account_been_analyzed(self) -> bool:
-    # TODO DEPRECATE     return (
-    # TODO DEPRECATE         self._local_results.get_aws_account_index_to_analyze()
-    # TODO DEPRECATE         == self._s3_uris_file_reader.get_number_of_aws_accounts()
-    # TODO DEPRECATE     )
-
 
 class _AwsAccountProcess(_Process):
     def __init__(self):
@@ -69,7 +63,6 @@ class _AwsAccountProcess(_Process):
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        # TODO DEPRECATE if self._local_results.get_aws_account_index_to_analyze() == 0:
         if not self._analyzed_aws_accounts.has_any_account_been_analyzed():
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
