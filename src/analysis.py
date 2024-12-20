@@ -267,6 +267,9 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
 class _AnalysisDfToCsv:
+    def __init__(self):
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     def export(self, df: AnalysisS3DataDf):
         file_path = LocalResults().analysis_paths.file_analysis
         csv_df = self._get_df_to_export(df)
@@ -280,7 +283,7 @@ class _AnalysisDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = S3UrisFileAnalyzer().get_first_aws_account()
+        aws_account_1 = self._s3_uris_file_analyzer.get_first_aws_account()
         result.index.names = [
             f"bucket_{aws_account_1}",
             f"file_path_in_s3_{aws_account_1}",
