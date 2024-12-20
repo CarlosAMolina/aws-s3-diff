@@ -14,24 +14,17 @@ def run():
     _InteractiveMenu().run()
 
 
-class _Process(ABC):
-    @abstractmethod
-    def run(self):
-        pass
-
-
 class _InteractiveMenu:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
-        self._local_results = LocalResults()
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._process_factory = _ProcessFactory()
 
     def run(self):
         print("Welcome to the AWS S3 Diff tool!")
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
-        self._get_process().run()
+        self._process_factory.get_process().run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -39,7 +32,20 @@ class _InteractiveMenu:
         aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
         print("\n".join(aws_accounts_list))
 
-    def _get_process(self) -> _Process:
+
+class _Process(ABC):
+    @abstractmethod
+    def run(self):
+        pass
+
+
+class _ProcessFactory:
+    def __init__(self):
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_process(self) -> _Process:
         """
         Some conditions avoid to generate a file if it exists.
         For example: the user drops the analysis file in order to run the program and generate the analysis again.
