@@ -29,6 +29,7 @@ class _IteractiveMenu:
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
+        _get_aws_account_process().run()
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating the combination file if it exists.
@@ -71,6 +72,11 @@ class _Process(ABC):
         pass
 
 
+class _AwsAccountProcess(_Process):
+    def run(self):
+        pass
+
+
 class _AwsAccountExportProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
@@ -88,6 +94,10 @@ class _AnalysisProcess(_Process):
     def run(self):
         S3DataAnalyzer().run()
         LocalResults().remove_file_with_analysis_date()
+
+
+def _get_aws_account_process() -> _Process:
+    return _AwsAccountProcess()
 
 
 def _get_aws_account_export_process(aws_account: str) -> _Process:
