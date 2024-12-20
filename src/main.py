@@ -24,12 +24,16 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
-        _get_aws_account_process().run()
+        # TODO not use this class and private method for the check.
+        if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+            _get_last_aws_account_process().run()
+        else:
+            _get_aws_account_process().run()
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating the combination file if it exists.
             # For example: the user drops the analysis file in order to run the program and generate the analysis again.
             if not self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
-                _get_aws_accounts_combination_process().run()
+                _get_combine_s3_data_process().run()
             _get_analysis_process().run()
 
     def _show_aws_accounts_to_analyze(self):
@@ -85,11 +89,10 @@ class _AwsAccountProcess(_Process):
 class _LastAwsAccountProcess(_AwsAccountProcess):
     def run(self):
         super().run()
-        export_s3_data_of_account(self._s3_uris_file_reader.get_aws_accounts()[-1])
-        _AnalysisProcess().run()
+        _NoCombinedS3DataProcess().run()
 
 
-class _AwsAccountsCombinationProcess(_Process):
+class _CombinesS3DataProcess(_Process):
     def run(self):
         export_s3_data_all_accounts_to_one_file()
 
@@ -100,12 +103,26 @@ class _AnalysisProcess(_Process):
         LocalResults().remove_file_with_analysis_date()
 
 
+class _NoCombinedS3DataProcess(_Process):
+    def run(self):
+        _CombinesS3DataProcess().run()
+        _AnalysisProcess().run()
+
+
 def _get_aws_account_process() -> _Process:
     return _AwsAccountProcess()
 
 
-def _get_aws_accounts_combination_process() -> _Process:
-    return _AwsAccountsCombinationProcess()
+def _get_last_aws_account_process() -> _Process:
+    return _LastAwsAccountProcess()
+
+
+def _get_combine_s3_data_process() -> _Process:
+    return _CombinesS3DataProcess()
+
+
+def _get_no_combined_s3_data_process() -> _Process:
+    return _NoCombinedS3DataProcess()
 
 
 def _get_analysis_process() -> _Process:
