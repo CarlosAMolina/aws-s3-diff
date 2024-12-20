@@ -102,9 +102,6 @@ class _AnalyzedAwsAccounts:
             raise RuntimeError("All AWS accounts have been analyzed")
         return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
 
-    def has_any_account_been_analyzed(self) -> bool:
-        return self._get_last_aws_account_analyzed() is not None
-
     def have_all_aws_accounts_been_analyzed(self) -> bool:
         return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_aws_accounts()[-1]
 
@@ -119,9 +116,7 @@ class _AnalyzedAwsAccounts:
 
 class _FirstAwsAccountProcess(_AwsAccountProcess):
     def run(self):
-        # TODO not required if
-        if not self._analyzed_aws_accounts.has_any_account_been_analyzed():
-            self._local_results.create_analysis_results_folder()
+        self._local_results.create_analysis_results_folder()
         super().run()
 
 
