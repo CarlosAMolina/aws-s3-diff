@@ -116,7 +116,10 @@ class _AnalyzedAwsAccounts:
 
 class _FirstAwsAccountProcess(_AwsAccountProcess):
     def run(self):
-        self._local_results.create_analysis_results_folder()
+        # The folder may exist but not the result file if an error occurred in the previous run,
+        # e.g. errors interacting with S3.
+        if not self._local_results.analysis_paths.directory_analysis.is_dir():
+            self._local_results.create_analysis_results_folder()
         super().run()
 
 
