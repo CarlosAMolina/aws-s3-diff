@@ -83,7 +83,7 @@ class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
         )
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return S3UrisFileAnalyzer().get_aws_accounts()[1]
+        return self._s3_uris_file_analyzer.get_aws_accounts()[1]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
