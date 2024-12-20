@@ -54,6 +54,11 @@ class _ProcessFactory:
             return _AnalysisProcess()
         if self._analyzed_aws_accounts.have_all_aws_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
+        if (
+            self._analyzed_aws_accounts.get_aws_account_to_analyze()
+            == self._s3_uris_file_reader.get_first_aws_account()
+        ):
+            return _FirstAwsAccountProcess()
         if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
@@ -68,8 +73,6 @@ class _AwsAccountProcess(_Process):
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        if not self._analyzed_aws_accounts.has_any_account_been_analyzed():
-            self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
@@ -112,6 +115,14 @@ class _AnalyzedAwsAccounts:
                 return result
             result = aws_account
         return result
+
+
+class _FirstAwsAccountProcess(_AwsAccountProcess):
+    def run(self):
+        # TODO not required if
+        if not self._analyzed_aws_accounts.has_any_account_been_analyzed():
+            self._local_results.create_analysis_results_folder()
+        super().run()
 
 
 class _LastAwsAccountProcess(_AwsAccountProcess):
