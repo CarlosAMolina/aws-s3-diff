@@ -48,7 +48,7 @@ class _InteractiveMenu:
             return _AnalysisProcess()
         if self._analyzed_aws_accounts.have_all_aws_account_been_analyzed():
             return _NoCombinedS3DataProcess()
-        if _AnalyzedAwsAccounts().get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
 
