@@ -37,6 +37,9 @@ class S3UrisFileReader:
     def get_aws_accounts(self) -> list[str]:
         return self.get_df_file_what_to_analyze().columns.to_list()
 
+    def get_first_aws_account(self) -> str:
+        return self.get_aws_accounts()[0]
+
     def get_last_aws_account(self) -> str:
         return self.get_aws_accounts()[-1]
 

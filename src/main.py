@@ -93,7 +93,7 @@ class _AnalyzedAwsAccounts:
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
         last_aws_account_analyzed = self._get_last_aws_account_analyzed()
         if last_aws_account_analyzed is None:
-            return aws_accounts_to_analyze[0]
+            return self._s3_uris_file_reader.get_first_aws_account()
         if last_aws_account_analyzed == self._s3_uris_file_reader.get_last_aws_account():
             # Unexpected situation. This method cannot be called if all accounts have been analyzed.
             raise RuntimeError("All AWS accounts have been analyzed")
