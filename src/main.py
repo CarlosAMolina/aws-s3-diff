@@ -54,14 +54,7 @@ class _ProcessFactory:
             return _AnalysisProcess()
         if self._analyzed_aws_accounts.have_all_aws_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
-        if (
-            self._analyzed_aws_accounts.get_aws_account_to_analyze()
-            == self._s3_uris_file_reader.get_first_aws_account()
-        ):
-            return _FirstAwsAccountProcess()
-        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
-            return _LastAwsAccountProcess()
-        return _IntermediateAccountProcess()
+        return _AwsAccountProcessFactory().get_process()
 
 
 class _AnalyzedAwsAccounts:
@@ -112,6 +105,22 @@ class _AwsAccountProcess(_Process):
                 sys.exit()
             if user_input == "y" or len(user_input) == 0:
                 return
+
+
+class _AwsAccountProcessFactory:
+    def __init__(self):
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_process(self) -> _AwsAccountProcess:
+        if (
+            self._analyzed_aws_accounts.get_aws_account_to_analyze()
+            == self._s3_uris_file_reader.get_first_aws_account()
+        ):
+            return _FirstAwsAccountProcess()
+        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
+            return _LastAwsAccountProcess()
+        return _IntermediateAccountProcess()
 
 
 class _FirstAwsAccountProcess(_AwsAccountProcess):
