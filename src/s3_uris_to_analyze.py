@@ -32,8 +32,6 @@ class S3UrisFileChecker:
 
 
 class S3UrisFileReader:
-    _FILE_NAME_S3_URIS = "s3-uris-to-analyze.csv"
-
     def get_aws_accounts(self) -> list[str]:
         return self.get_df_file_what_to_analyze().columns.to_list()
 
@@ -55,7 +53,7 @@ class S3UrisFileReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._directory_path_what_to_analyze.joinpath(self._FILE_NAME_S3_URIS)
+        return self._directory_path_what_to_analyze.joinpath("s3-uris-to-analyze.csv")
 
     @property
     def _directory_path_what_to_analyze(self) -> Path:
