@@ -39,9 +39,11 @@ class _IteractiveMenu:
         print("\n".join(aws_accounts_list))
 
     def _get_process(self) -> _Process:
+        """
+        Some conditions avoid to generate a file if it exists.
+        For example: the user drops the analysis file in order to run the program and generate the analysis again.
+        """
         if self._have_all_aws_account_been_analyzed():
-            # This condition avoids generating a file if it exists.
-            # For example: the user drops the analysis file in order to run the program and generate the analysis again.
             if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
                 return _AnalysisProcess()
             return _NoCombinedS3DataProcess()
