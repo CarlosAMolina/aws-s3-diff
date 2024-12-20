@@ -58,12 +58,15 @@ _ConditionConfig = dict[str, bool | str]
 
 
 class _AwsAccountsGenerator(ABC):
+    def __init__(self):
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     @abstractmethod
     def get_aws_accounts(self) -> _AnalysisAwsAccounts:
         pass
 
     def _get_aws_account_with_data_to_sync(self) -> str:
-        return S3UrisFileAnalyzer().get_aws_accounts()[0]
+        return self._s3_uris_file_analyzer.get_first_aws_account()
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
         result = S3UrisFileAnalyzer().get_aws_accounts()
