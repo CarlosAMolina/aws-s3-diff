@@ -27,8 +27,6 @@ class _IteractiveMenu:
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        if self._local_results.get_aws_account_index_to_analyze() == 0:
-            self._local_results.create_analysis_results_folder()
         _get_aws_account_process().run()
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
@@ -73,8 +71,12 @@ class _Process(ABC):
 
 
 class _AwsAccountProcess(_Process):
+    def __init__(self):
+        self._local_results = LocalResults()
+
     def run(self):
-        pass
+        if self._local_results.get_aws_account_index_to_analyze() == 0:
+            self._local_results.create_analysis_results_folder()
 
 
 class _AwsAccountExportProcess(_Process):
