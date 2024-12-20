@@ -18,6 +18,9 @@ class LocalResults:
         )
         return len(aws_accounts_analyzed)
 
+    def has_this_aws_account_been_analyzed(self, aws_account: str) -> bool:
+        return self.get_file_path_aws_account_results(aws_account).is_file()
+
     def get_file_path_aws_account_results(self, aws_account: str):
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
