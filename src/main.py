@@ -53,13 +53,13 @@ class _AwsAccountProcess(_Process):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
+        aws_account = self._get_aws_account_to_analyze()
+        print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
 
     def _show_aws_accounts_to_analyze(self):
-        aws_account = self._get_aws_account_to_analyze()
-        print(f"The following AWS account will be analyzed: {aws_account}")
         print("AWS accounts configured to be analyzed:")
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
