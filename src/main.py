@@ -47,8 +47,7 @@ class _InteractiveMenu:
             return _AnalysisProcess()
         if self._have_all_aws_account_been_analyzed():
             return _NoCombinedS3DataProcess()
-        # TODO not use this class and private method for the check.
-        if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+        if _AnalyzedAwsAccounts().get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
             return _LastAwsAccountProcess()
         return _AwsAccountProcess()
 
@@ -62,18 +61,35 @@ class _InteractiveMenu:
 class _AwsAccountProcess(_Process):
     def __init__(self):
         self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
 
     def run(self):
-        aws_account = self._get_aws_account_to_analyze()
+        # TODO? move to _InteractiveMenu
+        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
 
-    # TODO? move to _InteractiveMenu
-    def _get_aws_account_to_analyze(self) -> str:
+    def _exit_program_if_no_aws_credentials_in_terminal(self):
+        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
+        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
+        while True:
+            user_input = input("Y/n: ").lower()
+            if user_input == "n":
+                print("Generate the credentials to work with that AWS account and run the program again")
+                sys.exit()
+            if user_input == "y" or len(user_input) == 0:
+                return
+
+
+class _AnalyzedAwsAccounts:
+    def __init__(self):
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_aws_account_to_analyze(self) -> str:
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
         last_aws_account_analyzed = self._get_last_aws_account_analyzed()
         if last_aws_account_analyzed is None:
@@ -90,17 +106,6 @@ class _AwsAccountProcess(_Process):
                 return result
             result = aws_account
         return result
-
-    def _exit_program_if_no_aws_credentials_in_terminal(self):
-        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
-        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
-        while True:
-            user_input = input("Y/n: ").lower()
-            if user_input == "n":
-                print("Generate the credentials to work with that AWS account and run the program again")
-                sys.exit()
-            if user_input == "y" or len(user_input) == 0:
-                return
 
 
 class _LastAwsAccountProcess(_AwsAccountProcess):
