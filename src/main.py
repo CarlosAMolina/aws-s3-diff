@@ -72,6 +72,7 @@ class _AwsAccountProcess(_Process):
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
 
+    # TODO? move to _IteractiveMenu
     def _get_aws_account_to_analyze(self) -> str:
         aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
