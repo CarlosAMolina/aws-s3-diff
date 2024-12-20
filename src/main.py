@@ -94,7 +94,7 @@ class _LastAwsAccountProcess(_AwsAccountProcess):
         _NoCombinedS3DataProcess().run()
 
 
-class _CombinesS3DataProcess(_Process):
+class _CombineS3DataProcess(_Process):
     def run(self):
         export_s3_data_all_accounts_to_one_file()
 
@@ -107,7 +107,7 @@ class _AnalysisProcess(_Process):
 
 class _NoCombinedS3DataProcess(_Process):
     def run(self):
-        _CombinesS3DataProcess().run()
+        _CombineS3DataProcess().run()
         _AnalysisProcess().run()
 
 
