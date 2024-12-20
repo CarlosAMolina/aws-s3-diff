@@ -52,7 +52,7 @@ class _ProcessFactory:
         """
         if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
             return _AnalysisProcess()
-        if self._analyzed_aws_accounts.have_all_aws_account_been_analyzed():
+        if self._analyzed_aws_accounts.have_all_aws_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
         if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess()
@@ -103,7 +103,7 @@ class _AnalyzedAwsAccounts:
     def has_any_account_been_analyzed(self) -> bool:
         return self._get_last_aws_account_analyzed() is not None
 
-    def have_all_aws_account_been_analyzed(self) -> bool:
+    def have_all_aws_accounts_been_analyzed(self) -> bool:
         return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_aws_accounts()[-1]
 
     def _get_last_aws_account_analyzed(self) -> str | None:
