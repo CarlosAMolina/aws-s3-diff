@@ -91,6 +91,9 @@ class _CombinedAccountsS3DataDfToCsv:
 
 
 class _CombinedAccountsS3DataCsvToDf:
+    def __init__(self):
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     def get_df(self, file_path_s3_data_all_accounts: Path) -> AllAccoutsS3DataDf:
         result = self._get_df_from_file(file_path_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
@@ -98,7 +101,7 @@ class _CombinedAccountsS3DataCsvToDf:
     # TODO extract common code with _get_df_aws_account_from_file
     # TODO use in all scripts `file_path_in_s3_` instead of `file_path_`
     def _get_df_from_file(self, file_path_name: Path) -> Df:
-        aws_accounts = S3UrisFileAnalyzer().get_aws_accounts()
+        aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
         return read_csv(
             file_path_name,
             index_col=[f"bucket_{aws_accounts[0]}", f"file_path_in_s3_{aws_accounts[0]}", "file_name_all_aws_accounts"],
@@ -114,7 +117,7 @@ class _CombinedAccountsS3DataCsvToDf:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
-        for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
+        for aws_account in self._s3_uris_file_analyzer.get_aws_accounts():
             regex_result = re.match(rf"{aws_account}_(?P<key>.*)", column_name)
             if regex_result is not None:
                 return aws_account, regex_result.group("key")
@@ -122,12 +125,15 @@ class _CombinedAccountsS3DataCsvToDf:
 
 
 class _IndividualAccountsS3DataCsvFilesToDf:
+    def __init__(self):
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     def get_df(self) -> AllAccoutsS3DataDf:
         result = self._get_df_combine_aws_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
 
     def _get_df_combine_aws_accounts_results(self) -> AllAccoutsS3DataDf:
-        aws_accounts = S3UrisFileAnalyzer().get_aws_accounts()
+        aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
         result = self._get_df_for_aws_account(aws_accounts[0])
         for aws_account in aws_accounts[1:]:
             account_df = self._get_df_for_aws_account(aws_account)
