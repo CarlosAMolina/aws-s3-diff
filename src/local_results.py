@@ -9,6 +9,7 @@ class LocalResults:
         analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
         self.analysis_paths = _AnalysisPaths(analysis_date_time_str)
 
+    # TODO incorrect, any file is detected as an account s3 data file.
     def get_aws_account_index_to_analyze(self) -> int:
         aws_accounts_analyzed = (
             [file_path.stem for file_path in self.analysis_paths.directory_analysis.iterdir()]
