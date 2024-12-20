@@ -21,7 +21,7 @@ class S3UrisFileChecker:
             raise ValueError("Some AWS account names are empty")
 
     def _assert_no_empty_uris(self):
-        if self._s3_uris_file_reader.get_df_file_what_to_analyze().isnull().values.any():
+        if self._s3_uris_file_reader.df_file_what_to_analyze.isnull().values.any():
             raise ValueError("Some URIs are empty")
 
     def _assert_no_duplicated_uri_per_account(self):
@@ -32,8 +32,13 @@ class S3UrisFileChecker:
 
 
 class S3UrisFileReader:
+    def __init__(self):
+        # TODO I don't like to read a file in __init__()
+        # TODO make private
+        self.df_file_what_to_analyze = self._get_df_file_what_to_analyze()
+
     def get_aws_accounts(self) -> list[str]:
-        return self.get_df_file_what_to_analyze().columns.to_list()
+        return self.df_file_what_to_analyze.columns.to_list()
 
     def get_first_aws_account(self) -> str:
         return self.get_aws_accounts()[0]
@@ -42,13 +47,13 @@ class S3UrisFileReader:
         return self.get_aws_accounts()[-1]
 
     def get_s3_queries_for_aws_account(self, aws_account: str) -> list[S3Query]:
-        s3_uris_to_analyze = self.get_df_file_what_to_analyze()[aws_account].to_list()
+        s3_uris_to_analyze = self.df_file_what_to_analyze[aws_account].to_list()
         return [self.get_s3_query_from_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
     def get_s3_query_from_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
-    def get_df_file_what_to_analyze(self) -> Df:
+    def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
 
     @property

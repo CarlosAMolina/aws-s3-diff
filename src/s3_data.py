@@ -181,9 +181,7 @@ class _S3UriDfModifier:
         return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
 
     def _get_df_s3_uris_map_between_accounts(self) -> Df:
-        return self._s3_uris_file_reader.get_df_file_what_to_analyze()[
-            [self._aws_account_origin, self._aws_account_target]
-        ]
+        return self._s3_uris_file_reader.df_file_what_to_analyze[[self._aws_account_origin, self._aws_account_target]]
 
     def _get_df_modify_buckets_and_paths(self, s3_uris_map_df: Df) -> Df:
         result = self._df.copy()
