@@ -113,12 +113,10 @@ class _AwsAccountProcessFactory:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _AwsAccountProcess:
-        if (
-            self._analyzed_aws_accounts.get_aws_account_to_analyze()
-            == self._s3_uris_file_reader.get_first_aws_account()
-        ):
+        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
+        if aws_account == self._s3_uris_file_reader.get_first_aws_account():
             return _FirstAwsAccountProcess()
-        if self._analyzed_aws_accounts.get_aws_account_to_analyze() == self._s3_uris_file_reader.get_last_aws_account():
+        if aws_account == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess()
         return _IntermediateAccountProcess()
 
