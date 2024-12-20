@@ -69,7 +69,7 @@ class _AwsAccountsGenerator(ABC):
         return self._s3_uris_file_analyzer.get_first_aws_account()
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = S3UrisFileAnalyzer().get_aws_accounts()
+        result = self._s3_uris_file_analyzer.get_aws_accounts()
         result.remove(self._get_aws_account_with_data_to_sync())
         return result
 
