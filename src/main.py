@@ -67,6 +67,8 @@ class _AwsAccountProcess(_Process):
     def _get_aws_account_to_analyze(self) -> str:
         aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
+        if aws_account_index_to_analyze >= len(aws_accounts_to_analyze):
+            sys.exit("All AWS accounts have been analyzed")
         return aws_accounts_to_analyze[aws_account_index_to_analyze]
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
