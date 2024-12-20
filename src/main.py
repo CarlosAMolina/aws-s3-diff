@@ -43,9 +43,9 @@ class _IteractiveMenu:
         Some conditions avoid to generate a file if it exists.
         For example: the user drops the analysis file in order to run the program and generate the analysis again.
         """
+        if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
+            return _AnalysisProcess()
         if self._have_all_aws_account_been_analyzed():
-            if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
-                return _AnalysisProcess()
             return _NoCombinedS3DataProcess()
         # TODO not use this class and private method for the check.
         if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
