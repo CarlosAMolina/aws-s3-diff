@@ -23,6 +23,7 @@ class _IteractiveMenu:
         print("Welcome to the AWS S3 Diff tool!")
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
+        self._show_aws_accounts_to_analyze()
         _get_aws_account_process().run()
         aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
         _get_aws_account_export_process(aws_account).run()
@@ -32,6 +33,12 @@ class _IteractiveMenu:
             if not self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
                 _get_aws_accounts_combination_process().run()
             _get_analysis_process().run()
+
+    def _show_aws_accounts_to_analyze(self):
+        print("AWS accounts configured to be analyzed:")
+        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
+        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
+        print("\n".join(aws_accounts_list))
 
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
@@ -52,18 +59,11 @@ class _AwsAccountProcess(_Process):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
-        self._show_aws_accounts_to_analyze()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
-
-    def _show_aws_accounts_to_analyze(self):
-        print("AWS accounts configured to be analyzed:")
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
-        print("\n".join(aws_accounts_list))
 
     def _get_aws_account_to_analyze(self) -> str:
         aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
