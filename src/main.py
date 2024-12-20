@@ -23,7 +23,6 @@ class _IteractiveMenu:
         print("Welcome to the AWS S3 Diff tool!")
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
-        _get_aws_account_process()._show_aws_accounts_to_analyze()  # TODO move to class
         _get_aws_account_process().run()
         aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
         _get_aws_account_export_process(aws_account).run()
@@ -53,6 +52,7 @@ class _AwsAccountProcess(_Process):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
+        self._show_aws_accounts_to_analyze()
         aws_account = self._get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
