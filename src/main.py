@@ -68,7 +68,8 @@ class _AwsAccountProcess(_Process):
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        if self._local_results.get_aws_account_index_to_analyze() == 0:
+        # TODO DEPRECATE if self._local_results.get_aws_account_index_to_analyze() == 0:
+        if not self._analyzed_aws_accounts.has_any_account_been_analyzed():
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
 
@@ -98,6 +99,9 @@ class _AnalyzedAwsAccounts:
             # Unexpected situation. This method cannot be called if all accounts have been analyzed.
             raise RuntimeError("All AWS accounts have been analyzed")
         return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
+
+    def has_any_account_been_analyzed(self) -> bool:
+        return self._get_last_aws_account_analyzed() is not None
 
     def _get_last_aws_account_analyzed(self) -> str | None:
         result = None
