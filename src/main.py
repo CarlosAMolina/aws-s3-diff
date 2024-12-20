@@ -33,11 +33,6 @@ class _IteractiveMenu:
         print("\n".join(aws_accounts_list))
 
     def _run_process(self):
-        # TODO not use this class and private method for the check.
-        if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
-            _get_last_aws_account_process().run()
-        else:
-            _get_aws_account_process().run()
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating a file if it exists.
             # For example: the user drops the analysis file in order to run the program and generate the analysis again.
@@ -45,6 +40,11 @@ class _IteractiveMenu:
                 _get_analysis_process().run()
             else:
                 _get_no_combined_s3_data_process().run()
+        # TODO not use this class and private method for the check.
+        elif _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+            _get_last_aws_account_process().run()
+        else:
+            _get_aws_account_process().run()
 
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
