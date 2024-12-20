@@ -78,6 +78,10 @@ class _TargetAccountWithoutMoreFilesDfAnalysisConfig(_DfAnalysisConfig):
 
 
 class TestDfAnalysis(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     # TODO rename folder `test-origin-file-sync`
     @patch(
         "src.analysis.S3UrisFileAnalyzer._directory_path_what_to_analyze",
@@ -101,7 +105,7 @@ class TestDfAnalysis(unittest.TestCase):
 
     @property
     def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
-        all_aws_accounts = S3UrisFileAnalyzer().get_aws_accounts()
+        all_aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
         return _CompareAwsAccounts(*all_aws_accounts[:2])
 
 
