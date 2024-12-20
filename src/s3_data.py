@@ -60,6 +60,9 @@ class _AwsAccountExtractor:
 
 
 class _CombinedAccountsS3DataDfToCsv:
+    def __init__(self):
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+
     def export(self, df: Df):
         file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
         print(f"Exporting all AWS accounts S3 files information to {file_path}")
@@ -73,7 +76,7 @@ class _CombinedAccountsS3DataDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = S3UrisFileAnalyzer().get_aws_accounts()[0]
+        aws_account_1 = self._s3_uris_file_analyzer.get_first_aws_account()
         result.index.names = [
             f"bucket_{aws_account_1}",
             f"file_path_in_s3_{aws_account_1}",
