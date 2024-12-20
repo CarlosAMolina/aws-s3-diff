@@ -65,7 +65,6 @@ class _AwsAccountProcess(_Process):
         self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
 
     def run(self):
-        # TODO? move to _InteractiveMenu
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         print(f"The following AWS account will be analyzed: {aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
