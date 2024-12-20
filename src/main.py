@@ -11,7 +11,7 @@ from s3_uris_to_analyze import S3UrisFileReader
 
 
 def run():
-    _IteractiveMenu().run()
+    _InteractiveMenu().run()
 
 
 class _Process(ABC):
@@ -20,7 +20,7 @@ class _Process(ABC):
         pass
 
 
-class _IteractiveMenu:
+class _InteractiveMenu:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
         self._local_results = LocalResults()
@@ -72,7 +72,7 @@ class _AwsAccountProcess(_Process):
             self._local_results.create_analysis_results_folder()
         export_s3_data_of_account(aws_account)
 
-    # TODO? move to _IteractiveMenu
+    # TODO? move to _InteractiveMenu
     def _get_aws_account_to_analyze(self) -> str:
         for aws_account in self._s3_uris_file_reader.get_aws_accounts():
             if not self._local_results.has_this_aws_account_been_analyzed(aws_account):
