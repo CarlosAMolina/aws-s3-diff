@@ -62,7 +62,7 @@ class _AwsAccountProcess(_Process):
         self._exit_program_if_no_aws_credentials_in_terminal()
         if self._local_results.get_aws_account_index_to_analyze() == 0:
             self._local_results.create_analysis_results_folder()
-        _get_aws_account_export_process(aws_account).run()
+        export_s3_data_of_account(aws_account)
 
     def _get_aws_account_to_analyze(self) -> str:
         aws_account_index_to_analyze = self._local_results.get_aws_account_index_to_analyze()
@@ -82,6 +82,7 @@ class _AwsAccountProcess(_Process):
                 return
 
 
+# TODO drop
 class _AwsAccountExportProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
@@ -105,6 +106,7 @@ def _get_aws_account_process() -> _Process:
     return _AwsAccountProcess()
 
 
+# TODO drop
 def _get_aws_account_export_process(aws_account: str) -> _Process:
     return _AwsAccountExportProcess(aws_account)
 
