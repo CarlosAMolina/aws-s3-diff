@@ -14,6 +14,12 @@ def run():
     _IteractiveMenu().run()
 
 
+class _Process(ABC):
+    @abstractmethod
+    def run(self):
+        pass
+
+
 class _IteractiveMenu:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -24,7 +30,7 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
-        self._run_process()
+        self._get_process().run()
 
     def _show_aws_accounts_to_analyze(self):
         print("AWS accounts configured to be analyzed:")
@@ -32,31 +38,23 @@ class _IteractiveMenu:
         aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
         print("\n".join(aws_accounts_list))
 
-    def _run_process(self):
+    def _get_process(self) -> _Process:
         if self._have_all_aws_account_been_analyzed():
             # This condition avoids generating a file if it exists.
             # For example: the user drops the analysis file in order to run the program and generate the analysis again.
             if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
-                _get_analysis_process().run()
-            else:
-                _get_no_combined_s3_data_process().run()
+                return _get_analysis_process()
+            return _get_no_combined_s3_data_process()
         # TODO not use this class and private method for the check.
-        elif _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
-            _get_last_aws_account_process().run()
-        else:
-            _get_aws_account_process().run()
+        if _AwsAccountProcess()._get_aws_account_to_analyze() == self._s3_uris_file_reader.get_aws_accounts()[-1]:
+            return _get_last_aws_account_process()
+        return _get_aws_account_process()
 
     def _have_all_aws_account_been_analyzed(self) -> bool:
         return (
             self._local_results.get_aws_account_index_to_analyze()
             == self._s3_uris_file_reader.get_number_of_aws_accounts()
         )
-
-
-class _Process(ABC):
-    @abstractmethod
-    def run(self):
-        pass
 
 
 class _AwsAccountProcess(_Process):
