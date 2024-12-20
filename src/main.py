@@ -24,8 +24,7 @@ class _IteractiveMenu:
         print("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         _get_aws_account_process()._show_aws_accounts_to_analyze()  # TODO move to class
-        aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO move to class
-        print(f"The following AWS account will be analyzed: {aws_account}")
+        aws_account = _get_aws_account_process()._get_aws_account_to_analyze()  # TODO rm
         _get_aws_account_process().run()
         _get_aws_account_export_process(aws_account).run()
         if self._have_all_aws_account_been_analyzed():
@@ -59,6 +58,8 @@ class _AwsAccountProcess(_Process):
             self._local_results.create_analysis_results_folder()
 
     def _show_aws_accounts_to_analyze(self):
+        aws_account = self._get_aws_account_to_analyze()
+        print(f"The following AWS account will be analyzed: {aws_account}")
         print("AWS accounts configured to be analyzed:")
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
