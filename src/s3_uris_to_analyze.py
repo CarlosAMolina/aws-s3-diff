@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 
+import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 
@@ -9,6 +10,7 @@ from types_custom import S3Query
 
 class S3UrisFileChecker:
     def __init__(self):
+        # TODO rename _s3_uris_file_reader  to _s3_uris_file_analyzer
         self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def assert_file_is_correct(self):
@@ -21,7 +23,7 @@ class S3UrisFileChecker:
             raise ValueError("Some AWS account names are empty")
 
     def _assert_no_empty_uris(self):
-        if self._s3_uris_file_reader.df_file_what_to_analyze.isnull().values.any():
+        if self._s3_uris_file_reader.is_any_uri_null():
             raise ValueError("Some URIs are empty")
 
     def _assert_no_duplicated_uri_per_account(self):
@@ -55,6 +57,9 @@ class S3UrisFileAnalyzer:
 
     def get_df_s3_uris_map_between_accounts(self, aws_account_origin: str, aws_account_target: str) -> Df:
         return self.df_file_what_to_analyze[[aws_account_origin, aws_account_target]]
+
+    def is_any_uri_null(self) -> np.bool:
+        return self.df_file_what_to_analyze.isnull().values.any()
 
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
