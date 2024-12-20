@@ -7,7 +7,7 @@ from pandas import Series
 
 from local_results import LocalResults
 from s3_data import get_df_s3_data_all_accounts
-from s3_uris_to_analyze import S3UrisFileReader
+from s3_uris_to_analyze import S3UrisFileAnalyzer
 from types_custom import AllAccoutsS3DataDf
 from types_custom import AnalysisS3DataDf
 
@@ -63,10 +63,10 @@ class _AwsAccountsGenerator(ABC):
         pass
 
     def _get_aws_account_with_data_to_sync(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[0]
+        return S3UrisFileAnalyzer().get_aws_accounts()[0]
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = S3UrisFileReader().get_aws_accounts()
+        result = S3UrisFileAnalyzer().get_aws_accounts()
         result.remove(self._get_aws_account_with_data_to_sync())
         return result
 
@@ -80,7 +80,7 @@ class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
         )
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return S3UrisFileReader().get_aws_accounts()[1]
+        return S3UrisFileAnalyzer().get_aws_accounts()[1]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
@@ -280,7 +280,7 @@ class _AnalysisDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = S3UrisFileReader().get_aws_accounts()[0]
+        aws_account_1 = S3UrisFileAnalyzer().get_aws_accounts()[0]
         result.index.names = [
             f"bucket_{aws_account_1}",
             f"file_path_in_s3_{aws_account_1}",

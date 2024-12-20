@@ -18,9 +18,9 @@ class TestS3UriParts(unittest.TestCase):
         self.assertEqual("my-folder/my-object.png", result)
 
 
-class TestS3UrisFileReader(unittest.TestCase):
+class TestS3UrisFileAnalyzer(unittest.TestCase):
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
@@ -47,13 +47,13 @@ class TestS3UrisFileReader(unittest.TestCase):
                 S3Query("pets_dev", "non-existent-prefix"),
             ],
         }.items():
-            result = m_uris_to_analyze.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
+            result = m_uris_to_analyze.S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account)
             self.assertEqual(expected_result, result)
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
+        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/empty_aws_account.csv"),
     )
@@ -63,7 +63,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
         self.assertEqual("Some AWS account names are empty", str(exception.exception))
 
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
+        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/empty_uri.csv"),
     )
@@ -73,7 +73,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
         self.assertEqual("Some URIs are empty", str(exception.exception))
 
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._file_path_what_to_analyze",
+        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/duplicated_uri.csv"),
     )

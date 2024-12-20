@@ -6,8 +6,8 @@ from analysis import S3DataAnalyzer
 from local_results import LocalResults
 from s3_data import export_s3_data_all_accounts_to_one_file
 from s3_data import export_s3_data_of_account
+from s3_uris_to_analyze import S3UrisFileAnalyzer
 from s3_uris_to_analyze import S3UrisFileChecker
-from s3_uris_to_analyze import S3UrisFileReader
 
 
 def run():
@@ -16,7 +16,7 @@ def run():
 
 class _InteractiveMenu:
     def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
         self._process_factory = _ProcessFactory()
 
     def run(self):
@@ -43,7 +43,7 @@ class _ProcessFactory:
     def __init__(self):
         self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
         self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def get_process(self) -> _Process:
         """
@@ -60,7 +60,7 @@ class _ProcessFactory:
 class _AnalyzedAwsAccounts:
     def __init__(self):
         self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def get_aws_account_to_analyze(self) -> str:
         aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
@@ -108,7 +108,7 @@ class _AwsAccountProcess(_Process):
 class _AwsAccountProcessFactory:
     def __init__(self):
         self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def get_process(self) -> _AwsAccountProcess:
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()

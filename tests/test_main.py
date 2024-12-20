@@ -10,7 +10,7 @@ from pandas.testing import assert_frame_equal
 from src import main as m_main
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
-from src.s3_uris_to_analyze import S3UrisFileReader
+from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
 
 
@@ -30,15 +30,15 @@ class TestFunction_run(unittest.TestCase):
         cls._s3_server.stop()
 
     @patch(
-        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.analysis.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
     @patch("src.main.input", create=True)
     @patch.object(m_main.LocalResults, "remove_file_with_analysis_date")
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
-        mock_input.side_effect = ["Y"] * len(S3UrisFileReader().get_aws_accounts())
-        for aws_account in S3UrisFileReader().get_aws_accounts():
+        mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
+        for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             self._s3_server.create_objects(aws_account)
             m_main.run()
         result = self._get_df_from_csv(LocalResults().analysis_paths.file_analysis)

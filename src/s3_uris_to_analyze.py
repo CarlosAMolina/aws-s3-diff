@@ -9,7 +9,7 @@ from types_custom import S3Query
 
 class S3UrisFileChecker:
     def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def assert_file_is_correct(self):
         self._assert_no_empty_aws_account()
@@ -31,7 +31,7 @@ class S3UrisFileChecker:
                 raise ValueError(f"The AWS account {aws_account} has duplicated URIs")
 
 
-class S3UrisFileReader:
+class S3UrisFileAnalyzer:
     def __init__(self):
         # TODO I don't like to read a file in __init__()
         # TODO make private

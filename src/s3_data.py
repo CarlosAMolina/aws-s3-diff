@@ -10,7 +10,7 @@ from pandas import read_csv
 
 from local_results import LocalResults
 from s3_client import S3Client
-from s3_uris_to_analyze import S3UrisFileReader
+from s3_uris_to_analyze import S3UrisFileAnalyzer
 from types_custom import AllAccoutsS3DataDf
 from types_custom import S3Data
 from types_custom import S3Query
@@ -19,7 +19,7 @@ from types_custom import S3Query
 def export_s3_data_of_account(aws_account: str):
     _AwsAccountExtractor(
         LocalResults().get_file_path_aws_account_results(aws_account),
-        S3UrisFileReader().get_s3_queries_for_aws_account(aws_account),
+        S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account),
     ).extract()
 
 
@@ -73,7 +73,7 @@ class _CombinedAccountsS3DataDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = S3UrisFileReader().get_aws_accounts()[0]
+        aws_account_1 = S3UrisFileAnalyzer().get_aws_accounts()[0]
         result.index.names = [
             f"bucket_{aws_account_1}",
             f"file_path_in_s3_{aws_account_1}",
@@ -95,7 +95,7 @@ class _CombinedAccountsS3DataCsvToDf:
     # TODO extract common code with _get_df_aws_account_from_file
     # TODO use in all scripts `file_path_in_s3_` instead of `file_path_`
     def _get_df_from_file(self, file_path_name: Path) -> Df:
-        aws_accounts = S3UrisFileReader().get_aws_accounts()
+        aws_accounts = S3UrisFileAnalyzer().get_aws_accounts()
         return read_csv(
             file_path_name,
             index_col=[f"bucket_{aws_accounts[0]}", f"file_path_in_s3_{aws_accounts[0]}", "file_name_all_aws_accounts"],
@@ -111,7 +111,7 @@ class _CombinedAccountsS3DataCsvToDf:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
-        for aws_account in S3UrisFileReader().get_aws_accounts():
+        for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             regex_result = re.match(rf"{aws_account}_(?P<key>.*)", column_name)
             if regex_result is not None:
                 return aws_account, regex_result.group("key")
@@ -124,7 +124,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
         return self._get_df_drop_incorrect_empty_rows(result)
 
     def _get_df_combine_aws_accounts_results(self) -> AllAccoutsS3DataDf:
-        aws_accounts = S3UrisFileReader().get_aws_accounts()
+        aws_accounts = S3UrisFileAnalyzer().get_aws_accounts()
         result = self._get_df_for_aws_account(aws_accounts[0])
         for aws_account in aws_accounts[1:]:
             account_df = self._get_df_for_aws_account(aws_account)
@@ -174,7 +174,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
 class _S3UriDfModifier:
     def __init__(self, *args):
         self._aws_account_origin, self._aws_account_target, self._df = args
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileAnalyzer()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         s3_uris_map_df = self._get_df_s3_uris_map_between_accounts()

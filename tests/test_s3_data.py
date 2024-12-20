@@ -10,7 +10,7 @@ from pandas.testing import assert_frame_equal
 from src import s3_data as m_s3_data
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
-from src.s3_uris_to_analyze import S3UrisFileReader
+from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
 
 ExpectedResult = list[dict]
@@ -30,7 +30,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         cls._s3_server.stop()
 
     @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
@@ -43,7 +43,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
         }.items():
             self._s3_server.create_objects(aws_account)
             file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
-            s3_queries = S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
+            s3_queries = S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account)
             m_s3_data._AwsAccountExtractor(file_path_results, s3_queries).extract()
             result_df = read_csv_as_df(file_path_results)
             expected_result_df = read_csv_as_df(file_path_name_expected_result)
