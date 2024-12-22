@@ -1,6 +1,4 @@
 import unittest
-from pathlib import Path
-from unittest import mock
 
 from pandas import DataFrame as Df
 from pandas import MultiIndex
@@ -8,40 +6,21 @@ from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import s3_data as m_s3_data
-from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
-from tests.aws import S3Server
 
 ExpectedResult = list[dict]
 
 
 class TestAwsAccountExtractor(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._s3_server = S3Server()
-        cls._s3_server.start()
-        # Drop file created by the user or by other tests.
-        if _MainPaths().file_analysis_date_time.is_file():
-            LocalResults().remove_file_with_analysis_date()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._s3_server.stop()
-
-    @mock.patch(
-        "src.s3_uris_to_analyze.S3UrisFileAnalyzer._directory_path_what_to_analyze",
-        new_callable=mock.PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
-    )
-    def test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze):
+    def run_test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze, s3_server):
         LocalResults().create_analysis_results_folder()
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
             "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
         }.items():
-            self._s3_server.create_objects(aws_account)
+            s3_server.create_objects(aws_account)
             file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
             s3_queries = S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account)
             m_s3_data._AwsAccountExtractor(file_path_results, s3_queries).extract()
