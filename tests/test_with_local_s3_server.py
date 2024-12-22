@@ -19,7 +19,7 @@ class TestWithLocalS3Server(unittest.TestCase):
         # TODO rename in all files _s3_server to _mock_s3_server
         cls._s3_server = S3Server()
         cls._s3_server.start()
-        # Drop file created by the user or by other tests.
+        # Drop file created by the user
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
 
