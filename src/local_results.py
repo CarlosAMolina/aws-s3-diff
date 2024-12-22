@@ -33,9 +33,12 @@ class _AnalysisDateTime:
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
-        date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         with open(self._main_paths.file_analysis_date_time, "w") as file:
-            file.write(date_time_str)
+            file.write(self._new_date_time_str)
+
+    @property
+    def _new_date_time_str(self) -> str:
+        return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_date_time_str_stored(self) -> str:
         with open(self._main_paths.file_analysis_date_time) as file:
