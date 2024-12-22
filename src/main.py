@@ -143,16 +143,16 @@ class _LastAwsAccountProcess(_AwsAccountProcess):
         _NoCombinedS3DataProcess().run()
 
 
-class _AnalysisProcess(_Process):
-    def run(self):
-        S3DataAnalyzer().run()
-        LocalResults().remove_file_with_analysis_date()
-
-
 class _NoCombinedS3DataProcess(_Process):
     def run(self):
         export_s3_data_all_accounts_to_one_file()
         _AnalysisProcess().run()
+
+
+class _AnalysisProcess(_Process):
+    def run(self):
+        S3DataAnalyzer().run()
+        LocalResults().remove_file_with_analysis_date()
 
 
 if __name__ == "__main__":
