@@ -1,3 +1,4 @@
+import shutil
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -57,6 +58,7 @@ class TestFunction_run(unittest.TestCase):
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
         mock_remove_file_with_analysis_date.assert_called_once()
+        shutil.rmtree(LocalResults().analysis_paths.directory_analysis)
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
