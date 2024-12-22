@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -31,7 +32,16 @@ class TestWithLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
-    def test_run_test_of_test_s3_data(self, mock_directory_path_what_to_analyze):
+    @patch(
+        "src.local_results._AnalysisDateTime._new_date_time_str",
+        new_callable=PropertyMock,
+        return_value=f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}-test-s3-data',
+    )
+    def test_run_test_of_test_s3_data(
+        self,
+        mock_new_date_time_str,
+        mock_directory_path_what_to_analyze,
+    ):
         m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(
             mock_directory_path_what_to_analyze, self._s3_server
         )
