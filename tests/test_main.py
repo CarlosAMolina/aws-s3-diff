@@ -36,10 +36,14 @@ class TestFunction_run(unittest.TestCase):
     )
     @patch("src.main.input", create=True)
     @patch.object(m_main.LocalResults, "remove_file_with_analysis_date")
-    def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
-        self._run_test_run(mock_local_results, mock_input, mock_directory_path_what_to_analyze, self._s3_server)
+    def test_run(self, mock_remove_file_with_analysis_date, mock_input, mock_directory_path_what_to_analyze):
+        self._run_test_run(
+            mock_remove_file_with_analysis_date, mock_input, mock_directory_path_what_to_analyze, self._s3_server
+        )
 
-    def _run_test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze, s3_server):
+    def _run_test_run(
+        self, mock_remove_file_with_analysis_date, mock_input, mock_directory_path_what_to_analyze, s3_server
+    ):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             s3_server.create_objects(aws_account)
@@ -48,7 +52,7 @@ class TestFunction_run(unittest.TestCase):
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
-        mock_local_results.assert_called_once()
+        mock_remove_file_with_analysis_date.assert_called_once()
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
