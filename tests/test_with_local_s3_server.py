@@ -42,9 +42,7 @@ class TestWithLocalS3Server(unittest.TestCase):
         mock_new_date_time_str,
         mock_directory_path_what_to_analyze,
     ):
-        m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(
-            mock_directory_path_what_to_analyze, self._s3_server
-        )
+        m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(self._s3_server)
 
     def test_run_test_of_m_test_s3_client(self):
         # TODO remove previous created objects?

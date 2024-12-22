@@ -13,7 +13,7 @@ ExpectedResult = list[dict]
 
 
 class TestAwsAccountExtractor(unittest.TestCase):
-    def run_test_extract_generates_expected_result(self, mock_directory_path_what_to_analyze, s3_server):
+    def run_test_extract_generates_expected_result(self, s3_server):
         LocalResults().create_analysis_results_folder()
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
