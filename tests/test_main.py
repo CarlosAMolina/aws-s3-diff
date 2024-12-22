@@ -37,9 +37,9 @@ class TestFunction_run(unittest.TestCase):
     @patch("src.main.input", create=True)
     @patch.object(m_main.LocalResults, "remove_file_with_analysis_date")
     def test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze):
-        self.run_test_run(mock_local_results, mock_input, mock_directory_path_what_to_analyze, self._s3_server)
+        self._run_test_run(mock_local_results, mock_input, mock_directory_path_what_to_analyze, self._s3_server)
 
-    def run_test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze, s3_server):
+    def _run_test_run(self, mock_local_results, mock_input, mock_directory_path_what_to_analyze, s3_server):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             s3_server.create_objects(aws_account)
