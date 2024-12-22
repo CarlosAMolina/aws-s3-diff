@@ -27,6 +27,10 @@ class TestWithLocalS3Server(unittest.TestCase):
     def tearDownClass(cls):
         cls._s3_server.stop()
 
+    def tearDown(self):
+        if _MainPaths().file_analysis_date_time.is_file():
+            LocalResults().remove_file_with_analysis_date()
+
     @patch(
         "src.s3_uris_to_analyze.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=PropertyMock,
