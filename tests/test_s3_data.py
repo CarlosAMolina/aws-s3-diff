@@ -1,3 +1,4 @@
+import shutil
 import unittest
 
 from pandas import DataFrame as Df
@@ -28,6 +29,7 @@ class TestAwsAccountExtractor(unittest.TestCase):
             expected_result_df = read_csv_as_df(file_path_name_expected_result)
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
+        shutil.rmtree(LocalResults().analysis_paths.directory_analysis)
 
 
 class TestS3UriDfModifier(unittest.TestCase):
