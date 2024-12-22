@@ -25,6 +25,10 @@ class TestFunction_run(unittest.TestCase):
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().remove_file_with_analysis_date()
 
+    def tearDown(self):
+        if _MainPaths().file_analysis_date_time.is_file():
+            LocalResults().remove_file_with_analysis_date()
+
     @classmethod
     def tearDownClass(cls):
         cls._s3_server.stop()
@@ -53,7 +57,6 @@ class TestFunction_run(unittest.TestCase):
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
         mock_remove_file_with_analysis_date.assert_called_once()
-        LocalResults().remove_file_with_analysis_date()
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
