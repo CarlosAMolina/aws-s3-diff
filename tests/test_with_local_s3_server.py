@@ -1,4 +1,3 @@
-import datetime
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -35,15 +34,19 @@ class TestWithLocalS3Server(unittest.TestCase):
     @patch(
         "src.local_results._AnalysisDateTime._new_date_time_str",
         new_callable=PropertyMock,
-        return_value=f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}-test-s3-data',
+        return_value="20240101000000-test-s3-data",
+    )
+    @patch(
+        "src.local_results._AnalysisDateTime.get_analysis_date_time_str",
+        return_value="20240101000000-test-s3-data",
     )
     def test_run_test_s3_data(
         self,
+        mock_get_analysis_date_time_str,
         mock_new_date_time_str,
         mock_directory_path_what_to_analyze,
     ):
         m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(self._s3_server)
-        LocalResults().remove_file_with_analysis_date()
 
     def test_run_test_s3_client(self):
         # TODO remove previous created objects?
