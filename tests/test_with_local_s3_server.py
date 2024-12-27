@@ -31,21 +31,17 @@ class TestWithLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
-    @patch(
-        "src.local_results._AnalysisDateTime._new_date_time_str",
-        new_callable=PropertyMock,
-        return_value="20240101000000-test-s3-data",
-    )
-    @patch(
-        "src.local_results._AnalysisDateTime.get_analysis_date_time_str",
-        return_value="20240101000000-test-s3-data",
-    )
+    @patch("src.local_results._AnalysisDateTime._new_date_time_str", new_callable=PropertyMock)
+    @patch("src.local_results._AnalysisDateTime.get_analysis_date_time_str")
     def test_run_test_s3_data(
         self,
         mock_get_analysis_date_time_str,
         mock_new_date_time_str,
         mock_directory_path_what_to_analyze,
     ):
+        fake_analysis_date_time_str = "20240101000000-test-s3-data"
+        mock_get_analysis_date_time_str.return_value = fake_analysis_date_time_str
+        mock_new_date_time_str.return_value = fake_analysis_date_time_str
         m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(self._s3_server)
 
     def test_run_test_s3_client(self):
