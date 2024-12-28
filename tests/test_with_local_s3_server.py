@@ -54,8 +54,5 @@ class TestWithLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
     )
     @patch("src.main.input", create=True)
-    @patch("src.main.LocalResults.remove_file_with_analysis_date")  # TODO RM
-    def test_run(self, mock_remove_file_with_analysis_date, mock_input, mock_directory_path_what_to_analyze):
-        m_test_main.TestFunction_run().run_test_run(
-            mock_remove_file_with_analysis_date, mock_input, mock_directory_path_what_to_analyze, self._s3_server
-        )
+    def test_run(self, mock_input, mock_directory_path_what_to_analyze):
+        m_test_main.TestFunction_run().run_test_run(mock_input, mock_directory_path_what_to_analyze, self._s3_server)
