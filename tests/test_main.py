@@ -19,6 +19,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             local_s3_server.create_objects(aws_account)
             m_main.run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        self._test_extracted_aws_accounts_data(analysis_paths)
         result = self._get_df_from_csv(analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
@@ -45,3 +46,15 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
                 "aws_account_3_dev_size": "Int64",
             }
         )
+
+    def _test_extracted_aws_accounts_data(self, analysis_paths: _AnalysisPaths):
+        for aws_account, file_path_name_expected_result in {
+            "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
+            "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
+            "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
+        }.items():
+            file_path_results = analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
+            result_df = read_csv(file_path_results)
+            expected_result_df = read_csv(file_path_name_expected_result)
+            expected_result_df["date"] = result_df["date"]
+            assert_frame_equal(expected_result_df, result_df)

@@ -1,35 +1,12 @@
-import shutil
 import unittest
 
 from pandas import DataFrame as Df
 from pandas import MultiIndex
-from pandas import read_csv as read_csv_as_df
 from pandas.testing import assert_frame_equal
 
 from src import s3_data as m_s3_data
-from src.local_results import LocalResults
-from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 
 ExpectedResult = list[dict]
-
-
-class TestAwsAccountExtractorLocalS3Server(unittest.TestCase):
-    def run_test_extract_generates_expected_result(self, local_s3_server):
-        LocalResults().create_analysis_results_folder()
-        for aws_account, file_path_name_expected_result in {
-            "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
-            "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
-            "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
-        }.items():
-            local_s3_server.create_objects(aws_account)
-            file_path_results = LocalResults().get_file_path_aws_account_results(aws_account)
-            s3_queries = S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account)
-            m_s3_data._AwsAccountExtractor(file_path_results, s3_queries).extract()
-            result_df = read_csv_as_df(file_path_results)
-            expected_result_df = read_csv_as_df(file_path_name_expected_result)
-            expected_result_df["date"] = result_df["date"]
-            assert_frame_equal(expected_result_df, result_df)
-        shutil.rmtree(LocalResults().analysis_paths.directory_analysis)
 
 
 class TestS3UriDfModifier(unittest.TestCase):
