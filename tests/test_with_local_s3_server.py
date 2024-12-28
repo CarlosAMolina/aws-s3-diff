@@ -44,7 +44,6 @@ class TestWithLocalS3Server(unittest.TestCase):
         m_test_s3_data.TestAwsAccountExtractor().run_test_extract_generates_expected_result(self._s3_server)
 
     def test_run_test_s3_client(self):
-        # TODO remove previous created objects?
         self._s3_server.create_objects("aws_account_1_pro")
         m_test_s3_client.TestS3Client().run_test_get_s3_data_returns_expected_result_for_bucket_cars()
         m_test_s3_client.TestS3Client().run_test_get_s3_data_returns_expected_result_for_bucket_pets()
