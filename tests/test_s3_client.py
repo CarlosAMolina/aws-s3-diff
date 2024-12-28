@@ -8,7 +8,7 @@ from src import s3_client as m_s3_client
 _ExpectedResult = list[dict]
 
 
-class TestS3Client(unittest.TestCase):
+class TestS3ClientLocalS3Server(unittest.TestCase):
     def run_test_get_s3_data_returns_expected_result_for_bucket_cars(self):
         expected_result = [{"name": "cars-20241014.csv", "date": self._datetime_now, "size": 49}]
         s3_query = m_s3_client.S3Query("cars", "europe/spain/")

@@ -12,7 +12,7 @@ from src.local_results import _MainPaths
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 
 
-class TestFunction_run(unittest.TestCase):
+class TestFunction_runLocalS3Server(unittest.TestCase):
     def run_test_run(self, mock_input, mock_directory_path_what_to_analyze, local_s3_server):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():

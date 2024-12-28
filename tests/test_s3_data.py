@@ -13,7 +13,7 @@ from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 ExpectedResult = list[dict]
 
 
-class TestAwsAccountExtractor(unittest.TestCase):
+class TestAwsAccountExtractorLocalS3Server(unittest.TestCase):
     def run_test_extract_generates_expected_result(self, local_s3_server):
         LocalResults().create_analysis_results_folder()
         for aws_account, file_path_name_expected_result in {
