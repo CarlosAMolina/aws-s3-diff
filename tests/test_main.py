@@ -13,10 +13,10 @@ from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 
 
 class TestFunction_run(unittest.TestCase):
-    def run_test_run(self, mock_input, mock_directory_path_what_to_analyze, s3_server):
+    def run_test_run(self, mock_input, mock_directory_path_what_to_analyze, local_s3_server):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
-            s3_server.create_objects(aws_account)
+            local_s3_server.create_objects(aws_account)
             m_main.run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         result = self._get_df_from_csv(analysis_paths.file_analysis)
