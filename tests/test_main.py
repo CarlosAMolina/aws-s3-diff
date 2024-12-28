@@ -20,10 +20,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             m_main.run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._test_extracted_aws_accounts_data(analysis_paths)
-        result = self._get_df_from_csv(analysis_paths.file_analysis)
-        expected_result = self._get_df_from_csv_expected_result()
-        date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
-        assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
+        self._test_analysis_file(analysis_paths)
         shutil.rmtree(analysis_paths.directory_analysis)
 
     def _get_analysis_date_time_str(self) -> str:
@@ -58,3 +55,9 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             expected_result_df = read_csv(file_path_name_expected_result)
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
+
+    def _test_analysis_file(self, analysis_paths: _AnalysisPaths):
+        result = self._get_df_from_csv(analysis_paths.file_analysis)
+        expected_result = self._get_df_from_csv_expected_result()
+        date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
+        assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
