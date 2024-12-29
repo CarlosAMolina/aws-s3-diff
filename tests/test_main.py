@@ -40,8 +40,8 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             self._local_s3_server.create_objects(aws_account)
             m_main.run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
-        self._test_extracted_aws_accounts_data(analysis_paths)
-        self._test_analysis_file(analysis_paths)
+        self._assert_extracted_aws_accounts_data_have_expected_values(analysis_paths)
+        self._assert_analysis_file_has_expected_values(analysis_paths)
         shutil.rmtree(analysis_paths.directory_analysis)
 
     def _get_analysis_date_time_str(self) -> str:
@@ -65,7 +65,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             }
         )
 
-    def _test_extracted_aws_accounts_data(self, analysis_paths: _AnalysisPaths):
+    def _assert_extracted_aws_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
         for aws_account, file_path_name_expected_result in {
             "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
             "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
@@ -77,7 +77,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
-    def _test_analysis_file(self, analysis_paths: _AnalysisPaths):
+    def _assert_analysis_file_has_expected_values(self, analysis_paths: _AnalysisPaths):
         result = self._get_df_from_csv(analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
