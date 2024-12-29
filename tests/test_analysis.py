@@ -82,13 +82,14 @@ class TestDfAnalysis(unittest.TestCase):
     def setUpClass(cls):
         cls._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
-    # TODO rename folder `test-origin-file-sync`
     @patch(
-        "src.analysis.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        "src.analysis.S3UrisFileAnalyzer._file_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-origin-file-sync/"),
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/possible-s3-uris-to-analyze/to-test-possible-s3-files-all-accounts.csv"),
     )
-    def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_directory_path_what_to_analyze):
+    def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [_OriginFileSyncDfAnalysisConfig(), _TargetAccountWithoutMoreFilesDfAnalysisConfig()]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
