@@ -87,7 +87,7 @@ class TestDfAnalysis(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__)
         .parent.absolute()
-        .joinpath("fake-files/possible-s3-uris-to-analyze/to-test-possible-s3-files-all-accounts.csv"),
+        .joinpath("fake-files/s3-uris-to-analyze/to-test-possible-s3-files-all-accounts.csv"),
     )
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [_OriginFileSyncDfAnalysisConfig(), _TargetAccountWithoutMoreFilesDfAnalysisConfig()]:

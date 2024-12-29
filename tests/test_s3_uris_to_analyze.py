@@ -75,4 +75,4 @@ class TestS3UrisFileChecker(unittest.TestCase):
 
     @staticmethod
     def _get_file_path_s3_uri_to_analyze(file_name: str) -> Path:
-        return Path(__file__).parent.absolute().joinpath("fake-files", "possible-s3-uris-to-analyze", file_name)
+        return Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/possible-values", file_name)
