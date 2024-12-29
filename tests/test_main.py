@@ -31,7 +31,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     @patch(
         "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     @patch("src.main.input", create=True)
     def test_run(self, mock_input, mock_directory_path_what_to_analyze):

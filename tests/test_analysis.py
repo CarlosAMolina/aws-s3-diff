@@ -118,13 +118,10 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
     @patch(
         "src.analysis.S3UrisFileAnalyzer._directory_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
-    def test_get_df_set_analysis(
-        self,
-        mock_directory_path_what_to_analyze,
-    ):
-        df = _get_df_combine_accounts_s3_data_csv("fake-files/s3-files-all-accounts.csv")
+    def test_get_df_set_analysis(self, mock_directory_path_what_to_analyze):
+        df = _get_df_combine_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         result = _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
@@ -152,4 +149,5 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
 
 
 def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
-    return _CombinedAccountsS3DataCsvToDf().get_df(Path(__file__).parent.absolute().joinpath(file_path_name))
+    path = Path(__file__).parent.absolute().joinpath(file_path_name)
+    return _CombinedAccountsS3DataCsvToDf().get_df(path)
