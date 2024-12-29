@@ -66,14 +66,14 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         )
 
     def _assert_extracted_aws_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
-        for aws_account, file_path_name_expected_result in {
-            "aws_account_1_pro": "tests/fake-files/s3-results/20241201180132/aws_account_1_pro.csv",
-            "aws_account_2_release": "tests/fake-files/s3-results/20241201180132/aws_account_2_release.csv",
-            "aws_account_3_dev": "tests/fake-files/s3-results/20241201180132/aws_account_3_dev.csv",
+        for aws_account, file_name_expected_result in {
+            "aws_account_1_pro": "aws_account_1_pro.csv",
+            "aws_account_2_release": "aws_account_2_release.csv",
+            "aws_account_3_dev": "aws_account_3_dev.csv",
         }.items():
             file_path_results = analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
             result_df = read_csv(file_path_results)
-            expected_result_df = read_csv(file_path_name_expected_result)
+            expected_result_df = read_csv(f"tests/expected-results/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
