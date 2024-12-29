@@ -123,7 +123,7 @@ class TestAllAccoutsS3DataDfAnalyzer(unittest.TestCase):
         self,
         mock_directory_path_what_to_analyze,
     ):
-        df = _get_df_combine_accounts_s3_data_csv("fake-files/s3-results/20241201180132/s3-files-all-accounts.csv")
+        df = _get_df_combine_accounts_s3_data_csv("fake-files/s3-files-all-accounts.csv")
         result = _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
