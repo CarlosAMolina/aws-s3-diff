@@ -100,7 +100,7 @@ class TestDfAnalysis(unittest.TestCase):
             self.assertEqual(expected_result, result_to_check)
 
     def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
-        file_path_name = f"fake-files/test-origin-file-sync/s3-files-all-accounts/{file_name}"
+        file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
         return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
