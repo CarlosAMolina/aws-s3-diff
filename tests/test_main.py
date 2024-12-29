@@ -1,6 +1,8 @@
 import shutil
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from unittest.mock import PropertyMock
 
 from pandas import DataFrame as Df
 from pandas import read_csv
@@ -9,14 +11,33 @@ from pandas.testing import assert_frame_equal
 from src import main as m_main
 from src.local_results import _AnalysisPaths
 from src.local_results import _MainPaths
+from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
+from tests.aws import S3Server
 
 
 class TestFunction_runLocalS3Server(unittest.TestCase):
-    def run_test_run(self, mock_input, mock_directory_path_what_to_analyze, local_s3_server):
+    def setUp(self):
+        """As the S3Server takes time to run, it is better to group all tests with local sever in only one test class"""
+        self._local_s3_server = S3Server()
+        self._local_s3_server.start()
+        # Drop file created by the user
+        if _MainPaths().file_analysis_date_time.is_file():
+            LocalResults().remove_file_with_analysis_date()
+
+    def tearDown(self):
+        self._local_s3_server.stop()
+
+    @patch(
+        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files"),
+    )
+    @patch("src.main.input", create=True)
+    def test_run(self, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
-            local_s3_server.create_objects(aws_account)
+            self._local_s3_server.create_objects(aws_account)
             m_main.run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._test_extracted_aws_accounts_data(analysis_paths)
