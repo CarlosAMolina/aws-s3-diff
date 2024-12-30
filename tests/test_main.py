@@ -34,7 +34,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     @patch("src.main.input", create=True)
-    def test_run(self, mock_input, mock_directory_path_what_to_analyze):
+    def test_run_if_should_work_ok(self, mock_input, mock_directory_path_what_to_analyze):
         mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             self._local_s3_server.create_objects(aws_account)
