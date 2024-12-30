@@ -16,13 +16,6 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-def export_s3_data_of_account(aws_account: str):
-    _AwsAccountExtractor(
-        LocalResults().get_file_path_aws_account_results(aws_account),
-        S3UrisFileAnalyzer().get_s3_queries_for_aws_account(aws_account),
-    ).extract()
-
-
 def export_s3_data_all_accounts_to_one_file():
     s3_data_df = _IndividualAccountsS3DataCsvFilesToDf().get_df()
     _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
@@ -33,7 +26,7 @@ def get_df_s3_data_all_accounts() -> AllAccoutsS3DataDf:
     return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
 
-class _AwsAccountExtractor:
+class AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
         self._s3_queries = s3_queries

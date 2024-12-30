@@ -2,16 +2,24 @@ import sys
 from abc import ABC
 from abc import abstractmethod
 
+import botocore
+
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
+from s3_data import AwsAccountExtractor
 from s3_data import export_s3_data_all_accounts_to_one_file
-from s3_data import export_s3_data_of_account
 from s3_uris_to_analyze import S3UrisFileAnalyzer
 from s3_uris_to_analyze import S3UrisFileChecker
 
 
 def run():
-    _InteractiveMenu().run()
+    try:
+        _InteractiveMenu().run()
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
+    except botocore.exceptions.ClientError as error:
+        bucket_name = error.response["Error"]["BucketName"]
+        print(f"[ERROR] The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again")
+        return
 
 
 class _InteractiveMenu:
@@ -87,11 +95,13 @@ class _AnalyzedAwsAccounts:
 class _AwsAccountProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
+        self._local_results = LocalResults()
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def run(self):
         print(f"The following AWS account will be analyzed: {self._aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
-        export_s3_data_of_account(self._aws_account)
+        self._export_s3_data_of_account()
 
     def _exit_program_if_no_aws_credentials_in_terminal(self):
         # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
@@ -103,6 +113,12 @@ class _AwsAccountProcess(_Process):
                 sys.exit()
             if user_input == "y" or len(user_input) == 0:
                 return
+
+    def _export_s3_data_of_account(self):
+        AwsAccountExtractor(
+            self._local_results.get_file_path_aws_account_results(self._aws_account),
+            self._s3_uris_file_analyzer.get_s3_queries_for_aws_account(self._aws_account),
+        ).extract()
 
 
 class _AwsAccountProcessFactory:
