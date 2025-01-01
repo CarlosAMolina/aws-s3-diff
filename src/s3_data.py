@@ -75,10 +75,12 @@ class _S3DataCsvExporter:
 class _CombinedAccountsS3DataDfToCsv:
     def __init__(self):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._logger = get_logger()
 
     def export(self, df: Df):
         file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
-        print(f"Exporting all AWS accounts S3 files information to {file_path}")
+        self._logger = get_logger()
+        self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df = self._get_df_to_export(df)
         csv_df.to_csv(file_path)
 
