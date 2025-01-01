@@ -40,7 +40,7 @@ class AwsAccountExtractor:
         self._logger.info(f"Extracting AWS account information to {self._file_path_results}")
         self._s3_data_csv_exporter.create_file()
         for query_index, s3_query in enumerate(self._s3_queries, 1):
-            self._logger.info(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
+            self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._s3_queries)}: {s3_query}")
             self._extract_s3_data_of_query(s3_query)
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
