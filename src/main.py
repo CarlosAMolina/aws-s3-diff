@@ -16,10 +16,18 @@ def run():
     try:
         _InteractiveMenu().run()
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
-    except botocore.exceptions.ClientError as error:
-        bucket_name = error.response["Error"]["BucketName"]
-        print(f"[ERROR] The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again")
-        return
+    except botocore.exceptions.ClientError as exception:
+        error_code = exception.response["Error"]["Code"]
+        if error_code == "NoSuchBucket":
+            bucket_name = exception.response["Error"]["BucketName"]
+            print(
+                f"[ERROR] The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
+            )
+            return
+        if error_code == "InvalidAccessKeyId":
+            print("[ERROR] Incorrect AWS credentials. Authenticate and run the program again")
+            return
+        raise Exception from exception
 
 
 class _InteractiveMenu:

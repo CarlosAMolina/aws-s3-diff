@@ -41,16 +41,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     def test_run_does_not_raise_exception_if_bucket_does_not_exist(
         self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
-        def mock_to_not_generate_analysis_date_time_file():
-            mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = (
-                S3UrisFileAnalyzer().get_first_aws_account()
-            )
-            mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
-            mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
-            mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
-            mock_local_results().directory_analysis.is_dir.return_value = True
-
-        mock_to_not_generate_analysis_date_time_file()
+        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         mock_input.side_effect = ["Y"]
         m_main.run()
         # TODO when logger is used, assert log error message is generated
@@ -109,3 +100,29 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
+
+
+class TestFunction_runNoLocalS3Server(unittest.TestCase):
+    @patch("src.main.LocalResults")
+    @patch("src.main._AnalyzedAwsAccounts")
+    @patch(
+        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+    )
+    @patch("src.main.input", create=True)
+    def test_run_does_not_raise_exception_if_no_aws_credentials(
+        self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+    ):
+        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        mock_input.side_effect = ["Y"]
+        m_main.run()
+        # TODO when logger is used, assert log error message is generated
+
+
+def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results):
+    mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = S3UrisFileAnalyzer().get_first_aws_account()
+    mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
+    mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
+    mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
+    mock_local_results().directory_analysis.is_dir.return_value = True
