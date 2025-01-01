@@ -10,6 +10,7 @@ from pandas import MultiIndex
 from pandas import read_csv
 
 from local_results import LocalResults
+from logger import get_logger
 from s3_client import S3Client
 from s3_uris_to_analyze import S3UrisFileAnalyzer
 from types_custom import AllAccoutsS3DataDf
@@ -31,14 +32,15 @@ def get_df_s3_data_all_accounts() -> AllAccoutsS3DataDf:
 class AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
+        self._logger = get_logger()
         self._s3_queries = s3_queries
         self._s3_data_csv_exporter = _S3DataCsvExporter(file_path_results)
 
     def extract(self):
-        print(f"Extracting AWS account information to {self._file_path_results}")
+        self._logger.info(f"Extracting AWS account information to {self._file_path_results}")
         self._s3_data_csv_exporter.create_file()
         for query_index, s3_query in enumerate(self._s3_queries, 1):
-            print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
+            self._logger.info(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             self._extract_s3_data_of_query(s3_query)
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
