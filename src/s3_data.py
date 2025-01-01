@@ -34,6 +34,8 @@ class AwsAccountExtractor:
     def extract(self):
         print(f"Extracting AWS account information to {self._file_path_results}")
         for query_index, s3_query in enumerate(self._s3_queries, 1):
+            if not self._file_path_results.exists():
+                self._create_file()
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             self._extract_s3_data_of_query(s3_query)
         print("Extraction done")
@@ -50,8 +52,6 @@ class AwsAccountExtractor:
         self._export_data_to_csv(s3_data, s3_query)
 
     def _export_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
-        if not self._file_path_results.exists():
-            self._create_file()
         with open(self._file_path_results, "a", newline="") as f:
             headers = {**s3_query._asdict(), **s3_data[0]}.keys()
             # avoid ^M: https://stackoverflow.com/a/17725590
