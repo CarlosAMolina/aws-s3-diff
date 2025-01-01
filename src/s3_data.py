@@ -37,7 +37,7 @@ class AwsAccountExtractor:
         self._s3_data_csv_exporter = _S3DataCsvExporter(file_path_results)
 
     def extract(self):
-        self._logger.info(f"Extracting AWS account information to {self._file_path_results}")
+        self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
         self._s3_data_csv_exporter.create_file()
         try:
             for query_index, s3_query in enumerate(self._s3_queries, 1):
