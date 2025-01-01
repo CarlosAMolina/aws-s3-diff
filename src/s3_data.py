@@ -1,5 +1,6 @@
 import csv
 import re
+from io import TextIOWrapper
 from pathlib import Path
 
 import pandas as pd
@@ -42,9 +43,7 @@ class AwsAccountExtractor:
 
     def _create_file(self):
         with open(self._file_path_results, "w", newline="") as f:
-            headers = S3Query._fields + FileS3Data._fields
-            # avoid ^M: https://stackoverflow.com/a/17725590
-            w = csv.DictWriter(f, headers, lineterminator="\n")
+            w = _S3DataCsvExporter().get_dict_writer(f)
             w.writeheader()
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
@@ -53,12 +52,20 @@ class AwsAccountExtractor:
 
     def _export_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         with open(self._file_path_results, "a", newline="") as f:
-            headers = S3Query._fields + FileS3Data._fields
-            # avoid ^M: https://stackoverflow.com/a/17725590
-            w = csv.DictWriter(f, headers, lineterminator="\n")
+            w = _S3DataCsvExporter().get_dict_writer(f)
             for file_data in s3_data:
-                data = {**s3_query._asdict(), **file_data}
+                data = {**s3_query._asdict(), **file_data._asdict()}
                 w.writerow(data)
+
+
+class _S3DataCsvExporter:
+    def get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
+        # avoid ^M: https://stackoverflow.com/a/17725590
+        return csv.DictWriter(f, self._headers, lineterminator="\n")
+
+    @property
+    def _headers(self) -> tuple[str, ...]:
+        return S3Query._fields + FileS3Data._fields
 
 
 class _CombinedAccountsS3DataDfToCsv:

@@ -28,8 +28,8 @@ class S3Client:
             if page["KeyCount"] == 0:
                 if len(result) > 0:
                     raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
-                return [{key: None for key in FileS3Data._fields}]
-            page_files = [_FileS3DataFromS3Content(content).file_s3_data._asdict() for content in page["Contents"]]
+                return [FileS3Data()]
+            page_files = [_FileS3DataFromS3Content(content).file_s3_data for content in page["Contents"]]
             result += page_files
         return result
 
