@@ -166,7 +166,7 @@ class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
         try:
             super().run()
         except Exception as exception:
-            self._local_results.remove_file_with_analysis_date()
+            self._local_results.drop_file_with_analysis_date()
             self._local_results.analysis_paths.directory_analysis.rmdir()
             raise exception
 
@@ -191,7 +191,7 @@ class _NoCombinedS3DataProcess(_Process):
 class _AnalysisProcess(_Process):
     def run(self):
         S3DataAnalyzer().run()
-        LocalResults().remove_file_with_analysis_date()
+        LocalResults().drop_file_with_analysis_date()
 
 
 if __name__ == "__main__":

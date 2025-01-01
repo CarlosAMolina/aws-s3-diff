@@ -25,7 +25,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         self._local_s3_server.start()
         # Drop file created by the user
         if _MainPaths().file_analysis_date_time.is_file():
-            LocalResults().remove_file_with_analysis_date()
+            LocalResults().drop_file_with_analysis_date()
 
     def tearDown(self):
         self._local_s3_server.stop()

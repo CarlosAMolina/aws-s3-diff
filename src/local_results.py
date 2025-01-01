@@ -18,7 +18,7 @@ class LocalResults:
     def get_file_path_aws_account_results(self, aws_account: str):
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
-    def remove_file_with_analysis_date(self):
+    def drop_file_with_analysis_date(self):
         self._main_paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
