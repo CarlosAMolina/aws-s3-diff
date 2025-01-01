@@ -31,9 +31,9 @@ class S3Client:
                 return [{key: None for key in FileS3Data._fields}]
             page_files = [
                 {
-                    FileS3Data._fields[0]: self._get_file_name_from_response_key(content),
-                    FileS3Data._fields[1]: content["LastModified"],
-                    FileS3Data._fields[2]: content["Size"],
+                    FileS3Data._fields[0]: _FileS3DataFromS3Content(content).file_s3_data.name,
+                    FileS3Data._fields[1]: _FileS3DataFromS3Content(content).file_s3_data.date,
+                    FileS3Data._fields[2]: _FileS3DataFromS3Content(content).file_s3_data.size,
                 }
                 for content in page["Contents"]
             ]
@@ -52,5 +52,19 @@ class S3Client:
         )
         raise FolderInS3UriError(error_text)
 
+
+class _FileS3DataFromS3Content:
+    def __init__(self, s3_response_content: dict):
+        self._s3_response_content = s3_response_content
+
+    @property
+    def file_s3_data(self) -> FileS3Data:
+        return FileS3Data(
+            self._get_file_name_from_response_key(self._s3_response_content),
+            self._s3_response_content["LastModified"],
+            self._s3_response_content["Size"],
+        )
+
     def _get_file_name_from_response_key(self, content: dict) -> str:
+        # TODO use Path
         return content["Key"].split("/")[-1]
