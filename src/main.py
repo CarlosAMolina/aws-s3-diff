@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 import botocore
 
-from analysis import S3DataAnalyzer
+from analysis import AnalysisGenerator
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
@@ -190,7 +190,7 @@ class _NoCombinedS3DataProcess(_Process):
 
 class _AnalysisProcess(_Process):
     def run(self):
-        S3DataAnalyzer().run()
+        AnalysisGenerator().export_analysis_file()
         LocalResults().drop_file_with_analysis_date()
 
 

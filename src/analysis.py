@@ -13,12 +13,7 @@ from types_custom import AllAccoutsS3DataDf
 from types_custom import AnalysisS3DataDf
 
 
-class S3DataAnalyzer:
-    def run(self):
-        _AnalysisGenerator().export_analysis_file()
-
-
-class _AnalysisGenerator:
+class AnalysisGenerator:
     def export_analysis_file(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._export_analyzed_df_to_file(s3_analyzed_df)
