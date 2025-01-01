@@ -30,11 +30,7 @@ class S3Client:
                     raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
                 return [{key: None for key in FileS3Data._fields}]
             page_files = [
-                {
-                    FileS3Data._fields[0]: _FileS3DataFromS3Content(content).file_s3_data.name,
-                    FileS3Data._fields[1]: _FileS3DataFromS3Content(content).file_s3_data.date,
-                    FileS3Data._fields[2]: _FileS3DataFromS3Content(content).file_s3_data.size,
-                }
+                {field: getattr(_FileS3DataFromS3Content(content).file_s3_data, field) for field in FileS3Data._fields}
                 for content in page["Contents"]
             ]
             result += page_files
