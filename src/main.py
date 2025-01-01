@@ -6,6 +6,7 @@ import botocore
 
 from analysis import S3DataAnalyzer
 from local_results import LocalResults
+from logger import get_logger
 from s3_data import AwsAccountExtractor
 from s3_data import export_s3_data_all_accounts_to_one_file
 from s3_uris_to_analyze import S3UrisFileAnalyzer
@@ -13,6 +14,7 @@ from s3_uris_to_analyze import S3UrisFileChecker
 
 
 def run():
+    logger = get_logger()
     try:
         _InteractiveMenu().run()
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
@@ -20,12 +22,12 @@ def run():
         error_code = exception.response["Error"]["Code"]
         if error_code == "NoSuchBucket":
             bucket_name = exception.response["Error"]["BucketName"]
-            print(
-                f"[ERROR] The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
+            logger.error(
+                f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
             )
             return
         if error_code == "InvalidAccessKeyId":
-            print("[ERROR] Incorrect AWS credentials. Authenticate and run the program again")
+            logger.error("Incorrect AWS credentials. Authenticate and run the program again")
             return
         raise Exception from exception
 

@@ -43,8 +43,12 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         mock_input.side_effect = ["Y"]
-        m_main.run()
-        # TODO when logger is used, assert log error message is generated
+        with self.assertLogs(level="ERROR") as cm:
+            m_main.run()
+        self.assertEqual(
+            "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
+            cm.records[0].message,
+        )
 
     @patch(
         "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
@@ -116,8 +120,9 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         mock_input.side_effect = ["Y"]
-        m_main.run()
-        # TODO when logger is used, assert log error message is generated
+        with self.assertLogs(level="ERROR") as cm:
+            m_main.run()
+        self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
 
 
 def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results):
