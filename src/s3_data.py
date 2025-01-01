@@ -53,7 +53,7 @@ class AwsAccountExtractor:
 
     def _export_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         with open(self._file_path_results, "a", newline="") as f:
-            headers = {**s3_query._asdict(), **s3_data[0]}.keys()
+            headers = S3Query._fields + FileS3Data._fields
             # avoid ^M: https://stackoverflow.com/a/17725590
             w = csv.DictWriter(f, headers, lineterminator="\n")
             for file_data in s3_data:
