@@ -102,7 +102,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             directory_path.name for directory_path in _MainPaths().directory_all_results.glob("20*")
         ]
         analysis_directory_names.sort()
-        return analysis_directory_names[0]
+        return analysis_directory_names[-1]
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
