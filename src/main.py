@@ -51,7 +51,7 @@ class _InteractiveMenu:
 
     def _show_aws_accounts_to_analyze(self):
         aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
-        aws_accounts_list = [f"\n- {aws_account}" for aws_account in aws_accounts]
+        aws_accounts_list = [f"\n{index}. {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
         self._logger.info(f"AWS accounts configured to be analyzed:{''.join(aws_accounts_list)}")
 
 
