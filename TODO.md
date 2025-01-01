@@ -1,2 +1,3 @@
 - Test. Drop src/s3-uris-to-analyze.csv and run the tests to check that is mocked correctly. 
-- s3-urist-to-analyze.csv. Save in a new `config` folder.
+- s3-urist-to-analyze.csv. Check if the script can work with an uri without prefix, only the bucket. Example: `s3://bucket/`. If not, implement it
+
