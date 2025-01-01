@@ -6,6 +6,7 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from local_results import LocalResults
+from logger import get_logger
 from s3_data import get_df_s3_data_all_accounts
 from s3_uris_to_analyze import S3UrisFileAnalyzer
 from types_custom import AllAccoutsS3DataDf
@@ -271,12 +272,13 @@ def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
 class _AnalysisDfToCsv:
     def __init__(self):
+        self._logger = get_logger()
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def export(self, df: AnalysisS3DataDf):
         file_path = LocalResults().analysis_paths.file_analysis
         csv_df = self._get_df_to_export(df)
-        print(f"Exporting analysis to {file_path}")
+        self._logger.info(f"Exporting analysis to {file_path}")
         csv_df.to_csv(file_path)
 
     def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:

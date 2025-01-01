@@ -1,9 +1,12 @@
 import datetime
 from pathlib import Path
 
+from logger import get_logger
+
 
 class LocalResults:
     def __init__(self):
+        self._logger = get_logger()
         self._main_paths = _MainPaths()
         # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
         analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
@@ -19,7 +22,7 @@ class LocalResults:
         self._main_paths.file_analysis_date_time.unlink()
 
     def create_analysis_results_folder(self):
-        print(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
+        self._logger.info(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
 
 
