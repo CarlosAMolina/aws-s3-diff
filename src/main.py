@@ -38,9 +38,9 @@ def run():
 
 class _InteractiveMenu:
     def __init__(self):
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
-        self._process_factory = _ProcessFactory()
         self._logger = get_logger()
+        self._process_factory = _ProcessFactory()
+        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def run(self):
         self._logger.info("Welcome to the AWS S3 Diff tool!")
@@ -110,10 +110,11 @@ class _AwsAccountProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         self._local_results = LocalResults()
+        self._logger = get_logger()
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def run(self):
-        print(f"The following AWS account will be analyzed: {self._aws_account}")
+        self._logger.info(f"The following AWS account will be analyzed: {self._aws_account}")
         self._exit_program_if_no_aws_credentials_in_terminal()
         self._export_s3_data_of_account()
 
