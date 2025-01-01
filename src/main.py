@@ -163,7 +163,12 @@ class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
         # e.g. errors interacting with S3.
         if not self._local_results.analysis_paths.directory_analysis.is_dir():
             self._local_results.create_analysis_results_folder()
-        super().run()
+        try:
+            super().run()
+        except Exception as exception:
+            self._local_results.remove_file_with_analysis_date()
+            self._local_results.analysis_paths.directory_analysis.rmdir()
+            raise exception
 
 
 class _IntermediateAccountProcess(_NoLastAwsAccountProcess):
