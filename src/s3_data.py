@@ -38,18 +38,24 @@ class AwsAccountExtractor:
             self._extract_s3_data_of_query(s3_query)
         print("Extraction done")
 
+    def _create_file(self):
+        with open(self._file_path_results, "w", newline="") as f:
+            headers = S3Query._fields + S3Client.S3_DATA_KEYS
+            # avoid ^M: https://stackoverflow.com/a/17725590
+            w = csv.DictWriter(f, headers, lineterminator="\n")
+            w.writeheader()
+
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         s3_data = S3Client().get_s3_data(s3_query)
         self._export_data_to_csv(s3_data, s3_query)
 
     def _export_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
-        file_exists = self._file_path_results.exists()
+        if not self._file_path_results.exists():
+            self._create_file()
         with open(self._file_path_results, "a", newline="") as f:
-            # avoid ^M: https://stackoverflow.com/a/17725590
             headers = {**s3_query._asdict(), **s3_data[0]}.keys()
+            # avoid ^M: https://stackoverflow.com/a/17725590
             w = csv.DictWriter(f, headers, lineterminator="\n")
-            if not file_exists:
-                w.writeheader()
             for file_data in s3_data:
                 data = {**s3_query._asdict(), **file_data}
                 w.writerow(data)

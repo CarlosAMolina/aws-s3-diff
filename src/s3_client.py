@@ -8,7 +8,7 @@ from types_custom import S3Query
 
 
 class S3Client:
-    S3_DATA_KEYS = ["name", "date", "size"]
+    S3_DATA_KEYS = ("name", "date", "size")
 
     def __init__(self):
         session = boto3.Session()
