@@ -1,4 +1,6 @@
+import random
 import shutil
+import string
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -42,6 +44,8 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        # TODO try not to create a file
+        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         mock_input.side_effect = ["Y"]
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
@@ -64,6 +68,8 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        # TODO try not to create a file
+        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         self._local_s3_server.create_objects("test-uri-with-subfolder")
         m_main.run()
         mock_input.side_effect = ["Y"]
@@ -144,6 +150,8 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        # TODO try not to create a file
+        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         mock_input.side_effect = ["Y"]
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
@@ -156,3 +164,7 @@ def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mo
     mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
     mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
     mock_local_results().directory_analysis.is_dir.return_value = True
+
+
+def _get_foo_path() -> Path:
+    return Path("/tmp/", "".join(random.choice(string.ascii_lowercase) for i in range(20)))

@@ -33,8 +33,7 @@ class AwsAccountExtractor:
 
     def extract(self):
         print(f"Extracting AWS account information to {self._file_path_results}")
-        if not self._file_path_results.exists():
-            self._create_file()
+        self._create_file()
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             self._extract_s3_data_of_query(s3_query)
