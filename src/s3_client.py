@@ -29,8 +29,6 @@ class S3Client:
             if page["KeyCount"] == 0:
                 if len(result) > 0:
                     raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
-                # TODO try return empty list[dict] and check if all works ok,
-                # TODO this is better to avoid two dicts to update when the headers change.
                 return [{key: None for key in self.S3_DATA_KEYS}]
             page_files = [
                 {
