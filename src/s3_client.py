@@ -11,7 +11,6 @@ from types_custom import S3Query
 class S3Client:
     def __init__(self):
         session = boto3.Session()
-        # TODO? drop not used AWS_ENDPOINT
         self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> S3Data:
