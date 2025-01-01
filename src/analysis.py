@@ -16,7 +16,6 @@ from types_custom import AnalysisS3DataDf
 class S3DataAnalyzer:
     def run(self):
         _AnalysisGenerator().export_analysis_file()
-        # TODO _AnalysisSummary().show_summary()
 
 
 class _AnalysisGenerator:
@@ -36,13 +35,6 @@ class _AllAccoutsS3DataDfAnalyzer:
     def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
         aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
         return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
-
-
-class _AnalysisSummary:
-    def show_summary(self):
-        s3_analyzed_df = _AnalysisGenerator()._get_df_s3_data_analyzed()
-        aws_accounts_summary = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        _show_summary(aws_accounts_summary, s3_analyzed_df)
 
 
 class _AnalysisAwsAccounts:
@@ -256,17 +248,6 @@ class _AnalysisCondition:
     @property
     def _column_index_size_target(self) -> tuple:
         return (self._aws_accounts.target, "size")
-
-
-def _show_summary(aws_accounts: _AnalysisAwsAccounts, df: Df):
-    for aws_account_to_compare in aws_accounts.aws_accounts_where_files_must_be_copied:
-        column_name_compare_result = f"is_sync_ok_in_{aws_account_to_compare}"
-        condition = (df.loc[:, (aws_accounts.aws_account_origin, "size")].notnull()) & (
-            df.loc[:, ("analysis", column_name_compare_result)].eq(False)
-        )
-        result = df[condition]
-        print(f"Files not copied in {aws_account_to_compare} ({len(result)}):")
-        print(result)
 
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
