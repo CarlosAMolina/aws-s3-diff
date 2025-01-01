@@ -40,19 +40,19 @@ class _InteractiveMenu:
     def __init__(self):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
         self._process_factory = _ProcessFactory()
+        self._logger = get_logger()
 
     def run(self):
-        print("Welcome to the AWS S3 Diff tool!")
-        print("Checking if the URIs to analyze configuration file is correct")
+        self._logger.info("Welcome to the AWS S3 Diff tool!")
+        self._logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_aws_accounts_to_analyze()
         self._process_factory.get_process().run()
 
     def _show_aws_accounts_to_analyze(self):
-        print("AWS accounts configured to be analyzed:")
         aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
-        aws_accounts_list = [f"- {aws_account}" for aws_account in aws_accounts]
-        print("\n".join(aws_accounts_list))
+        aws_accounts_list = [f"\n- {aws_account}" for aws_account in aws_accounts]
+        self._logger.info(f"AWS accounts configured to be analyzed:{''.join(aws_accounts_list)}")
 
 
 class _Process(ABC):
