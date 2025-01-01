@@ -34,6 +34,8 @@ def set_aws_credentials():
 
 
 class S3:
+    # TODO rename aws_account to folder_name_with_files
+    # TODO example of usage: test_run_manages_s3_uri_with_folder
     def __init__(self, aws_account: str, endpoint_url: str | None = None):
         self._s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
         self._s3_client = boto3.client("s3", endpoint_url=endpoint_url)

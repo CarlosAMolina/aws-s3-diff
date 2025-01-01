@@ -38,8 +38,8 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         .joinpath("fake-files/s3-uris-to-analyze/to-test-non-existent-bucket.csv"),
     )
     @patch("src.main.input", create=True)
-    def test_run_does_not_raise_exception_if_bucket_does_not_exist(
-        self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+    def test_run_manages_bucket_does_not_exist(
+        self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         mock_input.side_effect = ["Y"]
@@ -47,6 +47,31 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             m_main.run()
         self.assertEqual(
             "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
+            cm.records[0].message,
+        )
+
+    @patch("src.main.LocalResults")
+    @patch("src.main._AnalyzedAwsAccounts")
+    @patch(
+        "src.main.S3UrisFileAnalyzer._file_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__)
+        .parent.absolute()
+        .joinpath("fake-files/s3-uris-to-analyze/to-test-s3-uri-with-folder.csv"),
+    )
+    @patch("src.main.input", create=True)
+    def test_run_manages_s3_uri_with_folder(
+        self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+    ):
+        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        self._local_s3_server.create_objects("test-uri-with-subfolder")
+        m_main.run()
+        mock_input.side_effect = ["Y"]
+        with self.assertLogs(level="ERROR") as cm:
+            m_main.run()
+        self.assertEqual(
+            "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
+            ". Subfolders (1): folder/subfolder/",
             cm.records[0].message,
         )
 
@@ -115,7 +140,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     @patch("src.main.input", create=True)
-    def test_run_does_not_raise_exception_if_no_aws_credentials(
+    def test_run_manages_no_aws_credentials(
         self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)

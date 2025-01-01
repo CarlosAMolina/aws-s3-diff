@@ -5,6 +5,7 @@ from abc import abstractmethod
 import botocore
 
 from analysis import S3DataAnalyzer
+from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import AwsAccountExtractor
@@ -30,6 +31,9 @@ def run():
             logger.error("Incorrect AWS credentials. Authenticate and run the program again")
             return
         raise Exception from exception
+    except FolderInS3UriError as exception:
+        logger.error(exception)
+        return
 
 
 class _InteractiveMenu:

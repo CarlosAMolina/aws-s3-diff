@@ -2,6 +2,7 @@ import os
 
 import boto3
 
+from exceptions import FolderInS3UriError
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -53,10 +54,10 @@ class S3Client:
             return
         folder_path_names = [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
         error_text = (
-            f"Subfolders detected in bucket {bucket}. This script cannot manage subfolders"
+            f"Subfolders detected in bucket '{bucket}'. The current version of the program cannot manage subfolders"
             f". Subfolders ({len(folder_path_names)}): {', '.join(folder_path_names)}"
         )
-        raise ValueError(error_text)
+        raise FolderInS3UriError(error_text)
 
     def _get_file_name_from_response_key(self, content: dict) -> str:
         return content["Key"].split("/")[-1]
