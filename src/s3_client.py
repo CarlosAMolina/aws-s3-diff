@@ -8,6 +8,8 @@ from types_custom import S3Query
 
 
 class S3Client:
+    S3_DATA_KEYS = ["name", "date", "size"]
+
     def __init__(self):
         session = boto3.Session()
         # TODO? drop not used AWS_ENDPOINT
@@ -29,18 +31,12 @@ class S3Client:
                     raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
                 # TODO try return empty list[dict] and check if all works ok,
                 # TODO this is better to avoid two dicts to update when the headers change.
-                return [
-                    {
-                        "name": None,
-                        "date": None,
-                        "size": None,
-                    }
-                ]
+                return [{key: None for key in self.S3_DATA_KEYS}]
             page_files = [
                 {
-                    "name": self._get_file_name_from_response_key(content),
-                    "date": content["LastModified"],
-                    "size": content["Size"],
+                    self.S3_DATA_KEYS[0]: self._get_file_name_from_response_key(content),
+                    self.S3_DATA_KEYS[1]: content["LastModified"],
+                    self.S3_DATA_KEYS[2]: content["Size"],
                 }
                 for content in page["Contents"]
             ]
