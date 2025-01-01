@@ -32,34 +32,37 @@ class AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
         self._s3_queries = s3_queries
+        self._s3_data_csv_exporter = _S3DataCsvExporter(file_path_results)
 
     def extract(self):
         print(f"Extracting AWS account information to {self._file_path_results}")
-        self._create_file()
+        self._s3_data_csv_exporter.create_file()
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             print(f"Running query {query_index}/{len(self._s3_queries)}: {s3_query}")
             self._extract_s3_data_of_query(s3_query)
         print("Extraction done")
 
-    def _create_file(self):
-        with open(self._file_path_results, "w", newline="") as f:
-            w = _S3DataCsvExporter().get_dict_writer(f)
-            w.writeheader()
-
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         s3_data = S3Client().get_s3_data(s3_query)
-        self._export_data_to_csv(s3_data, s3_query)
+        self._s3_data_csv_exporter.export_s3_data_to_csv(s3_data, s3_query)
 
-    def _export_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
+
+class _S3DataCsvExporter:
+    def __init__(self, file_path_results: Path):
+        self._file_path_results = file_path_results
+
+    def create_file(self):
+        with open(self._file_path_results, "w", newline="") as f:
+            self._get_dict_writer(f).writeheader()
+
+    def export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         with open(self._file_path_results, "a", newline="") as f:
-            w = _S3DataCsvExporter().get_dict_writer(f)
+            w = self._get_dict_writer(f)
             for file_data in s3_data:
                 data = {**s3_query._asdict(), **file_data._asdict()}
                 w.writerow(data)
 
-
-class _S3DataCsvExporter:
-    def get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
+    def _get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
         # avoid ^M: https://stackoverflow.com/a/17725590
         return csv.DictWriter(f, self._headers, lineterminator="\n")
 
