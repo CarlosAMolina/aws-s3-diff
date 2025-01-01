@@ -35,11 +35,10 @@ class S3UrisFileChecker:
 class S3UrisFileAnalyzer:
     def __init__(self):
         # TODO I don't like to read a file in __init__()
-        # TODO make private
-        self.df_file_what_to_analyze = self._get_df_file_what_to_analyze()
+        self._df_file_what_to_analyze = self._get_df_file_what_to_analyze()
 
     def get_aws_accounts(self) -> list[str]:
-        return self.df_file_what_to_analyze.columns.to_list()
+        return self._df_file_what_to_analyze.columns.to_list()
 
     def get_first_aws_account(self) -> str:
         return self.get_aws_accounts()[0]
@@ -48,17 +47,17 @@ class S3UrisFileAnalyzer:
         return self.get_aws_accounts()[-1]
 
     def get_s3_queries_for_aws_account(self, aws_account: str) -> list[S3Query]:
-        s3_uris_to_analyze = self.df_file_what_to_analyze[aws_account].to_list()
+        s3_uris_to_analyze = self._df_file_what_to_analyze[aws_account].to_list()
         return [self.get_s3_query_from_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
     def get_s3_query_from_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
     def get_df_s3_uris_map_between_accounts(self, aws_account_origin: str, aws_account_target: str) -> Df:
-        return self.df_file_what_to_analyze[[aws_account_origin, aws_account_target]]
+        return self._df_file_what_to_analyze[[aws_account_origin, aws_account_target]]
 
     def is_any_uri_null(self) -> np.bool:
-        return self.df_file_what_to_analyze.isnull().values.any()
+        return self._df_file_what_to_analyze.isnull().values.any()
 
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
