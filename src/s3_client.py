@@ -13,6 +13,7 @@ class S3Client:
         self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> S3Data:
+        # TODO move the logic to add the `/` to the S3Query object
         query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
         self._raise_exception_if_subfolders_in_s3(s3_query.bucket, query_prefix)
         # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
