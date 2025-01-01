@@ -39,14 +39,12 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         .parent.absolute()
         .joinpath("fake-files/s3-uris-to-analyze/to-test-non-existent-bucket.csv"),
     )
-    @patch("src.main.input", create=True)
     def test_run_manages_bucket_does_not_exist(
-        self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+        self, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         # TODO try not to create a file
         mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
-        mock_input.side_effect = ["Y"]
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual(
@@ -63,16 +61,14 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         .parent.absolute()
         .joinpath("fake-files/s3-uris-to-analyze/to-test-s3-uri-with-folder.csv"),
     )
-    @patch("src.main.input", create=True)
     def test_run_manages_s3_uri_with_folder(
-        self, mock_input, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+        self, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         # TODO try not to create a file
         mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         self._local_s3_server.create_objects("test-uri-with-subfolder")
         m_main.run()
-        mock_input.side_effect = ["Y"]
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual(
@@ -86,9 +82,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
-    @patch("src.main.input", create=True)
-    def test_run_if_should_work_ok(self, mock_input, mock_directory_path_what_to_analyze):
-        mock_input.side_effect = ["Y"] * len(S3UrisFileAnalyzer().get_aws_accounts())
+    def test_run_if_should_work_ok(self, mock_directory_path_what_to_analyze):
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             self._local_s3_server.create_objects(aws_account)
             m_main.run()
@@ -145,14 +139,12 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
-    @patch("src.main.input", create=True)
     def test_run_manages_no_aws_credentials(
-        self, mock_input, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
+        self, mock_directory_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
     ):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         # TODO try not to create a file
         mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
-        mock_input.side_effect = ["Y"]
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)

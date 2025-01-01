@@ -1,4 +1,3 @@
-import sys
 from abc import ABC
 from abc import abstractmethod
 
@@ -115,19 +114,7 @@ class _AwsAccountProcess(_Process):
 
     def run(self):
         self._logger.info(f"The following AWS account will be analyzed: {self._aws_account}")
-        self._exit_program_if_no_aws_credentials_in_terminal()
         self._export_s3_data_of_account()
-
-    def _exit_program_if_no_aws_credentials_in_terminal(self):
-        # TODO try avoid user iteraction, for example, detect with python that no credentials have been set.
-        print("Have you generated in you terminal the AWS credentials to authenticate in that AWS account?")
-        while True:
-            user_input = input("Y/n: ").lower()
-            if user_input == "n":
-                print("Generate the credentials to work with that AWS account and run the program again")
-                sys.exit()
-            if user_input == "y" or len(user_input) == 0:
-                return
 
     def _export_s3_data_of_account(self):
         AwsAccountExtractor(
@@ -150,7 +137,23 @@ class _AwsAccountProcessFactory:
         return _IntermediateAccountProcess(aws_account)
 
 
-class _FirstAwsAccountProcess(_AwsAccountProcess):
+class _NoLastAwsAccountProcess(_AwsAccountProcess):
+    def __init__(self, aws_account: str):
+        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        super().__init__(aws_account)
+
+    def run(self):
+        super().run()
+        self._show_next_account_to_analyze()
+
+    def _show_next_account_to_analyze(self):
+        self._logger.info(
+            f"The next account to analyze is {self._analyzed_aws_accounts.get_aws_account_to_analyze()}"
+            ". Authenticate and run the program again"
+        )
+
+
+class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
     def __init__(self, aws_account: str):
         super().__init__(aws_account)
         self._local_results = LocalResults()
@@ -163,7 +166,7 @@ class _FirstAwsAccountProcess(_AwsAccountProcess):
         super().run()
 
 
-class _IntermediateAccountProcess(_AwsAccountProcess):
+class _IntermediateAccountProcess(_NoLastAwsAccountProcess):
     def run(self):
         super().run()
 
