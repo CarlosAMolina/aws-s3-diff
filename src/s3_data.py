@@ -229,9 +229,8 @@ class _S3UriDfModifier:
     def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
         old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
         # TODO add test for url ending with and without `/`.
-        # TODO required `r` string?
         s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
-            s3_uris_map_df[self._aws_account_target].str.contains(rf"s3://{old_bucket}/{old_prefix}/?")
+            s3_uris_map_df[self._aws_account_target].str.contains(f"s3://{old_bucket}/{old_prefix}/?")
         ]
         if s3_uris_map_for_current_index_df.empty:
             raise ValueError("Unmatched value")
