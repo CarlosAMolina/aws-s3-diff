@@ -12,6 +12,7 @@ from local_results import LocalResults
 from s3_client import S3Client
 from s3_uris_to_analyze import S3UrisFileAnalyzer
 from types_custom import AllAccoutsS3DataDf
+from types_custom import FileS3Data
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -41,7 +42,7 @@ class AwsAccountExtractor:
 
     def _create_file(self):
         with open(self._file_path_results, "w", newline="") as f:
-            headers = S3Query._fields + S3Client.S3_DATA_KEYS
+            headers = S3Query._fields + FileS3Data._fields
             # avoid ^M: https://stackoverflow.com/a/17725590
             w = csv.DictWriter(f, headers, lineterminator="\n")
             w.writeheader()

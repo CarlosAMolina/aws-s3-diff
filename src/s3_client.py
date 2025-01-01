@@ -3,13 +3,12 @@ import os
 import boto3
 
 from exceptions import FolderInS3UriError
+from types_custom import FileS3Data
 from types_custom import S3Data
 from types_custom import S3Query
 
 
 class S3Client:
-    S3_DATA_KEYS = ("name", "date", "size")
-
     def __init__(self):
         session = boto3.Session()
         # TODO? drop not used AWS_ENDPOINT
@@ -29,12 +28,12 @@ class S3Client:
             if page["KeyCount"] == 0:
                 if len(result) > 0:
                     raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
-                return [{key: None for key in self.S3_DATA_KEYS}]
+                return [{key: None for key in FileS3Data._fields}]
             page_files = [
                 {
-                    self.S3_DATA_KEYS[0]: self._get_file_name_from_response_key(content),
-                    self.S3_DATA_KEYS[1]: content["LastModified"],
-                    self.S3_DATA_KEYS[2]: content["Size"],
+                    FileS3Data._fields[0]: self._get_file_name_from_response_key(content),
+                    FileS3Data._fields[1]: content["LastModified"],
+                    FileS3Data._fields[2]: content["Size"],
                 }
                 for content in page["Contents"]
             ]
