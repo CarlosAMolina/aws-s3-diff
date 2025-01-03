@@ -19,11 +19,17 @@ class LocalResults:
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
     def drop_file_with_analysis_date(self):
+        self._logger.debug(f"Removing the file: {self._main_paths.file_analysis_date_time}")
         self._main_paths.file_analysis_date_time.unlink()
 
+    # TODO rename create_directory_analysis
     def create_analysis_results_folder(self):
-        self._logger.info(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
+        self._logger.debug(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
+
+    def drop_directory_analysis(self):
+        self._logger.debug(f"Removing the directory: {self.analysis_paths.directory_analysis}")
+        self.analysis_paths.directory_analysis.rmdir()
 
 
 class _AnalysisDateTime:

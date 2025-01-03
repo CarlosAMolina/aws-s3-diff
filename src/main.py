@@ -167,7 +167,7 @@ class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
             super().run()
         except Exception as exception:
             self._local_results.drop_file_with_analysis_date()
-            self._local_results.analysis_paths.directory_analysis.rmdir()
+            self._local_results.drop_directory_analysis()
             raise exception
 
 
