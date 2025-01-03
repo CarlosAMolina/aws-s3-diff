@@ -26,7 +26,7 @@ def run():
                 f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
             )
             return
-        if error_code == "InvalidAccessKeyId":
+        if error_code in ("AccessDenied", "InvalidAccessKeyId"):
             logger.error("Incorrect AWS credentials. Authenticate and run the program again")
             return
         raise Exception from exception
