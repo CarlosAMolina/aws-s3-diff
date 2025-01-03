@@ -113,7 +113,7 @@ class _AwsAccountProcess(_Process):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
     def run(self):
-        self._logger.info(f"The following AWS account will be analyzed: {self._aws_account}")
+        self._logger.info(f"Analyzing the AWS account '{self._aws_account}'")
         self._export_s3_data_of_account()
 
     def _export_s3_data_of_account(self):
@@ -148,7 +148,7 @@ class _NoLastAwsAccountProcess(_AwsAccountProcess):
 
     def _show_next_account_to_analyze(self):
         self._logger.info(
-            f"The next account to analyze is {self._analyzed_aws_accounts.get_aws_account_to_analyze()}"
+            f"The next account to be analyzed is '{self._analyzed_aws_accounts.get_aws_account_to_analyze()}'"
             ". Authenticate and run the program again"
         )
 
