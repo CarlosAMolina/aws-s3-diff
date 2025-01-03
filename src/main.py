@@ -162,7 +162,7 @@ class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
         # The folder may exist but not the result file if an error occurred in the previous run,
         # e.g. errors interacting with S3.
         if not self._local_results.analysis_paths.directory_analysis.is_dir():
-            self._local_results.create_analysis_results_folder()
+            self._local_results.create_directory_analysis()
         try:
             super().run()
         except Exception as exception:

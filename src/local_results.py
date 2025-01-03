@@ -22,9 +22,8 @@ class LocalResults:
         self._logger.debug(f"Removing the file: {self._main_paths.file_analysis_date_time}")
         self._main_paths.file_analysis_date_time.unlink()
 
-    # TODO rename create_directory_analysis
-    def create_analysis_results_folder(self):
-        self._logger.debug(f"Creating the results folder: {self.analysis_paths.directory_analysis}")
+    def create_directory_analysis(self):
+        self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
 
     def drop_directory_analysis(self):
