@@ -144,11 +144,8 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_incorrect_aws_credentials(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        # TODO try mock inner method
         mock_extract.side_effect = ClientError({"Error": {"Code": "InvalidAccessKeyId"}}, "ListObjectsV2")
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        # TODO try not to create a file
-        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
@@ -164,11 +161,8 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_no_aws_credentials(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        # TODO try mock inner method
         mock_extract.side_effect = ClientError({"Error": {"Code": "AccessDenied"}}, "ListObjectsV2")
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        # TODO try not to create a file
-        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
