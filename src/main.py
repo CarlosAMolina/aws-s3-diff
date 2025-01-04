@@ -1,7 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 
-import botocore
+from botocore.exceptions import ClientError
 
 from analysis import AnalysisGenerator
 from exceptions import FolderInS3UriError
@@ -18,7 +18,7 @@ def run():
     try:
         _InteractiveMenu().run()
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
-    except botocore.exceptions.ClientError as exception:
+    except ClientError as exception:
         error_code = exception.response["Error"]["Code"]
         if error_code == "NoSuchBucket":
             bucket_name = exception.response["Error"]["BucketName"]
