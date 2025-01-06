@@ -122,37 +122,22 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_aws_client_errors(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        for (
-            expected_error_message,
-            client_error,
-        ) in {
-            "Incorrect AWS credentials. Authenticate and run the program again": _ListObjectsV2ClientErrorBuilder()
-            .with_error_code("InvalidAccessKeyId")
-            .build(),
-        }.items():
+        for test_inputs in (
+            (
+                "Incorrect AWS credentials. Authenticate and run the program again",
+                _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build(),
+            ),
+            (
+                "Incorrect AWS credentials. Authenticate and run the program again",
+                _ListObjectsV2ClientErrorBuilder().with_error_code("AccessDenied").build(),
+            ),
+        ):
+            expected_error_message, client_error = test_inputs
             mock_extract.side_effect = client_error
             _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
             with self.assertLogs(level="ERROR") as cm:
                 m_main.run()
             self.assertEqual(expected_error_message, cm.records[0].message)
-
-    @patch("src.main.LocalResults")
-    @patch("src.main._AnalyzedAwsAccounts")
-    @patch("src.main.AwsAccountExtractor.extract")
-    @patch(
-        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
-    )
-    def test_run_manages_no_aws_credentials(
-        self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
-    ):
-        mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("AccessDenied").build()
-        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
-        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        with self.assertLogs(level="ERROR") as cm:
-            m_main.run()
-        self.assertEqual(expected_error_message, cm.records[0].message)
 
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
