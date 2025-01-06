@@ -47,7 +47,6 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         # TODO try not to create a file
         mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         self._local_s3_server.create_objects("test-uri-with-subfolder")
-        m_main.run()
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
         self.assertEqual(
