@@ -123,10 +123,10 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
         mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build()
+        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
-        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
         self.assertEqual(expected_error_message, cm.records[0].message)
 
     @patch("src.main.LocalResults")
@@ -141,10 +141,10 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
         mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("AccessDenied").build()
+        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
-        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
         self.assertEqual(expected_error_message, cm.records[0].message)
 
     @patch("src.main.LocalResults")
@@ -159,12 +159,12 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
         mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("NoSuchBucket").build()
-        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        with self.assertLogs(level="ERROR") as cm:
-            m_main.run()
         expected_error_message = (
             "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again"
         )
+        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        with self.assertLogs(level="ERROR") as cm:
+            m_main.run()
         self.assertEqual(expected_error_message, cm.records[0].message)
 
 
