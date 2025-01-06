@@ -18,6 +18,9 @@ from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
 
+from src.main import FolderInS3UriError  # TODO move up
+
+
 
 class TestFunction_runLocalS3Server(unittest.TestCase):
     def setUp(self):
@@ -107,9 +110,6 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
-
-
-from src.main import FolderInS3UriError  # TODO move up
 
 
 class TestFunction_runNoLocalS3Server(unittest.TestCase):
