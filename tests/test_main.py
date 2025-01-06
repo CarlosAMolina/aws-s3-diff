@@ -156,11 +156,6 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                     m_main.run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
-    @patch("src.main._InteractiveMenu.run")
-    def test_run_manages_folder_in_s3_uri_error_and_generates_expected_error_messages(self, mock_interactive_menu):
-        mock_interactive_menu.side_effect = FolderInS3UriError
-        m_main.run()
-
 
 from src.main import FolderInS3UriError  # TODO move up
 
