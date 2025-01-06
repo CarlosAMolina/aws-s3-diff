@@ -150,7 +150,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
 
 class _ListObjectsV2ClientErrorBuilder:
     def __init__(self):
-        self._error_response = {"Error": {"Code": "NoSuchBucket", "BucketName": "foo"}}
+        self._error_response = {"Error": {"Code": "foo", "BucketName": "foo"}}
 
     def with_bucket_name(self, bucket_name: str) -> "_ListObjectsV2ClientErrorBuilder":
         self._error_response["Error"]["BucketName"] = bucket_name
