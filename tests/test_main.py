@@ -126,7 +126,8 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
-        self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
+        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
+        self.assertEqual(expected_error_message, cm.records[0].message)
 
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
@@ -143,7 +144,8 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
-        self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
+        expected_error_message = "Incorrect AWS credentials. Authenticate and run the program again"
+        self.assertEqual(expected_error_message, cm.records[0].message)
 
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
@@ -160,10 +162,10 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
-        self.assertEqual(
-            "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
-            cm.records[0].message,
+        expected_error_message = (
+            "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again"
         )
+        self.assertEqual(expected_error_message, cm.records[0].message)
 
 
 class _ListObjectsV2ClientErrorBuilder:
