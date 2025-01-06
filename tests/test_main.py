@@ -11,10 +11,11 @@ from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
-from src import main as m_main
 from src.local_results import _AnalysisPaths
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
+from src.main import FolderInS3UriError
+from src.main import run
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
 
@@ -48,7 +49,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
         self._local_s3_server.create_objects("test-uri-with-subfolder")
         with self.assertLogs(level="ERROR") as cm:
-            m_main.run()
+            run()
         self.assertEqual(
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/",
@@ -63,7 +64,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     def test_run_if_should_work_ok(self, mock_directory_path_what_to_analyze):
         for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
             self._local_s3_server.create_objects(aws_account)
-            m_main.run()
+            run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._assert_extracted_aws_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
@@ -143,7 +144,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             ),
             (
                 message_error_subfolder,
-                m_main.FolderInS3UriError(message_error_subfolder),
+                FolderInS3UriError(message_error_subfolder),
             ),
         ):
             expected_error_message, aws_error = test_data
@@ -151,7 +152,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                 mock_extract.side_effect = aws_error
                 _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
-                    m_main.run()
+                    run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
 
