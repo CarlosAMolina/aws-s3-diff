@@ -122,7 +122,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        for test_inputs in (
+        for test_data in (
             (
                 "Incorrect AWS credentials. Authenticate and run the program again",
                 _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build(),
@@ -139,7 +139,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                 .build(),
             ),
         ):
-            expected_error_message, client_error = test_inputs
+            expected_error_message, client_error = test_data
             with self.subTest(expected_error_message=expected_error_message, client_error=client_error):
                 mock_extract.side_effect = client_error
                 _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
