@@ -109,6 +109,9 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
 
+from src.main import FolderInS3UriError  # TODO move up
+
+
 class TestFunction_runNoLocalS3Server(unittest.TestCase):
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
@@ -121,7 +124,6 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        from src.main import FolderInS3UriError  # TODO move up
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/"
@@ -154,7 +156,6 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                 with self.assertLogs(level="ERROR") as cm:
                     m_main.run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
-
 
 
 class _ListObjectsV2ClientErrorBuilder:
