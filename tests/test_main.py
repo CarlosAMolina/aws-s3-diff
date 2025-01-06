@@ -133,7 +133,10 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             ),
             (
                 "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
-                _ListObjectsV2ClientErrorBuilder().with_error_code("NoSuchBucket").build(),
+                _ListObjectsV2ClientErrorBuilder()
+                .with_error_code("NoSuchBucket")
+                .with_bucket_name("invented_bucket")
+                .build(),
             ),
         ):
             expected_error_message, client_error = test_inputs
@@ -147,7 +150,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
 
 class _ListObjectsV2ClientErrorBuilder:
     def __init__(self):
-        self._error_response = {"Error": {"Code": "NoSuchBucket", "BucketName": "invented_bucket"}}
+        self._error_response = {"Error": {"Code": "NoSuchBucket", "BucketName": "foo"}}
 
     def with_bucket_name(self, bucket_name: str) -> "_ListObjectsV2ClientErrorBuilder":
         self._error_response["Error"]["BucketName"] = bucket_name
