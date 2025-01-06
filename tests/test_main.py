@@ -119,7 +119,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
-    def test_run_manages_aws_client_errors(
+    def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
         for test_inputs in (
