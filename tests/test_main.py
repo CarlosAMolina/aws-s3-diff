@@ -137,11 +137,12 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             ),
         ):
             expected_error_message, client_error = test_inputs
-            mock_extract.side_effect = client_error
-            _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-            with self.assertLogs(level="ERROR") as cm:
-                m_main.run()
-            self.assertEqual(expected_error_message, cm.records[0].message)
+            with self.subTest(expected_error_message=expected_error_message, client_error=client_error):
+                mock_extract.side_effect = client_error
+                _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+                with self.assertLogs(level="ERROR") as cm:
+                    m_main.run()
+                self.assertEqual(expected_error_message, cm.records[0].message)
 
 
 class _ListObjectsV2ClientErrorBuilder:
