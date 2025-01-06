@@ -167,6 +167,28 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             m_main.run()
         self.assertEqual("Incorrect AWS credentials. Authenticate and run the program again", cm.records[0].message)
 
+    @patch("src.main.LocalResults")
+    @patch("src.main._AnalyzedAwsAccounts")
+    @patch("src.main.AwsAccountExtractor.extract")
+    @patch(
+        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        new_callable=PropertyMock,
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+    )
+    def test_run_manages_bucket_does_not_exist(
+        self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
+    ):
+        mock_extract.side_effect = ClientError(
+            {"Error": {"Code": "NoSuchBucket", "BucketName": "invented_bucket"}}, "ListObjectsV2"
+        )
+        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+        with self.assertLogs(level="ERROR") as cm:
+            m_main.run()
+        self.assertEqual(
+            "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
+            cm.records[0].message,
+        )
+
 
 def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results):
     mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = S3UrisFileAnalyzer().get_first_aws_account()
