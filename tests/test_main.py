@@ -121,6 +121,12 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
+
+        message_error_subfolder = (
+            "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
+            ". Subfolders (1): folder/subfolder/"
+        )
+
         for test_data in (
             (
                 "Incorrect AWS credentials. Authenticate and run the program again",
@@ -136,6 +142,10 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                 .with_error_code("NoSuchBucket")
                 .with_bucket_name("invented_bucket")
                 .build(),
+            ),
+            (
+                message_error_subfolder,
+                FolderInS3UriError(message_error_subfolder),
             ),
         ):
             expected_error_message, aws_error = test_data
