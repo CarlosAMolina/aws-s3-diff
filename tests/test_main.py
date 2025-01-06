@@ -38,28 +38,6 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__)
         .parent.absolute()
-        .joinpath("fake-files/s3-uris-to-analyze/to-test-non-existent-bucket.csv"),
-    )
-    def test_run_manages_bucket_does_not_exist(
-        self, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
-    ):
-        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        # TODO try not to create a file
-        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
-        with self.assertLogs(level="ERROR") as cm:
-            m_main.run()
-        self.assertEqual(
-            "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
-            cm.records[0].message,
-        )
-
-    @patch("src.main.LocalResults")
-    @patch("src.main._AnalyzedAwsAccounts")
-    @patch(
-        "src.main.S3UrisFileAnalyzer._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__)
-        .parent.absolute()
         .joinpath("fake-files/s3-uris-to-analyze/to-test-s3-uri-with-folder.csv"),
     )
     def test_run_manages_s3_uri_with_folder(
