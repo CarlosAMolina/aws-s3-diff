@@ -18,9 +18,6 @@ from src.local_results import LocalResults
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
 
-from src.main import FolderInS3UriError  # TODO move up
-
-
 
 class TestFunction_runLocalS3Server(unittest.TestCase):
     def setUp(self):
@@ -146,7 +143,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             ),
             (
                 message_error_subfolder,
-                FolderInS3UriError(message_error_subfolder),
+                m_main.FolderInS3UriError(message_error_subfolder),
             ),
         ):
             expected_error_message, aws_error = test_data
