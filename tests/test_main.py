@@ -12,7 +12,6 @@ from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
 from src import main as m_main
-from src.exceptions import FolderInS3UriError
 from src.local_results import _AnalysisPaths
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
@@ -151,6 +150,9 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_folder_in_s3_uri_error_and_generates_expected_error_messages(self, mock_interactive_menu):
         mock_interactive_menu.side_effect = FolderInS3UriError
         m_main.run()
+
+
+from src.main import FolderInS3UriError  # TODO move up
 
 
 class _ListObjectsV2ClientErrorBuilder:
