@@ -122,7 +122,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_incorrect_aws_credentials(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        mock_extract.side_effect = ClientError({"Error": {"Code": "InvalidAccessKeyId"}}, "ListObjectsV2")
+        mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build()
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
@@ -139,7 +139,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_no_aws_credentials(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        mock_extract.side_effect = ClientError({"Error": {"Code": "AccessDenied"}}, "ListObjectsV2")
+        mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("AccessDenied").build()
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
@@ -156,9 +156,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_bucket_does_not_exist(
         self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
-        mock_extract.side_effect = ClientError(
-            {"Error": {"Code": "NoSuchBucket", "BucketName": "invented_bucket"}}, "ListObjectsV2"
-        )
+        mock_extract.side_effect = _ListObjectsV2ClientErrorBuilder().with_error_code("NoSuchBucket").build()
         _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
         with self.assertLogs(level="ERROR") as cm:
             m_main.run()
@@ -166,6 +164,22 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             "The bucket 'invented_bucket' does not exist. Specify a correct bucket and run the program again",
             cm.records[0].message,
         )
+
+
+class _ListObjectsV2ClientErrorBuilder:
+    def __init__(self):
+        self._error_response = {"Error": {"Code": "NoSuchBucket", "BucketName": "invented_bucket"}}
+
+    def with_bucket_name(self, bucket_name: str) -> "_ListObjectsV2ClientErrorBuilder":
+        self._error_response["Error"]["BucketName"] = bucket_name
+        return self
+
+    def with_error_code(self, code: str) -> "_ListObjectsV2ClientErrorBuilder":
+        self._error_response["Error"]["Code"] = code
+        return self
+
+    def build(self) -> ClientError:
+        return ClientError(self._error_response, "ListObjectsV2")
 
 
 def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results):
