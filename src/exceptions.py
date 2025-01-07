@@ -1,2 +1,2 @@
-class FolderInS3UriError(FileExistsError):
+class FolderInS3UriError(IsADirectoryError):
     pass
