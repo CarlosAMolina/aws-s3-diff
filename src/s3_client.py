@@ -21,11 +21,12 @@ class S3Client:
         query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
         last_key = ""
         result = []
+        max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
         while True:
             response = self._s3_client.list_objects_v2(
                 Bucket=s3_query.bucket,
                 Prefix=query_prefix,
-                MaxKeys=os.getenv("AWS_MAX_KEYS", 1_000),
+                MaxKeys=max_keys,
                 StartAfter=last_key,
                 Delimiter="/",  # Required for folders detection.
             )

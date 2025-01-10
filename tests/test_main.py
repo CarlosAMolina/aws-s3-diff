@@ -1,3 +1,4 @@
+import os
 import random
 import shutil
 import string
@@ -28,9 +29,11 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         # Drop file created by the user
         if _MainPaths().file_analysis_date_time.is_file():
             LocalResults().drop_file_with_analysis_date()
+        os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
 
     def tearDown(self):
         self._local_s3_server.stop()
+        os.environ.pop("AWS_MAX_KEYS")
 
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
