@@ -14,28 +14,38 @@ class S3Client:
         self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> S3Data:
+        """
+        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
+        """
         # TODO move the logic to add the `/` to the S3Query object
         query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
-        self._raise_exception_if_subfolders_in_s3(s3_query.bucket, query_prefix)
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/paginators.html
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
-        operation_parameters = {"Bucket": s3_query.bucket, "Prefix": query_prefix}
-        paginator = self._s3_client.get_paginator("list_objects_v2")
-        page_iterator = paginator.paginate(**operation_parameters)
+        last_key = ""
         result = []
-        for page in page_iterator:
-            if page["KeyCount"] == 0:
-                if len(result) > 0:
-                    raise ValueError("Not managed situation. Fix it to avoid lost data when returning empty result")
-                return [FileS3Data()]
-            page_files = [_FileS3DataFromS3Content(content).file_s3_data for content in page["Contents"]]
-            result += page_files
+        while True:
+            response = self._s3_client.list_objects_v2(
+                Bucket=s3_query.bucket,
+                Prefix=query_prefix,
+                MaxKeys=os.getenv("AWS_MAX_KEYS", 1_000),
+                StartAfter=last_key,
+                Delimiter="/",  # Required for folders detection.
+            )
+            """
+            `response["IsTruncated"] is True` is not valid to know if all objects were
+            retrieved because when using `MaxKeys`, `IsTruncated` is True.
+            """
+            if response.get("Contents") is None:
+                break
+            self._raise_exception_if_folders_in_response(response, s3_query.bucket)
+            # TODO use yield
+            result += [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
+            last_key = response["Contents"][-1]["Key"]
+        if len(result) == 0:
+            result += [FileS3Data()]
         return result
 
-    def _raise_exception_if_subfolders_in_s3(self, bucket: str, query_prefix: str):
-        # https://stackoverflow.com/questions/71577584/python-boto3-s3-list-only-current-directory-file-ignoring-subdirectory-files
-        response = self._s3_client.list_objects_v2(Bucket=bucket, Prefix=query_prefix, Delimiter="/")
-        if len(response.get("CommonPrefixes", [])) == 0:
+    def _raise_exception_if_folders_in_response(self, response: dict, bucket: str):
+        folder_path_names = self._get_folder_path_names_in_response_list_objects_v2(response)
+        if len(folder_path_names) == 0:
             return
         folder_path_names = [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
         error_text = (
@@ -43,6 +53,12 @@ class S3Client:
             f". Subfolders ({len(folder_path_names)}): {', '.join(folder_path_names)}"
         )
         raise FolderInS3UriError(error_text)
+
+    def _get_folder_path_names_in_response_list_objects_v2(self, response: dict) -> list[str]:
+        # Detect folders: https://stackoverflow.com/a/71579041
+        if "CommonPrefixes" not in response:
+            return []
+        return [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
 
 
 class _FileS3DataFromS3Content:
