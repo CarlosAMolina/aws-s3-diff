@@ -34,9 +34,11 @@ class S3Client:
             `response["IsTruncated"] is True` is not valid to know if all objects were
             retrieved because when using `MaxKeys`, `IsTruncated` is True.
             """
+            self._raise_exception_if_folders_in_response(response, s3_query.bucket)
+            # If S3 prefix only has a folder (no files), the response won't have the 'Contents' key,
+            # it is important to check the key after review if there are folders.
             if response.get("Contents") is None:
                 break
-            self._raise_exception_if_folders_in_response(response, s3_query.bucket)
             # TODO use yield
             result += [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
             last_key = response["Contents"][-1]["Key"]
