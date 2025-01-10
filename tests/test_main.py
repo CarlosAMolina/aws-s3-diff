@@ -15,7 +15,7 @@ from pandas.testing import assert_frame_equal
 from src.local_results import _AnalysisPaths
 from src.local_results import _MainPaths
 from src.local_results import LocalResults
-from src.main import FolderInS3UriError  # Does not work (breaks tests): from src.exceptions import FolderInS3UriError
+from src.main import FolderInS3UriError
 from src.main import run
 from src.s3_uris_to_analyze import S3UrisFileAnalyzer
 from tests.aws import S3Server
