@@ -18,9 +18,6 @@ class S3Server:
     def create_objects(self, aws_account):
         S3(aws_account).create_objects()
 
-    def create_objects_from_memory(self, bucket_name: str):
-        _MemoryS3().create_objects(bucket_name)
-
     def stop(self):
         self._mock_aws.stop()
 
@@ -78,9 +75,3 @@ class S3:
     def _get_file_paths_in_directory_path(self, directory_path: Path) -> list[Path]:
         """https://stackoverflow.com/questions/25380774/upload-a-directory-to-s3-with-boto"""
         return [Path(root, file_name) for root, _dirs, files in os.walk(directory_path) for file_name in files]
-
-
-class _MemoryS3:
-    def create_objects(self, bucket_name: str):
-        boto3.resource("s3").Bucket(bucket_name).create()
-        boto3.client("s3").put_object(Body="foo", Bucket=bucket_name, Key="tmp/folder/foo.txt")
