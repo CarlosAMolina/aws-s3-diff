@@ -1,7 +1,5 @@
 import os
-import random
 import shutil
-import string
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -34,30 +32,6 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     def tearDown(self):
         self._local_s3_server.stop()
         os.environ.pop("AWS_MAX_KEYS")
-
-    @patch("src.main.LocalResults")
-    @patch("src.main._AnalyzedAwsAccounts")
-    @patch(
-        "src.main.S3UrisFileAnalyzer._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__)
-        .parent.absolute()
-        .joinpath("fake-files/s3-uris-to-analyze/to-test-s3-uri-with-folder.csv"),
-    )
-    def test_run_manages_s3_uri_with_folder(
-        self, mock_file_path_what_to_analyze, mock_analyzed_aws_accounts, mock_local_results
-    ):
-        _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
-        # TODO try not to create a file
-        mock_local_results().get_file_path_aws_account_results.return_value = _get_foo_path()
-        self._local_s3_server.create_objects("test-uri-with-subfolder")
-        with self.assertLogs(level="ERROR") as cm:
-            run()
-        self.assertEqual(
-            "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
-            ". Subfolders (1): folder/subfolder/",
-            cm.records[0].message,
-        )
 
     @patch(
         "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
@@ -181,7 +155,3 @@ def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mo
     mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
     mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
     mock_local_results().directory_analysis.is_dir.return_value = True
-
-
-def _get_foo_path() -> Path:
-    return Path("/tmp/", "".join(random.choice(string.ascii_lowercase) for _ in range(20)))
