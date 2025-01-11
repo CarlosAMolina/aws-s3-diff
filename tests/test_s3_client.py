@@ -1,6 +1,6 @@
 import unittest
 
-from src.exceptions import FolderInS3UriError
+from src.s3_client import FolderInS3UriError
 from src.s3_client import S3Client
 from tests.aws import S3Server
 from types_custom import S3Query
