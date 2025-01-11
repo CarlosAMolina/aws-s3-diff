@@ -15,6 +15,7 @@ class FileS3Data(NamedTuple):
     name: str | None = None
     date: str | None = None
     size: int | None = None
+    hash: str | None = None
 
 
 S3Data = list[FileS3Data]

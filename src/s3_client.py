@@ -74,6 +74,7 @@ class _FileS3DataFromS3Content:
             self._get_file_name_from_response_key(self._s3_response_content),
             self._s3_response_content["LastModified"],
             self._s3_response_content["Size"],
+            self._s3_response_content["ETag"].strip('"'),
         )
 
     def _get_file_name_from_response_key(self, content: dict) -> str:
