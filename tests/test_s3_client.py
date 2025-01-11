@@ -8,9 +8,6 @@ from types_custom import S3Query
 
 class TestS3Client(unittest.TestCase):
     def setUp(self):
-        """As the S3Server takes time to run, it is better to group all tests with local sever in only one test class
-        TODO: in test_main the server is started too, see how to minimize time.
-        """
         self._local_s3_server = S3Server()
         self._local_s3_server.start()
         self._bucket_name = "bucket-1"

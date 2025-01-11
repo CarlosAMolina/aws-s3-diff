@@ -21,7 +21,6 @@ from tests.aws import S3Server
 
 class TestFunction_runLocalS3Server(unittest.TestCase):
     def setUp(self):
-        """As the S3Server takes time to run, it is better to group all tests with local sever in only one test class"""
         self._local_s3_server = S3Server()
         self._local_s3_server.start()
         # Drop file created by the user
