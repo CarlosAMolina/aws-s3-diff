@@ -127,10 +127,19 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             expected_error_message, aws_error = test_data
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_extract.side_effect = aws_error
-                _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+                self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
                     run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
+
+    def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_aws_accounts, mock_local_results):
+        mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = (
+            S3UrisFileAnalyzer().get_first_aws_account()
+        )
+        mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
+        mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
+        mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
+        mock_local_results().directory_analysis.is_dir.return_value = True
 
 
 class _ListObjectsV2ClientErrorBuilder:
@@ -147,11 +156,3 @@ class _ListObjectsV2ClientErrorBuilder:
 
     def build(self) -> ClientError:
         return ClientError(self._error_response, "ListObjectsV2")
-
-
-def _mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results):
-    mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = S3UrisFileAnalyzer().get_first_aws_account()
-    mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
-    mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
-    mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
-    mock_local_results().directory_analysis.is_dir.return_value = True
