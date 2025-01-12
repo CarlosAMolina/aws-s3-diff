@@ -8,7 +8,7 @@ from pandas import Series
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import get_df_s3_data_all_accounts
-from s3_uris_to_analyze import S3UrisFileAnalyzer
+from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
 from types_custom import AnalysisS3DataDf
 
@@ -32,7 +32,7 @@ _ConditionConfig = dict[str, bool | str]
 
 class _AnalysisAwsAccountsGenerator:
     def __init__(self):
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
         aws_account_origin = self._get_aws_account_with_data_to_sync()
@@ -48,13 +48,13 @@ class _AnalysisAwsAccountsGenerator:
         )
 
     def _get_aws_account_with_data_to_sync(self) -> str:
-        return self._s3_uris_file_analyzer.get_first_aws_account()
+        return self._s3_uris_file_reader.get_first_aws_account()
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return self._s3_uris_file_analyzer.get_aws_accounts()[1]
+        return self._s3_uris_file_reader.get_aws_accounts()[1]
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = self._s3_uris_file_analyzer.get_aws_accounts()
+        result = self._s3_uris_file_reader.get_aws_accounts()
         result.remove(self._get_aws_account_with_data_to_sync())
         return result
 
@@ -243,7 +243,7 @@ class _AnalysisCondition:
 class _AnalysisDfToCsv:
     def __init__(self):
         self._logger = get_logger()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def export(self, df: AnalysisS3DataDf):
         file_path = LocalResults().analysis_paths.file_analysis
@@ -258,7 +258,7 @@ class _AnalysisDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = self._s3_uris_file_analyzer.get_first_aws_account()
+        aws_account_1 = self._s3_uris_file_reader.get_first_aws_account()
         result.index.names = [
             f"bucket_{aws_account_1}",
             f"file_path_in_s3_{aws_account_1}",

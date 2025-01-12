@@ -15,7 +15,7 @@ from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.main import FolderInS3UriError
 from src.main import run
-from src.s3_uris_to_analyze import S3UrisFileAnalyzer
+from src.s3_uris_to_analyze import S3UrisFileReader
 from tests.aws import S3Server
 
 
@@ -33,12 +33,12 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         os.environ.pop("AWS_MAX_KEYS")
 
     @patch(
-        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        "src.main.S3UrisFileReader._directory_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     def test_run_if_should_work_ok(self, mock_directory_path_what_to_analyze):
-        for aws_account in S3UrisFileAnalyzer().get_aws_accounts():
+        for aws_account in S3UrisFileReader().get_aws_accounts():
             self._local_s3_server.create_objects(aws_account)
             run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
@@ -91,7 +91,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     @patch("src.main._AnalyzedAwsAccounts")
     @patch("src.main.AwsAccountExtractor.extract")
     @patch(
-        "src.main.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        "src.main.S3UrisFileReader._directory_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
@@ -133,7 +133,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
 
     def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_aws_accounts, mock_local_results):
         mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = (
-            S3UrisFileAnalyzer().get_first_aws_account()
+            S3UrisFileReader().get_first_aws_account()
         )
         mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
         mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True

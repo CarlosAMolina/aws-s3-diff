@@ -9,8 +9,8 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data import AwsAccountExtractor
 from s3_data import export_s3_data_all_accounts_to_one_file
-from s3_uris_to_analyze import S3UrisFileAnalyzer
 from s3_uris_to_analyze import S3UrisFileChecker
+from s3_uris_to_analyze import S3UrisFileReader
 
 
 def run():
@@ -39,7 +39,7 @@ class _InteractiveMenu:
     def __init__(self):
         self._logger = get_logger()
         self._process_factory = _ProcessFactory()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
         self._logger.info("Welcome to the AWS S3 Diff tool!")
@@ -49,7 +49,7 @@ class _InteractiveMenu:
         self._process_factory.get_process().run()
 
     def _show_aws_accounts_to_analyze(self):
-        aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
+        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         aws_accounts_list = [f"\n{index}. {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
         self._logger.info(f"AWS accounts configured to be analyzed:{''.join(aws_accounts_list)}")
 
@@ -64,7 +64,7 @@ class _ProcessFactory:
     def __init__(self):
         self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
         self._local_results = LocalResults()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _Process:
         """
@@ -81,24 +81,24 @@ class _ProcessFactory:
 class _AnalyzedAwsAccounts:
     def __init__(self):
         self._local_results = LocalResults()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_aws_account_to_analyze(self) -> str:
-        aws_accounts_to_analyze = self._s3_uris_file_analyzer.get_aws_accounts()
+        aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
         last_aws_account_analyzed = self._get_last_aws_account_analyzed()
         if last_aws_account_analyzed is None:
-            return self._s3_uris_file_analyzer.get_first_aws_account()
-        if last_aws_account_analyzed == self._s3_uris_file_analyzer.get_last_aws_account():
+            return self._s3_uris_file_reader.get_first_aws_account()
+        if last_aws_account_analyzed == self._s3_uris_file_reader.get_last_aws_account():
             # Unexpected situation. This method cannot be called if all accounts have been analyzed.
             raise RuntimeError("All AWS accounts have been analyzed")
         return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
 
     def have_all_aws_accounts_been_analyzed(self) -> bool:
-        return self._get_last_aws_account_analyzed() == self._s3_uris_file_analyzer.get_last_aws_account()
+        return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_last_aws_account()
 
     def _get_last_aws_account_analyzed(self) -> str | None:
         result = None
-        for aws_account in self._s3_uris_file_analyzer.get_aws_accounts():
+        for aws_account in self._s3_uris_file_reader.get_aws_accounts():
             if not self._local_results.has_this_aws_account_been_analyzed(aws_account):
                 return result
             result = aws_account
@@ -110,7 +110,7 @@ class _AwsAccountProcess(_Process):
         self._aws_account = aws_account
         self._local_results = LocalResults()
         self._logger = get_logger()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
         self._logger.info(f"Analyzing the AWS account '{self._aws_account}'")
@@ -119,20 +119,20 @@ class _AwsAccountProcess(_Process):
     def _export_s3_data_of_account(self):
         AwsAccountExtractor(
             self._local_results.get_file_path_aws_account_results(self._aws_account),
-            self._s3_uris_file_analyzer.get_s3_queries_for_aws_account(self._aws_account),
+            self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
         ).extract()
 
 
 class _AwsAccountProcessFactory:
     def __init__(self):
         self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _AwsAccountProcess:
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
-        if aws_account == self._s3_uris_file_analyzer.get_first_aws_account():
+        if aws_account == self._s3_uris_file_reader.get_first_aws_account():
             return _FirstAwsAccountProcess(aws_account)
-        if aws_account == self._s3_uris_file_analyzer.get_last_aws_account():
+        if aws_account == self._s3_uris_file_reader.get_last_aws_account():
             return _LastAwsAccountProcess(aws_account)
         return _IntermediateAccountProcess(aws_account)
 

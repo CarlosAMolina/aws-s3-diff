@@ -10,7 +10,7 @@ from types_custom import S3Query
 
 class S3UrisFileChecker:
     def __init__(self):
-        self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def assert_file_is_correct(self):
         self._assert_no_empty_aws_account()
@@ -18,21 +18,21 @@ class S3UrisFileChecker:
         self._assert_no_duplicated_uri_per_account()
 
     def _assert_no_empty_aws_account(self):
-        if any(aws_account.startswith("Unnamed: ") for aws_account in self._s3_uris_file_analyzer.get_aws_accounts()):
+        if any(aws_account.startswith("Unnamed: ") for aws_account in self._s3_uris_file_reader.get_aws_accounts()):
             raise ValueError("Some AWS account names are empty")
 
     def _assert_no_empty_uris(self):
-        if self._s3_uris_file_analyzer.is_any_uri_null():
+        if self._s3_uris_file_reader.is_any_uri_null():
             raise ValueError("Some URIs are empty")
 
     def _assert_no_duplicated_uri_per_account(self):
-        for aws_account in self._s3_uris_file_analyzer.get_aws_accounts():
-            queries = self._s3_uris_file_analyzer.get_s3_queries_for_aws_account(aws_account)
+        for aws_account in self._s3_uris_file_reader.get_aws_accounts():
+            queries = self._s3_uris_file_reader.get_s3_queries_for_aws_account(aws_account)
             if len(queries) != len(set(queries)):
                 raise ValueError(f"The AWS account {aws_account} has duplicated URIs")
 
 
-class S3UrisFileAnalyzer:
+class S3UrisFileReader:
     def __init__(self):
         # TODO I don't like to read a file in __init__()
         self._df_file_what_to_analyze = self._get_df_file_what_to_analyze()

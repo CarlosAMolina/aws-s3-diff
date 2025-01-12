@@ -18,7 +18,7 @@ from src.analysis import _DfAnalysis
 from src.analysis import _OriginFileSyncDfAnalysis
 from src.analysis import _S3DataSetAnalysis
 from src.analysis import _TargetAccountWithoutMoreFilesDfAnalysis
-from src.s3_uris_to_analyze import S3UrisFileAnalyzer
+from src.s3_uris_to_analyze import S3UrisFileReader
 
 
 class _DfAnalysisConfig(ABC):
@@ -80,10 +80,10 @@ class _TargetAccountWithoutMoreFilesDfAnalysisConfig(_DfAnalysisConfig):
 class TestDfAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._s3_uris_file_analyzer = S3UrisFileAnalyzer()
+        cls._s3_uris_file_reader = S3UrisFileReader()
 
     @patch(
-        "src.analysis.S3UrisFileAnalyzer._file_path_what_to_analyze",
+        "src.analysis.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__)
         .parent.absolute()
@@ -106,7 +106,7 @@ class TestDfAnalysis(unittest.TestCase):
 
     @property
     def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
-        all_aws_accounts = self._s3_uris_file_analyzer.get_aws_accounts()
+        all_aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         return _CompareAwsAccounts(*all_aws_accounts[:2])
 
 
@@ -116,7 +116,7 @@ class TestS3DataSetAnalysis(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     @patch(
-        "src.analysis.S3UrisFileAnalyzer._directory_path_what_to_analyze",
+        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
