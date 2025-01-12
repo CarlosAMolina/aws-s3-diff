@@ -87,9 +87,15 @@ class _S3DataSetAnalysis:
         return self._get_df_set_analysis_must_file_exist(result)
 
     def _get_df_set_analysis_file_has_been_copied(self, df: AllAccoutsS3DataDf) -> Df:
-        return _OriginFileSyncDfAnalysisSetter(
-            self._aws_accounts.aws_account_origin, self._aws_accounts.aws_accounts_where_files_must_be_copied
-        ).get_df_set_analysis(df)
+        result = df.copy()
+        for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
+            aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
+            self._logger.info(
+                f"Analyzing if files of the account '{aws_accounts.origin}' have been coppied to the account"
+                f" {aws_accounts.target}"
+            )
+            result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
+        return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_accounts = _AnalysisAwsAccountsGenerator().get_aws_accounts_to_analyze_account_without_more_files()
@@ -98,27 +104,6 @@ class _S3DataSetAnalysis:
             f" account '{aws_accounts.target}'"
         )
         return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
-
-
-class _OriginFileSyncDfAnalysisSetter:
-    def __init__(self, aws_account_origin: str, aws_accounts_target: list[str]):
-        self._aws_account_origin = aws_account_origin
-        self._aws_accounts_target = aws_accounts_target
-        self._logger = get_logger()
-
-    def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        result = df
-        for aws_account_target in self._aws_accounts_target:
-            aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
-            self._log_configuration(aws_accounts)
-            result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
-        return result
-
-    def _log_configuration(self, aws_accounts: _CompareAwsAccounts):
-        self._logger.info(
-            f"Analyzing if files of the account '{aws_accounts.origin}' have been coppied to the account"
-            f" {aws_accounts.target}"
-        )
 
 
 class _AnalysisConfig(ABC):
