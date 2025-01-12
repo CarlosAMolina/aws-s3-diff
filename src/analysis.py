@@ -91,7 +91,7 @@ class _S3DataSetAnalysis:
         for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
             aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
             self._logger.info(
-                f"Analyzing if files of the account '{aws_accounts.origin}' have been coppied to the account"
+                f"Analyzing if files of the account '{aws_accounts.origin}' have been copied to the account"
                 f" {aws_accounts.target}"
             )
             result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
