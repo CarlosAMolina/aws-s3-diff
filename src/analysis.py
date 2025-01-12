@@ -107,19 +107,17 @@ class _OriginFileSyncDfAnalysisSetter:
         self._logger = get_logger()
 
     def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        self._log_configuration()
         result = df
         for aws_account_target in self._aws_accounts_target:
             aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
+            self._log_configuration(aws_accounts)
             result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
         return result
 
-    def _log_configuration(self):
-        aws_accounts_target_for_log = [f"'{account}'" for account in self._aws_accounts_target]
-        aws_accounts_target_str = ", ".join(account for account in aws_accounts_target_for_log)
+    def _log_configuration(self, aws_accounts: _CompareAwsAccounts):
         self._logger.info(
-            f"Analyzing if files of the account '{self._aws_account_origin}' have been coppied to the accounts"
-            f" {aws_accounts_target_str}"
+            f"Analyzing if files of the account '{aws_accounts.origin}' have been coppied to the account"
+            f" {aws_accounts.target}"
         )
 
 
