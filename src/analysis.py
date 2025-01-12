@@ -45,24 +45,10 @@ _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AwsAccountsGenerator(ABC):
+class _AnalysisAwsAccountsGenerator:
     def __init__(self):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
-    @abstractmethod
-    def get_aws_accounts(self) -> _AnalysisAwsAccounts:
-        pass
-
-    def _get_aws_account_with_data_to_sync(self) -> str:
-        return self._s3_uris_file_analyzer.get_first_aws_account()
-
-    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = self._s3_uris_file_analyzer.get_aws_accounts()
-        result.remove(self._get_aws_account_with_data_to_sync())
-        return result
-
-
-class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
     def get_aws_accounts(self) -> _AnalysisAwsAccounts:
         return _AnalysisAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
@@ -70,14 +56,23 @@ class _AnalysisAwsAccountsGenerator(_AwsAccountsGenerator):
             self._get_aws_accounts_where_files_must_be_copied(),
         )
 
+    def _get_aws_account_with_data_to_sync(self) -> str:
+        return self._s3_uris_file_analyzer.get_first_aws_account()
+
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
         return self._s3_uris_file_analyzer.get_aws_accounts()[1]
+
+    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+        result = self._s3_uris_file_analyzer.get_aws_accounts()
+        result.remove(self._get_aws_account_with_data_to_sync())
+        return result
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
 class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
+        self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
         result = df.copy()
@@ -93,20 +88,37 @@ class _S3DataSetAnalysis:
         aws_accounts = _CompareAwsAccounts(
             self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
         )
+        self._log_configuration()
         return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
+
+    def _log_configuration(self):
+        self._logger.info(
+            f"Analyzing if the files of the account '{self._aws_accounts.aws_account_origin}' should exist in the"
+            f" account '{self._aws_accounts.aws_account_that_must_not_have_more_files}'"
+        )
 
 
 class _OriginFileSyncDfAnalysisSetter:
     def __init__(self, aws_account_origin: str, aws_accounts_target: list[str]):
         self._aws_account_origin = aws_account_origin
         self._aws_accounts_target = aws_accounts_target
+        self._logger = get_logger()
 
     def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
+        self._log_configuration()
         result = df
         for aws_account_target in self._aws_accounts_target:
             aws_accounts = _CompareAwsAccounts(self._aws_account_origin, aws_account_target)
             result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
         return result
+
+    def _log_configuration(self):
+        aws_accounts_target_for_log = [f"'{account}'" for account in self._aws_accounts_target]
+        aws_accounts_target_str = ", ".join(account for account in aws_accounts_target_for_log)
+        self._logger.info(
+            f"Analyzing if files of the account '{self._aws_account_origin}' have been coppied to the accounts"
+            f" {aws_accounts_target_str}"
+        )
 
 
 class _AnalysisConfig(ABC):
