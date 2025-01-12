@@ -93,14 +93,11 @@ class _S3DataSetAnalysis:
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
         aws_accounts = _AnalysisAwsAccountsGenerator().get_aws_accounts_to_analyze_account_without_more_files()
-        self._log_configuration(aws_accounts)
-        return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
-
-    def _log_configuration(self, aws_accounts: _CompareAwsAccounts):
         self._logger.info(
             f"Analyzing if the files of the account '{aws_accounts.origin}' should exist in the"
             f" account '{aws_accounts.target}'"
         )
+        return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
 
 
 class _OriginFileSyncDfAnalysisSetter:
