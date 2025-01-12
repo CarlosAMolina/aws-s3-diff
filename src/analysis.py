@@ -28,17 +28,7 @@ class AnalysisGenerator:
 
 class _AllAccoutsS3DataDfAnalyzer:
     def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        aws_accounts_analysis = _AnalysisAwsAccountsGenerator().get_aws_accounts()
-        return _S3DataSetAnalysis(aws_accounts_analysis).get_df_set_analysis_columns(df)
-
-
-class _AnalysisAwsAccounts:
-    def __init__(self, *args):
-        (
-            self.aws_account_origin,
-            self.aws_account_that_must_not_have_more_files,
-            self.aws_accounts_where_files_must_be_copied,
-        ) = args
+        return _S3DataSetAnalysis().get_df_set_analysis_columns(df)
 
 
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
@@ -48,14 +38,6 @@ _ConditionConfig = dict[str, bool | str]
 class _AnalysisAwsAccountsGenerator:
     def __init__(self):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
-
-    # TODO deprecate
-    def get_aws_accounts(self) -> _AnalysisAwsAccounts:
-        return _AnalysisAwsAccounts(
-            self._get_aws_account_with_data_to_sync(),
-            self._get_aws_account_that_must_not_have_more_files(),
-            self._get_aws_accounts_where_files_must_be_copied(),
-        )
 
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
         aws_account_origin = self._get_aws_account_with_data_to_sync()
@@ -84,8 +66,7 @@ class _AnalysisAwsAccountsGenerator:
 
 # TODO rename all SetAnalysis to AnalysisSetter
 class _S3DataSetAnalysis:
-    def __init__(self, aws_accounts: _AnalysisAwsAccounts):
-        self._aws_accounts = aws_accounts
+    def __init__(self):
         self._aws_accounts_generator = _AnalysisAwsAccountsGenerator()
         self._logger = get_logger()
 
