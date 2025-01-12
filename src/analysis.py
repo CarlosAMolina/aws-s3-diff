@@ -57,6 +57,13 @@ class _AnalysisAwsAccountsGenerator:
             self._get_aws_accounts_where_files_must_be_copied(),
         )
 
+    def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
+        aws_account_origin = self._get_aws_account_with_data_to_sync()
+        return [
+            _CompareAwsAccounts(aws_account_origin, aws_account_target)
+            for aws_account_target in self._get_aws_accounts_where_files_must_be_copied()
+        ]
+
     def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
         return _CompareAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
@@ -79,6 +86,7 @@ class _AnalysisAwsAccountsGenerator:
 class _S3DataSetAnalysis:
     def __init__(self, aws_accounts: _AnalysisAwsAccounts):
         self._aws_accounts = aws_accounts
+        self._aws_accounts_generator = _AnalysisAwsAccountsGenerator()
         self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
@@ -88,8 +96,7 @@ class _S3DataSetAnalysis:
 
     def _get_df_set_analysis_file_has_been_copied(self, df: AllAccoutsS3DataDf) -> Df:
         result = df.copy()
-        for aws_account_target in self._aws_accounts.aws_accounts_where_files_must_be_copied:
-            aws_accounts = _CompareAwsAccounts(self._aws_accounts.aws_account_origin, aws_account_target)
+        for aws_accounts in self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied():
             self._logger.info(
                 f"Analyzing if files of the account '{aws_accounts.origin}' have been copied to the account"
                 f" {aws_accounts.target}"
