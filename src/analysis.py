@@ -49,11 +49,18 @@ class _AnalysisAwsAccountsGenerator:
     def __init__(self):
         self._s3_uris_file_analyzer = S3UrisFileAnalyzer()
 
+    # TODO deprecate
     def get_aws_accounts(self) -> _AnalysisAwsAccounts:
         return _AnalysisAwsAccounts(
             self._get_aws_account_with_data_to_sync(),
             self._get_aws_account_that_must_not_have_more_files(),
             self._get_aws_accounts_where_files_must_be_copied(),
+        )
+
+    def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
+        return _CompareAwsAccounts(
+            self._get_aws_account_with_data_to_sync(),
+            self._get_aws_account_that_must_not_have_more_files(),
         )
 
     def _get_aws_account_with_data_to_sync(self) -> str:
@@ -85,16 +92,14 @@ class _S3DataSetAnalysis:
         ).get_df_set_analysis(df)
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_accounts = _CompareAwsAccounts(
-            self._aws_accounts.aws_account_origin, self._aws_accounts.aws_account_that_must_not_have_more_files
-        )
-        self._log_configuration()
+        aws_accounts = _AnalysisAwsAccountsGenerator().get_aws_accounts_to_analyze_account_without_more_files()
+        self._log_configuration(aws_accounts)
         return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
 
-    def _log_configuration(self):
+    def _log_configuration(self, aws_accounts: _CompareAwsAccounts):
         self._logger.info(
-            f"Analyzing if the files of the account '{self._aws_accounts.aws_account_origin}' should exist in the"
-            f" account '{self._aws_accounts.aws_account_that_must_not_have_more_files}'"
+            f"Analyzing if the files of the account '{aws_accounts.origin}' should exist in the"
+            f" account '{aws_accounts.target}'"
         )
 
 
