@@ -20,15 +20,10 @@ class AnalysisGenerator:
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
-        return _AllAccoutsS3DataDfAnalyzer().get_df_set_analysis(all_accounts_s3_data_df)
+        return _S3DataSetAnalysis().get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _export_analyzed_df_to_file(self, df: AnalysisS3DataDf):
         _AnalysisDfToCsv().export(df)
-
-
-class _AllAccoutsS3DataDfAnalyzer:
-    def get_df_set_analysis(self, df: AllAccoutsS3DataDf) -> Df:
-        return _S3DataSetAnalysis().get_df_set_analysis_columns(df)
 
 
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
