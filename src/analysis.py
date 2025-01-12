@@ -227,8 +227,8 @@ class _AnalysisCondition:
         # Replace nan results to avoid incorrect values due to equality compaisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
-            self._df.loc[:, self._column_index_size_origin]
-            .eq(self._df.loc[:, self._column_index_size_target])
+            self._df.loc[:, self._column_index_hash_origin]
+            .eq(self._df.loc[:, self._column_index_hash_target])
             .fillna(False)
         )
 
@@ -238,11 +238,25 @@ class _AnalysisCondition:
 
     @property
     def _column_index_size_origin(self) -> tuple:
-        return (self._aws_accounts.origin, "size")
+        return self._get_column_index_size_for_account(self._aws_accounts.origin)
 
     @property
     def _column_index_size_target(self) -> tuple:
-        return (self._aws_accounts.target, "size")
+        return self._get_column_index_size_for_account(self._aws_accounts.target)
+
+    def _get_column_index_size_for_account(self, aws_account: str) -> tuple:
+        return (aws_account, "size")
+
+    @property
+    def _column_index_hash_origin(self) -> tuple:
+        return self._get_column_index_hash_for_account(self._aws_accounts.origin)
+
+    @property
+    def _column_index_hash_target(self) -> tuple:
+        return self._get_column_index_hash_for_account(self._aws_accounts.target)
+
+    def _get_column_index_hash_for_account(self, aws_account: str) -> tuple:
+        return (aws_account, "hash")
 
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
