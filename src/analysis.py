@@ -1,10 +1,12 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
+from typing import Literal
 
 from pandas import DataFrame as Df
 from pandas import Series
 
+from analysis_config import config as analysis_config
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import get_df_s3_data_all_accounts
@@ -31,11 +33,8 @@ _ConditionConfig = dict[str, bool | str]
 
 
 class _AnalysisAwsAccountsGenerator:
-    def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
-
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
-        aws_account_origin = self._get_aws_account_with_data_to_sync()
+        aws_account_origin = self._get_aws_account_origin("is_file_copied")
         return [
             _CompareAwsAccounts(aws_account_origin, aws_account_target)
             for aws_account_target in self._get_aws_accounts_where_files_must_be_copied()
@@ -43,20 +42,18 @@ class _AnalysisAwsAccountsGenerator:
 
     def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
         return _CompareAwsAccounts(
-            self._get_aws_account_with_data_to_sync(),
+            self._get_aws_account_origin("can_file_exist"),
             self._get_aws_account_that_must_not_have_more_files(),
         )
 
-    def _get_aws_account_with_data_to_sync(self) -> str:
-        return self._s3_uris_file_reader.get_first_aws_account()
+    def _get_aws_account_origin(self, analysis_type: Literal["is_file_copied", "can_file_exist"]) -> str:
+        return analysis_config[analysis_type]["origin"]
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return self._s3_uris_file_reader.get_aws_accounts()[1]
+        return analysis_config["can_file_exist"]["target"]
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        result = self._s3_uris_file_reader.get_aws_accounts()
-        result.remove(self._get_aws_account_with_data_to_sync())
-        return result
+        return analysis_config["is_file_copied"]["targets"]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
