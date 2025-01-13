@@ -19,5 +19,5 @@ class FileS3Data(NamedTuple):
 
 
 S3Data = list[FileS3Data]
-AllAccoutsS3DataDf = Df  # It is the combination of all AWS accounts S3 data.
-AnalysisS3DataDf = Df  # It is the AllAccoutsS3DataDf plus the analysis result columns.
+AllAccountsS3DataDf = Df  # It is the combination of all AWS accounts S3 data.
+AnalysisS3DataDf = Df  # It is the AllAccountsS3DataDf plus the analysis result columns.

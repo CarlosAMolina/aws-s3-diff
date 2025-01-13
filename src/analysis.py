@@ -11,7 +11,7 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import get_df_s3_data_all_accounts
-from types_custom import AllAccoutsS3DataDf
+from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
 
 
@@ -64,7 +64,7 @@ class _S3DataAnalysisSetter:
         self._aws_accounts_generator = _ArrayCompareAwsAccountsGenerator()
         self._logger = get_logger()
 
-    def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
+    def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
         result = df.copy()
         for config in (
             self._get_config_analysis_is_file_copied(),
@@ -75,14 +75,14 @@ class _S3DataAnalysisSetter:
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _OriginFileSyncAllAccoutsS3DataDfAnalyzer,
+            _OriginFileSyncAllAccountsS3DataDfAnalyzer,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzer,
+            _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
@@ -90,7 +90,7 @@ class _S3DataAnalysisSetter:
     def _get_df_set_analysis(
         self,
         config: _AnalysisSetterConfig,
-        df: AllAccoutsS3DataDf,
+        df: AllAccountsS3DataDf,
     ) -> Df:
         result = df.copy()
         for aws_accounts in config.aws_accounts_array:
@@ -116,7 +116,7 @@ class _AnalysisConfig(ABC):
 
 # TODO refactor to ..Analyzer
 class _DfAnalysis:
-    def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccoutsS3DataDf):
+    def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
@@ -143,13 +143,13 @@ class _DfAnalysis:
         pass
 
 
-class _OriginFileSyncAllAccoutsS3DataDfAnalyzer(_DfAnalysis):
+class _OriginFileSyncAllAccountsS3DataDfAnalyzer(_DfAnalysis):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
 
 
-class _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzer(_DfAnalysis):
+class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer(_DfAnalysis):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)

@@ -13,7 +13,7 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_client import S3Client
-from types_custom import AllAccoutsS3DataDf
+from types_custom import AllAccountsS3DataDf
 from types_custom import FileS3Data
 from types_custom import S3Data
 from types_custom import S3Query
@@ -24,7 +24,7 @@ def export_s3_data_all_accounts_to_one_file():
     _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
 
 
-def get_df_s3_data_all_accounts() -> AllAccoutsS3DataDf:
+def get_df_s3_data_all_accounts() -> AllAccountsS3DataDf:
     file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
     return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
@@ -116,7 +116,7 @@ class _CombinedAccountsS3DataCsvToDf:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self, file_path_s3_data_all_accounts: Path) -> AllAccoutsS3DataDf:
+    def get_df(self, file_path_s3_data_all_accounts: Path) -> AllAccountsS3DataDf:
         result = self._get_df_from_file(file_path_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
 
@@ -150,11 +150,11 @@ class _IndividualAccountsS3DataCsvFilesToDf:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self) -> AllAccoutsS3DataDf:
+    def get_df(self) -> AllAccountsS3DataDf:
         result = self._get_df_combine_aws_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
 
-    def _get_df_combine_aws_accounts_results(self) -> AllAccoutsS3DataDf:
+    def _get_df_combine_aws_accounts_results(self) -> AllAccountsS3DataDf:
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         result = self._get_df_for_aws_account(aws_accounts[0])
         for aws_account in aws_accounts[1:]:
@@ -165,7 +165,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
             result = result.join(account_df, how="outer")
         return result
 
-    def _get_df_for_aws_account(self, aws_account: str) -> AllAccoutsS3DataDf:
+    def _get_df_for_aws_account(self, aws_account: str) -> AllAccountsS3DataDf:
         local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
         result = self._get_df_aws_account_from_file(local_file_path_name)
         result.columns = MultiIndex.from_tuples(self._get_column_names_mult_index(aws_account, list(result.columns)))
@@ -181,7 +181,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
             parse_dates=["date"],
         ).astype({"size": "Int64"})
 
-    def _get_df_drop_incorrect_empty_rows(self, df: AllAccoutsS3DataDf) -> AllAccoutsS3DataDf:
+    def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         """
         Drop null rows caused when merging query results without files in some accounts.
         Avoid drop queries without results in any aws account.
