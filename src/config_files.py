@@ -13,7 +13,7 @@ class AnalysisConfigReader:
     def get_aws_account_origin(self) -> str:
         return analysis_config["origin"]
 
-    def get_aws_account_that_must_not_have_more_files(self) -> list[str]:
+    def get_aws_accounts_that_must_not_have_more_files(self) -> list[str]:
         return analysis_config["can_the_file_exist_in"]
 
     def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
