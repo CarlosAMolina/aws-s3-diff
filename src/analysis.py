@@ -31,7 +31,7 @@ _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AnalysisAwsAccountsGenerator:
+class _ArrayCompareAwsAccountsGenerator:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
@@ -55,7 +55,7 @@ class _AnalysisAwsAccountsGenerator:
 # TODO rename all SetAnalysis to AnalysisSetter
 class _S3DataSetAnalysis:
     def __init__(self):
-        self._aws_accounts_generator = _AnalysisAwsAccountsGenerator()
+        self._aws_accounts_generator = _ArrayCompareAwsAccountsGenerator()
         self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
