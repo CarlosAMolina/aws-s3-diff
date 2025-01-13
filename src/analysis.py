@@ -116,7 +116,7 @@ class _AnalysisConfig(ABC):
 
 # TODO refactor to ..Analyzer
 class _DfAnalysis:
-    def __init__(self, aws_accounts: _CompareAwsAccounts, df: Df):
+    def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccoutsS3DataDf):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
