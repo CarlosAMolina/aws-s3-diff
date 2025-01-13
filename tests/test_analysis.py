@@ -16,7 +16,7 @@ from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CompareAwsAccounts
 from src.analysis import _DfAnalysis
 from src.analysis import _OriginFileSyncDfAnalysis
-from src.analysis import _S3DataSetAnalysis
+from src.analysis import _S3DataAnalysisSetter
 from src.analysis import _TargetAccountWithoutMoreFilesDfAnalysis
 from src.config_files import S3UrisFileReader
 
@@ -110,7 +110,7 @@ class TestDfAnalysis(unittest.TestCase):
         return _CompareAwsAccounts(*all_aws_accounts[:2])
 
 
-class TestS3DataSetAnalysis(unittest.TestCase):
+class TestS3DataAnalysisSetter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
@@ -122,7 +122,7 @@ class TestS3DataSetAnalysis(unittest.TestCase):
     )
     def get_df_set_analysis_columns(self, mock_directory_path_what_to_analyze):
         df = _get_df_combine_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
-        result = _S3DataSetAnalysis().get_df_set_analysis_columns(df)
+        result = _S3DataAnalysisSetter().get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
