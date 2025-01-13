@@ -22,7 +22,7 @@ class AnalysisGenerator:
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = get_df_s3_data_all_accounts()
-        return _S3DataAnalysisSetter().get_df_set_analysis_columns(all_accounts_s3_data_df)
+        return _AllAnalysisSetter().get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _export_analyzed_df_to_file(self, df: AnalysisS3DataDf):
         _AnalysisDfToCsv().export(df)
@@ -59,7 +59,7 @@ class _AnalysisSetterConfig(NamedTuple):
     log_message: str
 
 
-class _S3DataAnalysisSetter:
+class _AllAnalysisSetter:
     def __init__(self):
         self._aws_accounts_generator = _ArrayCompareAwsAccountsGenerator()
         self._logger = get_logger()
