@@ -145,7 +145,7 @@ class _DfAnalyzer:
 class _IsFileCopiedDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
-        return _OriginFileSyncAnalysisConfig(self._aws_account_target)
+        return _IsFileCopiedAnalysisConfig(self._aws_account_target)
 
 
 class _CanFileExistDfAnalyzer(_DfAnalyzer):
@@ -154,7 +154,7 @@ class _CanFileExistDfAnalyzer(_DfAnalyzer):
         return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)
 
 
-class _OriginFileSyncAnalysisConfig(_AnalysisConfig):
+class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
     @property
     def column_name_result(self) -> str:
         return f"is_sync_ok_in_{self._aws_account_target}"
