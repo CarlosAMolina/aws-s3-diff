@@ -1,7 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
-from typing import Literal
 
 from pandas import DataFrame as Df
 from pandas import Series
@@ -34,7 +33,7 @@ _ConditionConfig = dict[str, bool | str]
 
 class _AnalysisAwsAccountsGenerator:
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
-        aws_account_origin = self._get_aws_account_origin("is_file_copied")
+        aws_account_origin = self._get_aws_account_origin()
         return [
             _CompareAwsAccounts(aws_account_origin, aws_account_target)
             for aws_account_target in self._get_aws_accounts_where_files_must_be_copied()
@@ -42,18 +41,18 @@ class _AnalysisAwsAccountsGenerator:
 
     def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
         return _CompareAwsAccounts(
-            self._get_aws_account_origin("can_file_exist"),
+            self._get_aws_account_origin(),
             self._get_aws_account_that_must_not_have_more_files(),
         )
 
-    def _get_aws_account_origin(self, analysis_type: Literal["is_file_copied", "can_file_exist"]) -> str:
-        return analysis_config[analysis_type]["origin"]
+    def _get_aws_account_origin(self) -> str:
+        return analysis_config["origin"]
 
     def _get_aws_account_that_must_not_have_more_files(self) -> str:
-        return analysis_config["can_file_exist"]["target"]
+        return analysis_config["can_the_file_exist_in"]
 
     def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        return analysis_config["is_file_copied"]["targets"]
+        return analysis_config["is_the_file_copied_to"]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
