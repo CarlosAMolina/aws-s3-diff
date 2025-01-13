@@ -114,6 +114,7 @@ class _AnalysisConfig(ABC):
         pass
 
 
+# TODO rename add Setter
 class _DfAnalyzer:
     def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
