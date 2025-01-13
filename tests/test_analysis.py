@@ -17,7 +17,7 @@ from src.analysis import _CompareAwsAccounts
 from src.analysis import _DfAnalysis
 from src.analysis import _OriginFileSyncDfAnalysis
 from src.analysis import _S3DataAnalysisSetter
-from src.analysis import _TargetAccountWithoutMoreFilesDfAnalysis
+from src.analysis import _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzer
 from src.config_files import S3UrisFileReader
 
 
@@ -58,10 +58,10 @@ class _OriginFileSyncDfAnalysisConfig(_DfAnalysisConfig):
         return "is_sync_ok_in_aws_account_2_release"
 
 
-class _TargetAccountWithoutMoreFilesDfAnalysisConfig(_DfAnalysisConfig):
+class _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzerConfig(_DfAnalysisConfig):
     @property
     def analysis_class_to_check(self) -> type[_DfAnalysis]:
-        return _TargetAccountWithoutMoreFilesDfAnalysis
+        return _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzer
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -90,7 +90,10 @@ class TestDfAnalysis(unittest.TestCase):
         .joinpath("fake-files/s3-uris-to-analyze/to-test-possible-s3-files-all-accounts.csv"),
     )
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
-        for analysis_config in [_OriginFileSyncDfAnalysisConfig(), _TargetAccountWithoutMoreFilesDfAnalysisConfig()]:
+        for analysis_config in [
+            _OriginFileSyncDfAnalysisConfig(),
+            _TargetAccountWithoutMoreFilesAllAccoutsS3DataDfAnalyzerConfig(),
+        ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
     def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _DfAnalysisConfig):
