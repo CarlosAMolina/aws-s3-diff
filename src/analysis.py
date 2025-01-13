@@ -42,11 +42,12 @@ class _AnalysisAwsAccountsGenerator:
             for aws_account_target in self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
         ]
 
-    def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
-        return _CompareAwsAccounts(
-            self._analysis_config_reader.get_aws_account_origin(),
-            self._analysis_config_reader.get_aws_account_that_must_not_have_more_files(),
-        )
+    def get_array_aws_accounts_to_analyze_account_without_more_files(self) -> list[_CompareAwsAccounts]:
+        aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
+        return [
+            _CompareAwsAccounts(aws_account_origin, aws_account_target)
+            for aws_account_target in self._analysis_config_reader.get_aws_account_that_must_not_have_more_files()
+        ]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
@@ -71,12 +72,15 @@ class _S3DataSetAnalysis:
         return result
 
     def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
-        aws_accounts = _AnalysisAwsAccountsGenerator().get_aws_accounts_to_analyze_account_without_more_files()
-        self._logger.info(
-            f"Analyzing if the files of the account '{aws_accounts.origin}' should exist in the"
-            f" account '{aws_accounts.target}'"
-        )
-        return _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, df).get_df_set_analysis()
+        # TODO refactor code duplicated in _get_df_set_analysis_file_has_been_copied
+        result = df.copy()
+        for aws_accounts in self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files():
+            self._logger.info(
+                f"Analyzing if the files of the account '{aws_accounts.origin}' should exist in the"
+                f" account '{aws_accounts.target}'"
+            )
+            result = _TargetAccountWithoutMoreFilesDfAnalysis(aws_accounts, result).get_df_set_analysis()
+        return result
 
 
 class _AnalysisConfig(ABC):
