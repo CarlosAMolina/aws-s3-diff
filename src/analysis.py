@@ -151,7 +151,7 @@ class _IsFileCopiedDfAnalyzer(_DfAnalyzer):
 class _CanFileExistDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
-        return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)
+        return _CanFileExistAnalysisConfig(self._aws_account_target)
 
 
 class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
@@ -169,7 +169,7 @@ class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
         }
 
 
-class _TargetAccountWithoutMoreFilesAnalysisConfig(_AnalysisConfig):
+class _CanFileExistAnalysisConfig(_AnalysisConfig):
     @property
     def column_name_result(self) -> str:
         return f"can_exist_in_{self._aws_account_target}"
