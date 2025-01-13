@@ -5,7 +5,19 @@ import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 
+from analysis_config import config as analysis_config
 from types_custom import S3Query
+
+
+class AnalysisConfigReader:
+    def get_aws_account_origin(self) -> str:
+        return analysis_config["origin"]
+
+    def get_aws_account_that_must_not_have_more_files(self) -> str:
+        return analysis_config["can_the_file_exist_in"]
+
+    def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+        return analysis_config["is_the_file_copied_to"]
 
 
 class S3UrisFileChecker:

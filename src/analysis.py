@@ -5,7 +5,7 @@ from collections import namedtuple
 from pandas import DataFrame as Df
 from pandas import Series
 
-from analysis_config import config as analysis_config
+from config_files import AnalysisConfigReader
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
@@ -33,7 +33,7 @@ _ConditionConfig = dict[str, bool | str]
 
 class _AnalysisAwsAccountsGenerator:
     def __init__(self):
-        self._analysis_config_reader = _AnalysisConfigReader()
+        self._analysis_config_reader = AnalysisConfigReader()
 
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
         aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
@@ -47,17 +47,6 @@ class _AnalysisAwsAccountsGenerator:
             self._analysis_config_reader.get_aws_account_origin(),
             self._analysis_config_reader.get_aws_account_that_must_not_have_more_files(),
         )
-
-
-class _AnalysisConfigReader:
-    def get_aws_account_origin(self) -> str:
-        return analysis_config["origin"]
-
-    def get_aws_account_that_must_not_have_more_files(self) -> str:
-        return analysis_config["can_the_file_exist_in"]
-
-    def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        return analysis_config["is_the_file_copied_to"]
 
 
 # TODO rename all SetAnalysis to AnalysisSetter
