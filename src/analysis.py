@@ -71,20 +71,26 @@ class _S3DataSetAnalysis:
         return self._get_df_set_analysis_can_file_exist(result)
 
     def _get_df_set_analysis_file_has_been_copied(self, df: AllAccoutsS3DataDf) -> Df:
-        config = _AnalysisSetterConfig(
+        config = self._get_config_analysis_is_file_copied()
+        return self._get_df_set_analysis(config, df)
+
+    def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
+        return _AnalysisSetterConfig(
             _OriginFileSyncDfAnalysis,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
-        return self._get_df_set_analysis(config, df)
 
     def _get_df_set_analysis_can_file_exist(self, df: AllAccoutsS3DataDf) -> Df:
-        config = _AnalysisSetterConfig(
+        config = self._get_config_analysis_can_file_exist()
+        return self._get_df_set_analysis(config, df)
+
+    def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
+        return _AnalysisSetterConfig(
             _TargetAccountWithoutMoreFilesDfAnalysis,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
-            "Analyzing if the files of the account '{origin}' should exist in the account '{target}'",
+            "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
-        return self._get_df_set_analysis(config, df)
 
     def _get_df_set_analysis(
         self,
