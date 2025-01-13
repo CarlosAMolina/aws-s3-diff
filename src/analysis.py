@@ -82,7 +82,7 @@ class _S3DataAnalysisSetter:
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer,
+            _CanFileExistDfAnalyzer,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
@@ -148,7 +148,7 @@ class _IsFileCopiedDfAnalyzer(_DfAnalyzer):
         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
 
 
-class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer(_DfAnalyzer):
+class _CanFileExistDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)

@@ -13,11 +13,11 @@ from pandas.testing import assert_frame_equal
 
 from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AnalysisDfToCsv
+from src.analysis import _CanFileExistDfAnalyzer
 from src.analysis import _CompareAwsAccounts
 from src.analysis import _DfAnalyzer
 from src.analysis import _IsFileCopiedDfAnalyzer
 from src.analysis import _S3DataAnalysisSetter
-from src.analysis import _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer
 from src.config_files import S3UrisFileReader
 
 
@@ -58,10 +58,10 @@ class _IsFileCopiedDfAnalyzerConfig(_DfAnalyzerConfig):
         return "is_sync_ok_in_aws_account_2_release"
 
 
-class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzerConfig(_DfAnalyzerConfig):
+class _CanFileExistDfAnalyzerConfig(_DfAnalyzerConfig):
     @property
     def analysis_class_to_check(self) -> type[_DfAnalyzer]:
-        return _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer
+        return _CanFileExistDfAnalyzer
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -92,7 +92,7 @@ class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [
             _IsFileCopiedDfAnalyzerConfig(),
-            _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzerConfig(),
+            _CanFileExistDfAnalyzerConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
