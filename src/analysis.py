@@ -32,26 +32,31 @@ _ConditionConfig = dict[str, bool | str]
 
 
 class _AnalysisAwsAccountsGenerator:
+    def __init__(self):
+        self._analysis_config_reader = _AnalysisConfigReader()
+
     def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_CompareAwsAccounts]:
-        aws_account_origin = self._get_aws_account_origin()
+        aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
         return [
             _CompareAwsAccounts(aws_account_origin, aws_account_target)
-            for aws_account_target in self._get_aws_accounts_where_files_must_be_copied()
+            for aws_account_target in self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
         ]
 
     def get_aws_accounts_to_analyze_account_without_more_files(self) -> _CompareAwsAccounts:
         return _CompareAwsAccounts(
-            self._get_aws_account_origin(),
-            self._get_aws_account_that_must_not_have_more_files(),
+            self._analysis_config_reader.get_aws_account_origin(),
+            self._analysis_config_reader.get_aws_account_that_must_not_have_more_files(),
         )
 
-    def _get_aws_account_origin(self) -> str:
+
+class _AnalysisConfigReader:
+    def get_aws_account_origin(self) -> str:
         return analysis_config["origin"]
 
-    def _get_aws_account_that_must_not_have_more_files(self) -> str:
+    def get_aws_account_that_must_not_have_more_files(self) -> str:
         return analysis_config["can_the_file_exist_in"]
 
-    def _get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+    def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
         return analysis_config["is_the_file_copied_to"]
 
 
