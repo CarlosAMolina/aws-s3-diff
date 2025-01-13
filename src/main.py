@@ -4,13 +4,13 @@ from abc import abstractmethod
 from botocore.exceptions import ClientError
 
 from analysis import AnalysisGenerator
+from config_files import S3UrisFileChecker
+from config_files import S3UrisFileReader
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import AwsAccountExtractor
 from s3_data import export_s3_data_all_accounts_to_one_file
-from s3_uris_to_analyze import S3UrisFileChecker
-from s3_uris_to_analyze import S3UrisFileReader
 
 
 def run():

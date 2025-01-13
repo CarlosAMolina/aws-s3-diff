@@ -18,7 +18,7 @@ from src.analysis import _DfAnalysis
 from src.analysis import _OriginFileSyncDfAnalysis
 from src.analysis import _S3DataSetAnalysis
 from src.analysis import _TargetAccountWithoutMoreFilesDfAnalysis
-from src.s3_uris_to_analyze import S3UrisFileReader
+from src.config_files import S3UrisFileReader
 
 
 class _DfAnalysisConfig(ABC):

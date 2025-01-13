@@ -6,10 +6,10 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from analysis_config import config as analysis_config
+from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data import get_df_s3_data_all_accounts
-from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
 from types_custom import AnalysisS3DataDf
 

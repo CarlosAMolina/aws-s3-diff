@@ -9,10 +9,10 @@ from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
 
+from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_client import S3Client
-from s3_uris_to_analyze import S3UrisFileReader
 from types_custom import AllAccoutsS3DataDf
 from types_custom import FileS3Data
 from types_custom import S3Data
