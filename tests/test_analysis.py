@@ -14,17 +14,17 @@ from pandas.testing import assert_frame_equal
 from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AllAnalysisSetter
 from src.analysis import _AnalysisDfToCsv
-from src.analysis import _CanFileExistDfAnalyzer
+from src.analysis import _AnalysisSetter
+from src.analysis import _CanFileExistAnalysisSetter
 from src.analysis import _CompareAwsAccounts
-from src.analysis import _DfAnalyzer
-from src.analysis import _IsFileCopiedDfAnalyzer
+from src.analysis import _IsFileCopiedAnalysisSetter
 from src.config_files import S3UrisFileReader
 
 
-class _DfAnalyzerConfig(ABC):
+class _AnalysisSetterConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
+    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
         pass
 
     @property
@@ -38,10 +38,10 @@ class _DfAnalyzerConfig(ABC):
         pass
 
 
-class _IsFileCopiedDfAnalyzerConfig(_DfAnalyzerConfig):
+class _IsFileCopiedAnalysisSetterConfig(_AnalysisSetterConfig):
     @property
-    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
-        return _IsFileCopiedDfAnalyzer
+    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
+        return _IsFileCopiedAnalysisSetter
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -58,10 +58,10 @@ class _IsFileCopiedDfAnalyzerConfig(_DfAnalyzerConfig):
         return "is_sync_ok_in_aws_account_2_release"
 
 
-class _CanFileExistDfAnalyzerConfig(_DfAnalyzerConfig):
+class _CanFileExistAnalysisSetterConfig(_AnalysisSetterConfig):
     @property
-    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
-        return _CanFileExistDfAnalyzer
+    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
+        return _CanFileExistAnalysisSetter
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -91,12 +91,12 @@ class TestDfAnalysis(unittest.TestCase):
     )
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [
-            _IsFileCopiedDfAnalyzerConfig(),
-            _CanFileExistDfAnalyzerConfig(),
+            _IsFileCopiedAnalysisSetterConfig(),
+            _CanFileExistAnalysisSetterConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
-    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _DfAnalyzerConfig):
+    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisSetterConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()

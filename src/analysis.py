@@ -54,7 +54,7 @@ class _ArrayCompareAwsAccountsGenerator:
 
 
 class _AnalysisSetterConfig(NamedTuple):
-    df_analyzer: type["_DfAnalyzer"]
+    df_analyzer: type["_AnalysisSetter"]
     aws_accounts_array: list[_CompareAwsAccounts]
     log_message: str
 
@@ -75,14 +75,14 @@ class _AllAnalysisSetter:
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _IsFileCopiedDfAnalyzer,
+            _IsFileCopiedAnalysisSetter,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _CanFileExistDfAnalyzer,
+            _CanFileExistAnalysisSetter,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
@@ -114,8 +114,7 @@ class _AnalysisConfig(ABC):
         pass
 
 
-# TODO rename add Setter
-class _DfAnalyzer:
+class _AnalysisSetter:
     def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
@@ -143,13 +142,13 @@ class _DfAnalyzer:
         pass
 
 
-class _IsFileCopiedDfAnalyzer(_DfAnalyzer):
+class _IsFileCopiedAnalysisSetter(_AnalysisSetter):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _IsFileCopiedAnalysisConfig(self._aws_account_target)
 
 
-class _CanFileExistDfAnalyzer(_DfAnalyzer):
+class _CanFileExistAnalysisSetter(_AnalysisSetter):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _CanFileExistAnalysisConfig(self._aws_account_target)
