@@ -73,7 +73,7 @@ class _S3DataSetAnalysis:
             result = _OriginFileSyncDfAnalysis(aws_accounts, result).get_df_set_analysis()
         return result
 
-    def _get_df_set_analysis_must_file_exist(self, df: Df) -> Df:
+    def _get_df_set_analysis_must_file_exist(self, df: AllAccoutsS3DataDf) -> Df:
         # TODO refactor code duplicated in _get_df_set_analysis_file_has_been_copied
         result = df.copy()
         for aws_accounts in self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files():
