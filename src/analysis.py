@@ -67,12 +67,12 @@ class _S3DataSetAnalysis:
 
     def get_df_set_analysis_columns(self, df: AllAccoutsS3DataDf) -> Df:
         result = df.copy()
-        result = self._get_df_set_analysis_file_has_been_copied(result)
-        return self._get_df_set_analysis_can_file_exist(result)
-
-    def _get_df_set_analysis_file_has_been_copied(self, df: AllAccoutsS3DataDf) -> Df:
-        config = self._get_config_analysis_is_file_copied()
-        return self._get_df_set_analysis(config, df)
+        for config in (
+            self._get_config_analysis_is_file_copied(),
+            self._get_config_analysis_can_file_exist(),
+        ):
+            result = self._get_df_set_analysis(config, result)
+        return result
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
@@ -80,10 +80,6 @@ class _S3DataSetAnalysis:
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
-
-    def _get_df_set_analysis_can_file_exist(self, df: AllAccoutsS3DataDf) -> Df:
-        config = self._get_config_analysis_can_file_exist()
-        return self._get_df_set_analysis(config, df)
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
