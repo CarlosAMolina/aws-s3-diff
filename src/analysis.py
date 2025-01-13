@@ -54,7 +54,7 @@ class _ArrayCompareAwsAccountsGenerator:
 
 
 class _AnalysisSetterConfig(NamedTuple):
-    df_analyzer: type["_DfAnalysis"]
+    df_analyzer: type["_DfAnalyzer"]
     aws_accounts_array: list[_CompareAwsAccounts]
     log_message: str
 
@@ -114,8 +114,7 @@ class _AnalysisConfig(ABC):
         pass
 
 
-# TODO refactor to ..Analyzer
-class _DfAnalysis:
+class _DfAnalyzer:
     def __init__(self, aws_accounts: _CompareAwsAccounts, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
@@ -143,13 +142,13 @@ class _DfAnalysis:
         pass
 
 
-class _OriginFileSyncAllAccountsS3DataDfAnalyzer(_DfAnalysis):
+class _OriginFileSyncAllAccountsS3DataDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _OriginFileSyncAnalysisConfig(self._aws_account_target)
 
 
-class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer(_DfAnalysis):
+class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _TargetAccountWithoutMoreFilesAnalysisConfig(self._aws_account_target)

@@ -14,17 +14,17 @@ from pandas.testing import assert_frame_equal
 from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CompareAwsAccounts
-from src.analysis import _DfAnalysis
+from src.analysis import _DfAnalyzer
 from src.analysis import _OriginFileSyncAllAccountsS3DataDfAnalyzer
 from src.analysis import _S3DataAnalysisSetter
 from src.analysis import _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer
 from src.config_files import S3UrisFileReader
 
 
-class _DfAnalysisConfig(ABC):
+class _DfAnalyzerConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
         pass
 
     @property
@@ -38,9 +38,9 @@ class _DfAnalysisConfig(ABC):
         pass
 
 
-class _OriginFileSyncAllAccountsS3DataDfAnalyzerConfig(_DfAnalysisConfig):
+class _OriginFileSyncAllAccountsS3DataDfAnalyzerConfig(_DfAnalyzerConfig):
     @property
-    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
         return _OriginFileSyncAllAccountsS3DataDfAnalyzer
 
     @property
@@ -58,9 +58,9 @@ class _OriginFileSyncAllAccountsS3DataDfAnalyzerConfig(_DfAnalysisConfig):
         return "is_sync_ok_in_aws_account_2_release"
 
 
-class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzerConfig(_DfAnalysisConfig):
+class _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzerConfig(_DfAnalyzerConfig):
     @property
-    def analysis_class_to_check(self) -> type[_DfAnalysis]:
+    def analysis_class_to_check(self) -> type[_DfAnalyzer]:
         return _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer
 
     @property
@@ -96,7 +96,7 @@ class TestDfAnalysis(unittest.TestCase):
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
-    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _DfAnalysisConfig):
+    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _DfAnalyzerConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()
