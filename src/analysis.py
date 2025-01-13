@@ -75,7 +75,7 @@ class _S3DataAnalysisSetter:
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
-            _OriginFileSyncAllAccountsS3DataDfAnalyzer,
+            _IsFileCopiedDfAnalyzer,
             self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
@@ -142,7 +142,7 @@ class _DfAnalyzer:
         pass
 
 
-class _OriginFileSyncAllAccountsS3DataDfAnalyzer(_DfAnalyzer):
+class _IsFileCopiedDfAnalyzer(_DfAnalyzer):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _OriginFileSyncAnalysisConfig(self._aws_account_target)

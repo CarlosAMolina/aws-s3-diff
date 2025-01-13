@@ -15,7 +15,7 @@ from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CompareAwsAccounts
 from src.analysis import _DfAnalyzer
-from src.analysis import _OriginFileSyncAllAccountsS3DataDfAnalyzer
+from src.analysis import _IsFileCopiedDfAnalyzer
 from src.analysis import _S3DataAnalysisSetter
 from src.analysis import _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzer
 from src.config_files import S3UrisFileReader
@@ -38,10 +38,10 @@ class _DfAnalyzerConfig(ABC):
         pass
 
 
-class _OriginFileSyncAllAccountsS3DataDfAnalyzerConfig(_DfAnalyzerConfig):
+class _IsFileCopiedDfAnalyzerConfig(_DfAnalyzerConfig):
     @property
     def analysis_class_to_check(self) -> type[_DfAnalyzer]:
-        return _OriginFileSyncAllAccountsS3DataDfAnalyzer
+        return _IsFileCopiedDfAnalyzer
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -91,7 +91,7 @@ class TestDfAnalysis(unittest.TestCase):
     )
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [
-            _OriginFileSyncAllAccountsS3DataDfAnalyzerConfig(),
+            _IsFileCopiedDfAnalyzerConfig(),
             _TargetAccountWithoutMoreFilesAllAccountsS3DataDfAnalyzerConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
