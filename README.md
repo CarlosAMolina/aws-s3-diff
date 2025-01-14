@@ -27,7 +27,7 @@ The order in which the AWS accounts are specified is the order in which they wil
 
 This file specifies what to analyzed abut the extracted AWS information.
 
-File path: [here](config/analysis-config.csv).
+File path: [here](config/analysis-config.json).
 
 You can configure the values of the following keys (do not modify the keys, only the values):
 
@@ -39,7 +39,7 @@ can_the_file_exist_in | Array of strings  | If the file does not exist in the or
 
 ### Run the program
 
-In this step we have already configured the `s3-uris-to-analyze.csv` file.
+In this step we have already update the previous configuration files with the desired values.
 
 Authenticate in the terminal to the first AWS account that will be analyzed, this is required in order to allow botocore to connect with your AWS account. Execute:
 
