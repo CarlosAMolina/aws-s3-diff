@@ -32,7 +32,7 @@ class AnalysisConfigReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._directory_path_what_to_analyze.joinpath("analysis_config.json")
+        return self._directory_path_what_to_analyze.joinpath("analysis-config.json")
 
     # TODO duplicated in S3UrisFileReader, extract to common class
     @property

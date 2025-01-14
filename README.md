@@ -27,7 +27,7 @@ The order in which the AWS accounts are specified is the order in which they wil
 
 This file specifies what to analyzed abut the extracted AWS information.
 
-File path: [here](config/s3-uris-to-analyze.csv).
+File path: [here](config/analysis-config.csv).
 
 You can configure the values of the following keys (do not modify the keys, only the values):
 
