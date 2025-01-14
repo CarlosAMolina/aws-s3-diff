@@ -1,3 +1,4 @@
+import json
 import re
 from pathlib import Path
 
@@ -5,19 +6,38 @@ import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 
-from analysis_config import config as analysis_config
 from types_custom import S3Query
 
+# TODO implement AnalysisConfigChecker like S3UrisFileChecker
 
+
+# TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
+    def __init__(self):
+        # TODO I don't like to read a file in __init__()
+        self._analysis_config = self._get_analysis_config()
+
     def get_aws_account_origin(self) -> str:
-        return analysis_config["origin"]
+        return self._analysis_config["origin"]
 
     def get_aws_accounts_that_must_not_have_more_files(self) -> list[str]:
-        return analysis_config["can_the_file_exist_in"]
+        return self._analysis_config["can_the_file_exist_in"]
 
     def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
-        return analysis_config["is_the_file_copied_to"]
+        return self._analysis_config["is_the_file_copied_to"]
+
+    def _get_analysis_config(self) -> dict:
+        with open(self._file_path_what_to_analyze, encoding="utf-8") as read_file:
+            return json.load(read_file)
+
+    @property
+    def _file_path_what_to_analyze(self) -> Path:
+        return self._directory_path_what_to_analyze.joinpath("analysis_config.json")
+
+    # TODO duplicated in S3UrisFileReader, extract to common class
+    @property
+    def _directory_path_what_to_analyze(self) -> Path:
+        return Path(__file__).parent.parent.joinpath("config")
 
 
 class S3UrisFileChecker:
