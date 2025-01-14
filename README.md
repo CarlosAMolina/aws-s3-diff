@@ -23,6 +23,20 @@ File structure:
 
 The order in which the AWS accounts are specified is the order in which they will be analyzed.
 
+### analysis_config.json file configuration
+
+This file specifies what to analyzed abut the extracted AWS information.
+
+File path: [here](config/s3-uris-to-analyze.csv).
+
+You can configure the values of the following keys (do not modify the keys, only the values):
+
+Key                   | Type of the value | What is it?
+----------------------|-------------------|---------------------------------------------------------------------------
+origin                | String            | The reference account to compare other accounts.
+is_the_file_copied_to | Array of strings  | Checks if the file in the origin account has been copied to other accounts.
+can_the_file_exist_in | Array of strings  | If the file does not exist in the origin account, it cannot exist in other accounts.
+
 ### Run the program
 
 In this step we have already configured the `s3-uris-to-analyze.csv` file.
