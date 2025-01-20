@@ -15,6 +15,7 @@ from types_custom import S3Query
 # TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
     def __init__(self):
+        self._config_directory_path = LocalPaths().config_directory
         # TODO I don't like to read a file in __init__()
         self._analysis_config = self._get_analysis_config()
 
@@ -33,7 +34,7 @@ class AnalysisConfigReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return _get_directory_path_config().joinpath("analysis-config.json")
+        return self._config_directory_path.joinpath("analysis-config.json")
 
 
 class S3UrisFileChecker:
@@ -62,6 +63,7 @@ class S3UrisFileChecker:
 
 class S3UrisFileReader:
     def __init__(self):
+        self._config_directory_path = LocalPaths().config_directory
         # TODO I don't like to read a file in __init__()
         self._df_file_what_to_analyze = self._get_df_file_what_to_analyze()
 
@@ -92,11 +94,7 @@ class S3UrisFileReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return _get_directory_path_config().joinpath("s3-uris-to-analyze.csv")
-
-
-def _get_directory_path_config() -> Path:
-    return LocalPaths().config_directory
+        return self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
 
 
 class _S3UriParts:
