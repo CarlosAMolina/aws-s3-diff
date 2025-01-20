@@ -7,7 +7,7 @@ class LocalPaths:
 
     @property
     def config_directory(self) -> Path:
-        return Path(__file__).parent.parent.joinpath("config")
+        return self._current_path.parent.joinpath("config")
 
     @property
     def all_results_directory(self) -> Path:
