@@ -64,8 +64,8 @@ class _MainPaths:
         self._local_paths = LocalPaths()
 
     @property
-    def directory_all_results(self) -> Path:
-        return self._local_paths.directory_all_results
+    def all_results_directory(self) -> Path:
+        return self._local_paths.all_results_directory
 
     @property
     def file_analysis_date_time(self) -> Path:
@@ -79,7 +79,7 @@ class _AnalysisPaths:
 
     @property
     def directory_analysis(self) -> Path:
-        return self._main_paths.directory_all_results.joinpath(self._analysis_date_time_str)
+        return self._main_paths.all_results_directory.joinpath(self._analysis_date_time_str)
 
     @property
     def file_analysis(self) -> Path:

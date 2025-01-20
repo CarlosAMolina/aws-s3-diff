@@ -10,9 +10,9 @@ class LocalPaths:
         return Path(__file__).parent.parent.joinpath("config")
 
     @property
-    def directory_all_results(self) -> Path:
+    def all_results_directory(self) -> Path:
         return self._current_path.parent.joinpath("s3-results")
 
     @property
     def file_analysis_date_time(self) -> Path:
-        return self.directory_all_results.joinpath("analysis_date_time.txt")
+        return self.all_results_directory.joinpath("analysis_date_time.txt")

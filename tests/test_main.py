@@ -48,7 +48,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
-            directory_path.name for directory_path in _MainPaths().directory_all_results.glob("20*")
+            directory_path.name for directory_path in _MainPaths().all_results_directory.glob("20*")
         ]
         analysis_directory_names.sort()
         return analysis_directory_names[-1]
