@@ -67,7 +67,7 @@ class _S3DataCsvExporter:
         with open(self._file_path_results, "a", newline="") as f:
             w = self._get_dict_writer(f)
             for file_data in s3_data:
-                data = {**s3_query._asdict(), **file_data._asdict()}
+                data = {**s3_query.as_dict(), **file_data._asdict()}
                 w.writerow(data)
 
     def _get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
@@ -76,7 +76,7 @@ class _S3DataCsvExporter:
 
     @property
     def _headers(self) -> tuple[str, ...]:
-        return S3Query._fields + FileS3Data._fields
+        return S3Query.DICT_KEYS + FileS3Data._fields
 
 
 class _CombinedAccountsS3DataDfToCsv:
@@ -228,7 +228,10 @@ class _S3UriDfModifier:
 
     def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
         old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
+        # TODO convert all to S3Query and compare them to avoid check '/'
+        old_prefix = old_prefix[:-1] if old_prefix.endswith("/") else old_prefix
         # TODO add test for url ending with and without `/`.
+        # TODO use `==` instead of contains to avoid wrong results.
         s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
             s3_uris_map_df[self._aws_account_target].str.contains(f"s3://{old_bucket}/{old_prefix}/?")
         ]

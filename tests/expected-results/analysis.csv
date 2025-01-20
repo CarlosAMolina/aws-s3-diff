@@ -1,9 +1,9 @@
 bucket_aws_account_1_pro,file_path_in_s3_aws_account_1_pro,file_name_all_aws_accounts,aws_account_1_pro_date,aws_account_1_pro_size,aws_account_1_pro_hash,aws_account_2_release_date,aws_account_2_release_size,aws_account_2_release_hash,aws_account_3_dev_date,aws_account_3_dev_size,aws_account_3_dev_hash,is_sync_ok_in_aws_account_2_release,is_sync_ok_in_aws_account_3_dev,can_exist_in_aws_account_2_release
-cars,europe/spain,cars-20241014.csv,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-19 22:33:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,True,True,
-pets,dogs/big_size,dogs-20240914.csv,2024-09-14 09:22:11+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:01:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:11:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,True,True,
-pets,dogs/big_size,dogs-20241015.csv,2024-10-15 10:23:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 11:20:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 12:29:18+00:00,19,77bb49be128f088eda87f370b58b2ee0,True,False,
-pets,dogs/big_size,dogs-20241019.csv,2024-10-19 06:50:08+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-10-19 07:52:08+00:00,38,14e40c09cf854c4802c8352939fd9a10,2024-10-19 09:55:08+00:00,20,78e051ff226ded4e9aa2b03e07788619,False,True,
-pets,dogs/big_size,dogs-20241020-test.csv,,,,2024-10-20 19:31:01+00:00,44,b513223316f922e948ea530ae7304e6d,,,,False,True,False
-pets,dogs/big_size,dogs-20241021.csv,,,,,,,2024-10-21 10:50:08+00:00,28,7e3bd8ea6895b50856c6390a134a8c2b,True,False,
-pets,horses/europe,horses-20210219.csv,,,,,,,2021-02-19 23:15:08+00:00,68,475220fb2304d19a3ac36d287dbbd1a8,True,False,
-pets,non-existent-prefix,,,,,,,,,,,True,True,
+cars,europe/spain/,cars-20241014.csv,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-19 22:33:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,True,True,
+pets,dogs/big_size/,dogs-20240914.csv,2024-09-14 09:22:11+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:01:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:11:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,True,True,
+pets,dogs/big_size/,dogs-20241015.csv,2024-10-15 10:23:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 11:20:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 12:29:18+00:00,19,77bb49be128f088eda87f370b58b2ee0,True,False,
+pets,dogs/big_size/,dogs-20241019.csv,2024-10-19 06:50:08+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-10-19 07:52:08+00:00,38,14e40c09cf854c4802c8352939fd9a10,2024-10-19 09:55:08+00:00,20,78e051ff226ded4e9aa2b03e07788619,False,True,
+pets,dogs/big_size/,dogs-20241020-test.csv,,,,2024-10-20 19:31:01+00:00,44,b513223316f922e948ea530ae7304e6d,,,,False,True,False
+pets,dogs/big_size/,dogs-20241021.csv,,,,,,,2024-10-21 10:50:08+00:00,28,7e3bd8ea6895b50856c6390a134a8c2b,True,False,
+pets,horses/europe/,horses-20210219.csv,,,,,,,2021-02-19 23:15:08+00:00,68,475220fb2304d19a3ac36d287dbbd1a8,True,False,
+pets,non-existent-prefix/,,,,,,,,,,,True,True,

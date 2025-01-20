@@ -3,12 +3,31 @@ from typing import NamedTuple
 from pandas import DataFrame as Df
 
 
-class S3Query(NamedTuple):
-    bucket: str
-    prefix: str
+class S3Query:
+    DICT_KEYS = ("bucket", "prefix")
+
+    def __init__(self, bucket: str, prefix: str):
+        self.bucket = bucket
+        self._prefix = prefix
 
     def __repr__(self):
         return f"s3://{self.bucket}/{self.prefix}"
+
+    def __eq__(self, other):
+        if isinstance(other, S3Query):
+            return self.bucket == other.bucket and self._prefix == other._prefix
+        return False
+
+    def __hash__(self):
+        return hash((self.bucket, self._prefix))
+
+    def as_dict(self) -> dict:
+        return {key: getattr(self, key) for key in self.DICT_KEYS}
+
+    @property
+    def prefix(self) -> str:
+        # If a S3 query does not end in slash, S3 folders are not managed correctly.
+        return self._prefix if self._prefix.endswith("/") else f"{self._prefix}/"
 
 
 class FileS3Data(NamedTuple):

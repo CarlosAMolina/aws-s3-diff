@@ -17,15 +17,13 @@ class S3Client:
         """
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
         """
-        # TODO move the logic to add the `/` to the S3Query object
-        query_prefix = s3_query.prefix if s3_query.prefix.endswith("/") else f"{s3_query.prefix}/"
         last_key = ""
         result = []
         max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
         while True:
             response = self._s3_client.list_objects_v2(
                 Bucket=s3_query.bucket,
-                Prefix=query_prefix,
+                Prefix=s3_query.prefix,
                 MaxKeys=max_keys,
                 StartAfter=last_key,
                 Delimiter="/",  # Required for folders detection.

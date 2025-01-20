@@ -1,8 +1,8 @@
 bucket,prefix,name,date,size,hash
-cars,europe/spain,cars-20241014.csv,2024-10-19 22:33:01+00:00,49,f15993242621717c5eb2a329b672bc1d
-pets,dogs/big_size,dogs-20240914.csv,2024-09-14 22:01:33+00:00,20,78e051ff226ded4e9aa2b03e07788619
-pets,dogs/big_size,dogs-20241015.csv,2024-10-15 11:20:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af
-pets,dogs/big_size,dogs-20241019.csv,2024-10-19 07:52:08+00:00,38,14e40c09cf854c4802c8352939fd9a10
-pets,dogs/big_size,dogs-20241020-test.csv,2024-10-20 19:31:01+00:00,44,b513223316f922e948ea530ae7304e6d
-pets,horses/europe,,,,
-pets,non-existent-prefix,,,,
+cars,europe/spain/,cars-20241014.csv,2024-10-19 22:33:01+00:00,49,f15993242621717c5eb2a329b672bc1d
+pets,dogs/big_size/,dogs-20240914.csv,2024-09-14 22:01:33+00:00,20,78e051ff226ded4e9aa2b03e07788619
+pets,dogs/big_size/,dogs-20241015.csv,2024-10-15 11:20:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af
+pets,dogs/big_size/,dogs-20241019.csv,2024-10-19 07:52:08+00:00,38,14e40c09cf854c4802c8352939fd9a10
+pets,dogs/big_size/,dogs-20241020-test.csv,2024-10-20 19:31:01+00:00,44,b513223316f922e948ea530ae7304e6d
+pets,horses/europe/,,,,
+pets,non-existent-prefix/,,,,
