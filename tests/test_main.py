@@ -11,8 +11,8 @@ from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
 from src.config_files import S3UrisFileReader
+from src.local_paths import LocalPaths
 from src.local_results import _AnalysisPaths
-from src.local_results import _MainPaths
 from src.local_results import LocalResults
 from src.main import FolderInS3UriError
 from src.main import run
@@ -24,7 +24,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         self._local_s3_server = S3Server()
         self._local_s3_server.start()
         # Drop file created by the user
-        if _MainPaths().analysis_date_time_file.is_file():
+        if LocalPaths().analysis_date_time_file.is_file():
             LocalResults().drop_file_with_analysis_date()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
 
@@ -48,7 +48,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
-            directory_path.name for directory_path in _MainPaths().all_results_directory.glob("20*")
+            directory_path.name for directory_path in LocalPaths().all_results_directory.glob("20*")
         ]
         analysis_directory_names.sort()
         return analysis_directory_names[-1]

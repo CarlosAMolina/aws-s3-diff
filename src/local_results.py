@@ -8,7 +8,7 @@ from logger import get_logger
 class LocalResults:
     def __init__(self):
         self._logger = get_logger()
-        self._main_paths = _MainPaths()
+        self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
         # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
         analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
         self.analysis_paths = _AnalysisPaths(analysis_date_time_str)
@@ -20,8 +20,8 @@ class LocalResults:
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
     def drop_file_with_analysis_date(self):
-        self._logger.debug(f"Removing the file: {self._main_paths.analysis_date_time_file}")
-        self._main_paths.analysis_date_time_file.unlink()
+        self._logger.debug(f"Removing the file: {self._analysis_date_time_file_path}")
+        self._analysis_date_time_file_path.unlink()
 
     def create_directory_analysis(self):
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
@@ -34,15 +34,15 @@ class LocalResults:
 
 class _AnalysisDateTime:
     def __init__(self):
-        self._main_paths = _MainPaths()
+        self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
     def get_analysis_date_time_str(self) -> str:
-        if not self._main_paths.analysis_date_time_file.is_file():
+        if not self._analysis_date_time_file_path.is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
-        with open(self._main_paths.analysis_date_time_file, "w") as file:
+        with open(self._analysis_date_time_file_path, "w") as file:
             file.write(self._new_date_time_str)
 
     @property
@@ -54,32 +54,19 @@ class _AnalysisDateTime:
         return "%Y%m%d%H%M%S"
 
     def _get_date_time_str_stored(self) -> str:
-        with open(self._main_paths.analysis_date_time_file) as file:
+        with open(self._analysis_date_time_file_path) as file:
             # `strip()` to avoid errors if the file is modified manually by te user.
             return file.read().strip()
-
-
-class _MainPaths:
-    def __init__(self):
-        self._local_paths = LocalPaths()
-
-    @property
-    def all_results_directory(self) -> Path:
-        return self._local_paths.all_results_directory
-
-    @property
-    def analysis_date_time_file(self) -> Path:
-        return self._local_paths.analysis_date_time_file
 
 
 class _AnalysisPaths:
     def __init__(self, analysis_date_time_str: str):
         self._analysis_date_time_str = analysis_date_time_str
-        self._main_paths = _MainPaths()
+        self._all_results_directory_path = LocalPaths().all_results_directory
 
     @property
     def directory_analysis(self) -> Path:
-        return self._main_paths.all_results_directory.joinpath(self._analysis_date_time_str)
+        return self._all_results_directory_path.joinpath(self._analysis_date_time_str)
 
     @property
     def file_analysis(self) -> Path:
