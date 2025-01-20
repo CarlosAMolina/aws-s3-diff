@@ -64,8 +64,7 @@ class S3UrisFileChecker:
 class S3UrisFileReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        # TODO I don't like to read a file in __init__()
-        self._df_file_what_to_analyze = self._get_df_file_what_to_analyze()
+        self.__df_file_what_to_analyze = None
 
     def get_aws_accounts(self) -> list[str]:
         return self._df_file_what_to_analyze.columns.to_list()
@@ -88,6 +87,12 @@ class S3UrisFileReader:
 
     def is_any_uri_null(self) -> np.bool:
         return self._df_file_what_to_analyze.isnull().values.any()
+
+    @property
+    def _df_file_what_to_analyze(self) -> Df:
+        if self.__df_file_what_to_analyze is None:
+            self.__df_file_what_to_analyze = self._get_df_file_what_to_analyze()
+        return self.__df_file_what_to_analyze
 
     def _get_df_file_what_to_analyze(self) -> Df:
         return read_csv(self._file_path_what_to_analyze)
