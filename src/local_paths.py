@@ -12,3 +12,7 @@ class LocalPaths:
     @property
     def directory_all_results(self) -> Path:
         return self._current_path.parent.joinpath("s3-results")
+
+    @property
+    def file_analysis_date_time(self) -> Path:
+        return self.directory_all_results.joinpath("analysis_date_time.txt")

@@ -69,7 +69,7 @@ class _MainPaths:
 
     @property
     def file_analysis_date_time(self) -> Path:
-        return self.directory_all_results.joinpath("analysis_date_time.txt")
+        return self._local_paths.file_analysis_date_time
 
 
 class _AnalysisPaths:
