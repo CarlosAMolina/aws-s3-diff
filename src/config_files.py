@@ -6,6 +6,7 @@ import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 
+from local_paths import LocalPaths
 from types_custom import S3Query
 
 # TODO implement AnalysisConfigChecker like S3UrisFileChecker
@@ -94,9 +95,8 @@ class S3UrisFileReader:
         return _get_directory_path_config().joinpath("s3-uris-to-analyze.csv")
 
 
-# TODO add test (I think is not being tested)
 def _get_directory_path_config() -> Path:
-    return Path(__file__).parent.parent.joinpath("config")
+    return LocalPaths().config_directory
 
 
 class _S3UriParts:
