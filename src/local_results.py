@@ -20,8 +20,8 @@ class LocalResults:
         return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
 
     def drop_file_with_analysis_date(self):
-        self._logger.debug(f"Removing the file: {self._main_paths.file_analysis_date_time}")
-        self._main_paths.file_analysis_date_time.unlink()
+        self._logger.debug(f"Removing the file: {self._main_paths.analysis_date_time_file}")
+        self._main_paths.analysis_date_time_file.unlink()
 
     def create_directory_analysis(self):
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
@@ -37,12 +37,12 @@ class _AnalysisDateTime:
         self._main_paths = _MainPaths()
 
     def get_analysis_date_time_str(self) -> str:
-        if not self._main_paths.file_analysis_date_time.is_file():
+        if not self._main_paths.analysis_date_time_file.is_file():
             self._export_date_time_str()
         return self._get_date_time_str_stored()
 
     def _export_date_time_str(self):
-        with open(self._main_paths.file_analysis_date_time, "w") as file:
+        with open(self._main_paths.analysis_date_time_file, "w") as file:
             file.write(self._new_date_time_str)
 
     @property
@@ -54,7 +54,7 @@ class _AnalysisDateTime:
         return "%Y%m%d%H%M%S"
 
     def _get_date_time_str_stored(self) -> str:
-        with open(self._main_paths.file_analysis_date_time) as file:
+        with open(self._main_paths.analysis_date_time_file) as file:
             # `strip()` to avoid errors if the file is modified manually by te user.
             return file.read().strip()
 
@@ -68,8 +68,8 @@ class _MainPaths:
         return self._local_paths.all_results_directory
 
     @property
-    def file_analysis_date_time(self) -> Path:
-        return self._local_paths.file_analysis_date_time
+    def analysis_date_time_file(self) -> Path:
+        return self._local_paths.analysis_date_time_file
 
 
 class _AnalysisPaths:

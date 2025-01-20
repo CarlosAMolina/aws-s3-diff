@@ -24,7 +24,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         self._local_s3_server = S3Server()
         self._local_s3_server.start()
         # Drop file created by the user
-        if _MainPaths().file_analysis_date_time.is_file():
+        if _MainPaths().analysis_date_time_file.is_file():
             LocalResults().drop_file_with_analysis_date()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
 
