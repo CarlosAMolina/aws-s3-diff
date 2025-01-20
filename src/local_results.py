@@ -1,6 +1,7 @@
 import datetime
 from pathlib import Path
 
+from local_paths import LocalPaths
 from logger import get_logger
 
 
@@ -60,11 +61,11 @@ class _AnalysisDateTime:
 
 class _MainPaths:
     def __init__(self):
-        self._current_path = Path(__file__).parent.absolute()
+        self._local_paths = LocalPaths()
 
     @property
     def directory_all_results(self) -> Path:
-        return self._current_path.parent.joinpath("s3-results")
+        return self._local_paths.directory_all_results
 
     @property
     def file_analysis_date_time(self) -> Path:
