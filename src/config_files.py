@@ -16,8 +16,7 @@ from types_custom import S3Query
 class AnalysisConfigReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        # TODO I don't like to read a file in __init__()
-        self._analysis_config = self._get_analysis_config()
+        self.__analysis_config = None  # To avoid read a file in __init__.
 
     def get_aws_account_origin(self) -> str:
         return self._analysis_config["origin"]
@@ -27,6 +26,12 @@ class AnalysisConfigReader:
 
     def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
         return self._analysis_config["is_the_file_copied_to"]
+
+    @property
+    def _analysis_config(self) -> dict:
+        if self.__analysis_config is None:
+            self.__analysis_config = self._get_analysis_config()
+        return self.__analysis_config
 
     def _get_analysis_config(self) -> dict:
         with open(self._file_path_what_to_analyze, encoding="utf-8") as read_file:
@@ -64,7 +69,7 @@ class S3UrisFileChecker:
 class S3UrisFileReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        self.__df_file_what_to_analyze = None
+        self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
 
     def get_aws_accounts(self) -> list[str]:
         return self._df_file_what_to_analyze.columns.to_list()
