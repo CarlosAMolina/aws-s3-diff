@@ -20,12 +20,12 @@ class TestS3UriParts(unittest.TestCase):
 
 class TestS3UrisFileReader(unittest.TestCase):
     @mock.patch(
-        "src.config_files.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.config_files.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_get_s3_queries_for_aws_account_returns_if_accounts_with_different_buckets(
-        self, mock_directory_path_what_to_analyze
+        self, mock_file_path_what_to_analyze
     ):
         for aws_account, expected_result in {
             "aws_account_1_pro": [

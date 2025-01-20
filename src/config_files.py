@@ -32,12 +32,7 @@ class AnalysisConfigReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._directory_path_what_to_analyze.joinpath("analysis-config.json")
-
-    # TODO duplicated in S3UrisFileReader, extract to common class
-    @property
-    def _directory_path_what_to_analyze(self) -> Path:
-        return Path(__file__).parent.parent.joinpath("config")
+        return _get_directory_path_config().joinpath("analysis-config.json")
 
 
 class S3UrisFileChecker:
@@ -96,11 +91,12 @@ class S3UrisFileReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._directory_path_what_to_analyze.joinpath("s3-uris-to-analyze.csv")
+        return _get_directory_path_config().joinpath("s3-uris-to-analyze.csv")
 
-    @property
-    def _directory_path_what_to_analyze(self) -> Path:
-        return Path(__file__).parent.parent.joinpath("config")
+
+# TODO add test (I think is not being tested)
+def _get_directory_path_config() -> Path:
+    return Path(__file__).parent.parent.joinpath("config")
 
 
 class _S3UriParts:

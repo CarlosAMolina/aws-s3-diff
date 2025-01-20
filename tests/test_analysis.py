@@ -119,11 +119,11 @@ class TestAllAnalysisSetter(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     @patch(
-        "src.analysis.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.analysis.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
-    def get_df_set_analysis_columns(self, mock_directory_path_what_to_analyze):
+    def get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
         df = _get_df_combine_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         result = _AllAnalysisSetter().get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.

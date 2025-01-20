@@ -33,11 +33,11 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         os.environ.pop("AWS_MAX_KEYS")
 
     @patch(
-        "src.main.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
-    def test_run_if_should_work_ok(self, mock_directory_path_what_to_analyze):
+    def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
         for aws_account in S3UrisFileReader().get_aws_accounts():
             self._local_s3_server.create_objects(aws_account)
             run()
@@ -91,12 +91,12 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     @patch("src.main._AnalyzedAwsAccounts")
     @patch("src.main.AwsAccountExtractor.extract")
     @patch(
-        "src.main.S3UrisFileReader._directory_path_what_to_analyze",
+        "src.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
-        self, mock_directory_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
+        self, mock_file_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
     ):
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
