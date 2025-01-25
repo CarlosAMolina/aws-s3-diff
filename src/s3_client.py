@@ -16,24 +16,24 @@ class S3Client:
 
     def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
-        last_key = ""
-        while True:
-            response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
+        response = self._s3_client.list_objects_v2(**self._get_request_arguments(s3_query))
+        while response["KeyCount"] != 0:
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
-            if response["KeyCount"] == 0:
-                return
-            last_key = response["Contents"][-1]["Key"]
             yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
+            last_key = response["Contents"][-1]["Key"]
+            response = self._s3_client.list_objects_v2(**self._get_request_arguments(s3_query, last_key))
 
-    def _get_request_arguments(self, last_key: str, s3_query: S3Query) -> dict:
+    def _get_request_arguments(self, s3_query: S3Query, last_key: str | None = None) -> dict:
         max_keys = int(os.getenv("AWS_MAX_KEYS", 1000))
-        return {
+        result = {
             "Bucket": s3_query.bucket,
             "Prefix": s3_query.prefix,
             "MaxKeys": max_keys,
-            "StartAfter": last_key,
             "Delimiter": "/",  # Required for folders detection.
         }
+        if last_key:
+            result["StartAfter"] = last_key
+        return result
 
     def _raise_exception_if_folders_in_response(self, response: dict, bucket: str):
         folder_path_names = self._get_folder_path_names_in_response_list_objects_v2(response)
