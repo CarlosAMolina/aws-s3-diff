@@ -15,7 +15,7 @@ class S3Query:
 
     def __eq__(self, other):
         if isinstance(other, S3Query):
-            return self.bucket == other.bucket and self._prefix == other._prefix
+            return self.bucket == other.bucket and self.prefix == other.prefix
         return False
 
     def __hash__(self):
