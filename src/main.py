@@ -6,6 +6,7 @@ from botocore.exceptions import ClientError
 from analysis import AnalysisGenerator
 from config_files import S3UrisFileChecker
 from config_files import S3UrisFileReader
+from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
@@ -31,6 +32,9 @@ def run():
             return
         raise Exception from exception
     except FolderInS3UriError as exception:
+        logger.error(exception)
+        return
+    except AnalysisConfigError as exception:
         logger.error(exception)
         return
 
