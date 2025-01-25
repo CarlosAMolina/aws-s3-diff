@@ -39,13 +39,13 @@ class AwsAccountExtractor:
     def extract(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
         self._s3_data_csv_exporter.create_file()
-        try:
-            for query_index, s3_query in enumerate(self._s3_queries, 1):
-                self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._s3_queries)}: {s3_query}")
+        for query_index, s3_query in enumerate(self._s3_queries, 1):
+            self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._s3_queries)}: {s3_query}")
+            try:
                 self._extract_s3_data_of_query(s3_query)
-        except Exception as exception:
-            self._s3_data_csv_exporter.drop_file()
-            raise exception
+            except Exception as exception:
+                self._s3_data_csv_exporter.drop_file()
+                raise exception
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         s3_data = S3Client().get_s3_data(s3_query)
