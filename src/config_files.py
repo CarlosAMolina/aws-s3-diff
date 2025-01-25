@@ -9,14 +9,66 @@ from pandas import read_csv
 from local_paths import LocalPaths
 from types_custom import S3Query
 
-# TODO implement AnalysisConfigChecker like S3UrisFileChecker
+
+# TODO test
+# TODO add custom error
+class AnalysisConfigChecker:
+    def __init__(self):
+        self._analysis_config_reader = AnalysisConfigReader()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def assert_file_is_correct(self):
+        self._assert_aws_account_origin_exists()
+        self._assert_aws_accounts_target_exist()
+
+    def _assert_aws_account_origin_exists(self):
+        aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
+        if not self._exists_aws_account(aws_account_origin):
+            raise ValueError(self._get_error_message_aws_account_does_not_exist(aws_account_origin))
+
+    def _assert_aws_accounts_target_exist(self):
+        aws_accounts_wrong_check_copy = self._get_aws_accounts_not_exist(
+            self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
+        )
+        aws_accounts_wrong_check_more_files = self._get_aws_accounts_not_exist(
+            self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
+        )
+        aws_accounts_wrong = aws_accounts_wrong_check_copy | aws_accounts_wrong_check_more_files
+        if len(aws_accounts_wrong) == 1:
+            raise ValueError(self._get_error_message_aws_account_does_not_exist(list(aws_accounts_wrong)[0]))
+        if len(aws_accounts_wrong) > 1:
+            raise ValueError(self._get_error_message_aws_accounts_do_not_exist(aws_accounts_wrong))
+
+    def _exists_aws_account(self, aws_account: str) -> bool:
+        return aws_account in self._s3_uris_file_reader.get_aws_accounts()
+
+    def _get_aws_accounts_not_exist(self, aws_accounts: list[str]) -> set[str]:
+        return {aws_account for aws_account in aws_accounts if not self._exists_aws_account(aws_account)}
+
+    def _get_error_message_aws_account_does_not_exist(self, aws_account: str) -> str:
+        return self._get_error_message(f"The AWS accounts '{aws_account}' is")
+
+    def _get_error_message_aws_accounts_do_not_exist(self, aws_accounts: set[str]) -> str:
+        aws_accounts_str = "', '".join(aws_accounts)
+        return self._get_error_message(f"The AWS accounts '{aws_accounts_str}' are")
+
+    def _get_error_message(self, text_prefix: str) -> str:
+        return (
+            f"{text_prefix} defined in {self._analysis_config_reader.FILE_NAME} but not in "
+            f"{self._s3_uris_file_reader.FILE_NAME}"
+        )
 
 
 # TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
+    FILE_NAME = "analysis-config.json"
+
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
         self.__analysis_config = None  # To avoid read a file in __init__.
+
+    def is_aws_account_origin_defined(self) -> bool:
+        return len(self.get_aws_account_origin()) > 0
 
     def get_aws_account_origin(self) -> str:
         return self._analysis_config["origin"]
@@ -39,7 +91,7 @@ class AnalysisConfigReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath("analysis-config.json")
+        return self._config_directory_path.joinpath(self.FILE_NAME)
 
 
 class S3UrisFileChecker:
@@ -67,6 +119,8 @@ class S3UrisFileChecker:
 
 
 class S3UrisFileReader:
+    FILE_NAME = "s3-uris-to-analyze.csv"
+
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
         self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
@@ -104,7 +158,7 @@ class S3UrisFileReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
+        return self._config_directory_path.joinpath(self.FILE_NAME)
 
 
 class _S3UriParts:

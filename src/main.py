@@ -190,7 +190,7 @@ class _NoCombinedS3DataProcess(_Process):
 
 class _AnalysisProcess(_Process):
     def run(self):
-        AnalysisGenerator().export_analysis_file()
+        AnalysisGenerator().run()
         LocalResults().drop_file_with_analysis_date()
 
 

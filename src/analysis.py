@@ -6,6 +6,7 @@ from typing import NamedTuple
 from pandas import DataFrame as Df
 from pandas import Series
 
+from config_files import AnalysisConfigChecker
 from config_files import AnalysisConfigReader
 from config_files import S3UrisFileReader
 from local_results import LocalResults
@@ -16,7 +17,19 @@ from types_custom import AnalysisS3DataDf
 
 
 class AnalysisGenerator:
-    def export_analysis_file(self):
+    def __init__(self):
+        self._logger = get_logger()
+        self._analysis_config_checker = AnalysisConfigChecker()
+        self._analysis_config_reader = AnalysisConfigReader()
+
+    def run(self):
+        if self._analysis_config_reader.is_aws_account_origin_defined():
+            self._analysis_config_checker.assert_file_is_correct()
+            self._export_analysis_file()
+        else:
+            self._logger.info("No analysis configured. Omitting")
+
+    def _export_analysis_file(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._export_analyzed_df_to_file(s3_analyzed_df)
 
