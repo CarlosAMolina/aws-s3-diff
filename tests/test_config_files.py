@@ -22,6 +22,40 @@ class TestAnalysisConfigChecker(unittest.TestCase):
             str(exception.exception),
         )
 
+    @mock.patch("src.config_files.AnalysisConfigReader")
+    @mock.patch("src.config_files.S3UrisFileReader")
+    def test_assert_file_is_correct_raises_expected_exception_if_target_account_does_not_exist(
+        self, mock_s3_uris_file_reader, mock_analysis_config_reader
+    ):
+        mock_analysis_config_reader.return_value.get_aws_account_origin.return_value = "pro"
+        mock_analysis_config_reader.return_value.get_aws_accounts_where_files_must_be_copied.return_value = ["releas"]
+        mock_s3_uris_file_reader.return_value.get_aws_accounts.return_value = ["pro", "release"]
+        with self.assertRaises(AnalysisConfigError) as exception:
+            m_config_files.AnalysisConfigChecker().assert_file_is_correct()
+        self.assertEqual(
+            "The AWS account 'releas' is defined in analysis-config.json but not in s3-uris-to-analyze.csv",
+            str(exception.exception),
+        )
+
+    @mock.patch("src.config_files.AnalysisConfigReader")
+    @mock.patch("src.config_files.S3UrisFileReader")
+    def test_assert_file_is_correct_raises_expected_exception_if_target_accounts_do_not_exist(
+        self, mock_s3_uris_file_reader, mock_analysis_config_reader
+    ):
+        mock_analysis_config_reader.return_value.get_aws_account_origin.return_value = "pro"
+        mock_analysis_config_reader.return_value.get_aws_accounts_where_files_must_be_copied.return_value = [
+            "releas",
+            "de",
+            "pre",
+        ]
+        mock_s3_uris_file_reader.return_value.get_aws_accounts.return_value = ["pro", "release", "dev", "pre"]
+        with self.assertRaises(AnalysisConfigError) as exception:
+            m_config_files.AnalysisConfigChecker().assert_file_is_correct()
+        self.assertEqual(
+            "The AWS accounts 'de', 'releas' are defined in analysis-config.json but not in s3-uris-to-analyze.csv",
+            str(exception.exception),
+        )
+
 
 class TestS3UriParts(unittest.TestCase):
     def test_bucket(self):

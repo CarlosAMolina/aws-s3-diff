@@ -14,7 +14,6 @@ FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
 FILE_NAME_S3_URIS_TO_ANALYZE = "s3-uris-to-analyze.csv"
 
 
-# TODO test
 class AnalysisConfigChecker:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
@@ -40,7 +39,7 @@ class AnalysisConfigChecker:
         if len(aws_accounts_wrong) == 1:
             raise AnalysisConfigError(self._get_error_message_aws_account_does_not_exist(list(aws_accounts_wrong)[0]))
         if len(aws_accounts_wrong) > 1:
-            raise AnalysisConfigError(self._get_error_message_aws_accounts_do_not_exist(aws_accounts_wrong))
+            raise AnalysisConfigError(self._get_error_message_aws_accounts_do_not_exist(sorted(aws_accounts_wrong)))
 
     def _exists_aws_account(self, aws_account: str) -> bool:
         return aws_account in self._s3_uris_file_reader.get_aws_accounts()
@@ -51,7 +50,7 @@ class AnalysisConfigChecker:
     def _get_error_message_aws_account_does_not_exist(self, aws_account: str) -> str:
         return self._get_error_message(f"The AWS account '{aws_account}' is")
 
-    def _get_error_message_aws_accounts_do_not_exist(self, aws_accounts: set[str]) -> str:
+    def _get_error_message_aws_accounts_do_not_exist(self, aws_accounts: list[str]) -> str:
         aws_accounts_str = "', '".join(aws_accounts)
         return self._get_error_message(f"The AWS accounts '{aws_accounts_str}' are")
 
