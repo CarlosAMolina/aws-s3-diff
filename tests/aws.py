@@ -15,8 +15,8 @@ class S3Server:
     def start(self):
         self._mock_aws.start()
 
-    def create_objects(self, aws_account):
-        S3(aws_account).create_objects()
+    def create_objects(self, folder_name_with_files):
+        S3(folder_name_with_files).create_objects()
 
     def stop(self):
         self._mock_aws.stop()
@@ -34,13 +34,11 @@ def set_aws_credentials():
 
 
 class S3:
-    # TODO rename aws_account to folder_name_with_files
-    # TODO example of usage: test_run_manages_s3_uri_with_folder
-    def __init__(self, aws_account: str, endpoint_url: str | None = None):
+    def __init__(self, folder_name_with_files: str, endpoint_url: str | None = None):
         self._s3_resource = boto3.resource("s3", endpoint_url=endpoint_url)
         self._s3_client = boto3.client("s3", endpoint_url=endpoint_url)
         current_path = Path(__file__).parent.absolute()
-        self._local_s3_objects_path = current_path.joinpath("fake-files/local-s3-server", aws_account)
+        self._local_s3_objects_path = current_path.joinpath("fake-files/local-s3-server", folder_name_with_files)
 
     def create_objects(self):
         self._create_buckets()
