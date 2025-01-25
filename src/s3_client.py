@@ -35,7 +35,7 @@ class S3Client:
             yield [FileS3Data()]
 
     def _get_request_arguments(self, last_key: str, s3_query: S3Query) -> dict:
-        max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
+        max_keys = int(os.getenv("AWS_MAX_KEYS", 1000))
         return {
             "Bucket": s3_query.bucket,
             "Prefix": s3_query.prefix,
