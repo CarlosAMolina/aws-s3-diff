@@ -87,6 +87,13 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
 
 
 class TestFunction_runNoLocalS3Server(unittest.TestCase):
+    @patch("src.main._InteractiveMenu.run")
+    def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
+        mock_run.side_effect = # TODO mock raise AnalysisConfigError
+        with self.assertLogs(level="ERROR") as cm:
+            run()
+        self.assertEqual("TODO", cm.records[0].message)
+
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAwsAccounts")
     @patch("src.main.AwsAccountExtractor.extract")
