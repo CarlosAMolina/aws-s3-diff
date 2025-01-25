@@ -31,7 +31,6 @@ class AwsAccountExtractor:
         self._file_path_results = file_path_results
         self._logger = get_logger()
         self._s3_queries = s3_queries
-        self._s3_data_csv_exporter = _S3DataCsvExporter(file_path_results)
 
     def extract(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
@@ -40,22 +39,14 @@ class AwsAccountExtractor:
             try:
                 self._extract_s3_data_of_query(s3_query)
             except Exception as exception:
-                self._s3_data_csv_exporter.drop_file()
+                self._drop_file()
                 raise exception
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         s3_data = S3Client().get_s3_data(s3_query)
-        self._s3_data_csv_exporter.export_s3_data_to_csv(s3_data, s3_query)
+        self._export_s3_data_to_csv(s3_data, s3_query)
 
-
-class _S3DataCsvExporter:
-    def __init__(self, file_path_results: Path):
-        self._file_path_results = file_path_results
-
-    def drop_file(self):
-        self._file_path_results.unlink()
-
-    def export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
+    def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         data = [file_data._asdict() for file_data in s3_data]
         s3_data_df = Df(data)
         query_and_data_df = s3_data_df.copy()
@@ -63,6 +54,9 @@ class _S3DataCsvExporter:
         query_and_data_df.insert(1, "prefix", s3_query.prefix)
         export_headers = not self._file_path_results.is_file()
         query_and_data_df.to_csv(header=export_headers, index=False, mode="a", path_or_buf=self._file_path_results)
+
+    def _drop_file(self):
+        self._file_path_results.unlink()
 
 
 class _CombinedAccountsS3DataDfToCsv:
