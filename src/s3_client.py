@@ -27,10 +27,9 @@ class S3Client:
             # it is important to check the key after review if there are folders.
             if response.get("Contents") is None:
                 break
-            # TODO use yield
-            yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
             is_any_result = True
             last_key = response["Contents"][-1]["Key"]
+            yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
         # It is important to return empty FileS3Data to save the query in the results file if no results.
         if is_any_result is False:
             yield [FileS3Data()]
