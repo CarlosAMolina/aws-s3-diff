@@ -47,13 +47,17 @@ class AwsAccountExtractor:
         self._export_s3_data_to_csv(s3_data, s3_query)
 
     def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
-        data = [file_data._asdict() for file_data in s3_data]
-        s3_data_df = Df(data)
-        query_and_data_df = s3_data_df.copy()
-        query_and_data_df.insert(0, "bucket", s3_query.bucket)
-        query_and_data_df.insert(1, "prefix", s3_query.prefix)
+        query_and_data_df = self._get_df_query_and_data(s3_data, s3_query)
         export_headers = not self._file_path_results.is_file()
         query_and_data_df.to_csv(header=export_headers, index=False, mode="a", path_or_buf=self._file_path_results)
+
+    def _get_df_query_and_data(self, s3_data: S3Data, s3_query: S3Query) -> Df:
+        data = [file_data._asdict() for file_data in s3_data]
+        s3_data_df = Df(data)
+        result = s3_data_df.copy()
+        result.insert(0, "bucket", s3_query.bucket)
+        result.insert(1, "prefix", s3_query.prefix)
+        return result
 
     def _drop_file(self):
         self._file_path_results.unlink()
