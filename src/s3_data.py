@@ -1,6 +1,4 @@
-import csv
 import re
-from io import TextIOWrapper
 from pathlib import Path
 
 import pandas as pd
@@ -14,7 +12,6 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_client import S3Client
 from types_custom import AllAccountsS3DataDf
-from types_custom import FileS3Data
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -38,7 +35,6 @@ class AwsAccountExtractor:
 
     def extract(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
-        self._s3_data_csv_exporter.create_file()
         for query_index, s3_query in enumerate(self._s3_queries, 1):
             self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._s3_queries)}: {s3_query}")
             try:
@@ -56,10 +52,6 @@ class _S3DataCsvExporter:
     def __init__(self, file_path_results: Path):
         self._file_path_results = file_path_results
 
-    def create_file(self):
-        with open(self._file_path_results, "w", newline="") as f:
-            self._get_dict_writer(f).writeheader()
-
     def drop_file(self):
         self._file_path_results.unlink()
 
@@ -69,15 +61,8 @@ class _S3DataCsvExporter:
         query_and_data_df = s3_data_df.copy()
         query_and_data_df.insert(0, "bucket", s3_query.bucket)
         query_and_data_df.insert(1, "prefix", s3_query.prefix)
-        query_and_data_df.to_csv(header=False, index=False, mode="a", path_or_buf=self._file_path_results)
-
-    def _get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
-        # avoid ^M: https://stackoverflow.com/a/17725590
-        return csv.DictWriter(f, self._headers, lineterminator="\n")
-
-    @property
-    def _headers(self) -> tuple[str, ...]:
-        return S3Query.DICT_KEYS + FileS3Data._fields
+        export_headers = not self._file_path_results.is_file()
+        query_and_data_df.to_csv(header=export_headers, index=False, mode="a", path_or_buf=self._file_path_results)
 
 
 class _CombinedAccountsS3DataDfToCsv:

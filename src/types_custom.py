@@ -4,8 +4,6 @@ from pandas import DataFrame as Df
 
 
 class S3Query:
-    DICT_KEYS = ("bucket", "prefix")
-
     def __init__(self, bucket: str, prefix: str):
         self.bucket = bucket
         self._prefix = prefix
