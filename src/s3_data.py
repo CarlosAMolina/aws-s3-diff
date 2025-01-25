@@ -64,11 +64,12 @@ class _S3DataCsvExporter:
         self._file_path_results.unlink()
 
     def export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
-        with open(self._file_path_results, "a", newline="") as f:
-            w = self._get_dict_writer(f)
-            for file_data in s3_data:
-                data = {**s3_query.as_dict(), **file_data._asdict()}
-                w.writerow(data)
+        data = [file_data._asdict() for file_data in s3_data]
+        s3_data_df = Df(data)
+        query_and_data_df = s3_data_df.copy()
+        query_and_data_df.insert(0, "bucket", s3_query.bucket)
+        query_and_data_df.insert(1, "prefix", s3_query.prefix)
+        query_and_data_df.to_csv(header=False, index=False, mode="a", path_or_buf=self._file_path_results)
 
     def _get_dict_writer(self, f: TextIOWrapper) -> csv.DictWriter:
         # avoid ^M: https://stackoverflow.com/a/17725590

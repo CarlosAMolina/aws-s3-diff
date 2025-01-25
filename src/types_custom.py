@@ -21,9 +21,6 @@ class S3Query:
     def __hash__(self):
         return hash((self.bucket, self._prefix))
 
-    def as_dict(self) -> dict:
-        return {key: getattr(self, key) for key in self.DICT_KEYS}
-
     @property
     def prefix(self) -> str:
         # If a S3 query does not end in slash, S3 folders are not managed correctly.
