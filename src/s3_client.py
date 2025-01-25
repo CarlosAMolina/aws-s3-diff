@@ -16,16 +16,15 @@ class S3Client:
 
     def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
-        are_more_requests_required = True
         last_key = ""
-        while are_more_requests_required:
+        while True:
             response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
             if self._no_results(response):
-                are_more_requests_required = False
                 # It is important to return empty FileS3Data to save the query in the results file if no results.
                 if last_key == "":
                     yield [FileS3Data()]
+                return
             else:
                 last_key = response["Contents"][-1]["Key"]
                 yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
