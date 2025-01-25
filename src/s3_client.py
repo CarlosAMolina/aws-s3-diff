@@ -17,7 +17,7 @@ class S3Client:
     def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
         last_key = ""
-        result = []
+        is_any_result = False
         while True:
             response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
@@ -28,11 +28,12 @@ class S3Client:
             if response.get("Contents") is None:
                 break
             # TODO use yield
-            result += [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
+            yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
+            is_any_result = True
             last_key = response["Contents"][-1]["Key"]
-        if len(result) == 0:
-            result += [FileS3Data()]
-        yield result
+        # It is important to return empty FileS3Data to save the query in the results file if no results.
+        if is_any_result is False:
+            yield [FileS3Data()]
 
     def _get_request_arguments(self, last_key: str, s3_query: S3Query) -> dict:
         max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
