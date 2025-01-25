@@ -20,7 +20,7 @@ class S3Client:
         while True:
             response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
-            if self._no_results(response):
+            if response["KeyCount"] == 0:
                 return
             last_key = response["Contents"][-1]["Key"]
             yield [_FileS3DataFromS3Content(content).file_s3_data for content in response["Contents"]]
@@ -51,9 +51,6 @@ class S3Client:
         if "CommonPrefixes" not in response:
             return []
         return [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
-
-    def _no_results(self, response: dict) -> bool:
-        return response["KeyCount"] == 0
 
 
 class _FileS3DataFromS3Content:
