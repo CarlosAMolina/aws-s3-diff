@@ -6,12 +6,12 @@ import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
 
+from exceptions import AnalysisConfigError
 from local_paths import LocalPaths
 from types_custom import S3Query
 
 
 # TODO test
-# TODO add custom error
 class AnalysisConfigChecker:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
@@ -24,7 +24,7 @@ class AnalysisConfigChecker:
     def _assert_aws_account_origin_exists(self):
         aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
         if not self._exists_aws_account(aws_account_origin):
-            raise ValueError(self._get_error_message_aws_account_does_not_exist(aws_account_origin))
+            raise AnalysisConfigError(self._get_error_message_aws_account_does_not_exist(aws_account_origin))
 
     def _assert_aws_accounts_target_exist(self):
         aws_accounts_wrong_check_copy = self._get_aws_accounts_not_exist(
@@ -35,9 +35,9 @@ class AnalysisConfigChecker:
         )
         aws_accounts_wrong = aws_accounts_wrong_check_copy | aws_accounts_wrong_check_more_files
         if len(aws_accounts_wrong) == 1:
-            raise ValueError(self._get_error_message_aws_account_does_not_exist(list(aws_accounts_wrong)[0]))
+            raise AnalysisConfigError(self._get_error_message_aws_account_does_not_exist(list(aws_accounts_wrong)[0]))
         if len(aws_accounts_wrong) > 1:
-            raise ValueError(self._get_error_message_aws_accounts_do_not_exist(aws_accounts_wrong))
+            raise AnalysisConfigError(self._get_error_message_aws_accounts_do_not_exist(aws_accounts_wrong))
 
     def _exists_aws_account(self, aws_account: str) -> bool:
         return aws_account in self._s3_uris_file_reader.get_aws_accounts()
