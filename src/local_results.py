@@ -9,9 +9,7 @@ class LocalResults:
     def __init__(self):
         self._logger = get_logger()
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
-        # TODO _get_analysis_date_time_str has file input and outputs, don't do this in __init__
-        analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
-        self.analysis_paths = _AnalysisPaths(analysis_date_time_str)
+        self._analysis_paths = None  # To avoid read/create file in __init__.
 
     def has_this_aws_account_been_analyzed(self, aws_account: str) -> bool:
         return self.get_file_path_aws_account_results(aws_account).is_file()
@@ -30,6 +28,14 @@ class LocalResults:
     def drop_directory_analysis(self):
         self._logger.debug(f"Removing the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.rmdir()
+
+    @property
+    def analysis_paths(self) -> "_AnalysisPaths":
+        if self._analysis_paths is None:
+            # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
+            analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
+            self._analysis_paths = _AnalysisPaths(analysis_date_time_str)
+        return self._analysis_paths
 
 
 class _AnalysisDateTime:
