@@ -10,6 +10,9 @@ from exceptions import AnalysisConfigError
 from local_paths import LocalPaths
 from types_custom import S3Query
 
+FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
+FILE_NAME_S3_URIS_TO_ANALYZE = "s3-uris-to-analyze.csv"
+
 
 # TODO test
 class AnalysisConfigChecker:
@@ -46,23 +49,18 @@ class AnalysisConfigChecker:
         return {aws_account for aws_account in aws_accounts if not self._exists_aws_account(aws_account)}
 
     def _get_error_message_aws_account_does_not_exist(self, aws_account: str) -> str:
-        return self._get_error_message(f"The AWS accounts '{aws_account}' is")
+        return self._get_error_message(f"The AWS account '{aws_account}' is")
 
     def _get_error_message_aws_accounts_do_not_exist(self, aws_accounts: set[str]) -> str:
         aws_accounts_str = "', '".join(aws_accounts)
         return self._get_error_message(f"The AWS accounts '{aws_accounts_str}' are")
 
     def _get_error_message(self, text_prefix: str) -> str:
-        return (
-            f"{text_prefix} defined in {self._analysis_config_reader.FILE_NAME} but not in "
-            f"{self._s3_uris_file_reader.FILE_NAME}"
-        )
+        return f"{text_prefix} defined in {FILE_NAME_ANALYSIS_CONFIG} but not in {FILE_NAME_S3_URIS_TO_ANALYZE}"
 
 
 # TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
-    FILE_NAME = "analysis-config.json"
-
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
         self.__analysis_config = None  # To avoid read a file in __init__.
@@ -91,7 +89,7 @@ class AnalysisConfigReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath(self.FILE_NAME)
+        return self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
 
 
 class S3UrisFileChecker:
@@ -119,8 +117,6 @@ class S3UrisFileChecker:
 
 
 class S3UrisFileReader:
-    FILE_NAME = "s3-uris-to-analyze.csv"
-
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
         self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
@@ -158,7 +154,7 @@ class S3UrisFileReader:
 
     @property
     def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath(self.FILE_NAME)
+        return self._config_directory_path.joinpath(FILE_NAME_S3_URIS_TO_ANALYZE)
 
 
 class _S3UriParts:

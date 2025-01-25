@@ -27,11 +27,11 @@ test:
 	poetry run python -m unittest discover
 
 test-filter:
-	#poetry run python -m unittest discover -p test_config_files.py -k TestS3UrisFileChecker
+	poetry run python -m unittest discover -p test_config_files.py -k TestAnalysisConfigChecker
 	#poetry run python -m unittest discover -p test_combine.py -k TestS3UriDfModifier
 	#poetry run python -m unittest discover -p test_analysis.py #-k TestOriginFileSyncDfAnalysis.test_get_df_set_analysis_result_if_file_sync_is_ok
 	#poetry run python -m unittest discover -p test_with_local_s3_server.py -k TestWithLocalS3Server.test_run_test_s3_data
 	#poetry run python -m unittest discover -p test_main.py -k TestFunction_runNoLocalS3Server.test_run_manages_aws_client_errors_and_generates_expected_error_messages
 	#poetry run python -m unittest discover -p test_main.py -k TestFunction_runLocalS3Server.test_run_if_should_work_ok
-	poetry run python -m unittest discover -p test_s3_client.py
+	#poetry run python -m unittest discover -p test_s3_client.py
 
