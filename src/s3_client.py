@@ -14,9 +14,7 @@ class S3Client:
         self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> S3Data:
-        """
-        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
-        """
+        """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
         last_key = ""
         result = []
         max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
@@ -28,11 +26,9 @@ class S3Client:
                 StartAfter=last_key,
                 Delimiter="/",  # Required for folders detection.
             )
-            """
-            `response["IsTruncated"] is True` is not valid to know if all objects were
-            retrieved because when using `MaxKeys`, `IsTruncated` is True.
-            """
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
+            # When using `MaxKeys`, `IsTruncated` is True and we can't check if all objects were
+            # retrieved with `response["IsTruncated"] is True`.
             # If S3 prefix only has a folder (no files), the response won't have the 'Contents' key,
             # it is important to check the key after review if there are folders.
             if response.get("Contents") is None:
