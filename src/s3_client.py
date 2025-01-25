@@ -21,11 +21,7 @@ class S3Client:
         while True:
             response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
-            # When using `MaxKeys`, `IsTruncated` is True and we can't check if all objects were
-            # retrieved with `response["IsTruncated"] is True`.
-            # If S3 prefix only has a folder (no files), the response won't have the 'Contents' key,
-            # it is important to check the key after review if there are folders.
-            if response.get("Contents") is None:
+            if self._all_results_have_been_retrieved(response):
                 break
             is_any_s3_file = True
             last_key = response["Contents"][-1]["Key"]
@@ -60,6 +56,9 @@ class S3Client:
         if "CommonPrefixes" not in response:
             return []
         return [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
+
+    def _all_results_have_been_retrieved(self, response: dict) -> bool:
+        return response["KeyCount"] == 0
 
 
 class _FileS3DataFromS3Content:
