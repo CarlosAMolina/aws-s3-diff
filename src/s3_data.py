@@ -53,9 +53,7 @@ class AwsAccountExtractor:
         query_and_data_df.to_csv(header=export_headers, index=False, mode="a", path_or_buf=self._file_path_results)
 
     def _get_df_query_and_data(self, s3_data: S3Data, s3_query: S3Query) -> Df:
-        data = [file_data._asdict() for file_data in s3_data]
-        s3_data_df = Df(data)
-        result = s3_data_df.copy()
+        result = Df(file_data._asdict() for file_data in s3_data)
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
