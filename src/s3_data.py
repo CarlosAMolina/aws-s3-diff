@@ -12,6 +12,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_client import S3Client
 from types_custom import AllAccountsS3DataDf
+from types_custom import FileS3Data
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -44,8 +45,12 @@ class AwsAccountExtractor:
                 raise exception
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
+        is_any_result = False
         for s3_data in self._s3_client.get_s3_data(s3_query):
+            is_any_result = True
             self._export_s3_data_to_csv(s3_data, s3_query)
+        if not is_any_result:
+            self._export_s3_data_to_csv([FileS3Data()], s3_query)
 
     def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         query_and_data_df = self._get_df_query_and_data(s3_data, s3_query)
