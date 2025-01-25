@@ -17,15 +17,8 @@ class S3Client:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
         last_key = ""
         result = []
-        max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
         while True:
-            response = self._s3_client.list_objects_v2(
-                Bucket=s3_query.bucket,
-                Prefix=s3_query.prefix,
-                MaxKeys=max_keys,
-                StartAfter=last_key,
-                Delimiter="/",  # Required for folders detection.
-            )
+            response = self._s3_client.list_objects_v2(**self._get_request_arguments(last_key, s3_query))
             self._raise_exception_if_folders_in_response(response, s3_query.bucket)
             # When using `MaxKeys`, `IsTruncated` is True and we can't check if all objects were
             # retrieved with `response["IsTruncated"] is True`.
@@ -39,6 +32,16 @@ class S3Client:
         if len(result) == 0:
             result += [FileS3Data()]
         return result
+
+    def _get_request_arguments(self, last_key: str, s3_query: S3Query) -> dict:
+        max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
+        return {
+            "Bucket": s3_query.bucket,
+            "Prefix": s3_query.prefix,
+            "MaxKeys": max_keys,
+            "StartAfter": last_key,
+            "Delimiter": "/",  # Required for folders detection.
+        }
 
     def _raise_exception_if_folders_in_response(self, response: dict, bucket: str):
         folder_path_names = self._get_folder_path_names_in_response_list_objects_v2(response)
