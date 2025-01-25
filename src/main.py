@@ -18,6 +18,9 @@ def run():
     logger = get_logger()
     try:
         _InteractiveMenu().run()
+    except (AnalysisConfigError, FolderInS3UriError) as exception:
+        logger.error(exception)
+        return
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
     except ClientError as exception:
         error_code = exception.response["Error"]["Code"]
@@ -31,12 +34,6 @@ def run():
             logger.error("Incorrect AWS credentials. Authenticate and run the program again")
             return
         raise Exception from exception
-    except FolderInS3UriError as exception:
-        logger.error(exception)
-        return
-    except AnalysisConfigError as exception:
-        logger.error(exception)
-        return
 
 
 class _InteractiveMenu:
