@@ -26,7 +26,8 @@ class TestS3Client(unittest.TestCase):
             "KeyCount": 1,
         }
         with self.assertRaises(FolderInS3UriError) as exception:
-            S3Client().get_s3_data(S3Query("bucket-1", "tmp"))
+            for _ in S3Client().get_s3_data(S3Query("bucket-1", "tmp")):
+                pass
         expected_error_message = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): tmp/folder/"

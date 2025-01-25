@@ -44,8 +44,8 @@ class AwsAccountExtractor:
                 raise exception
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
-        s3_data = self._s3_client.get_s3_data(s3_query)
-        self._export_s3_data_to_csv(s3_data, s3_query)
+        for s3_data in self._s3_client.get_s3_data(s3_query):
+            self._export_s3_data_to_csv(s3_data, s3_query)
 
     def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         query_and_data_df = self._get_df_query_and_data(s3_data, s3_query)

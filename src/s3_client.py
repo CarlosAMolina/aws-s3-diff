@@ -1,4 +1,5 @@
 import os
+from collections.abc import Iterator
 
 import boto3
 
@@ -13,7 +14,7 @@ class S3Client:
         session = boto3.Session()
         self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
-    def get_s3_data(self, s3_query: S3Query) -> S3Data:
+    def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
         last_key = ""
         result = []
@@ -31,7 +32,7 @@ class S3Client:
             last_key = response["Contents"][-1]["Key"]
         if len(result) == 0:
             result += [FileS3Data()]
-        return result
+        yield result
 
     def _get_request_arguments(self, last_key: str, s3_query: S3Query) -> dict:
         max_keys = int(os.getenv("AWS_MAX_KEYS", "1000"))
