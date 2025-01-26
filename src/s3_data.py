@@ -215,12 +215,18 @@ class _S3UriDfModifier:
     def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
         # TODO add test for url ending with and without `/`.
         old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
-        iloc_row_to_use = self._get_iloc_of_the_s3_uri_to_use(
-            S3Query(old_bucket, old_prefix), s3_uris_map_df[self._aws_account_target].tolist()
-        )
-        s3_uri_to_use = s3_uris_map_df.iloc[iloc_row_to_use][self._aws_account_origin]
-        query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
+        query_to_use = self._get_s3_query_to_use(S3Query(old_bucket, old_prefix), s3_uris_map_df)
         return (query_to_use.bucket, query_to_use.prefix, old_file_name)
+
+    def _get_s3_query_to_use(self, old_s3_query: S3Query, s3_uris_map_df: Df) -> S3Query:
+        s3_uri_to_use = self._get_s3_uri_to_use(old_s3_query, s3_uris_map_df)
+        return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
+
+    def _get_s3_uri_to_use(self, old_s3_query: S3Query, s3_uris_map_df: Df) -> str:
+        iloc_row_to_use = self._get_iloc_of_the_s3_uri_to_use(
+            old_s3_query, s3_uris_map_df[self._aws_account_target].tolist()
+        )
+        return s3_uris_map_df.iloc[iloc_row_to_use][self._aws_account_origin]
 
     def _get_iloc_of_the_s3_uri_to_use(self, old_s3_query: S3Query, new_s3_uris: list[str]) -> int:
         for index, new_s3_uri in enumerate(new_s3_uris):
