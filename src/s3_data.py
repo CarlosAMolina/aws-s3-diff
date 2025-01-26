@@ -221,13 +221,13 @@ class _S3UriDfModifier:
             df = result.loc[result["new_value"].isnull(), ["current_value", "new_value"]]
             error_text = f"These values have not been replaced:\n{df.to_string(index=False)}"
             raise ValueError(error_text)
-        result.drop(["bucket_and_prefix", "current_value"], axis="columns", inplace=True)
+        result.drop(["bucket_and_prefix", "current_value"], axis="columns", level=0, inplace=True)
         result = result.rename(columns={"new_value": "bucket_and_prefix"})
         # TODO use regex defined in config_files.py
         result[["bucket_new", "prefix_new"]] = result["bucket_and_prefix"].str.extract(
             r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
         )
-        result.drop(["bucket", "prefix", "bucket_and_prefix"], axis="columns", inplace=True)
+        result.drop(["bucket", "prefix", "bucket_and_prefix"], axis="columns", level=0, inplace=True)
         result = result.rename(columns={"bucket_new": "bucket", "prefix_new": "prefix"})
         result.insert(0, "bucket", result.pop("bucket"))
         result.insert(1, "prefix", result.pop("prefix"))
