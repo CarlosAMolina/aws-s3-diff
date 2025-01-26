@@ -64,11 +64,11 @@ class _FileS3DataFromS3Content:
     @property
     def file_s3_data(self) -> FileS3Data:
         return FileS3Data(
-            self._get_file_name_from_response_key(self._s3_response_content),
+            self._get_file_name_from_response(self._s3_response_content),
             self._s3_response_content["LastModified"],
             self._s3_response_content["Size"],
             self._s3_response_content["ETag"].strip('"'),
         )
 
-    def _get_file_name_from_response_key(self, content: dict) -> str:
+    def _get_file_name_from_response(self, content: dict) -> str:
         return Path(content["Key"]).name
