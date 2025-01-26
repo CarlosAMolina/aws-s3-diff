@@ -32,7 +32,6 @@ class AwsAccountExtractor:
         self._file_path_results = file_path_results
         self._logger = get_logger()
         self._s3_queries = s3_queries
-        self._s3_client = S3Client()
 
     def extract(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
@@ -46,7 +45,7 @@ class AwsAccountExtractor:
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         is_any_result = False
-        for s3_data in self._s3_client.get_s3_data(s3_query):
+        for s3_data in S3Client(s3_query).get_s3_data():
             is_any_result = True
             self._export_s3_data_to_csv(s3_data, s3_query)
         if not is_any_result:

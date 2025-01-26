@@ -11,32 +11,34 @@ from types_custom import S3Query
 
 
 class S3Client:
-    def __init__(self):
-        self._s3_requester = _S3Requester()
+    def __init__(self, s3_query: S3Query):
+        self._bucket = s3_query.bucket
+        self._s3_requester = _S3Requester(s3_query)
         self._response_analyzer = _ResponseAnalyzer()
 
-    def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
+    def get_s3_data(self) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
-        response = self._s3_requester.get_response(s3_query)
+        response = self._s3_requester.get_response()
         while response["KeyCount"] != 0:
-            self._response_analyzer.raise_exception_if_folders_in_response(response, s3_query.bucket)
+            self._response_analyzer.raise_exception_if_folders_in_response(response, self._bucket)
             yield self._response_analyzer.get_s3_data_from_response(response)
             last_key = response["Contents"][-1]["Key"]
-            response = self._s3_requester.get_response(s3_query, last_key)
+            response = self._s3_requester.get_response(last_key)
 
 
 class _S3Requester:
-    def __init__(self):
+    def __init__(self, s3_query: S3Query):
+        self._s3_query = s3_query
         self._s3_client = boto3.Session().client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
-    def get_response(self, s3_query: S3Query, last_key: str | None = None) -> dict:
-        return self._s3_client.list_objects_v2(**self._get_request_arguments(s3_query, last_key))
+    def get_response(self, last_key: str | None = None) -> dict:
+        return self._s3_client.list_objects_v2(**self._get_request_arguments(last_key))
 
-    def _get_request_arguments(self, s3_query: S3Query, last_key: str | None = None) -> dict:
+    def _get_request_arguments(self, last_key: str | None = None) -> dict:
         max_keys = int(os.getenv("AWS_MAX_KEYS", 1000))
         result = {
-            "Bucket": s3_query.bucket,
-            "Prefix": s3_query.prefix,
+            "Bucket": self._s3_query.bucket,
+            "Prefix": self._s3_query.prefix,
             "MaxKeys": max_keys,
             "Delimiter": "/",  # Required for folders detection.
         }
