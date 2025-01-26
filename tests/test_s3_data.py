@@ -10,22 +10,27 @@ ExpectedResult = list[dict]
 
 
 class TestS3UriDfModifier(unittest.TestCase):
-    def test_get_df_set_s3_uris_in_origin_account(self):
+    def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
         aws_account_origin = "aws_account_1_pro"
         aws_account_target = "aws_account_3_dev"
-        df = Df(
+        df_prefix_does_not_end_with_slash = Df(
             [
-                ["cars_dev", "europe/spain/", "cars-20241014.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy/", "dogs-20240914.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy/", "dogs-20241015.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy/", "dogs-20241019.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy/", "dogs-20241021.csv"] + ["foo"] * 3,
-                ["pets_dev", "horses/europe/", "horses-20210219.csv"] + ["foo"] * 3,
-                ["pets_dev", "non-existent-prefix/", None] + ["foo"] * 3,
+                ["cars_dev", "europe/spain", "cars-20241014.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20240914.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241015.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241019.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241021.csv"] + ["foo"] * 3,
+                ["pets_dev", "horses/europe", "horses-20210219.csv"] + ["foo"] * 3,
+                ["pets_dev", "non-existent-prefix", None] + ["foo"] * 3,
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        df = self._get_df_as_multi_index(aws_account_target, df)
+        df_prefix_ends_with_slash = df_prefix_does_not_end_with_slash.copy()
+        df_prefix_ends_with_slash["prefix"] = df_prefix_ends_with_slash["prefix"] + "/"
+        df_prefix_ends_with_slash = self._get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
+        df_prefix_does_not_end_with_slash = self._get_df_as_multi_index(
+            aws_account_target, df_prefix_does_not_end_with_slash
+        )
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
                 aws_account_origin: {
@@ -62,11 +67,19 @@ class TestS3UriDfModifier(unittest.TestCase):
         expected_result = self._get_df_as_multi_index(aws_account_target, expected_result)
         for test_data in (
             (
-                df,
+                df_prefix_ends_with_slash,
                 s3_uris_map_df_prefix_ends_with_slash,
             ),
             (
-                df,
+                df_prefix_ends_with_slash,
+                s3_uris_map_df_prefix_does_not_end_with_slash,
+            ),
+            (
+                df_prefix_does_not_end_with_slash,
+                s3_uris_map_df_prefix_ends_with_slash,
+            ),
+            (
+                df_prefix_does_not_end_with_slash,
                 s3_uris_map_df_prefix_does_not_end_with_slash,
             ),
         ):
