@@ -5,20 +5,25 @@ import boto3
 from moto import mock_aws
 
 
-# TODO use with open for mock_aws
 class S3Server:
     def __init__(self):
         """http://docs.getmoto.org/en/latest/docs/getting_started.html"""
         set_aws_credentials()
         self._mock_aws = mock_aws()
 
-    def start(self):
-        self._mock_aws.start()
+    def __enter__(self):
+        self._start()
+
+    def __exit__(self, *args):
+        self._stop()
 
     def create_objects(self, folder_name_with_files):
         S3(folder_name_with_files).create_objects()
 
-    def stop(self):
+    def _start(self):
+        self._mock_aws.start()
+
+    def _stop(self):
         self._mock_aws.stop()
 
 

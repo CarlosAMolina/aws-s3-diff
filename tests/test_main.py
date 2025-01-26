@@ -23,14 +23,12 @@ from tests.aws import S3Server
 class TestFunction_runLocalS3Server(unittest.TestCase):
     def setUp(self):
         self._local_s3_server = S3Server()
-        self._local_s3_server.start()
         # Drop file created by the user
         if LocalPaths().analysis_date_time_file.is_file():
             LocalResults().drop_file_with_analysis_date()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
 
     def tearDown(self):
-        self._local_s3_server.stop()
         os.environ.pop("AWS_MAX_KEYS")
 
     @patch(
@@ -39,9 +37,10 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
-        for aws_account in S3UrisFileReader().get_aws_accounts():
-            self._local_s3_server.create_objects(aws_account)
-            run()
+        with self._local_s3_server:
+            for aws_account in S3UrisFileReader().get_aws_accounts():
+                self._local_s3_server.create_objects(aws_account)
+                run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._assert_extracted_aws_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
