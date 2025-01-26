@@ -213,7 +213,6 @@ class _S3UriDfModifier:
         ]
 
     def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
-        # TODO add test for url ending with and without `/`.
         old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
         query_to_use = self._get_s3_query_to_use(S3Query(old_bucket, old_prefix), s3_uris_map_df)
         return (query_to_use.bucket, query_to_use.prefix, old_file_name)
@@ -232,4 +231,4 @@ class _S3UriDfModifier:
         for index, new_s3_uri in enumerate(new_s3_uris):
             if old_s3_query == self._s3_uris_file_reader.get_s3_query_from_s3_uri(new_s3_uri):
                 return index
-        raise ValueError("Unmatched value")
+        raise ValueError(f"{old_s3_query} is not in {new_s3_uris}")
