@@ -89,9 +89,10 @@ class TestS3UriDfModifier(unittest.TestCase):
             ),
         ):
             old_multi_index_as_tuple, s3_uris_map_df = test_data
-            self.assertEqual(
-                ("foo", "bar/baz/", "qux.txt"),
-                m_s3_data._S3UriDfModifier(aws_account_origin, aws_account_target, Df())._get_new_multi_index_as_tuple(
-                    old_multi_index_as_tuple, s3_uris_map_df
-                ),
-            )
+            with self.subTest(old_multi_index_as_tuple=old_multi_index_as_tuple, s3_uris_map_df=s3_uris_map_df):
+                self.assertEqual(
+                    ("foo", "bar/baz/", "qux.txt"),
+                    m_s3_data._S3UriDfModifier(
+                        aws_account_origin, aws_account_target, Df()
+                    )._get_new_multi_index_as_tuple(old_multi_index_as_tuple, s3_uris_map_df),
+                )
