@@ -198,10 +198,9 @@ class _S3UriDfModifier:
             self._aws_account_origin, self._aws_account_target
         )
         return self._get_df_set_s3_uris_in_origin_account(s3_uris_map_df)
-        # TODO remove methods below.
-        # return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
 
     # TODO rename, it has the same name as the public method
+    # TODO refactor, too long
     def _get_df_set_s3_uris_in_origin_account(self, s3_uris_map_df: Df) -> Df:
         original_lenght = len(self._df)
         result = self._df.copy()
@@ -236,36 +235,3 @@ class _S3UriDfModifier:
         final_length = len(result)
         assert original_lenght == final_length
         return result
-
-    def _get_df_modify_buckets_and_paths(self, s3_uris_map_df: Df) -> Df:
-        result = self._df.copy()
-        new_multi_index_as_tuples = self._get_new_multi_index_as_tuples(result.index.tolist(), s3_uris_map_df)
-        result.index = MultiIndex.from_tuples(new_multi_index_as_tuples, names=result.index.names)
-        return result
-
-    def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples: list[tuple], s3_uris_map_df: Df) -> list[tuple]:
-        return [
-            self._get_new_multi_index_as_tuple(old_multi_index_as_tuple, s3_uris_map_df)
-            for old_multi_index_as_tuple in old_multi_index_as_tuples
-        ]
-
-    def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
-        old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
-        query_to_use = self._get_s3_query_to_use(S3Query(old_bucket, old_prefix), s3_uris_map_df)
-        return (query_to_use.bucket, query_to_use.prefix, old_file_name)
-
-    def _get_s3_query_to_use(self, old_s3_query: S3Query, s3_uris_map_df: Df) -> S3Query:
-        s3_uri_to_use = self._get_s3_uri_to_use(old_s3_query, s3_uris_map_df)
-        return self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
-
-    def _get_s3_uri_to_use(self, old_s3_query: S3Query, s3_uris_map_df: Df) -> str:
-        iloc_row_to_use = self._get_iloc_of_the_s3_uri_to_use(
-            old_s3_query, s3_uris_map_df[self._aws_account_target].tolist()
-        )
-        return s3_uris_map_df.iloc[iloc_row_to_use][self._aws_account_origin]
-
-    def _get_iloc_of_the_s3_uri_to_use(self, old_s3_query: S3Query, new_s3_uris: list[str]) -> int:
-        for index, new_s3_uri in enumerate(new_s3_uris):
-            if old_s3_query == self._s3_uris_file_reader.get_s3_query_from_s3_uri(new_s3_uri):
-                return index
-        raise ValueError(f"{old_s3_query} is not in {new_s3_uris}")
