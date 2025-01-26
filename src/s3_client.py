@@ -1,5 +1,6 @@
 import os
 from collections.abc import Iterator
+from pathlib import Path
 
 import boto3
 
@@ -70,5 +71,4 @@ class _FileS3DataFromS3Content:
         )
 
     def _get_file_name_from_response_key(self, content: dict) -> str:
-        # TODO use Path
-        return content["Key"].split("/")[-1]
+        return Path(content["Key"]).name
