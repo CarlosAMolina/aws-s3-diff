@@ -194,10 +194,16 @@ class _S3UriDfModifier:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
-        original_lenght = len(self._df)
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._aws_account_origin, self._aws_account_target
         )
+        return self._get_df_set_s3_uris_in_origin_account(s3_uris_map_df)
+        # TODO remove methods below.
+        # return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
+
+    # TODO rename, it has the same name as the public method
+    def _get_df_set_s3_uris_in_origin_account(self, s3_uris_map_df: Df) -> Df:
+        original_lenght = len(self._df)
         result = self._df.copy()
         result = result.reset_index()
         result["bucket_and_prefix"] = "s3://" + result["bucket"] + "/" + result["prefix"].str.rstrip("/")
@@ -230,8 +236,6 @@ class _S3UriDfModifier:
         final_length = len(result)
         assert original_lenght == final_length
         return result
-        # TODO remove below methods
-        return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
 
     def _get_df_modify_buckets_and_paths(self, s3_uris_map_df: Df) -> Df:
         result = self._df.copy()
