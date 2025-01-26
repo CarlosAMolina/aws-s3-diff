@@ -54,20 +54,13 @@ class S3Client:
         return [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
 
     def _get_s3_data_from_response(self, response: dict) -> S3Data:
-        return [
-            _FileS3DataFromS3Content(content).get_file_s3_data_from_s3_response_content()
-            for content in response["Contents"]
-        ]
+        return [self._get_file_s3_data_from_s3_response_content(content) for content in response["Contents"]]
 
-
-class _FileS3DataFromS3Content:
-    def __init__(self, s3_response_content: dict):
-        self._s3_response_content = s3_response_content
-
-    def get_file_s3_data_from_s3_response_content(self) -> FileS3Data:
+    @staticmethod
+    def _get_file_s3_data_from_s3_response_content(s3_response_content: dict) -> FileS3Data:
         return FileS3Data(
-            Path(self._s3_response_content["Key"]).name,
-            self._s3_response_content["LastModified"],
-            self._s3_response_content["Size"],
-            self._s3_response_content["ETag"].strip('"'),
+            Path(s3_response_content["Key"]).name,
+            s3_response_content["LastModified"],
+            s3_response_content["Size"],
+            s3_response_content["ETag"].strip('"'),
         )
