@@ -194,9 +194,43 @@ class _S3UriDfModifier:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
+        original_lenght = len(self._df)
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._aws_account_origin, self._aws_account_target
         )
+        result = self._df.copy()
+        result = result.reset_index()
+        result["bucket_and_prefix"] = "s3://" + result["bucket"] + "/" + result["prefix"].str.rstrip("/")
+        for aws_account in (self._aws_account_origin, self._aws_account_target):
+            s3_uris_map_df.loc[:, aws_account] = s3_uris_map_df[aws_account].str.rstrip("/")
+        s3_uris_map_df = s3_uris_map_df.rename(
+            columns={self._aws_account_origin: "new_value", self._aws_account_target: "current_value"}
+        )
+        s3_uris_map_df.columns = [
+            s3_uris_map_df.columns,
+            [""] * len(s3_uris_map_df.columns),
+        ]  # To merge to a MultiIndex Df.
+        result = result.merge(s3_uris_map_df, left_on="bucket_and_prefix", right_on="current_value", how="left")
+        if result["new_value"].isnull().any():
+            df = result.loc[result["new_value"].isnull(), ["current_value", "new_value"]]
+            error_text = f"These values have not been replaced:\n{df.to_string(index=False)}"
+            raise ValueError(error_text)
+        result.drop(["bucket_and_prefix", "current_value"], axis="columns", inplace=True)
+        result = result.rename(columns={"new_value": "bucket_and_prefix"})
+        # TODO use regex defined in config_files.py
+        result[["bucket_new", "prefix_new"]] = result["bucket_and_prefix"].str.extract(
+            r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
+        )
+        result.drop(["bucket", "prefix", "bucket_and_prefix"], axis="columns", inplace=True)
+        result = result.rename(columns={"bucket_new": "bucket", "prefix_new": "prefix"})
+        result.insert(0, "bucket", result.pop("bucket"))
+        result.insert(1, "prefix", result.pop("prefix"))
+        result["prefix"] = result["prefix"] + "/"
+        result = result.set_index(["bucket", "prefix", "name"])
+        final_length = len(result)
+        assert original_lenght == final_length
+        return result
+        # TODO remove below methods
         return self._get_df_modify_buckets_and_paths(s3_uris_map_df)
 
     def _get_df_modify_buckets_and_paths(self, s3_uris_map_df: Df) -> Df:
@@ -206,7 +240,6 @@ class _S3UriDfModifier:
         return result
 
     def _get_new_multi_index_as_tuples(self, old_multi_index_as_tuples: list[tuple], s3_uris_map_df: Df) -> list[tuple]:
-        # TODO use pandas join instead of foor loop
         return [
             self._get_new_multi_index_as_tuple(old_multi_index_as_tuple, s3_uris_map_df)
             for old_multi_index_as_tuple in old_multi_index_as_tuples
