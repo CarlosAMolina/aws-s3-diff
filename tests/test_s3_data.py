@@ -25,8 +25,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        df = df.set_index(["bucket", "prefix", "name"])
-        df.columns = [[aws_account_target] * len(df.columns), df.columns]
+        df = self._get_df_as_multi_index(aws_account_target, df)
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
                 aws_account_origin: {
@@ -48,7 +47,6 @@ class TestS3UriDfModifier(unittest.TestCase):
             s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
                 s3_uris_map_df_prefix_ends_with_slash[aws_account] + "/"
             )
-        # TODO refactor extract common code when df is defined
         expected_result = Df(
             [
                 ["cars", "europe/spain/", "cars-20241014.csv"] + ["foo"] * 3,
@@ -61,8 +59,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        expected_result = expected_result.set_index(["bucket", "prefix", "name"])
-        expected_result.columns = [[aws_account_target] * len(expected_result.columns), expected_result.columns]
+        expected_result = self._get_df_as_multi_index(aws_account_target, expected_result)
         for test_data in (
             (
                 df,
@@ -81,6 +78,12 @@ class TestS3UriDfModifier(unittest.TestCase):
                         aws_account_origin, aws_account_target, df
                     )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
                 )
+
+    def _get_df_as_multi_index(self, aws_account_target: str, df: Df) -> Df:
+        result = df.copy()
+        result = result.set_index(["bucket", "prefix", "name"])
+        result.columns = [[aws_account_target] * len(result.columns), result.columns]
+        return result
 
     def test_get_df_modify_buckets_and_paths(self):
         old_multi_index = MultiIndex.from_tuples(
