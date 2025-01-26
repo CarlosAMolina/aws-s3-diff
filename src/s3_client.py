@@ -12,8 +12,7 @@ from types_custom import S3Query
 
 class S3Client:
     def __init__(self):
-        session = boto3.Session()
-        self._s3_client = session.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
+        self._s3_client = boto3.Session().client("s3", endpoint_url=os.getenv("AWS_ENDPOINT"))
 
     def get_s3_data(self, s3_query: S3Query) -> Iterator[S3Data]:
         """https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html"""
