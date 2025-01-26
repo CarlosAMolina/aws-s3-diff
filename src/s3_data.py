@@ -109,7 +109,6 @@ class _CombinedAccountsS3DataCsvToDf:
         return self._get_df_set_multi_index_columns(result)
 
     # TODO extract common code with _get_df_aws_account_from_file
-    # TODO use in all scripts `file_path_in_s3_` instead of `file_path_`
     def _get_df_from_file(self, file_path_name: Path) -> Df:
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         return read_csv(
