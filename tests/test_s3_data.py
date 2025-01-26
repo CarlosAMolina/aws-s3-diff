@@ -58,3 +58,40 @@ class TestS3UriDfModifier(unittest.TestCase):
             )
         )
         assert_frame_equal(expected_result, result)
+
+    def test_get_new_multi_index_as_tuple_if_prefixes_end_or_not_with_slash(self):
+        aws_account_origin = "pro"
+        aws_account_target = "release"
+        old_multi_index_as_tuple_prefix_ends_with_slash = "foo", "bar/baz/", "qux.txt"
+        old_multi_index_as_tuple_prefix_does_not_end_with_slash = "foo", "bar/baz", "qux.txt"
+        s3_uris_map_df_prefix_ends_with_slash = Df(
+            {"pro": ["s3://foo/bar/", "s3://foo/bar/baz/"], "release": ["s3://foo/bar/", "s3://foo/bar/baz/"]}
+        )
+        s3_uris_map_df_prefix_does_not_end_with_slash = Df(
+            {"pro": ["s3://foo/bar", "s3://foo/bar/baz"], "release": ["s3://foo/bar", "s3://foo/bar/baz"]}
+        )
+        for test_data in (
+            (
+                old_multi_index_as_tuple_prefix_ends_with_slash,
+                s3_uris_map_df_prefix_ends_with_slash,
+            ),
+            (
+                old_multi_index_as_tuple_prefix_ends_with_slash,
+                s3_uris_map_df_prefix_does_not_end_with_slash,
+            ),
+            (
+                old_multi_index_as_tuple_prefix_does_not_end_with_slash,
+                s3_uris_map_df_prefix_ends_with_slash,
+            ),
+            (
+                old_multi_index_as_tuple_prefix_does_not_end_with_slash,
+                s3_uris_map_df_prefix_does_not_end_with_slash,
+            ),
+        ):
+            old_multi_index_as_tuple, s3_uris_map_df = test_data
+            self.assertEqual(
+                ("foo", "bar/baz/", "qux.txt"),
+                m_s3_data._S3UriDfModifier(aws_account_origin, aws_account_target, Df())._get_new_multi_index_as_tuple(
+                    old_multi_index_as_tuple, s3_uris_map_df
+                ),
+            )
