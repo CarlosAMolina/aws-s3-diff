@@ -213,16 +213,17 @@ class _S3UriDfModifier:
         ]
 
     def _get_new_multi_index_as_tuple(self, old_multi_index_as_tuple: tuple, s3_uris_map_df: Df) -> tuple:
-        old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
-        # TODO convert all to S3Query and compare them to avoid check '/'
-        old_prefix = old_prefix[:-1] if old_prefix.endswith("/") else old_prefix
         # TODO add test for url ending with and without `/`.
-        # TODO use `==` instead of contains to avoid wrong results.
-        s3_uris_map_for_current_index_df: Df = s3_uris_map_df[
-            s3_uris_map_df[self._aws_account_target].str.contains(f"s3://{old_bucket}/{old_prefix}/?")
-        ]
-        if s3_uris_map_for_current_index_df.empty:
-            raise ValueError("Unmatched value")
-        s3_uri_to_use = s3_uris_map_for_current_index_df[self._aws_account_origin].values[0]
+        old_bucket, old_prefix, old_file_name = old_multi_index_as_tuple
+        iloc_row_to_use = self._get_iloc_of_the_s3_uri_to_use(
+            S3Query(old_bucket, old_prefix), s3_uris_map_df[self._aws_account_target].tolist()
+        )
+        s3_uri_to_use = s3_uris_map_df.iloc[iloc_row_to_use][self._aws_account_origin]
         query_to_use = self._s3_uris_file_reader.get_s3_query_from_s3_uri(s3_uri_to_use)
         return (query_to_use.bucket, query_to_use.prefix, old_file_name)
+
+    def _get_iloc_of_the_s3_uri_to_use(self, old_s3_query: S3Query, new_s3_uris: list[str]) -> int:
+        for index, new_s3_uri in enumerate(new_s3_uris):
+            if old_s3_query == self._s3_uris_file_reader.get_s3_query_from_s3_uri(new_s3_uri):
+                return index
+        raise ValueError("Unmatched value")
