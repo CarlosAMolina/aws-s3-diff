@@ -19,22 +19,7 @@ class TestS3UriDfModifier(unittest.TestCase):
         df_prefix_ends_with_slash = (
             _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build()
         )
-        s3_uris_map_df_prefix_does_not_end_with_slash = Df(
-            {
-                _AWS_ACCOUNT_ORIGIN: {
-                    0: "s3://cars/europe/spain",
-                    1: "s3://pets/dogs/big_size",
-                    2: "s3://pets/horses/europe",
-                    3: "s3://pets/non-existent-prefix",
-                },
-                _AWS_ACCOUNT_TARGET: {
-                    0: "s3://cars_dev/europe/spain",
-                    1: "s3://pets_dev/dogs/size/heavy",
-                    2: "s3://pets_dev/horses/europe",
-                    3: "s3://pets_dev/non-existent-prefix",
-                },
-            }
-        )
+        s3_uris_map_df_prefix_does_not_end_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
         s3_uris_map_df_prefix_ends_with_slash = s3_uris_map_df_prefix_does_not_end_with_slash.copy()
         for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
             s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
@@ -113,6 +98,35 @@ class _AwsAccountS3DataDfBuilder:
     def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
         self._df = _get_df_as_multi_index(self._df)
         return self
+
+    def build(self) -> Df:
+        return self._df
+
+
+class _S3UrisMapDfBuilder:
+    def __init__(self):
+        self._df = Df(
+            {
+                _AWS_ACCOUNT_ORIGIN: {
+                    0: "s3://cars/europe/spain",
+                    1: "s3://pets/dogs/big_size",
+                    2: "s3://pets/horses/europe",
+                    3: "s3://pets/non-existent-prefix",
+                },
+                _AWS_ACCOUNT_TARGET: {
+                    0: "s3://cars_dev/europe/spain",
+                    1: "s3://pets_dev/dogs/size/heavy",
+                    2: "s3://pets_dev/horses/europe",
+                    3: "s3://pets_dev/non-existent-prefix",
+                },
+            }
+        )
+
+    def without_trailing_slash(self) -> "_S3UrisMapDfBuilder":
+        return self
+
+    def with_trailing_slash(self) -> "_S3UrisMapDfBuilder":
+        raise NotImplementedError
 
     def build(self) -> Df:
         return self._df
