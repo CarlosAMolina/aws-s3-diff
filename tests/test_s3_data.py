@@ -14,7 +14,6 @@ class TestS3UriDfModifier(unittest.TestCase):
         aws_account_target = "aws_account_3_dev"
         df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().build()
         df_prefix_ends_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().build()
-        df_prefix_ends_with_slash["prefix"] = df_prefix_ends_with_slash["prefix"] + "/"
         df_prefix_ends_with_slash = _get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
         df_prefix_does_not_end_with_slash = _get_df_as_multi_index(
             aws_account_target, df_prefix_does_not_end_with_slash
@@ -104,6 +103,7 @@ class _AwsAccountS3DataDfBuilder:
         )
 
     def with_trailing_slash_in_prefix(self) -> "_AwsAccountS3DataDfBuilder":
+        self._df["prefix"] = self._df["prefix"] + "/"
         return self
 
     def without_trailing_slash_in_prefix(self) -> "_AwsAccountS3DataDfBuilder":
