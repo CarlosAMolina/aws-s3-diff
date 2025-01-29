@@ -138,10 +138,6 @@ class _AwsAccountS3DataDfBuilder:
         self._local_results = LocalResults()
         self.__df = None  # To avoid read file more than once.
 
-    # TODO deprecate if not used (check when all code is refactored)
-    def without_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
-        return self
-
     def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
         self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
         return self
