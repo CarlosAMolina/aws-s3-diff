@@ -18,22 +18,23 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-def get_df_s3_data_all_accounts() -> AllAccountsS3DataDf:
-    file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
-    return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
-
-
 # TODO replace AllAccountsS3DataDf with this.
 class NewAllAccountsS3DataDf:
     def __init__(self):
-        # TODO manybe te name must indicate that is combining AccountS3Data
+        # TODO maybe te name should indicate that is combining AccountS3Data
         self._df_generator = _AllAccountsS3DataDfGenerator()
         # TODO rename to _AllAccountsS3DataDfCsvExporter
         self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
+        self._local_results = LocalResults()
 
     def to_csv(self):
         df = self._df_generator.get_df()
         self._export_to_csv(df)
+
+    def get_df_from_csv(self) -> AllAccountsS3DataDf:
+        # TODO don't access a property of a property
+        file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
+        return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
 
 class AwsAccountExtractor:

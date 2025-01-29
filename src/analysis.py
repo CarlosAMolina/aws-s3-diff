@@ -11,7 +11,7 @@ from config_files import AnalysisConfigReader
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
-from s3_data import get_df_s3_data_all_accounts
+from s3_data import NewAllAccountsS3DataDf
 from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
 
@@ -34,7 +34,7 @@ class AnalysisGenerator:
         self._export_analyzed_df_to_file(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
-        all_accounts_s3_data_df = get_df_s3_data_all_accounts()
+        all_accounts_s3_data_df = NewAllAccountsS3DataDf().get_df_from_csv()
         return _AllAnalysisSetter().get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _export_analyzed_df_to_file(self, df: AnalysisS3DataDf):
