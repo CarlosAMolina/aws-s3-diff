@@ -7,8 +7,8 @@ from src import s3_data as m_s3_data
 
 ExpectedResult = list[dict]
 
-_aws_account_origin = "aws_account_1_pro"
-_aws_account_target = "aws_account_3_dev"
+_AWS_ACCOUNT_ORIGIN = "aws_account_1_pro"
+_AWS_ACCOUNT_TARGET = "aws_account_3_dev"
 
 
 class TestS3UriDfModifier(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestS3UriDfModifier(unittest.TestCase):
         df_prefix_does_not_end_with_slash = _get_df_as_multi_index(df_prefix_does_not_end_with_slash)
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
-                _aws_account_origin: {
+                _AWS_ACCOUNT_ORIGIN: {
                     0: "s3://cars/europe/spain",
                     1: "s3://pets/dogs/big_size",
                     2: "s3://pets/horses/europe",
                     3: "s3://pets/non-existent-prefix",
                 },
-                _aws_account_target: {
+                _AWS_ACCOUNT_TARGET: {
                     0: "s3://cars_dev/europe/spain",
                     1: "s3://pets_dev/dogs/size/heavy",
                     2: "s3://pets_dev/horses/europe",
@@ -34,7 +34,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             }
         )
         s3_uris_map_df_prefix_ends_with_slash = s3_uris_map_df_prefix_does_not_end_with_slash.copy()
-        for aws_account in (_aws_account_origin, _aws_account_target):
+        for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
             s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
                 s3_uris_map_df_prefix_ends_with_slash[aws_account] + "/"
             )
@@ -74,7 +74,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                 assert_frame_equal(
                     expected_result,
                     m_s3_data._S3UriDfModifier(
-                        _aws_account_origin, _aws_account_target, df
+                        _AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET, df
                     )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
                 )
 
@@ -82,7 +82,7 @@ class TestS3UriDfModifier(unittest.TestCase):
 def _get_df_as_multi_index(df: Df) -> Df:
     result = df.copy()
     result = result.set_index(["bucket", "prefix", "name"])
-    result.columns = [[_aws_account_target] * len(result.columns), result.columns]
+    result.columns = [[_AWS_ACCOUNT_TARGET] * len(result.columns), result.columns]
     return result
 
 
