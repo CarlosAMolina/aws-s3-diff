@@ -133,42 +133,6 @@ class _CombinedAccountsS3DataCsvToDf:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _AwsAccountS3DataDfBuilder:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
-        self._local_results = LocalResults()
-        self.__df = None  # To avoid read file more than once.
-
-    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
-        self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
-        return self
-
-    def build(self) -> Df:
-        return self._df
-
-    @property
-    def _df(self) -> Df:
-        if self.__df is None:
-            local_file_path_name = self._local_results.get_file_path_aws_account_results(self._aws_account)
-            self.__df = self._get_df_aws_account_from_file(local_file_path_name)
-        return self.__df
-
-    def _get_df_aws_account_from_file(self, file_path_name: Path) -> Df:
-        return pd.read_csv(
-            file_path_name,
-            index_col=["bucket", "prefix", "name"],
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
-
-    @_df.setter
-    def _df(self, df: Df):
-        self.__df = df
-
-    @property
-    def _column_names_mult_index(self) -> list[tuple[str, str]]:
-        return [(self._aws_account, column_name) for column_name in self._df.columns]
-
-
 class _IndividualAccountsS3DataCsvFilesToDf:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -210,6 +174,42 @@ class _IndividualAccountsS3DataCsvFilesToDf:
         result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
         result = result.set_index(["bucket", "prefix", "name"])
         return result.drop(columns=(("count", "files_in_bucket_prefix")))
+
+
+class _AwsAccountS3DataDfBuilder:
+    def __init__(self, aws_account: str):
+        self._aws_account = aws_account
+        self._local_results = LocalResults()
+        self.__df = None  # To avoid read file more than once.
+
+    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+        self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
+        return self
+
+    def build(self) -> Df:
+        return self._df
+
+    @property
+    def _df(self) -> Df:
+        if self.__df is None:
+            local_file_path_name = self._local_results.get_file_path_aws_account_results(self._aws_account)
+            self.__df = self._get_df_aws_account_from_file(local_file_path_name)
+        return self.__df
+
+    def _get_df_aws_account_from_file(self, file_path_name: Path) -> Df:
+        return pd.read_csv(
+            file_path_name,
+            index_col=["bucket", "prefix", "name"],
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
+
+    @_df.setter
+    def _df(self, df: Df):
+        self.__df = df
+
+    @property
+    def _column_names_mult_index(self) -> list[tuple[str, str]]:
+        return [(self._aws_account, column_name) for column_name in self._df.columns]
 
 
 class _S3UriDfModifier:
