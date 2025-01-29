@@ -36,22 +36,12 @@ class TestS3UriDfModifier(unittest.TestCase):
             )
         )
         for test_data in (
-            (
-                df_prefix_ends_with_slash,
-                s3_uris_map_df_prefix_ends_with_slash,
-            ),
-            (
-                df_prefix_ends_with_slash,
+            (df, s3_uris_map_df)
+            for df in (df_prefix_ends_with_slash, df_prefix_does_not_end_with_slash)
+            for s3_uris_map_df in (
                 s3_uris_map_df_prefix_does_not_end_with_slash,
-            ),
-            (
-                df_prefix_does_not_end_with_slash,
                 s3_uris_map_df_prefix_ends_with_slash,
-            ),
-            (
-                df_prefix_does_not_end_with_slash,
-                s3_uris_map_df_prefix_does_not_end_with_slash,
-            ),
+            )
         ):
             df, s3_uris_map_df = test_data
             with self.subTest(df=df, s3_uris_map_df=s3_uris_map_df):
