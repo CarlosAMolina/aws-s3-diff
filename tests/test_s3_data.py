@@ -15,10 +15,8 @@ class TestS3UriDfModifier(unittest.TestCase):
     def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
         df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().build()
         df_prefix_ends_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().build()
-        df_prefix_ends_with_slash = _get_df_as_multi_index(_aws_account_target, df_prefix_ends_with_slash)
-        df_prefix_does_not_end_with_slash = _get_df_as_multi_index(
-            _aws_account_target, df_prefix_does_not_end_with_slash
-        )
+        df_prefix_ends_with_slash = _get_df_as_multi_index(df_prefix_ends_with_slash)
+        df_prefix_does_not_end_with_slash = _get_df_as_multi_index(df_prefix_does_not_end_with_slash)
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
                 _aws_account_origin: {
@@ -52,7 +50,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        expected_result = _get_df_as_multi_index(_aws_account_target, expected_result)
+        expected_result = _get_df_as_multi_index(expected_result)
         for test_data in (
             (
                 df_prefix_ends_with_slash,
@@ -81,10 +79,10 @@ class TestS3UriDfModifier(unittest.TestCase):
                 )
 
 
-def _get_df_as_multi_index(aws_account_target: str, df: Df) -> Df:
+def _get_df_as_multi_index(df: Df) -> Df:
     result = df.copy()
     result = result.set_index(["bucket", "prefix", "name"])
-    result.columns = [[aws_account_target] * len(result.columns), result.columns]
+    result.columns = [[_aws_account_target] * len(result.columns), result.columns]
     return result
 
 
