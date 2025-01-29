@@ -145,10 +145,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
         result = _AwsAccountS3DataDfBuilder(aws_accounts[0]).with_multi_index().build()
         for aws_account in aws_accounts[1:]:
-            account_df = _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().build()
-            account_df = _S3UriDfModifier(
-                aws_accounts[0], aws_account, account_df
-            ).get_df_set_s3_uris_in_origin_account()
+            account_df = _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().with_origin_account_index().build()
             result = result.join(account_df, how="outer")
         return result
 
@@ -177,10 +174,19 @@ class _AwsAccountS3DataDfBuilder:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+        self.__aws_accounts = None  # To avoid read file more than once.
         self.__df = None  # To avoid read file more than once.
 
     def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
         self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
+        return self
+
+    def with_origin_account_index(self) -> "_AwsAccountS3DataDfBuilder":
+        """The with_multi_index method must be called before this method is called"""
+        self._df = _S3UriDfModifier(
+            self._aws_account_origin, self._aws_account, self._df
+        ).get_df_set_s3_uris_in_origin_account()
         return self
 
     def build(self) -> AccountS3DataDf:
@@ -207,6 +213,16 @@ class _AwsAccountS3DataDfBuilder:
     @property
     def _column_names_mult_index(self) -> list[tuple[str, str]]:
         return [(self._aws_account, column_name) for column_name in self._df.columns]
+
+    @property
+    def _aws_account_origin(self) -> str:
+        return self._aws_accounts[0]
+
+    @property
+    def _aws_accounts(self) -> list[str]:
+        if self.__aws_accounts is None:
+            self.__aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
+        return self.__aws_accounts
 
 
 class _S3UriDfModifier:
