@@ -20,7 +20,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build()
         )
         s3_uris_map_df_prefix_does_not_end_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
-        s3_uris_map_df_prefix_ends_with_slash = s3_uris_map_df_prefix_does_not_end_with_slash.copy()
+        s3_uris_map_df_prefix_ends_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
         for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
             s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
                 s3_uris_map_df_prefix_ends_with_slash[aws_account] + "/"
