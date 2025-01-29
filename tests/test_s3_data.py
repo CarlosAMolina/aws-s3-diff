@@ -7,26 +7,27 @@ from src import s3_data as m_s3_data
 
 ExpectedResult = list[dict]
 
+_aws_account_origin = "aws_account_1_pro"
+_aws_account_target = "aws_account_3_dev"
+
 
 class TestS3UriDfModifier(unittest.TestCase):
     def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
-        aws_account_origin = "aws_account_1_pro"
-        aws_account_target = "aws_account_3_dev"
         df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().build()
         df_prefix_ends_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().build()
-        df_prefix_ends_with_slash = _get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
+        df_prefix_ends_with_slash = _get_df_as_multi_index(_aws_account_target, df_prefix_ends_with_slash)
         df_prefix_does_not_end_with_slash = _get_df_as_multi_index(
-            aws_account_target, df_prefix_does_not_end_with_slash
+            _aws_account_target, df_prefix_does_not_end_with_slash
         )
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
-                aws_account_origin: {
+                _aws_account_origin: {
                     0: "s3://cars/europe/spain",
                     1: "s3://pets/dogs/big_size",
                     2: "s3://pets/horses/europe",
                     3: "s3://pets/non-existent-prefix",
                 },
-                aws_account_target: {
+                _aws_account_target: {
                     0: "s3://cars_dev/europe/spain",
                     1: "s3://pets_dev/dogs/size/heavy",
                     2: "s3://pets_dev/horses/europe",
@@ -35,7 +36,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             }
         )
         s3_uris_map_df_prefix_ends_with_slash = s3_uris_map_df_prefix_does_not_end_with_slash.copy()
-        for aws_account in (aws_account_origin, aws_account_target):
+        for aws_account in (_aws_account_origin, _aws_account_target):
             s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
                 s3_uris_map_df_prefix_ends_with_slash[aws_account] + "/"
             )
@@ -51,7 +52,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        expected_result = _get_df_as_multi_index(aws_account_target, expected_result)
+        expected_result = _get_df_as_multi_index(_aws_account_target, expected_result)
         for test_data in (
             (
                 df_prefix_ends_with_slash,
@@ -75,7 +76,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                 assert_frame_equal(
                     expected_result,
                     m_s3_data._S3UriDfModifier(
-                        aws_account_origin, aws_account_target, df
+                        _aws_account_origin, _aws_account_target, df
                     )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
                 )
 
