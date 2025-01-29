@@ -138,8 +138,16 @@ class _AwsAccountS3DataDfBuilder:
         self._local_results = LocalResults()
         self.__df = None  # To avoid read file more than once.
 
+    # TODO deprecate if not used (check when all code is refactored)
     def without_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
         return self
+
+    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+        self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
+        return self
+
+    def build(self) -> Df:
+        return self._df
 
     @property
     def _df(self) -> Df:
@@ -159,8 +167,9 @@ class _AwsAccountS3DataDfBuilder:
     def _df(self, df: Df):
         self.__df = df
 
-    def build(self) -> Df:
-        return self._df
+    @property
+    def _column_names_mult_index(self) -> list[tuple[str, str]]:
+        return [(self._aws_account, column_name) for column_name in self._df.columns]
 
 
 class _IndividualAccountsS3DataCsvFilesToDf:
@@ -184,12 +193,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
 
     # TODO incorrect return type, the data is of one account, not all accounts
     def _get_df_for_aws_account(self, aws_account: str) -> AllAccountsS3DataDf:
-        result = _AwsAccountS3DataDfBuilder(aws_account).without_multi_index().build()
-        result.columns = MultiIndex.from_tuples(self._get_column_names_mult_index(aws_account, list(result.columns)))
-        return result
-
-    def _get_column_names_mult_index(self, aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
-        return [(aws_account, column_name) for column_name in column_names]
+        return _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().build()
 
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         """
