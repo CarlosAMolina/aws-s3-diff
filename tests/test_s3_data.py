@@ -15,8 +15,8 @@ class TestS3UriDfModifier(unittest.TestCase):
         df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix()
         df_prefix_ends_with_slash = df_prefix_does_not_end_with_slash.copy()
         df_prefix_ends_with_slash["prefix"] = df_prefix_ends_with_slash["prefix"] + "/"
-        df_prefix_ends_with_slash = self._get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
-        df_prefix_does_not_end_with_slash = self._get_df_as_multi_index(
+        df_prefix_ends_with_slash = _get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
+        df_prefix_does_not_end_with_slash = _get_df_as_multi_index(
             aws_account_target, df_prefix_does_not_end_with_slash
         )
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
@@ -52,7 +52,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        expected_result = self._get_df_as_multi_index(aws_account_target, expected_result)
+        expected_result = _get_df_as_multi_index(aws_account_target, expected_result)
         for test_data in (
             (
                 df_prefix_ends_with_slash,
@@ -80,11 +80,12 @@ class TestS3UriDfModifier(unittest.TestCase):
                     )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
                 )
 
-    def _get_df_as_multi_index(self, aws_account_target: str, df: Df) -> Df:
-        result = df.copy()
-        result = result.set_index(["bucket", "prefix", "name"])
-        result.columns = [[aws_account_target] * len(result.columns), result.columns]
-        return result
+
+def _get_df_as_multi_index(aws_account_target: str, df: Df) -> Df:
+    result = df.copy()
+    result = result.set_index(["bucket", "prefix", "name"])
+    result.columns = [[aws_account_target] * len(result.columns), result.columns]
+    return result
 
 
 class _AwsAccountS3DataDfBuilder:
@@ -103,4 +104,7 @@ class _AwsAccountS3DataDfBuilder:
         )
 
     def with_trailing_slash_in_prefix(self) -> Df:
+        return self._df
+
+    def without_trailing_slash_in_prefix(self) -> Df:
         return self._df
