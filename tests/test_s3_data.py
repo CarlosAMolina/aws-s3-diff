@@ -20,24 +20,21 @@ class TestS3UriDfModifier(unittest.TestCase):
             _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build()
         )
         s3_uris_map_df_prefix_does_not_end_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
-        s3_uris_map_df_prefix_ends_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
-        for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
-            s3_uris_map_df_prefix_ends_with_slash[aws_account] = (
-                s3_uris_map_df_prefix_ends_with_slash[aws_account] + "/"
+        s3_uris_map_df_prefix_ends_with_slash = _S3UrisMapDfBuilder().with_trailing_slash().build()
+        expected_result = _get_df_as_multi_index(
+            Df(
+                [
+                    ["cars", "europe/spain/", "cars-20241014.csv"] + ["foo"] * 3,
+                    ["pets", "dogs/big_size/", "dogs-20240914.csv"] + ["foo"] * 3,
+                    ["pets", "dogs/big_size/", "dogs-20241015.csv"] + ["foo"] * 3,
+                    ["pets", "dogs/big_size/", "dogs-20241019.csv"] + ["foo"] * 3,
+                    ["pets", "dogs/big_size/", "dogs-20241021.csv"] + ["foo"] * 3,
+                    ["pets", "horses/europe/", "horses-20210219.csv"] + ["foo"] * 3,
+                    ["pets", "non-existent-prefix/", None] + ["foo"] * 3,
+                ],
+                columns=["bucket", "prefix", "name", "date", "size", "hash"],
             )
-        expected_result = Df(
-            [
-                ["cars", "europe/spain/", "cars-20241014.csv"] + ["foo"] * 3,
-                ["pets", "dogs/big_size/", "dogs-20240914.csv"] + ["foo"] * 3,
-                ["pets", "dogs/big_size/", "dogs-20241015.csv"] + ["foo"] * 3,
-                ["pets", "dogs/big_size/", "dogs-20241019.csv"] + ["foo"] * 3,
-                ["pets", "dogs/big_size/", "dogs-20241021.csv"] + ["foo"] * 3,
-                ["pets", "horses/europe/", "horses-20210219.csv"] + ["foo"] * 3,
-                ["pets", "non-existent-prefix/", None] + ["foo"] * 3,
-            ],
-            columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
-        expected_result = _get_df_as_multi_index(expected_result)
         for test_data in (
             (
                 df_prefix_ends_with_slash,
@@ -126,7 +123,9 @@ class _S3UrisMapDfBuilder:
         return self
 
     def with_trailing_slash(self) -> "_S3UrisMapDfBuilder":
-        raise NotImplementedError
+        for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
+            self._df[aws_account] = self._df[aws_account] + "/"
+        return self
 
     def build(self) -> Df:
         return self._df
