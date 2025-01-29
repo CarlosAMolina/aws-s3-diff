@@ -18,14 +18,17 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-def export_s3_data_all_accounts_to_one_file():
-    s3_data_df = _AllAccountsS3DataDfGenerator().get_df()
-    _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
-
-
 def get_df_s3_data_all_accounts() -> AllAccountsS3DataDf:
     file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
     return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
+
+
+# TODO replace AllAccountsS3DataDf with this.
+class NewAllAccountsS3DataDf:
+    def to_csv(self):
+        s3_data_df = _AllAccountsS3DataDfGenerator().get_df()
+        # TODO rename to _AllAccountsS3DataDfCsvExporter
+        _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
 
 
 class AwsAccountExtractor:
