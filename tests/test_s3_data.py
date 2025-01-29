@@ -12,18 +12,7 @@ class TestS3UriDfModifier(unittest.TestCase):
     def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
         aws_account_origin = "aws_account_1_pro"
         aws_account_target = "aws_account_3_dev"
-        df_prefix_does_not_end_with_slash = Df(
-            [
-                ["cars_dev", "europe/spain", "cars-20241014.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy", "dogs-20240914.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy", "dogs-20241015.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy", "dogs-20241019.csv"] + ["foo"] * 3,
-                ["pets_dev", "dogs/size/heavy", "dogs-20241021.csv"] + ["foo"] * 3,
-                ["pets_dev", "horses/europe", "horses-20210219.csv"] + ["foo"] * 3,
-                ["pets_dev", "non-existent-prefix", None] + ["foo"] * 3,
-            ],
-            columns=["bucket", "prefix", "name", "date", "size", "hash"],
-        )
+        df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix()
         df_prefix_ends_with_slash = df_prefix_does_not_end_with_slash.copy()
         df_prefix_ends_with_slash["prefix"] = df_prefix_ends_with_slash["prefix"] + "/"
         df_prefix_ends_with_slash = self._get_df_as_multi_index(aws_account_target, df_prefix_ends_with_slash)
@@ -96,3 +85,22 @@ class TestS3UriDfModifier(unittest.TestCase):
         result = result.set_index(["bucket", "prefix", "name"])
         result.columns = [[aws_account_target] * len(result.columns), result.columns]
         return result
+
+
+class _AwsAccountS3DataDfBuilder:
+    def __init__(self):
+        self._df = Df(
+            [
+                ["cars_dev", "europe/spain", "cars-20241014.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20240914.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241015.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241019.csv"] + ["foo"] * 3,
+                ["pets_dev", "dogs/size/heavy", "dogs-20241021.csv"] + ["foo"] * 3,
+                ["pets_dev", "horses/europe", "horses-20210219.csv"] + ["foo"] * 3,
+                ["pets_dev", "non-existent-prefix", None] + ["foo"] * 3,
+            ],
+            columns=["bucket", "prefix", "name", "date", "size", "hash"],
+        )
+
+    def with_trailing_slash_in_prefix(self) -> Df:
+        return self._df
