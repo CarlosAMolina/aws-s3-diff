@@ -143,17 +143,14 @@ class _IndividualAccountsS3DataCsvFilesToDf:
 
     def _get_df_combine_aws_accounts_results(self) -> AllAccountsS3DataDf:
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        result = self._get_df_for_aws_account(aws_accounts[0])
+        result = _AwsAccountS3DataDfBuilder(aws_accounts[0]).with_multi_index().build()
         for aws_account in aws_accounts[1:]:
-            account_df = self._get_df_for_aws_account(aws_account)
+            account_df = _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().build()
             account_df = _S3UriDfModifier(
                 aws_accounts[0], aws_account, account_df
             ).get_df_set_s3_uris_in_origin_account()
             result = result.join(account_df, how="outer")
         return result
-
-    def _get_df_for_aws_account(self, aws_account: str) -> AccountS3DataDf:
-        return _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().build()
 
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         """
@@ -186,7 +183,7 @@ class _AwsAccountS3DataDfBuilder:
         self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
         return self
 
-    def build(self) -> Df:
+    def build(self) -> AccountS3DataDf:
         return self._df
 
     @property
