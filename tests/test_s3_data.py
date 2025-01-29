@@ -13,10 +13,12 @@ _AWS_ACCOUNT_TARGET = "aws_account_3_dev"
 
 class TestS3UriDfModifier(unittest.TestCase):
     def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
-        df_prefix_does_not_end_with_slash = _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().build()
-        df_prefix_ends_with_slash = _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().build()
-        df_prefix_ends_with_slash = _get_df_as_multi_index(df_prefix_ends_with_slash)
-        df_prefix_does_not_end_with_slash = _get_df_as_multi_index(df_prefix_does_not_end_with_slash)
+        df_prefix_does_not_end_with_slash = (
+            _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().with_multi_index().build()
+        )
+        df_prefix_ends_with_slash = (
+            _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build()
+        )
         s3_uris_map_df_prefix_does_not_end_with_slash = Df(
             {
                 _AWS_ACCOUNT_ORIGIN: {
@@ -106,6 +108,10 @@ class _AwsAccountS3DataDfBuilder:
         return self
 
     def without_trailing_slash_in_prefix(self) -> "_AwsAccountS3DataDfBuilder":
+        return self
+
+    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+        self._df = _get_df_as_multi_index(self._df)
         return self
 
     def build(self) -> Df:
