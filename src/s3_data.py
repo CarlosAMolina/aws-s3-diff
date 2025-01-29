@@ -11,6 +11,7 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_client import S3Client
+from types_custom import AccountS3DataDf
 from types_custom import AllAccountsS3DataDf
 from types_custom import FileS3Data
 from types_custom import S3Data
@@ -187,8 +188,7 @@ class _IndividualAccountsS3DataCsvFilesToDf:
             result = result.join(account_df, how="outer")
         return result
 
-    # TODO incorrect return type, the data is of one account, not all accounts
-    def _get_df_for_aws_account(self, aws_account: str) -> AllAccountsS3DataDf:
+    def _get_df_for_aws_account(self, aws_account: str) -> AccountS3DataDf:
         return _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().build()
 
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
