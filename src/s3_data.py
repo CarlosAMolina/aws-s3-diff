@@ -132,6 +132,37 @@ class _CombinedAccountsS3DataCsvToDf:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
+class _AwsAccountS3DataDfBuilder:
+    def __init__(self, aws_account: str):
+        self._aws_account = aws_account
+        self._local_results = LocalResults()
+        self.__df = None  # To avoid read file more than once.
+
+    def without_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+        return self
+
+    @property
+    def _df(self) -> Df:
+        if self.__df is None:
+            local_file_path_name = self._local_results.get_file_path_aws_account_results(self._aws_account)
+            self.__df = self._get_df_aws_account_from_file(local_file_path_name)
+        return self.__df
+
+    def _get_df_aws_account_from_file(self, file_path_name: Path) -> Df:
+        return pd.read_csv(
+            file_path_name,
+            index_col=["bucket", "prefix", "name"],
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
+
+    @_df.setter
+    def _df(self, df: Df):
+        self.__df = df
+
+    def build(self) -> Df:
+        return self._df
+
+
 class _IndividualAccountsS3DataCsvFilesToDf:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -151,21 +182,14 @@ class _IndividualAccountsS3DataCsvFilesToDf:
             result = result.join(account_df, how="outer")
         return result
 
+    # TODO incorrect return type, the data is of one account, not all accounts
     def _get_df_for_aws_account(self, aws_account: str) -> AllAccountsS3DataDf:
-        local_file_path_name = LocalResults().get_file_path_aws_account_results(aws_account)
-        result = self._get_df_aws_account_from_file(local_file_path_name)
+        result = _AwsAccountS3DataDfBuilder(aws_account).without_multi_index().build()
         result.columns = MultiIndex.from_tuples(self._get_column_names_mult_index(aws_account, list(result.columns)))
         return result
 
     def _get_column_names_mult_index(self, aws_account: str, column_names: list[str]) -> list[tuple[str, str]]:
         return [(aws_account, column_name) for column_name in column_names]
-
-    def _get_df_aws_account_from_file(self, file_path_name: Path) -> Df:
-        return pd.read_csv(
-            file_path_name,
-            index_col=["bucket", "prefix", "name"],
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
 
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         """
