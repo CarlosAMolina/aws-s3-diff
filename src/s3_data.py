@@ -25,10 +25,15 @@ def get_df_s3_data_all_accounts() -> AllAccountsS3DataDf:
 
 # TODO replace AllAccountsS3DataDf with this.
 class NewAllAccountsS3DataDf:
-    def to_csv(self):
-        s3_data_df = _AllAccountsS3DataDfGenerator().get_df()
+    def __init__(self):
+        # TODO manybe te name must indicate that is combining AccountS3Data
+        self._df_generator = _AllAccountsS3DataDfGenerator()
         # TODO rename to _AllAccountsS3DataDfCsvExporter
-        _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
+        self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
+
+    def to_csv(self):
+        df = self._df_generator.get_df()
+        self._export_to_csv(df)
 
 
 class AwsAccountExtractor:
