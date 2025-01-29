@@ -19,7 +19,7 @@ from types_custom import S3Query
 
 
 def export_s3_data_all_accounts_to_one_file():
-    s3_data_df = _IndividualAccountsS3DataCsvFilesToDf().get_df()
+    s3_data_df = _AllAccountsS3DataDfGenerator().get_df()
     _CombinedAccountsS3DataDfToCsv().export(s3_data_df)
 
 
@@ -133,7 +133,7 @@ class _CombinedAccountsS3DataCsvToDf:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _IndividualAccountsS3DataCsvFilesToDf:
+class _AllAccountsS3DataDfGenerator:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
