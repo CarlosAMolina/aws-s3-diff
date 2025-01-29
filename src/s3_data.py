@@ -18,8 +18,7 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-# TODO replace AllAccountsS3DataDf with this.
-class NewAllAccountsS3DataDf:
+class AllAccountsS3DataDfFactory:
     def __init__(self):
         # TODO maybe te name should indicate that is combining AccountS3Data
         self._df_generator = _AllAccountsS3DataDfGenerator()
