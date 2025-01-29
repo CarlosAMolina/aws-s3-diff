@@ -38,20 +38,15 @@ class TestS3UriDfModifier(unittest.TestCase):
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
-        df_prefix_does_not_end_with_slash = (
-            _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().with_multi_index().build()
-        )
-        df_prefix_ends_with_slash = (
-            _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build()
-        )
-        s3_uris_map_df_prefix_does_not_end_with_slash = _S3UrisMapDfBuilder().without_trailing_slash().build()
-        s3_uris_map_df_prefix_ends_with_slash = _S3UrisMapDfBuilder().with_trailing_slash().build()
         return [
             (df, s3_uris_map_df)
-            for df in (df_prefix_ends_with_slash, df_prefix_does_not_end_with_slash)
+            for df in (
+                _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build(),
+                _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().with_multi_index().build(),
+            )
             for s3_uris_map_df in (
-                s3_uris_map_df_prefix_does_not_end_with_slash,
-                s3_uris_map_df_prefix_ends_with_slash,
+                _S3UrisMapDfBuilder().with_trailing_slash().build(),
+                _S3UrisMapDfBuilder().without_trailing_slash().build(),
             )
         ]
 
