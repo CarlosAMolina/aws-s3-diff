@@ -41,12 +41,12 @@ class TestS3UriDfModifier(unittest.TestCase):
         return [
             (df, s3_uris_map_df)
             for df in (
-                _AwsAccountS3DataDfBuilder().with_trailing_slash_in_prefix().with_multi_index().build(),
-                _AwsAccountS3DataDfBuilder().without_trailing_slash_in_prefix().with_multi_index().build(),
+                _AwsAccountS3DataDfFactory().get_df_with_trailing_slash_in_prefix(),
+                _AwsAccountS3DataDfFactory().get_df_without_trailing_slash_in_prefix(),
             )
             for s3_uris_map_df in (
-                _S3UrisMapDfBuilder().with_trailing_slash().build(),
-                _S3UrisMapDfBuilder().without_trailing_slash().build(),
+                _S3UrisMapDfFactory().get_df_with_trailing_slash(),
+                _S3UrisMapDfFactory().get_df_without_trailing_slash(),
             )
         ]
 
@@ -58,7 +58,7 @@ def _get_df_as_multi_index(df: Df) -> Df:
     return result
 
 
-class _AwsAccountS3DataDfBuilder:
+class _AwsAccountS3DataDfFactory:
     def __init__(self):
         self._df = Df(
             [
@@ -73,22 +73,21 @@ class _AwsAccountS3DataDfBuilder:
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
 
-    def with_trailing_slash_in_prefix(self) -> "_AwsAccountS3DataDfBuilder":
+    def get_df_with_trailing_slash_in_prefix(self) -> Df:
         self._df["prefix"] = self._df["prefix"] + "/"
-        return self
+        self._with_multi_index()
+        return self._df
 
-    def without_trailing_slash_in_prefix(self) -> "_AwsAccountS3DataDfBuilder":
-        return self
+    def get_df_without_trailing_slash_in_prefix(self) -> Df:
+        self._with_multi_index()
+        return self._df
 
-    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+    def _with_multi_index(self) -> "_AwsAccountS3DataDfFactory":
         self._df = _get_df_as_multi_index(self._df)
         return self
 
-    def build(self) -> Df:
-        return self._df
 
-
-class _S3UrisMapDfBuilder:
+class _S3UrisMapDfFactory:
     def __init__(self):
         self._df = Df(
             {
@@ -107,13 +106,10 @@ class _S3UrisMapDfBuilder:
             }
         )
 
-    def without_trailing_slash(self) -> "_S3UrisMapDfBuilder":
-        return self
+    def get_df_without_trailing_slash(self) -> Df:
+        return self._df
 
-    def with_trailing_slash(self) -> "_S3UrisMapDfBuilder":
+    def get_df_with_trailing_slash(self) -> Df:
         for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
             self._df[aws_account] = self._df[aws_account] + "/"
-        return self
-
-    def build(self) -> Df:
         return self._df
