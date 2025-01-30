@@ -31,7 +31,7 @@ class _AnalysisGenerator:
         self._analysis_config_reader = AnalysisConfigReader()
 
     def run(self):
-        if self._analysis_config_reader.is_aws_account_origin_defined():
+        if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
             self._export_analysis_file()
         else:

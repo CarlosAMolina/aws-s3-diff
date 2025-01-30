@@ -64,7 +64,7 @@ class AnalysisConfigReader:
         self._config_directory_path = LocalPaths().config_directory
         self.__analysis_config = None  # To avoid read a file in __init__.
 
-    def is_aws_account_origin_defined(self) -> bool:
+    def must_run_analysis(self) -> bool:
         return len(self.get_aws_account_origin()) > 0
 
     def get_aws_account_origin(self) -> str:
