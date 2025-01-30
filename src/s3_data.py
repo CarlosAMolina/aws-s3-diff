@@ -46,6 +46,12 @@ class AccountS3DataFactory:
             self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
         ).extract()
 
+    def get_df_from_csv(self) -> Df:
+        return _AwsAccountS3DataDfBuilder(self._aws_account).with_multi_index().build()
+
+    def get_df_from_csv_with_original_account_index(self) -> Df:
+        return _AwsAccountS3DataDfBuilder(self._aws_account).with_multi_index().with_origin_account_index().build()
+
 
 class _AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
@@ -162,9 +168,9 @@ class _AccountsS3DataDfCombinator:
 
     def _get_df_combine_aws_accounts_results(self) -> AllAccountsS3DataDf:
         aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        result = _AwsAccountS3DataDfBuilder(aws_accounts[0]).with_multi_index().build()
+        result = AccountS3DataFactory(aws_accounts[0]).get_df_from_csv()
         for aws_account in aws_accounts[1:]:
-            account_df = _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().with_origin_account_index().build()
+            account_df = AccountS3DataFactory(aws_account).get_df_from_csv_with_original_account_index()
             result = result.join(account_df, how="outer")
         return result
 
