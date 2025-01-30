@@ -18,11 +18,9 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-class AllAccountsS3DataDfFactory:
+class AllAccountsS3DataFactory:
     def __init__(self):
-        # TODO maybe te name should indicate that is combining AccountS3Data
         self._df_generator = _AccountsS3DataDfCombinator()
-        # TODO rename to _AllAccountsS3DataDfCsvExporter
         self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
         self._local_results = LocalResults()
 

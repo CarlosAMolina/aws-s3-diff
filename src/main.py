@@ -10,7 +10,7 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
-from s3_data import AllAccountsS3DataDfFactory
+from s3_data import AllAccountsS3DataFactory
 from s3_data import AwsAccountExtractor
 
 
@@ -185,7 +185,7 @@ class _LastAwsAccountProcess(_AwsAccountProcess):
 
 class _NoCombinedS3DataProcess(_Process):
     def run(self):
-        AllAccountsS3DataDfFactory().to_csv()
+        AllAccountsS3DataFactory().to_csv()
         _AnalysisProcess().run()
 
 
