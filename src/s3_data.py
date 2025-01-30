@@ -21,7 +21,7 @@ from types_custom import S3Query
 class AllAccountsS3DataDfFactory:
     def __init__(self):
         # TODO maybe te name should indicate that is combining AccountS3Data
-        self._df_generator = _AllAccountsS3DataDfGenerator()
+        self._df_generator = _AccountsS3DataDfCombinator()
         # TODO rename to _AllAccountsS3DataDfCsvExporter
         self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
         self._local_results = LocalResults()
@@ -141,7 +141,7 @@ class _CombinedAccountsS3DataCsvToDf:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _AllAccountsS3DataDfGenerator:
+class _AccountsS3DataDfCombinator:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
