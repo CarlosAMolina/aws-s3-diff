@@ -41,14 +41,13 @@ class AccountS3DataFactory:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def to_csv_extract_s3_data(self):
-        AwsAccountExtractor(
+        _AwsAccountExtractor(
             self._local_results.get_file_path_aws_account_results(self._aws_account),
             self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
         ).extract()
 
 
-# TODO private
-class AwsAccountExtractor:
+class _AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
         self._logger = get_logger()
