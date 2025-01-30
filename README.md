@@ -33,6 +33,7 @@ You can configure the values of the following keys (do not modify the keys, only
 
 Key                   | Type of the value | What is it?
 ----------------------|-------------------|---------------------------------------------------------------------------
+run_analysis          | Boolean           | If the analysis should be executed.
 origin                | String            | The reference account to compare other accounts.
 is_the_file_copied_to | Array of strings  | Checks if the file in the origin account has been copied to other accounts.
 can_the_file_exist_in | Array of strings  | If the file does not exist in the origin account, it cannot exist in other accounts.

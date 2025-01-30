@@ -65,7 +65,7 @@ class AnalysisConfigReader:
         self.__analysis_config = None  # To avoid read a file in __init__.
 
     def must_run_analysis(self) -> bool:
-        return len(self.get_aws_account_origin()) > 0
+        return self._analysis_config["run_analysis"] is True
 
     def get_aws_account_origin(self) -> str:
         return self._analysis_config["origin"]
