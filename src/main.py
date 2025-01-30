@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from botocore.exceptions import ClientError
 
-from analysis import AnalysisGenerator
+from analysis import AnalysisS3DataFactory
 from config_files import S3UrisFileChecker
 from config_files import S3UrisFileReader
 from exceptions import AnalysisConfigError
@@ -184,7 +184,7 @@ class _NoCombinedS3DataProcess(_Process):
 
 class _AnalysisProcess(_Process):
     def run(self):
-        AnalysisGenerator().run()
+        AnalysisS3DataFactory().to_csv()
         LocalResults().drop_file_with_analysis_date()
 
 

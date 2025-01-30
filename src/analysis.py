@@ -16,7 +16,15 @@ from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
 
 
-class AnalysisGenerator:
+class AnalysisS3DataFactory:
+    def __init__(self):
+        self._analysis_generator = _AnalysisGenerator()
+
+    def to_csv(self):
+        self._analysis_generator.run()
+
+
+class _AnalysisGenerator:
     def __init__(self):
         self._logger = get_logger()
         self._analysis_config_checker = AnalysisConfigChecker()
