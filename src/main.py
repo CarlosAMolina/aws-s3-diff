@@ -10,8 +10,8 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
+from s3_data import AccountS3DataFactory
 from s3_data import AllAccountsS3DataFactory
-from s3_data import AwsAccountExtractor
 
 
 def run():
@@ -109,19 +109,12 @@ class _AnalyzedAwsAccounts:
 class _AwsAccountProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
-        self._local_results = LocalResults()
+        self._account_s3_data_factory = AccountS3DataFactory(aws_account)
         self._logger = get_logger()
-        self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
         self._logger.info(f"Analyzing the AWS account '{self._aws_account}'")
-        self._export_s3_data_of_account()
-
-    def _export_s3_data_of_account(self):
-        AwsAccountExtractor(
-            self._local_results.get_file_path_aws_account_results(self._aws_account),
-            self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
-        ).extract()
+        self._account_s3_data_factory.to_csv_extract_s3_data()
 
 
 class _AwsAccountProcessFactory:

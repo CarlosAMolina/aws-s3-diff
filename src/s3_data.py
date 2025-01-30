@@ -34,6 +34,20 @@ class AllAccountsS3DataFactory:
         return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
 
+class AccountS3DataFactory:
+    def __init__(self, aws_account: str):
+        self._aws_account = aws_account
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def to_csv_extract_s3_data(self):
+        AwsAccountExtractor(
+            self._local_results.get_file_path_aws_account_results(self._aws_account),
+            self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
+        ).extract()
+
+
+# TODO private
 class AwsAccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
