@@ -1,6 +1,5 @@
 import json
 import re
-from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
@@ -120,19 +119,6 @@ class S3UrisFileReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
         self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
-        self._index = 0
-
-    def __iter__(self) -> Iterator[str]:
-        for index, account in enumerate(self.get_aws_accounts()[self._index :]):
-            self._index = index
-            yield account
-
-    def __next__(self) -> str:
-        if self._index < len(self.get_aws_accounts()):
-            result = self.get_aws_accounts()[self._index]
-            self._index += 1
-            return result
-        raise StopIteration
 
     def get_aws_accounts(self) -> list[str]:
         return self._df_file_what_to_analyze.columns.to_list()
