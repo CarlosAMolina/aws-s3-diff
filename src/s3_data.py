@@ -141,16 +141,15 @@ class _CombinedAccountsS3DataCsvToDf:
 
 class _AccountsS3DataDfCombinator:
     def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._aws_accounts = S3UrisFileReader()
 
     def get_df(self) -> AllAccountsS3DataDf:
         result = self._get_df_combine_aws_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
 
     def _get_df_combine_aws_accounts_results(self) -> AllAccountsS3DataDf:
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        result = _AwsAccountS3DataDfBuilder(aws_accounts[0]).with_multi_index().build()
-        for aws_account in aws_accounts[1:]:
+        result = _AwsAccountS3DataDfBuilder(next(self._aws_accounts)).with_multi_index().build()
+        for aws_account in self._aws_accounts:
             account_df = _AwsAccountS3DataDfBuilder(aws_account).with_multi_index().with_origin_account_index().build()
             result = result.join(account_df, how="outer")
         return result
