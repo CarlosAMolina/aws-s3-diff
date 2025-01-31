@@ -35,25 +35,33 @@ _ArrayAwsAccountsToCompare = list[_AwsAccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
 
 
-class _ArrayAwsAccountsToCompareFactory:
+class _ArrayAwsAccountsToCompareFactory(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
-    def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> _ArrayAwsAccountsToCompare:
-        return self._get_array_aws_accounts_for_target_accounts(
-            self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
-        )
-
-    def get_array_aws_accounts_to_analyze_account_without_more_files(self) -> _ArrayAwsAccountsToCompare:
-        return self._get_array_aws_accounts_for_target_accounts(
-            self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
-        )
+    @abstractmethod
+    def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
+        pass
 
     def _get_array_aws_accounts_for_target_accounts(self, aws_account_targets: list[str]) -> _ArrayAwsAccountsToCompare:
         aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
         return [
             _AwsAccountsToCompare(aws_account_origin, aws_account_target) for aws_account_target in aws_account_targets
         ]
+
+
+class _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
+    def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
+        return self._get_array_aws_accounts_for_target_accounts(
+            self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
+        )
+
+
+class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
+    def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
+        return self._get_array_aws_accounts_for_target_accounts(
+            self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
+        )
 
 
 class _AnalysisSetterConfig(NamedTuple):
@@ -64,7 +72,6 @@ class _AnalysisSetterConfig(NamedTuple):
 
 class _AllAnalysisSetter:
     def __init__(self):
-        self._aws_accounts_to_compare_factory = _ArrayAwsAccountsToCompareFactory()
         self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
@@ -79,14 +86,14 @@ class _AllAnalysisSetter:
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _IsFileCopiedAnalysisSetter,
-            self._aws_accounts_to_compare_factory.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
+            _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _CanFileExistAnalysisSetter,
-            self._aws_accounts_to_compare_factory.get_array_aws_accounts_to_analyze_account_without_more_files(),
+            _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
 
