@@ -50,7 +50,7 @@ class _ArrayAwsAccountsToCompareFactory(ABC):
         ]
 
 
-class _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
+class _FileCopiedAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
     def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
         return self._get_array_aws_accounts_for_target_accounts(
             self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
@@ -76,11 +76,11 @@ class _AnalysisSetterConfigFactory(ABC):
         pass
 
 
-class _FilesCopiedAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
+class _FileCopiedAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
     def get_config(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _IsFileCopiedAnalysisSetter,
-            _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
+            _FileCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
@@ -108,7 +108,7 @@ class _AllAnalysisSetter:
         return result
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
-        return _FilesCopiedAnalysisSetterConfigFactory().get_config()
+        return _FileCopiedAnalysisSetterConfigFactory().get_config()
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _NoMoreFilesAnalysisSetterConfigFactory().get_config()
