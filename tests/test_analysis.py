@@ -15,8 +15,8 @@ from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AllAnalysisSetter
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _AnalysisSetter
+from src.analysis import _AwsAccountsToCompare
 from src.analysis import _CanFileExistAnalysisSetter
-from src.analysis import _CompareAwsAccounts
 from src.analysis import _IsFileCopiedAnalysisSetter
 from src.config_files import S3UrisFileReader
 
@@ -108,9 +108,9 @@ class TestDfAnalysis(unittest.TestCase):
         return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
-    def _aws_accounts_to_compare(self) -> _CompareAwsAccounts:
+    def _aws_accounts_to_compare(self) -> _AwsAccountsToCompare:
         all_aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        return _CompareAwsAccounts(*all_aws_accounts[:2])
+        return _AwsAccountsToCompare(*all_aws_accounts[:2])
 
 
 class TestAllAnalysisSetter(unittest.TestCase):
