@@ -96,27 +96,38 @@ class _NoMoreFilesAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
 
 class _AllAnalysisSetter:
     def __init__(self):
-        self._logger = get_logger()
+        self._analysis_config_reader = AnalysisConfigReader()
 
     def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
-        result = df.copy()
-        for config in (
-            _FileCopiedAnalysisSetterConfigFactory().get_config(),
-            _NoMoreFilesAnalysisSetterConfigFactory().get_config(),
-        ):
-            result = self._get_df_set_analysis(config, result)
-        return result
+        result_builder = _AnalysisBuilder(df)
+        if len(self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()):
+            result_builder.with_analysis_is_file_copied()
+        if len(self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()):
+            result_builder.with_analysis_no_more_files()
+        return result_builder.build()
 
-    def _get_df_set_analysis(
-        self,
-        config: _AnalysisSetterConfig,
-        df: AllAccountsS3DataDf,
-    ) -> Df:
-        result = df.copy()
+
+class _AnalysisBuilder:
+    def __init__(self, df: AllAccountsS3DataDf):
+        self._df = df
+        self._logger = get_logger()
+
+    def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
+        self._set_analysis(_FileCopiedAnalysisSetterConfigFactory())
+        return self
+
+    def with_analysis_no_more_files(self) -> "_AnalysisBuilder":
+        self._set_analysis(_NoMoreFilesAnalysisSetterConfigFactory())
+        return self
+
+    def _set_analysis(self, config_factory: _AnalysisSetterConfigFactory):
+        config = config_factory.get_config()
         for aws_accounts in config.aws_accounts_array:
             self._logger.info(config.log_message.format(origin=aws_accounts.origin, target=aws_accounts.target))
-            result = config.df_analyzer(aws_accounts, result).get_df_set_analysis()
-        return result
+            self._df = config.df_analyzer(aws_accounts, self._df).get_df_set_analysis()
+
+    def build(self) -> Df:
+        return self._df
 
 
 class _AnalysisConfig(ABC):
