@@ -17,15 +17,17 @@ from types_custom import AnalysisS3DataDf
 
 class AnalysisS3DataFactory:
     def __init__(self):
-        pass
+        self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
+        self._all_analysis_setter = _AllAnalysisSetter()
+        self._analysis_df_to_csv = _AnalysisDfToCsv()
 
     def to_csv(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        _AnalysisDfToCsv().export(s3_analyzed_df)
+        self._analysis_df_to_csv.export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
-        all_accounts_s3_data_df = AllAccountsS3DataFactory().get_df_from_csv()
-        return _AllAnalysisSetter().get_df_set_analysis_columns(all_accounts_s3_data_df)
+        all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
+        return self._all_analysis_setter.get_df_set_analysis_columns(all_accounts_s3_data_df)
 
 
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
