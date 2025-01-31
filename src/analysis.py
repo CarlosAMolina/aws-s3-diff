@@ -70,13 +70,13 @@ class _AnalysisSetterConfig(NamedTuple):
     log_message: str
 
 
-class _AnalysisSetterConfigFactory(ABC):
+class _AnalysisConfigFactory(ABC):
     @abstractmethod
     def get_config(self) -> _AnalysisSetterConfig:
         pass
 
 
-class _FileCopiedAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
+class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _IsFileCopiedAnalysisSetter,
@@ -85,7 +85,7 @@ class _FileCopiedAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
         )
 
 
-class _NoMoreFilesAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
+class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _CanFileExistAnalysisSetter,
@@ -113,14 +113,14 @@ class _AnalysisBuilder:
         self._logger = get_logger()
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._set_analysis(_FileCopiedAnalysisSetterConfigFactory())
+        self._set_analysis(_FileCopiedAnalysisConfigFactory())
         return self
 
     def with_analysis_no_more_files(self) -> "_AnalysisBuilder":
-        self._set_analysis(_NoMoreFilesAnalysisSetterConfigFactory())
+        self._set_analysis(_NoMoreFilesAnalysisConfigFactory())
         return self
 
-    def _set_analysis(self, config_factory: _AnalysisSetterConfigFactory):
+    def _set_analysis(self, config_factory: _AnalysisConfigFactory):
         config = config_factory.get_config()
         for aws_accounts in config.aws_accounts_array:
             self._logger.info(config.log_message.format(origin=aws_accounts.origin, target=aws_accounts.target))
