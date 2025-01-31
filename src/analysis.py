@@ -35,7 +35,7 @@ _ArrayAwsAccountsToCompare = list[_AwsAccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
 
 
-class _AwsAccountsToCompareFactory:
+class _ArrayAwsAccountsToCompareFactory:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
@@ -64,7 +64,7 @@ class _AnalysisSetterConfig(NamedTuple):
 
 class _AllAnalysisSetter:
     def __init__(self):
-        self._aws_accounts_to_compare_factory = _AwsAccountsToCompareFactory()
+        self._aws_accounts_to_compare_factory = _ArrayAwsAccountsToCompareFactory()
         self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
