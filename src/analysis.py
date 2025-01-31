@@ -70,6 +70,30 @@ class _AnalysisSetterConfig(NamedTuple):
     log_message: str
 
 
+class _AnalysisSetterConfigFactory(ABC):
+    @abstractmethod
+    def get_config(self) -> _AnalysisSetterConfig:
+        pass
+
+
+class _FilesCopiedAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
+    def get_config(self) -> _AnalysisSetterConfig:
+        return _AnalysisSetterConfig(
+            _IsFileCopiedAnalysisSetter,
+            _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
+            "Analyzing if files of the account '{origin}' have been copied to the account {target}",
+        )
+
+
+class _NoMoreFilesAnalysisSetterConfigFactory(_AnalysisSetterConfigFactory):
+    def get_config(self) -> _AnalysisSetterConfig:
+        return _AnalysisSetterConfig(
+            _CanFileExistAnalysisSetter,
+            _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
+            "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
+        )
+
+
 class _AllAnalysisSetter:
     def __init__(self):
         self._logger = get_logger()
@@ -84,18 +108,10 @@ class _AllAnalysisSetter:
         return result
 
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
-        return _AnalysisSetterConfig(
-            _IsFileCopiedAnalysisSetter,
-            _FilesCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
-            "Analyzing if files of the account '{origin}' have been copied to the account {target}",
-        )
+        return _FilesCopiedAnalysisSetterConfigFactory().get_config()
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
-        return _AnalysisSetterConfig(
-            _CanFileExistAnalysisSetter,
-            _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
-            "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
-        )
+        return _NoMoreFilesAnalysisSetterConfigFactory().get_config()
 
     def _get_df_set_analysis(
         self,
