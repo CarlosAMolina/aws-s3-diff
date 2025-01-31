@@ -17,17 +17,9 @@ from types_custom import AnalysisS3DataDf
 
 class AnalysisS3DataFactory:
     def __init__(self):
-        self._analysis_generator = _AnalysisGenerator()
+        pass
 
     def to_csv(self):
-        self._analysis_generator.run()
-
-
-class _AnalysisGenerator:
-    def run(self):
-        self._export_analysis_file()
-
-    def _export_analysis_file(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
         self._export_analyzed_df_to_file(s3_analyzed_df)
 
