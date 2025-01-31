@@ -101,17 +101,11 @@ class _AllAnalysisSetter:
     def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
         result = df.copy()
         for config in (
-            self._get_config_analysis_is_file_copied(),
-            self._get_config_analysis_can_file_exist(),
+            _FileCopiedAnalysisSetterConfigFactory().get_config(),
+            _NoMoreFilesAnalysisSetterConfigFactory().get_config(),
         ):
             result = self._get_df_set_analysis(config, result)
         return result
-
-    def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
-        return _FileCopiedAnalysisSetterConfigFactory().get_config()
-
-    def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
-        return _NoMoreFilesAnalysisSetterConfigFactory().get_config()
 
     def _get_df_set_analysis(
         self,
