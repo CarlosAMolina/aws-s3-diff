@@ -21,14 +21,11 @@ class AnalysisS3DataFactory:
 
     def to_csv(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        self._export_analyzed_df_to_file(s3_analyzed_df)
+        _AnalysisDfToCsv().export(s3_analyzed_df)
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = AllAccountsS3DataFactory().get_df_from_csv()
         return _AllAnalysisSetter().get_df_set_analysis_columns(all_accounts_s3_data_df)
-
-    def _export_analyzed_df_to_file(self, df: AnalysisS3DataDf):
-        _AnalysisDfToCsv().export(df)
 
 
 _CompareAwsAccounts = namedtuple("_CompareAwsAccounts", "origin target")
