@@ -258,9 +258,10 @@ class _AnalysisDfToCsv:
     def __init__(self):
         self._logger = get_logger()
         self._s3_uris_file_reader = S3UrisFileReader()
+        self._local_results = LocalResults()
 
     def export(self, df: AnalysisS3DataDf):
-        file_path = LocalResults().analysis_paths.file_analysis
+        file_path = self._local_results.analysis_paths.file_analysis
         csv_df = self._get_df_to_export(df)
         self._logger.info(f"Exporting analysis to {file_path}")
         csv_df.to_csv(file_path)
