@@ -65,7 +65,7 @@ class _AnalysisSetterConfig(NamedTuple):
 
 class _AllAnalysisSetter:
     def __init__(self):
-        self._aws_accounts_generator = _AwsAccountsToCompareFactory()
+        self._aws_accounts_to_compare_generator = _AwsAccountsToCompareFactory()
         self._logger = get_logger()
 
     def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
@@ -80,14 +80,14 @@ class _AllAnalysisSetter:
     def _get_config_analysis_is_file_copied(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _IsFileCopiedAnalysisSetter,
-            self._aws_accounts_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
+            self._aws_accounts_to_compare_generator.get_array_aws_accounts_to_analyze_if_files_have_been_copied(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
     def _get_config_analysis_can_file_exist(self) -> _AnalysisSetterConfig:
         return _AnalysisSetterConfig(
             _CanFileExistAnalysisSetter,
-            self._aws_accounts_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
+            self._aws_accounts_to_compare_generator.get_array_aws_accounts_to_analyze_account_without_more_files(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
 
