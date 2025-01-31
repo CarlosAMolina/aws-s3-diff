@@ -31,6 +31,7 @@ class AnalysisS3DataFactory:
 
 
 _AwsAccountsToCompare = namedtuple("_AwsAccountsToCompare", "origin target")
+_ArrayAwsAccountsToCompare = list[_AwsAccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
 
 
@@ -38,19 +39,17 @@ class _AwsAccountsToCompareFactory:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
-    def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> list[_AwsAccountsToCompare]:
+    def get_array_aws_accounts_to_analyze_if_files_have_been_copied(self) -> _ArrayAwsAccountsToCompare:
         return self._get_array_aws_accounts_for_target_accounts(
             self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
         )
 
-    def get_array_aws_accounts_to_analyze_account_without_more_files(self) -> list[_AwsAccountsToCompare]:
+    def get_array_aws_accounts_to_analyze_account_without_more_files(self) -> _ArrayAwsAccountsToCompare:
         return self._get_array_aws_accounts_for_target_accounts(
             self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
         )
 
-    def _get_array_aws_accounts_for_target_accounts(
-        self, aws_account_targets: list[str]
-    ) -> list[_AwsAccountsToCompare]:
+    def _get_array_aws_accounts_for_target_accounts(self, aws_account_targets: list[str]) -> _ArrayAwsAccountsToCompare:
         aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
         return [
             _AwsAccountsToCompare(aws_account_origin, aws_account_target) for aws_account_target in aws_account_targets
@@ -59,7 +58,7 @@ class _AwsAccountsToCompareFactory:
 
 class _AnalysisSetterConfig(NamedTuple):
     df_analyzer: type["_AnalysisSetter"]
-    aws_accounts_array: list[_AwsAccountsToCompare]
+    aws_accounts_array: _ArrayAwsAccountsToCompare
     log_message: str
 
 
