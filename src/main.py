@@ -4,6 +4,8 @@ from abc import abstractmethod
 from botocore.exceptions import ClientError
 
 from analysis import AnalysisS3DataFactory
+from config_files import AnalysisConfigChecker
+from config_files import AnalysisConfigReader
 from config_files import S3UrisFileChecker
 from config_files import S3UrisFileReader
 from exceptions import AnalysisConfigError
@@ -183,8 +185,18 @@ class _NoCombinedS3DataProcess(_Process):
 
 
 class _AnalysisProcess(_Process):
+    def __init__(self):
+        self._logger = get_logger()
+        self._analysis_config_reader = AnalysisConfigReader()
+        self._analysis_config_checker = AnalysisConfigChecker()
+        self._analysis_s3_data_factory = AnalysisS3DataFactory()
+
     def run(self):
-        AnalysisS3DataFactory().to_csv()
+        if self._analysis_config_reader.must_run_analysis():
+            self._analysis_config_checker.assert_file_is_correct()
+            self._analysis_s3_data_factory.to_csv()
+        else:
+            self._logger.info("No analysis configured. Omitting")
         LocalResults().drop_file_with_analysis_date()
 
 
