@@ -95,10 +95,10 @@ class _TypeAnalysisFactory(ABC):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
         pass
 
-    # TODO use _AccountsToCompareAnalysisFactory without " in return type
+    # TODO use _TwoAccountsAnalysisFactory without " in return type
     @property
     @abstractmethod
-    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
+    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
         pass
 
 
@@ -106,10 +106,9 @@ class _FileCopiedTypeAnalysisFactory(_TypeAnalysisFactory):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
         return _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_accounts()
 
-    # TODO rename _AccountsToCompareAnalysis... -> TwoAccountsAnalysis...
     @property
-    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
-        return _IsFileCopiedAccountsToCompareAnalysisFactory
+    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
+        return _IsFileCopiedTwoAccountsAnalysisFactory
 
 
 class _NoMoreFilesTypeAnalysisFactory(_TypeAnalysisFactory):
@@ -117,12 +116,12 @@ class _NoMoreFilesTypeAnalysisFactory(_TypeAnalysisFactory):
         return _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_accounts()
 
     @property
-    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
+    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
         # TODO rename to NoMoreFiles...
-        return _CanFileExistAccountsToCompareAnalysisFactory
+        return _CanFileExistTwoAccountsAnalysisFactory
 
 
-class _AccountsToCompareAnalysisFactory(ABC):
+class _TwoAccountsAnalysisFactory(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: AllAccountsS3DataDf):
         self._accounts = accounts
         self._condition = _AnalysisCondition(accounts, df)
@@ -161,7 +160,7 @@ class _AccountsToCompareAnalysisFactory(ABC):
         pass
 
 
-class _IsFileCopiedAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFactory):
+class _IsFileCopiedTwoAccountsAnalysisFactory(_TwoAccountsAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
@@ -182,7 +181,7 @@ class _IsFileCopiedAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFa
         }
 
 
-class _CanFileExistAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFactory):
+class _CanFileExistTwoAccountsAnalysisFactory(_TwoAccountsAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
