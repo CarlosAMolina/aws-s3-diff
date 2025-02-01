@@ -72,7 +72,7 @@ class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCo
 
 
 class _AnalysisConfig(NamedTuple):
-    analysis_factory: type["_AnalysisFactory"]
+    analysis_factory: type["_AwsAccountsToCompareAnalysisFactory"]
     aws_accounts_array: _ArrayAwsAccountsToCompare
 
 
@@ -85,7 +85,7 @@ class _AnalysisConfigFactory(ABC):
 class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
-            _IsFileCopiedAnalysisFactory,
+            _IsFileCopiedAwsAccountsToCompareAnalysisFactory,
             _FileCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
         )
 
@@ -93,7 +93,7 @@ class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
 class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
-            _CanFileExistAnalysisFactory,
+            _CanFileExistAwsAccountsToCompareAnalysisFactory,
             _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
         )
 
@@ -119,7 +119,7 @@ class _AnalysisBuilder:
         return self._df
 
 
-class _AnalysisFactory(ABC):
+class _AwsAccountsToCompareAnalysisFactory(ABC):
     def __init__(self, aws_accounts: _AwsAccountsToCompare, df: AllAccountsS3DataDf):
         self._aws_accounts = aws_accounts
         self._condition = _AnalysisCondition(aws_accounts, df)
@@ -158,7 +158,7 @@ class _AnalysisFactory(ABC):
         pass
 
 
-class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
+class _IsFileCopiedAwsAccountsToCompareAnalysisFactory(_AwsAccountsToCompareAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files of the account '{self._aws_accounts.origin}' have been copied to the account"
@@ -179,7 +179,7 @@ class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
         }
 
 
-class _CanFileExistAnalysisFactory(_AnalysisFactory):
+class _CanFileExistAwsAccountsToCompareAnalysisFactory(_AwsAccountsToCompareAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files in account '{self._aws_accounts.target}' can exist, compared to account"
