@@ -124,21 +124,6 @@ class _AnalysisBuilder:
         return self._df
 
 
-class _AnalysisConfig(ABC):
-    def __init__(self, aws_account_target: str):
-        self._aws_account_target = aws_account_target
-
-    @property
-    @abstractmethod
-    def column_name_result(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def condition_config(self) -> _ConditionConfig:
-        pass
-
-
 class _AnalysisFactory(ABC):
     def __init__(self, aws_accounts: _AwsAccountsToCompare, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
@@ -152,40 +137,33 @@ class _AnalysisFactory(ABC):
         for (
             condition_name,
             condition_result_to_set,
-        ) in self._analysis_config.condition_config.items():
+        ) in self._condition_config.items():
             condition_results: Series = getattr(self._condition, condition_name)
             result.loc[condition_results, [self._result_column_multi_index]] = condition_result_to_set
         return result
 
     @property
     def _result_column_multi_index(self) -> tuple[str, str]:
-        return ("analysis", self._analysis_config.column_name_result)
+        return ("analysis", self._column_name_result)
 
     @property
     @abstractmethod
-    def _analysis_config(self) -> _AnalysisConfig:
+    def _column_name_result(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def _condition_config(self) -> _ConditionConfig:
         pass
 
 
 class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
     @property
-    def _analysis_config(self) -> _AnalysisConfig:
-        return _IsFileCopiedAnalysisConfig(self._aws_account_target)
-
-
-class _CanFileExistAnalysisFactory(_AnalysisFactory):
-    @property
-    def _analysis_config(self) -> _AnalysisConfig:
-        return _CanFileExistAnalysisConfig(self._aws_account_target)
-
-
-class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
-    @property
-    def column_name_result(self) -> str:
+    def _column_name_result(self) -> str:
         return f"is_sync_ok_in_{self._aws_account_target}"
 
     @property
-    def condition_config(self) -> _ConditionConfig:
+    def _condition_config(self) -> _ConditionConfig:
         return {
             "condition_sync_is_wrong": False,
             "condition_sync_is_ok": True,
@@ -194,13 +172,13 @@ class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
         }
 
 
-class _CanFileExistAnalysisConfig(_AnalysisConfig):
+class _CanFileExistAnalysisFactory(_AnalysisFactory):
     @property
-    def column_name_result(self) -> str:
+    def _column_name_result(self) -> str:
         return f"can_exist_in_{self._aws_account_target}"
 
     @property
-    def condition_config(self) -> _ConditionConfig:
+    def _condition_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
 
 
