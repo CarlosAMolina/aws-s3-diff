@@ -72,7 +72,7 @@ class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCo
 
 
 class _AnalysisConfig(NamedTuple):
-    analysis_factory: type["_AwsAccountsToCompareAnalysisFactory"]
+    aws_accounts_to_compare_analysis_factory: type["_AwsAccountsToCompareAnalysisFactory"]
     aws_accounts_array: _ArrayAwsAccountsToCompare
 
 
@@ -113,7 +113,7 @@ class _AnalysisBuilder:
     def _set_analysis(self, config_factory: _AnalysisConfigFactory):
         config = config_factory.get_config()
         for aws_accounts in config.aws_accounts_array:
-            self._df = config.analysis_factory(aws_accounts, self._df).get_df_set_analysis()
+            self._df = config.aws_accounts_to_compare_analysis_factory(aws_accounts, self._df).get_df_set_analysis()
 
     def build(self) -> Df:
         return self._df
