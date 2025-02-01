@@ -38,12 +38,9 @@ class TestS3UriDfModifier(unittest.TestCase):
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
+        df = _AccountS3DataDfFactory().get_df_with_trailing_slash_in_prefix()
         return [
             (df, s3_uris_map_df)
-            for df in (
-                _AccountS3DataDfFactory().get_df_with_trailing_slash_in_prefix(),
-                _AccountS3DataDfFactory().get_df_without_trailing_slash_in_prefix(),
-            )
             for s3_uris_map_df in (
                 _S3UrisMapDfFactory().get_df_with_trailing_slash(),
                 _S3UrisMapDfFactory().get_df_without_trailing_slash(),
@@ -75,10 +72,6 @@ class _AccountS3DataDfFactory:
 
     def get_df_with_trailing_slash_in_prefix(self) -> Df:
         self._df["prefix"] = self._df["prefix"] + "/"
-        self._with_multi_index()
-        return self._df
-
-    def get_df_without_trailing_slash_in_prefix(self) -> Df:
         self._with_multi_index()
         return self._df
 

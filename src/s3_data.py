@@ -256,6 +256,7 @@ class _S3UriDfModifier:
         original_lenght = len(self._df)
         result = self._df.copy()
         result = result.reset_index()
+        assert result["prefix"].str.endswith("/").all()
         result["bucket_and_prefix"] = "s3://" + result["bucket"] + "/" + result["prefix"].str.rstrip("/")
         for account in (self._account_origin, self._account_target):
             s3_uris_map_df.loc[:, account] = s3_uris_map_df[account].str.rstrip("/")
