@@ -17,25 +17,7 @@ from s3_data import AllAccountsS3DataFactory
 
 
 def run():
-    logger = get_logger()
-    try:
-        _Main().run()
-    except (AnalysisConfigError, FolderInS3UriError) as exception:
-        logger.error(exception)
-        return
-    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
-    except ClientError as exception:
-        error_code = exception.response["Error"]["Code"]
-        if error_code == "NoSuchBucket":
-            bucket_name = exception.response["Error"]["BucketName"]
-            logger.error(
-                f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
-            )
-            return
-        if error_code in ("AccessDenied", "InvalidAccessKeyId"):
-            logger.error("Incorrect AWS credentials. Authenticate and run the program again")
-            return
-        raise Exception from exception
+    _Main().run()
 
 
 class _Main:
@@ -45,7 +27,24 @@ class _Main:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
-        self._run_without_catching_exceptions()
+        try:
+            self._run_without_catching_exceptions()
+        except (AnalysisConfigError, FolderInS3UriError) as exception:
+            self._logger.error(exception)
+            return
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
+        except ClientError as exception:
+            error_code = exception.response["Error"]["Code"]
+            if error_code == "NoSuchBucket":
+                bucket_name = exception.response["Error"]["BucketName"]
+                self._logger.error(
+                    f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
+                )
+                return
+            if error_code in ("AccessDenied", "InvalidAccessKeyId"):
+                self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                return
+            raise Exception from exception
 
     def _run_without_catching_exceptions(self):
         self._logger.info("Welcome to the AWS S3 Diff tool!")
