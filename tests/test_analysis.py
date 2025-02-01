@@ -13,10 +13,10 @@ from pandas.testing import assert_frame_equal
 
 from s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AnalysisDfToCsv
-from src.analysis import _AnalysisSetter
+from src.analysis import _AnalysisFactory
 from src.analysis import _AwsAccountsToCompare
-from src.analysis import _CanFileExistAnalysisSetter
-from src.analysis import _IsFileCopiedAnalysisSetter
+from src.analysis import _CanFileExistAnalysisFactory
+from src.analysis import _IsFileCopiedAnalysisFactory
 from src.analysis import AnalysisS3DataFactory
 from src.config_files import S3UrisFileReader
 
@@ -24,7 +24,7 @@ from src.config_files import S3UrisFileReader
 class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
+    def analysis_class_to_check(self) -> type[_AnalysisFactory]:
         pass
 
     @property
@@ -40,8 +40,8 @@ class _AnalysisBuilderConfig(ABC):
 
 class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
-        return _IsFileCopiedAnalysisSetter
+    def analysis_class_to_check(self) -> type[_AnalysisFactory]:
+        return _IsFileCopiedAnalysisFactory
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -60,8 +60,8 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
 class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_AnalysisSetter]:
-        return _CanFileExistAnalysisSetter
+    def analysis_class_to_check(self) -> type[_AnalysisFactory]:
+        return _CanFileExistAnalysisFactory
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:

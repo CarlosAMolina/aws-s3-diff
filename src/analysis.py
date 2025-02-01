@@ -71,9 +71,8 @@ class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCo
         return self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
 
 
-# TODO rename all Setter in all files
 class _AnalysisBuilderConfig(NamedTuple):
-    df_analyzer: type["_AnalysisSetter"]
+    df_analyzer: type["_AnalysisFactory"]
     aws_accounts_array: _ArrayAwsAccountsToCompare
     log_message: str
 
@@ -87,7 +86,7 @@ class _AnalysisConfigFactory(ABC):
 class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisBuilderConfig:
         return _AnalysisBuilderConfig(
-            _IsFileCopiedAnalysisSetter,
+            _IsFileCopiedAnalysisFactory,
             _FileCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
@@ -96,7 +95,7 @@ class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
 class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisBuilderConfig:
         return _AnalysisBuilderConfig(
-            _CanFileExistAnalysisSetter,
+            _CanFileExistAnalysisFactory,
             _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
@@ -140,8 +139,7 @@ class _AnalysisConfig(ABC):
         pass
 
 
-# TODO rename to AnalysisFactory
-class _AnalysisSetter(ABC):
+class _AnalysisFactory(ABC):
     def __init__(self, aws_accounts: _AwsAccountsToCompare, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
         self._condition = _AnalysisCondition(aws_accounts, df)
@@ -169,13 +167,13 @@ class _AnalysisSetter(ABC):
         pass
 
 
-class _IsFileCopiedAnalysisSetter(_AnalysisSetter):
+class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _IsFileCopiedAnalysisConfig(self._aws_account_target)
 
 
-class _CanFileExistAnalysisSetter(_AnalysisSetter):
+class _CanFileExistAnalysisFactory(_AnalysisFactory):
     @property
     def _analysis_config(self) -> _AnalysisConfig:
         return _CanFileExistAnalysisConfig(self._aws_account_target)
