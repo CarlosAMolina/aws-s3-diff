@@ -45,6 +45,9 @@ class _Main:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
+        self._run_without_catching_exceptions()
+
+    def _run_without_catching_exceptions(self):
         self._logger.info("Welcome to the AWS S3 Diff tool!")
         self._logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
