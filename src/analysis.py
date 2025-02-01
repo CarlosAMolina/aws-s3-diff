@@ -63,7 +63,7 @@ class _FileCopiedAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFa
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
 
-class _NoMoreFilesAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
+class _CanExistAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
@@ -77,7 +77,7 @@ class _AnalysisBuilder:
         return self
 
     def with_analysis_no_more_files(self) -> "_AnalysisBuilder":
-        self._df = _NoMoreFilesTypeAnalysisFactory().get_df(self._df)
+        self._df = _CanExistTypeAnalysisFactory().get_df(self._df)
         return self
 
     def build(self) -> Df:
@@ -111,13 +111,12 @@ class _FileCopiedTypeAnalysisFactory(_TypeAnalysisFactory):
         return _IsFileCopiedTwoAccountsAnalysisFactory
 
 
-class _NoMoreFilesTypeAnalysisFactory(_TypeAnalysisFactory):
+class _CanExistTypeAnalysisFactory(_TypeAnalysisFactory):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_accounts()
+        return _CanExistAnalysisArrayAccountsToCompareFactory().get_array_accounts()
 
     @property
     def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
-        # TODO rename to NoMoreFiles...
         return _CanFileExistTwoAccountsAnalysisFactory
 
 
