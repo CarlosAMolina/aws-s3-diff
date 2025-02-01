@@ -47,9 +47,8 @@ class _ArrayAwsAccountsToCompareFactory(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
-    @abstractmethod
     def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
-        pass
+        return self._get_array_aws_accounts_for_target_accounts(self._get_aws_account_targets())
 
     def _get_array_aws_accounts_for_target_accounts(self, aws_account_targets: list[str]) -> _ArrayAwsAccountsToCompare:
         aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
@@ -57,19 +56,19 @@ class _ArrayAwsAccountsToCompareFactory(ABC):
             _AwsAccountsToCompare(aws_account_origin, aws_account_target) for aws_account_target in aws_account_targets
         ]
 
+    @abstractmethod
+    def _get_aws_account_targets(self) -> list[str]:
+        pass
+
 
 class _FileCopiedAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
-    def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
-        return self._get_array_aws_accounts_for_target_accounts(
-            self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
-        )
+    def _get_aws_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
 
 
 class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCompareFactory):
-    def get_array_aws_accounts(self) -> _ArrayAwsAccountsToCompare:
-        return self._get_array_aws_accounts_for_target_accounts(
-            self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
-        )
+    def _get_aws_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
 
 
 # TODO rename all Setter in all files
