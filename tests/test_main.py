@@ -20,7 +20,7 @@ from src.main import FolderInS3UriError
 from tests.aws import S3Server
 
 
-class TestFunction_runLocalS3Server(unittest.TestCase):
+class TestMainWithLocalS3Server(unittest.TestCase):
     def setUp(self):
         self._local_s3_server = S3Server()
         # Drop file created by the user
@@ -86,7 +86,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
 
-class TestFunction_runNoLocalS3Server(unittest.TestCase):
+class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("src.main._Main._run_without_catching_exceptions")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
         mock_run.side_effect = AnalysisConfigError("foo")
