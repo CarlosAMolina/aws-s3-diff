@@ -65,7 +65,7 @@ class _Process(ABC):
 
 class _ProcessFactory:
     def __init__(self):
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._analyzed_aws_accounts = _AnalyzedAccounts()
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -78,10 +78,10 @@ class _ProcessFactory:
             return _AnalysisProcess()
         if self._analyzed_aws_accounts.have_all_aws_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
-        return _AwsAccountProcessFactory().get_process()
+        return _AccountProcessFactory().get_process()
 
 
-class _AnalyzedAwsAccounts:
+class _AnalyzedAccounts:
     def __init__(self):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -108,7 +108,7 @@ class _AnalyzedAwsAccounts:
         return result
 
 
-class _AwsAccountProcess(_Process):
+class _AccountProcess(_Process):
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         self._account_s3_data_factory = AccountS3DataFactory(aws_account)
@@ -119,23 +119,23 @@ class _AwsAccountProcess(_Process):
         self._account_s3_data_factory.to_csv_extract_s3_data()
 
 
-class _AwsAccountProcessFactory:
+class _AccountProcessFactory:
     def __init__(self):
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._analyzed_aws_accounts = _AnalyzedAccounts()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_process(self) -> _AwsAccountProcess:
+    def get_process(self) -> _AccountProcess:
         aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
         if aws_account == self._s3_uris_file_reader.get_first_aws_account():
-            return _FirstAwsAccountProcess(aws_account)
+            return _FirstAccountProcess(aws_account)
         if aws_account == self._s3_uris_file_reader.get_last_aws_account():
-            return _LastAwsAccountProcess(aws_account)
+            return _LastAccountProcess(aws_account)
         return _IntermediateAccountProcess(aws_account)
 
 
-class _NoLastAwsAccountProcess(_AwsAccountProcess):
+class _NoLastAccountProcess(_AccountProcess):
     def __init__(self, aws_account: str):
-        self._analyzed_aws_accounts = _AnalyzedAwsAccounts()
+        self._analyzed_aws_accounts = _AnalyzedAccounts()
         super().__init__(aws_account)
 
     def run(self):
@@ -149,7 +149,7 @@ class _NoLastAwsAccountProcess(_AwsAccountProcess):
         )
 
 
-class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
+class _FirstAccountProcess(_NoLastAccountProcess):
     def __init__(self, aws_account: str):
         super().__init__(aws_account)
         self._local_results = LocalResults()
@@ -167,12 +167,12 @@ class _FirstAwsAccountProcess(_NoLastAwsAccountProcess):
             raise exception
 
 
-class _IntermediateAccountProcess(_NoLastAwsAccountProcess):
+class _IntermediateAccountProcess(_NoLastAccountProcess):
     def run(self):
         super().run()
 
 
-class _LastAwsAccountProcess(_AwsAccountProcess):
+class _LastAccountProcess(_AccountProcess):
     def run(self):
         super().run()
         _NoCombinedS3DataProcess().run()

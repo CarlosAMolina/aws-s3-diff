@@ -95,7 +95,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         self.assertEqual("foo", cm.records[0].message)
 
     @patch("src.main.LocalResults")
-    @patch("src.main._AnalyzedAwsAccounts")
+    @patch("src.main._AnalyzedAccounts")
     @patch("src.main.AccountS3DataFactory.to_csv_extract_s3_data")
     @patch(
         "src.main.S3UrisFileReader._file_path_what_to_analyze",

@@ -41,8 +41,8 @@ class TestS3UriDfModifier(unittest.TestCase):
         return [
             (df, s3_uris_map_df)
             for df in (
-                _AwsAccountS3DataDfFactory().get_df_with_trailing_slash_in_prefix(),
-                _AwsAccountS3DataDfFactory().get_df_without_trailing_slash_in_prefix(),
+                _AccountS3DataDfFactory().get_df_with_trailing_slash_in_prefix(),
+                _AccountS3DataDfFactory().get_df_without_trailing_slash_in_prefix(),
             )
             for s3_uris_map_df in (
                 _S3UrisMapDfFactory().get_df_with_trailing_slash(),
@@ -58,7 +58,7 @@ def _get_df_as_multi_index(df: Df) -> Df:
     return result
 
 
-class _AwsAccountS3DataDfFactory:
+class _AccountS3DataDfFactory:
     def __init__(self):
         self._df = Df(
             [
@@ -82,7 +82,7 @@ class _AwsAccountS3DataDfFactory:
         self._with_multi_index()
         return self._df
 
-    def _with_multi_index(self) -> "_AwsAccountS3DataDfFactory":
+    def _with_multi_index(self) -> "_AccountS3DataDfFactory":
         self._df = _get_df_as_multi_index(self._df)
         return self
 

@@ -41,19 +41,19 @@ class AccountS3DataFactory:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def to_csv_extract_s3_data(self):
-        _AwsAccountExtractor(
+        _AccountExtractor(
             self._local_results.get_file_path_aws_account_results(self._aws_account),
             self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
         ).extract()
 
     def get_df_from_csv(self) -> Df:
-        return _AwsAccountS3DataDfBuilder(self._aws_account).with_multi_index().build()
+        return _AccountS3DataDfBuilder(self._aws_account).with_multi_index().build()
 
     def get_df_from_csv_with_original_account_index(self) -> Df:
-        return _AwsAccountS3DataDfBuilder(self._aws_account).with_multi_index().with_origin_account_index().build()
+        return _AccountS3DataDfBuilder(self._aws_account).with_multi_index().with_origin_account_index().build()
 
 
-class _AwsAccountExtractor:
+class _AccountExtractor:
     def __init__(self, file_path_results: Path, s3_queries: list[S3Query]):
         self._file_path_results = file_path_results
         self._logger = get_logger()
@@ -195,18 +195,18 @@ class _AccountsS3DataDfCombinator:
         return result.drop(columns=(("count", "files_in_bucket_prefix")))
 
 
-class _AwsAccountS3DataDfBuilder:
+class _AccountS3DataDfBuilder:
     def __init__(self, aws_account: str):
         self._aws_account = aws_account
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
         self.__df = None  # To avoid read file more than once.
 
-    def with_multi_index(self) -> "_AwsAccountS3DataDfBuilder":
+    def with_multi_index(self) -> "_AccountS3DataDfBuilder":
         self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
         return self
 
-    def with_origin_account_index(self) -> "_AwsAccountS3DataDfBuilder":
+    def with_origin_account_index(self) -> "_AccountS3DataDfBuilder":
         """The with_multi_index method must be called before this method is called"""
         self._df = _S3UriDfModifier(
             self._s3_uris_file_reader.get_first_aws_account(), self._aws_account, self._df

@@ -12,11 +12,11 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from s3_data import _CombinedAccountsS3DataCsvToDf
+from src.analysis import _AccountsToCompare
+from src.analysis import _AccountsToCompareAnalysisFactory
 from src.analysis import _AnalysisDfToCsv
-from src.analysis import _AwsAccountsToCompare
-from src.analysis import _AwsAccountsToCompareAnalysisFactory
-from src.analysis import _CanFileExistAwsAccountsToCompareAnalysisFactory
-from src.analysis import _IsFileCopiedAwsAccountsToCompareAnalysisFactory
+from src.analysis import _CanFileExistAccountsToCompareAnalysisFactory
+from src.analysis import _IsFileCopiedAccountsToCompareAnalysisFactory
 from src.analysis import AnalysisS3DataFactory
 from src.config_files import S3UrisFileReader
 
@@ -24,7 +24,7 @@ from src.config_files import S3UrisFileReader
 class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_AwsAccountsToCompareAnalysisFactory]:
+    def analysis_class_to_check(self) -> type[_AccountsToCompareAnalysisFactory]:
         pass
 
     @property
@@ -40,8 +40,8 @@ class _AnalysisBuilderConfig(ABC):
 
 class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_AwsAccountsToCompareAnalysisFactory]:
-        return _IsFileCopiedAwsAccountsToCompareAnalysisFactory
+    def analysis_class_to_check(self) -> type[_AccountsToCompareAnalysisFactory]:
+        return _IsFileCopiedAccountsToCompareAnalysisFactory
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -60,8 +60,8 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
 class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_AwsAccountsToCompareAnalysisFactory]:
-        return _CanFileExistAwsAccountsToCompareAnalysisFactory
+    def analysis_class_to_check(self) -> type[_AccountsToCompareAnalysisFactory]:
+        return _CanFileExistAccountsToCompareAnalysisFactory
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -108,9 +108,9 @@ class TestDfAnalysis(unittest.TestCase):
         return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
-    def _aws_accounts_to_compare(self) -> _AwsAccountsToCompare:
+    def _aws_accounts_to_compare(self) -> _AccountsToCompare:
         all_aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        return _AwsAccountsToCompare(*all_aws_accounts[:2])
+        return _AccountsToCompare(*all_aws_accounts[:2])
 
 
 class TestAnalysisS3DataFactory(unittest.TestCase):
