@@ -1,6 +1,6 @@
 {
   "run_analysis": true,
   "origin": "pro",
-  "is_the_file_copied_to": ["release", "aws_account_3_dev"],
+  "is_the_file_copied_to": ["release", "dev"],
   "can_the_file_exist_in": ["release"]
 }

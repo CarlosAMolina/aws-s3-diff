@@ -131,9 +131,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
-        expected_result = expected_result.astype(
-            {"is_sync_ok_in_release": "object", "is_sync_ok_in_aws_account_3_dev": "object"}
-        )
+        expected_result = expected_result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
 
@@ -143,11 +141,11 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
             {
                 "pro_size": "Int64",
                 "release_size": "Int64",
-                "aws_account_3_dev_size": "Int64",
+                "dev_size": "Int64",
             }
         )
         # https://stackoverflow.com/questions/26763344/convert-pandas-column-to-datetime/26763793#26763793
-        date_column_names = ["pro_date", "release_date", "aws_account_3_dev_date"]
+        date_column_names = ["pro_date", "release_date", "dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
 

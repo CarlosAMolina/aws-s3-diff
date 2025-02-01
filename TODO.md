@@ -3,5 +3,5 @@
 - aws accounts values. Replace:
   - pro.. -> pro
   - release.. -> release
-  - aws_account_3_dev.. -> dev
+  - dev.. -> dev
 

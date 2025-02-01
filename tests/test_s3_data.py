@@ -8,7 +8,7 @@ from src import s3_data as m_s3_data
 ExpectedResult = list[dict]
 
 _AWS_ACCOUNT_ORIGIN = "pro"
-_AWS_ACCOUNT_TARGET = "aws_account_3_dev"
+_AWS_ACCOUNT_TARGET = "dev"
 
 
 class TestS3UriDfModifier(unittest.TestCase):
