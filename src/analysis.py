@@ -64,7 +64,8 @@ class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCo
         )
 
 
-class _AnalysisSetterConfig(NamedTuple):
+# TODO rename all Setter in all files
+class _AnalysisBuilderConfig(NamedTuple):
     df_analyzer: type["_AnalysisSetter"]
     aws_accounts_array: _ArrayAwsAccountsToCompare
     log_message: str
@@ -72,13 +73,13 @@ class _AnalysisSetterConfig(NamedTuple):
 
 class _AnalysisConfigFactory(ABC):
     @abstractmethod
-    def get_config(self) -> _AnalysisSetterConfig:
+    def get_config(self) -> _AnalysisBuilderConfig:
         pass
 
 
 class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
-    def get_config(self) -> _AnalysisSetterConfig:
-        return _AnalysisSetterConfig(
+    def get_config(self) -> _AnalysisBuilderConfig:
+        return _AnalysisBuilderConfig(
             _IsFileCopiedAnalysisSetter,
             _FileCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if files of the account '{origin}' have been copied to the account {target}",
@@ -86,8 +87,8 @@ class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
 
 
 class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
-    def get_config(self) -> _AnalysisSetterConfig:
-        return _AnalysisSetterConfig(
+    def get_config(self) -> _AnalysisBuilderConfig:
+        return _AnalysisBuilderConfig(
             _CanFileExistAnalysisSetter,
             _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",

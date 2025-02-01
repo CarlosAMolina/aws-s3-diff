@@ -21,7 +21,7 @@ from src.analysis import _IsFileCopiedAnalysisSetter
 from src.config_files import S3UrisFileReader
 
 
-class _AnalysisSetterConfig(ABC):
+class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
     def analysis_class_to_check(self) -> type[_AnalysisSetter]:
@@ -38,7 +38,7 @@ class _AnalysisSetterConfig(ABC):
         pass
 
 
-class _IsFileCopiedAnalysisSetterConfig(_AnalysisSetterConfig):
+class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
     def analysis_class_to_check(self) -> type[_AnalysisSetter]:
         return _IsFileCopiedAnalysisSetter
@@ -58,7 +58,7 @@ class _IsFileCopiedAnalysisSetterConfig(_AnalysisSetterConfig):
         return "is_sync_ok_in_aws_account_2_release"
 
 
-class _CanFileExistAnalysisSetterConfig(_AnalysisSetterConfig):
+class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
     def analysis_class_to_check(self) -> type[_AnalysisSetter]:
         return _CanFileExistAnalysisSetter
@@ -91,12 +91,12 @@ class TestDfAnalysis(unittest.TestCase):
     )
     def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
         for analysis_config in [
-            _IsFileCopiedAnalysisSetterConfig(),
-            _CanFileExistAnalysisSetterConfig(),
+            _IsFileCopiedAnalysisBuilderConfig(),
+            _CanFileExistAnalysisBuilderConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
-    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisSetterConfig):
+    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisBuilderConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
             result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()
