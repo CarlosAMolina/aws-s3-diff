@@ -18,8 +18,8 @@ from types_custom import AnalysisS3DataDf
 class AnalysisS3DataFactory:
     def __init__(self):
         self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
-        self._all_analysis_setter = _AllAnalysisSetter()
         self._analysis_df_to_csv = _AnalysisDfToCsv()
+        self._analysis_config_reader = AnalysisConfigReader()
 
     def to_csv(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
@@ -27,7 +27,15 @@ class AnalysisS3DataFactory:
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
-        return self._all_analysis_setter.get_df_set_analysis_columns(all_accounts_s3_data_df)
+        return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
+
+    def _get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
+        result_builder = _AnalysisBuilder(df)
+        if len(self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()):
+            result_builder.with_analysis_is_file_copied()
+        if len(self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()):
+            result_builder.with_analysis_no_more_files()
+        return result_builder.build()
 
 
 _AwsAccountsToCompare = namedtuple("_AwsAccountsToCompare", "origin target")
@@ -93,19 +101,6 @@ class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
             _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
             "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
-
-
-class _AllAnalysisSetter:
-    def __init__(self):
-        self._analysis_config_reader = AnalysisConfigReader()
-
-    def get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
-        result_builder = _AnalysisBuilder(df)
-        if len(self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()):
-            result_builder.with_analysis_is_file_copied()
-        if len(self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()):
-            result_builder.with_analysis_no_more_files()
-        return result_builder.build()
 
 
 class _AnalysisBuilder:

@@ -12,12 +12,12 @@ from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
 from s3_data import _CombinedAccountsS3DataCsvToDf
-from src.analysis import _AllAnalysisSetter
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _AnalysisSetter
 from src.analysis import _AwsAccountsToCompare
 from src.analysis import _CanFileExistAnalysisSetter
 from src.analysis import _IsFileCopiedAnalysisSetter
+from src.analysis import AnalysisS3DataFactory
 from src.config_files import S3UrisFileReader
 
 
@@ -113,7 +113,7 @@ class TestDfAnalysis(unittest.TestCase):
         return _AwsAccountsToCompare(*all_aws_accounts[:2])
 
 
-class TestAllAnalysisSetter(unittest.TestCase):
+class TestAnalysisS3DataFactory(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
@@ -123,9 +123,10 @@ class TestAllAnalysisSetter(unittest.TestCase):
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
-    def get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
+    def test_get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
+        # TODO try to call AnalysisS3DataFactory()._get_df_s3_data_analyzed(df)
         df = _get_df_combine_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
-        result = _AllAnalysisSetter().get_df_set_analysis_columns(df)
+        result = AnalysisS3DataFactory()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
