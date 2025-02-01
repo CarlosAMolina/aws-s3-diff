@@ -7,8 +7,8 @@ from src import s3_data as m_s3_data
 
 ExpectedResult = list[dict]
 
-_AWS_ACCOUNT_ORIGIN = "pro"
-_AWS_ACCOUNT_TARGET = "dev"
+_ACCOUNT_ORIGIN = "pro"
+_ACCOUNT_TARGET = "dev"
 
 
 class TestS3UriDfModifier(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                 assert_frame_equal(
                     expected_result,
                     m_s3_data._S3UriDfModifier(
-                        _AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET, df
+                        _ACCOUNT_ORIGIN, _ACCOUNT_TARGET, df
                     )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
                 )
 
@@ -54,7 +54,7 @@ class TestS3UriDfModifier(unittest.TestCase):
 def _get_df_as_multi_index(df: Df) -> Df:
     result = df.copy()
     result = result.set_index(["bucket", "prefix", "name"])
-    result.columns = [[_AWS_ACCOUNT_TARGET] * len(result.columns), result.columns]
+    result.columns = [[_ACCOUNT_TARGET] * len(result.columns), result.columns]
     return result
 
 
@@ -91,13 +91,13 @@ class _S3UrisMapDfFactory:
     def __init__(self):
         self._df = Df(
             {
-                _AWS_ACCOUNT_ORIGIN: {
+                _ACCOUNT_ORIGIN: {
                     0: "s3://cars/europe/spain",
                     1: "s3://pets/dogs/big_size",
                     2: "s3://pets/horses/europe",
                     3: "s3://pets/non-existent-prefix",
                 },
-                _AWS_ACCOUNT_TARGET: {
+                _ACCOUNT_TARGET: {
                     0: "s3://cars_dev/europe/spain",
                     1: "s3://pets_dev/dogs/size/heavy",
                     2: "s3://pets_dev/horses/europe",
@@ -110,6 +110,6 @@ class _S3UrisMapDfFactory:
         return self._df
 
     def get_df_with_trailing_slash(self) -> Df:
-        for aws_account in (_AWS_ACCOUNT_ORIGIN, _AWS_ACCOUNT_TARGET):
+        for aws_account in (_ACCOUNT_ORIGIN, _ACCOUNT_TARGET):
             self._df[aws_account] = self._df[aws_account] + "/"
         return self._df
