@@ -37,6 +37,22 @@ class AnalysisS3DataFactory:
         return result_builder.build()
 
 
+class _AnalysisBuilder:
+    def __init__(self, df: AllAccountsS3DataDf):
+        self._df = df
+
+    def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
+        self._df = _FileCopiedTypeAnalysisFactory().get_df(self._df)
+        return self
+
+    def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
+        self._df = _CanExistTypeAnalysisFactory().get_df(self._df)
+        return self
+
+    def build(self) -> Df:
+        return self._df
+
+
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 _ArrayAccountsToCompare = list[_AccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
@@ -66,22 +82,6 @@ class _FileCopiedAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFa
 class _CanExistAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
-
-
-class _AnalysisBuilder:
-    def __init__(self, df: AllAccountsS3DataDf):
-        self._df = df
-
-    def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._df = _FileCopiedTypeAnalysisFactory().get_df(self._df)
-        return self
-
-    def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
-        self._df = _CanExistTypeAnalysisFactory().get_df(self._df)
-        return self
-
-    def build(self) -> Df:
-        return self._df
 
 
 class _TypeAnalysisFactory(ABC):
