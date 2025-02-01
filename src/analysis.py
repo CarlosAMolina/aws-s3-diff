@@ -74,7 +74,6 @@ class _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory(_ArrayAwsAccountsToCo
 class _AnalysisConfig(NamedTuple):
     analysis_factory: type["_AnalysisFactory"]
     aws_accounts_array: _ArrayAwsAccountsToCompare
-    log_message: str
 
 
 class _AnalysisConfigFactory(ABC):
@@ -88,7 +87,6 @@ class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
         return _AnalysisConfig(
             _IsFileCopiedAnalysisFactory,
             _FileCopiedAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
-            "Analyzing if files of the account '{origin}' have been copied to the account {target}",
         )
 
 
@@ -97,14 +95,12 @@ class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
         return _AnalysisConfig(
             _CanFileExistAnalysisFactory,
             _NoMoreFilesAnalysisArrayAwsAccountsToCompareFactory().get_array_aws_accounts(),
-            "Analyzing if iles in account '{target}' can exist, compared to account '{origin}'",
         )
 
 
 class _AnalysisBuilder:
     def __init__(self, df: AllAccountsS3DataDf):
         self._df = df
-        self._logger = get_logger()
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         self._set_analysis(_FileCopiedAnalysisConfigFactory())
@@ -117,7 +113,6 @@ class _AnalysisBuilder:
     def _set_analysis(self, config_factory: _AnalysisConfigFactory):
         config = config_factory.get_config()
         for aws_accounts in config.aws_accounts_array:
-            self._logger.info(config.log_message.format(origin=aws_accounts.origin, target=aws_accounts.target))
             self._df = config.analysis_factory(aws_accounts, self._df).get_df_set_analysis()
 
     def build(self) -> Df:
@@ -126,11 +121,13 @@ class _AnalysisBuilder:
 
 class _AnalysisFactory(ABC):
     def __init__(self, aws_accounts: _AwsAccountsToCompare, df: AllAccountsS3DataDf):
-        self._aws_account_target = aws_accounts.target
+        self._aws_accounts = aws_accounts
         self._condition = _AnalysisCondition(aws_accounts, df)
         self._df = df
+        self._logger = get_logger()
 
     def get_df_set_analysis(self) -> AnalysisS3DataDf:
+        self._log_analysis()
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[self._result_column_multi_index]] = None
@@ -141,6 +138,10 @@ class _AnalysisFactory(ABC):
             condition_results: Series = getattr(self._condition, condition_name)
             result.loc[condition_results, [self._result_column_multi_index]] = condition_result_to_set
         return result
+
+    @abstractmethod
+    def _log_analysis(self):
+        pass
 
     @property
     def _result_column_multi_index(self) -> tuple[str, str]:
@@ -158,9 +159,15 @@ class _AnalysisFactory(ABC):
 
 
 class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
+    def _log_analysis(self):
+        self._logger.info(
+            f"Analyzing if files of the account '{self._aws_accounts.origin}' have been copied to the account"
+            f" '{self._aws_accounts.target}'"
+        )
+
     @property
     def _column_name_result(self) -> str:
-        return f"is_sync_ok_in_{self._aws_account_target}"
+        return f"is_sync_ok_in_{self._aws_accounts.target}"
 
     @property
     def _condition_config(self) -> _ConditionConfig:
@@ -173,9 +180,15 @@ class _IsFileCopiedAnalysisFactory(_AnalysisFactory):
 
 
 class _CanFileExistAnalysisFactory(_AnalysisFactory):
+    def _log_analysis(self):
+        self._logger.info(
+            f"Analyzing if files in account '{self._aws_accounts.target}' can exist, compared to account"
+            f" '{self._aws_accounts.origin}'"
+        )
+
     @property
     def _column_name_result(self) -> str:
-        return f"can_exist_in_{self._aws_account_target}"
+        return f"can_exist_in_{self._aws_accounts.target}"
 
     @property
     def _condition_config(self) -> _ConditionConfig:
