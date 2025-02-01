@@ -141,13 +141,13 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")
         result = read_csv(expected_result_file_path).astype(
             {
-                "aws_account_1_pro_size": "Int64",
+                "pro_size": "Int64",
                 "aws_account_2_release_size": "Int64",
                 "aws_account_3_dev_size": "Int64",
             }
         )
         # https://stackoverflow.com/questions/26763344/convert-pandas-column-to-datetime/26763793#26763793
-        date_column_names = ["aws_account_1_pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
+        date_column_names = ["pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
 

@@ -79,7 +79,7 @@ class TestS3UrisFileReader(unittest.TestCase):
         self, mock_file_path_what_to_analyze
     ):
         for aws_account, expected_result in {
-            "aws_account_1_pro": [
+            "pro": [
                 S3Query("cars", "europe/spain"),
                 S3Query("pets", "dogs/big_size"),
                 S3Query("pets", "horses/europe"),

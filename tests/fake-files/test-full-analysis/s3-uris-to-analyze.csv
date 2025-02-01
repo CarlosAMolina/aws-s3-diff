@@ -1,4 +1,4 @@
-aws_account_1_pro,aws_account_2_release,aws_account_3_dev
+pro,aws_account_2_release,aws_account_3_dev
 s3://cars/europe/spain,s3://cars/europe/spain,s3://cars_dev/europe/spain
 s3://pets/dogs/big_size,s3://pets/dogs/big_size,s3://pets_dev/dogs/size/heavy
 s3://pets/horses/europe,s3://pets/horses/europe,s3://pets_dev/horses/europe

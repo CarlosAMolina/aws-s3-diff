@@ -9,7 +9,7 @@ server = ThreadedMotoServer()
 server.start()
 ENDPOINT_URL = "http://localhost:5000"
 print("MotoServer:", ENDPOINT_URL)
-S3("aws_account_1_pro", ENDPOINT_URL).create_objects()
+S3("pro", ENDPOINT_URL).create_objects()
 print("You can now run aws commands in another terminal. Example: aws --endpoint-url http://localhost:5000 s3 ls")
 input("Press enter to stop the MotoServer")
 print("Stopping MotoServer")
