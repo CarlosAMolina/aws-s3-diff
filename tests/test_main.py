@@ -14,9 +14,9 @@ from src.config_files import S3UrisFileReader
 from src.local_paths import LocalPaths
 from src.local_results import _AnalysisPaths
 from src.local_results import LocalResults
+from src.main import _Main
 from src.main import AnalysisConfigError
 from src.main import FolderInS3UriError
-from src.main import run
 from tests.aws import S3Server
 
 
@@ -40,7 +40,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         with self._local_s3_server:
             for account in S3UrisFileReader().get_accounts():
                 self._local_s3_server.create_objects(account)
-                run()
+                _Main().run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
@@ -91,7 +91,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
         mock_run.side_effect = AnalysisConfigError("foo")
         with self.assertLogs(level="ERROR") as cm:
-            run()
+            _Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
     @patch("src.main.LocalResults")
@@ -135,7 +135,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
                 mock_extract.side_effect = aws_error
                 self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
-                    run()
+                    _Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
     def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):

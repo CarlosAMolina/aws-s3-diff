@@ -16,10 +16,6 @@ from s3_data import AccountS3DataFactory
 from s3_data import AllAccountsS3DataFactory
 
 
-def run():
-    _Main().run()
-
-
 class _Main:
     def __init__(self):
         self._logger = get_logger()
@@ -203,4 +199,4 @@ class _AnalysisProcess(_Process):
 
 
 if __name__ == "__main__":
-    run()
+    _Main().run()
