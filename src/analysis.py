@@ -146,6 +146,7 @@ class _AnalysisConfig(ABC):
         pass
 
 
+# TODO rename to AnalysisFactory
 class _AnalysisSetter(ABC):
     def __init__(self, aws_accounts: _AwsAccountsToCompare, df: AllAccountsS3DataDf):
         self._aws_account_target = aws_accounts.target
