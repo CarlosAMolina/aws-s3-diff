@@ -19,7 +19,7 @@ from s3_data import AllAccountsS3DataFactory
 def run():
     logger = get_logger()
     try:
-        _InteractiveMenu().run()
+        _Main().run()
     except (AnalysisConfigError, FolderInS3UriError) as exception:
         logger.error(exception)
         return
@@ -38,7 +38,7 @@ def run():
         raise Exception from exception
 
 
-class _InteractiveMenu:
+class _Main:
     def __init__(self):
         self._logger = get_logger()
         self._process_factory = _ProcessFactory()

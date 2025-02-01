@@ -87,7 +87,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
 
 
 class TestFunction_runNoLocalS3Server(unittest.TestCase):
-    @patch("src.main._InteractiveMenu.run")
+    @patch("src.main._Main.run")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
         mock_run.side_effect = AnalysisConfigError("foo")
         with self.assertLogs(level="ERROR") as cm:
