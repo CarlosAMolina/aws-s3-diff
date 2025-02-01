@@ -33,7 +33,7 @@ class AnalysisS3DataFactory:
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
         if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
-            result_builder.with_analysis_no_more_files()
+            result_builder.with_analysis_can_exist_files()
         return result_builder.build()
 
 
@@ -76,7 +76,7 @@ class _AnalysisBuilder:
         self._df = _FileCopiedTypeAnalysisFactory().get_df(self._df)
         return self
 
-    def with_analysis_no_more_files(self) -> "_AnalysisBuilder":
+    def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
         self._df = _CanExistTypeAnalysisFactory().get_df(self._df)
         return self
 
