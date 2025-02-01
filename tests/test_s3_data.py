@@ -110,6 +110,6 @@ class _S3UrisMapDfFactory:
         return self._df
 
     def get_df_with_trailing_slash(self) -> Df:
-        for aws_account in (_ACCOUNT_ORIGIN, _ACCOUNT_TARGET):
-            self._df[aws_account] = self._df[aws_account] + "/"
+        for account in (_ACCOUNT_ORIGIN, _ACCOUNT_TARGET):
+            self._df[account] = self._df[account] + "/"
         return self._df

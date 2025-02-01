@@ -31,9 +31,9 @@ class AnalysisS3DataFactory:
 
     def _get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
         result_builder = _AnalysisBuilder(df)
-        if len(self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()):
+        if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
-        if len(self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()):
+        if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
             result_builder.with_analysis_no_more_files()
         return result_builder.build()
 
@@ -47,33 +47,31 @@ class _ArrayAccountsToCompareFactory(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
-    def get_array_aws_accounts(self) -> _ArrayAccountsToCompare:
-        return self._get_array_aws_accounts_for_target_accounts(self._get_aws_account_targets())
+    def get_array_accounts(self) -> _ArrayAccountsToCompare:
+        return self._get_array_accounts_for_target_accounts(self._get_account_targets())
 
-    def _get_array_aws_accounts_for_target_accounts(self, aws_account_targets: list[str]) -> _ArrayAccountsToCompare:
-        aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
-        return [
-            _AccountsToCompare(aws_account_origin, aws_account_target) for aws_account_target in aws_account_targets
-        ]
+    def _get_array_accounts_for_target_accounts(self, account_targets: list[str]) -> _ArrayAccountsToCompare:
+        account_origin = self._analysis_config_reader.get_account_origin()
+        return [_AccountsToCompare(account_origin, account_target) for account_target in account_targets]
 
     @abstractmethod
-    def _get_aws_account_targets(self) -> list[str]:
+    def _get_account_targets(self) -> list[str]:
         pass
 
 
 class _FileCopiedAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
-    def _get_aws_account_targets(self) -> list[str]:
-        return self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
+    def _get_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
 
 class _NoMoreFilesAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
-    def _get_aws_account_targets(self) -> list[str]:
-        return self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
+    def _get_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
 
 class _AnalysisConfig(NamedTuple):
-    aws_accounts_to_compare_analysis_factory: type["_AccountsToCompareAnalysisFactory"]
-    aws_accounts_array: _ArrayAccountsToCompare
+    accounts_to_compare_analysis_factory: type["_AccountsToCompareAnalysisFactory"]
+    accounts_array: _ArrayAccountsToCompare
 
 
 class _AnalysisConfigFactory(ABC):
@@ -86,7 +84,7 @@ class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
             _IsFileCopiedAccountsToCompareAnalysisFactory,
-            _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_aws_accounts(),
+            _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_accounts(),
         )
 
 
@@ -94,7 +92,7 @@ class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
     def get_config(self) -> _AnalysisConfig:
         return _AnalysisConfig(
             _CanFileExistAccountsToCompareAnalysisFactory,
-            _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_aws_accounts(),
+            _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_accounts(),
         )
 
 
@@ -112,17 +110,17 @@ class _AnalysisBuilder:
 
     def _set_analysis(self, config_factory: _AnalysisConfigFactory):
         config = config_factory.get_config()
-        for aws_accounts in config.aws_accounts_array:
-            self._df = config.aws_accounts_to_compare_analysis_factory(aws_accounts, self._df).get_df_set_analysis()
+        for accounts in config.accounts_array:
+            self._df = config.accounts_to_compare_analysis_factory(accounts, self._df).get_df_set_analysis()
 
     def build(self) -> Df:
         return self._df
 
 
 class _AccountsToCompareAnalysisFactory(ABC):
-    def __init__(self, aws_accounts: _AccountsToCompare, df: AllAccountsS3DataDf):
-        self._aws_accounts = aws_accounts
-        self._condition = _AnalysisCondition(aws_accounts, df)
+    def __init__(self, accounts: _AccountsToCompare, df: AllAccountsS3DataDf):
+        self._accounts = accounts
+        self._condition = _AnalysisCondition(accounts, df)
         self._df = df
         self._logger = get_logger()
 
@@ -161,13 +159,13 @@ class _AccountsToCompareAnalysisFactory(ABC):
 class _IsFileCopiedAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
-            f"Analyzing if files of the account '{self._aws_accounts.origin}' have been copied to the account"
-            f" '{self._aws_accounts.target}'"
+            f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
+            f" '{self._accounts.target}'"
         )
 
     @property
     def _column_name_result(self) -> str:
-        return f"is_sync_ok_in_{self._aws_accounts.target}"
+        return f"is_sync_ok_in_{self._accounts.target}"
 
     @property
     def _condition_config(self) -> _ConditionConfig:
@@ -182,13 +180,13 @@ class _IsFileCopiedAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFa
 class _CanFileExistAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFactory):
     def _log_analysis(self):
         self._logger.info(
-            f"Analyzing if files in account '{self._aws_accounts.target}' can exist, compared to account"
-            f" '{self._aws_accounts.origin}'"
+            f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
+            f" '{self._accounts.origin}'"
         )
 
     @property
     def _column_name_result(self) -> str:
-        return f"can_exist_in_{self._aws_accounts.target}"
+        return f"can_exist_in_{self._accounts.target}"
 
     @property
     def _condition_config(self) -> _ConditionConfig:
@@ -196,8 +194,8 @@ class _CanFileExistAccountsToCompareAnalysisFactory(_AccountsToCompareAnalysisFa
 
 
 class _AnalysisCondition:
-    def __init__(self, aws_accounts: _AccountsToCompare, df: Df):
-        self._aws_accounts = aws_accounts
+    def __init__(self, accounts: _AccountsToCompare, df: Df):
+        self._accounts = accounts
         self._df = df
 
     @property
@@ -210,15 +208,15 @@ class _AnalysisCondition:
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
-        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_account
 
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
-        return ~self._condition_exists_file_to_sync & ~self._condition_exists_file_in_target_aws_account
+        return ~self._condition_exists_file_to_sync & ~self._condition_exists_file_in_target_account
 
     @property
     def condition_must_not_exist(self) -> Series:
-        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_aws_account
+        return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_account
 
     @property
     def condition_not_exist_file_to_sync(self) -> Series:
@@ -239,30 +237,30 @@ class _AnalysisCondition:
         )
 
     @property
-    def _condition_exists_file_in_target_aws_account(self) -> Series:
+    def _condition_exists_file_in_target_account(self) -> Series:
         return self._df.loc[:, self._column_index_size_target].notnull()
 
     @property
     def _column_index_size_origin(self) -> tuple:
-        return self._get_column_index_size_for_account(self._aws_accounts.origin)
+        return self._get_column_index_size_for_account(self._accounts.origin)
 
     @property
     def _column_index_size_target(self) -> tuple:
-        return self._get_column_index_size_for_account(self._aws_accounts.target)
+        return self._get_column_index_size_for_account(self._accounts.target)
 
-    def _get_column_index_size_for_account(self, aws_account: str) -> tuple:
-        return (aws_account, "size")
+    def _get_column_index_size_for_account(self, account: str) -> tuple:
+        return (account, "size")
 
     @property
     def _column_index_hash_origin(self) -> tuple:
-        return self._get_column_index_hash_for_account(self._aws_accounts.origin)
+        return self._get_column_index_hash_for_account(self._accounts.origin)
 
     @property
     def _column_index_hash_target(self) -> tuple:
-        return self._get_column_index_hash_for_account(self._aws_accounts.target)
+        return self._get_column_index_hash_for_account(self._accounts.target)
 
-    def _get_column_index_hash_for_account(self, aws_account: str) -> tuple:
-        return (aws_account, "hash")
+    def _get_column_index_hash_for_account(self, account: str) -> tuple:
+        return (account, "hash")
 
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
@@ -285,11 +283,11 @@ class _AnalysisDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = self._s3_uris_file_reader.get_first_aws_account()
+        account_1 = self._s3_uris_file_reader.get_first_account()
         result.index.names = [
-            f"bucket_{aws_account_1}",
-            f"file_path_in_s3_{aws_account_1}",
-            "file_name_all_aws_accounts",
+            f"bucket_{account_1}",
+            f"file_path_in_s3_{account_1}",
+            "file_name_all_accounts",
         ]
         return result
 

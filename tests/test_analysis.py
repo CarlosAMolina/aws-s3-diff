@@ -99,7 +99,7 @@ class TestDfAnalysis(unittest.TestCase):
     def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisBuilderConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             df = self._get_df_combine_accounts_s3_data_csv(file_name)
-            result = config.analysis_class_to_check(self._aws_accounts_to_compare, df).get_df_set_analysis()
+            result = config.analysis_class_to_check(self._accounts_to_compare, df).get_df_set_analysis()
             result_to_check = result.loc[:, ("analysis", config.column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
 
@@ -108,9 +108,9 @@ class TestDfAnalysis(unittest.TestCase):
         return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
-    def _aws_accounts_to_compare(self) -> _AccountsToCompare:
-        all_aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        return _AccountsToCompare(*all_aws_accounts[:2])
+    def _accounts_to_compare(self) -> _AccountsToCompare:
+        all_accounts = self._s3_uris_file_reader.get_accounts()
+        return _AccountsToCompare(*all_accounts[:2])
 
 
 class TestAnalysisS3DataFactory(unittest.TestCase):

@@ -38,11 +38,11 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     )
     def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
         with self._local_s3_server:
-            for aws_account in S3UrisFileReader().get_aws_accounts():
-                self._local_s3_server.create_objects(aws_account)
+            for account in S3UrisFileReader().get_accounts():
+                self._local_s3_server.create_objects(account)
                 run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
-        self._assert_extracted_aws_accounts_data_have_expected_values(analysis_paths)
+        self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
         shutil.rmtree(analysis_paths.directory_analysis)
 
@@ -67,13 +67,13 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
             }
         )
 
-    def _assert_extracted_aws_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
-        for aws_account, file_name_expected_result in {
+    def _assert_extracted_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
+        for account, file_name_expected_result in {
             "pro": "pro.csv",
             "release": "release.csv",
             "dev": "dev.csv",
         }.items():
-            file_path_results = analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
+            file_path_results = analysis_paths.directory_analysis.joinpath(f"{account}.csv")
             result_df = read_csv(file_path_results)
             expected_result_df = read_csv(f"tests/expected-results/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
@@ -103,7 +103,7 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
-        self, mock_file_path_what_to_analyze, mock_extract, mock_analyzed_aws_accounts, mock_local_results
+        self, mock_file_path_what_to_analyze, mock_extract, mock_analyzed_accounts, mock_local_results
     ):
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
@@ -133,16 +133,14 @@ class TestFunction_runNoLocalS3Server(unittest.TestCase):
             expected_error_message, aws_error = test_data
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_extract.side_effect = aws_error
-                self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_aws_accounts, mock_local_results)
+                self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
                     run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
-    def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_aws_accounts, mock_local_results):
-        mock_analyzed_aws_accounts().get_aws_account_to_analyze.return_value = (
-            S3UrisFileReader().get_first_aws_account()
-        )
-        mock_analyzed_aws_accounts().have_all_aws_accounts_been_analyzed.return_value = False
+    def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):
+        mock_analyzed_accounts().get_account_to_analyze.return_value = S3UrisFileReader().get_first_account()
+        mock_analyzed_accounts().have_all_accounts_been_analyzed.return_value = False
         mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
         mock_local_results().analysis_paths.file_s3_data_all_accounts.is_file.return_value = False
         mock_local_results().directory_analysis.is_dir.return_value = True

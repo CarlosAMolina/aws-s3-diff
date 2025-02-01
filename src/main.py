@@ -48,13 +48,13 @@ class _InteractiveMenu:
         self._logger.info("Welcome to the AWS S3 Diff tool!")
         self._logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
-        self._show_aws_accounts_to_analyze()
+        self._show_accounts_to_analyze()
         self._process_factory.get_process().run()
 
-    def _show_aws_accounts_to_analyze(self):
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        aws_accounts_list = [f"\n{index}. {aws_account}" for index, aws_account in enumerate(aws_accounts, 1)]
-        self._logger.info(f"AWS accounts configured to be analyzed:{''.join(aws_accounts_list)}")
+    def _show_accounts_to_analyze(self):
+        accounts = self._s3_uris_file_reader.get_accounts()
+        accounts_list = [f"\n{index}. {account}" for index, account in enumerate(accounts, 1)]
+        self._logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
 
 class _Process(ABC):
@@ -65,7 +65,7 @@ class _Process(ABC):
 
 class _ProcessFactory:
     def __init__(self):
-        self._analyzed_aws_accounts = _AnalyzedAccounts()
+        self._analyzed_accounts = _AnalyzedAccounts()
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -76,7 +76,7 @@ class _ProcessFactory:
         """
         if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
             return _AnalysisProcess()
-        if self._analyzed_aws_accounts.have_all_aws_accounts_been_analyzed():
+        if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
         return _AccountProcessFactory().get_process()
 
@@ -86,57 +86,57 @@ class _AnalyzedAccounts:
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_aws_account_to_analyze(self) -> str:
-        aws_accounts_to_analyze = self._s3_uris_file_reader.get_aws_accounts()
-        last_aws_account_analyzed = self._get_last_aws_account_analyzed()
-        if last_aws_account_analyzed is None:
-            return self._s3_uris_file_reader.get_first_aws_account()
-        if last_aws_account_analyzed == self._s3_uris_file_reader.get_last_aws_account():
+    def get_account_to_analyze(self) -> str:
+        accounts_to_analyze = self._s3_uris_file_reader.get_accounts()
+        last_account_analyzed = self._get_last_account_analyzed()
+        if last_account_analyzed is None:
+            return self._s3_uris_file_reader.get_first_account()
+        if last_account_analyzed == self._s3_uris_file_reader.get_last_account():
             # Unexpected situation. This method cannot be called if all accounts have been analyzed.
             raise RuntimeError("All AWS accounts have been analyzed")
-        return aws_accounts_to_analyze[aws_accounts_to_analyze.index(last_aws_account_analyzed) + 1]
+        return accounts_to_analyze[accounts_to_analyze.index(last_account_analyzed) + 1]
 
-    def have_all_aws_accounts_been_analyzed(self) -> bool:
-        return self._get_last_aws_account_analyzed() == self._s3_uris_file_reader.get_last_aws_account()
+    def have_all_accounts_been_analyzed(self) -> bool:
+        return self._get_last_account_analyzed() == self._s3_uris_file_reader.get_last_account()
 
-    def _get_last_aws_account_analyzed(self) -> str | None:
+    def _get_last_account_analyzed(self) -> str | None:
         result = None
-        for aws_account in self._s3_uris_file_reader.get_aws_accounts():
-            if not self._local_results.has_this_aws_account_been_analyzed(aws_account):
+        for account in self._s3_uris_file_reader.get_accounts():
+            if not self._local_results.has_this_account_been_analyzed(account):
                 return result
-            result = aws_account
+            result = account
         return result
 
 
 class _AccountProcess(_Process):
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
-        self._account_s3_data_factory = AccountS3DataFactory(aws_account)
+    def __init__(self, account: str):
+        self._account = account
+        self._account_s3_data_factory = AccountS3DataFactory(account)
         self._logger = get_logger()
 
     def run(self):
-        self._logger.info(f"Analyzing the AWS account '{self._aws_account}'")
+        self._logger.info(f"Analyzing the AWS account '{self._account}'")
         self._account_s3_data_factory.to_csv_extract_s3_data()
 
 
 class _AccountProcessFactory:
     def __init__(self):
-        self._analyzed_aws_accounts = _AnalyzedAccounts()
+        self._analyzed_accounts = _AnalyzedAccounts()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _AccountProcess:
-        aws_account = self._analyzed_aws_accounts.get_aws_account_to_analyze()
-        if aws_account == self._s3_uris_file_reader.get_first_aws_account():
-            return _FirstAccountProcess(aws_account)
-        if aws_account == self._s3_uris_file_reader.get_last_aws_account():
-            return _LastAccountProcess(aws_account)
-        return _IntermediateAccountProcess(aws_account)
+        account = self._analyzed_accounts.get_account_to_analyze()
+        if account == self._s3_uris_file_reader.get_first_account():
+            return _FirstAccountProcess(account)
+        if account == self._s3_uris_file_reader.get_last_account():
+            return _LastAccountProcess(account)
+        return _IntermediateAccountProcess(account)
 
 
 class _NoLastAccountProcess(_AccountProcess):
-    def __init__(self, aws_account: str):
-        self._analyzed_aws_accounts = _AnalyzedAccounts()
-        super().__init__(aws_account)
+    def __init__(self, account: str):
+        self._analyzed_accounts = _AnalyzedAccounts()
+        super().__init__(account)
 
     def run(self):
         super().run()
@@ -144,14 +144,14 @@ class _NoLastAccountProcess(_AccountProcess):
 
     def _show_next_account_to_analyze(self):
         self._logger.info(
-            f"The next account to be analyzed is '{self._analyzed_aws_accounts.get_aws_account_to_analyze()}'"
+            f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
             ". Authenticate and run the program again"
         )
 
 
 class _FirstAccountProcess(_NoLastAccountProcess):
-    def __init__(self, aws_account: str):
-        super().__init__(aws_account)
+    def __init__(self, account: str):
+        super().__init__(account)
         self._local_results = LocalResults()
 
     def run(self):

@@ -20,39 +20,39 @@ class AnalysisConfigChecker:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def assert_file_is_correct(self):
-        self._assert_aws_account_origin_exists()
-        self._assert_aws_accounts_target_exist()
+        self._assert_account_origin_exists()
+        self._assert_accounts_target_exist()
 
-    def _assert_aws_account_origin_exists(self):
-        aws_account_origin = self._analysis_config_reader.get_aws_account_origin()
-        if not self._exists_aws_account(aws_account_origin):
-            raise AnalysisConfigError(self._get_error_message_aws_account_does_not_exist(aws_account_origin))
+    def _assert_account_origin_exists(self):
+        account_origin = self._analysis_config_reader.get_account_origin()
+        if not self._exists_account(account_origin):
+            raise AnalysisConfigError(self._get_error_message_account_does_not_exist(account_origin))
 
-    def _assert_aws_accounts_target_exist(self):
-        aws_accounts_wrong_check_copy = self._get_aws_accounts_not_exist(
-            self._analysis_config_reader.get_aws_accounts_where_files_must_be_copied()
+    def _assert_accounts_target_exist(self):
+        accounts_wrong_check_copy = self._get_accounts_not_exist(
+            self._analysis_config_reader.get_accounts_where_files_must_be_copied()
         )
-        aws_accounts_wrong_check_more_files = self._get_aws_accounts_not_exist(
-            self._analysis_config_reader.get_aws_accounts_that_must_not_have_more_files()
+        accounts_wrong_check_more_files = self._get_accounts_not_exist(
+            self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
         )
-        aws_accounts_wrong = aws_accounts_wrong_check_copy | aws_accounts_wrong_check_more_files
-        if len(aws_accounts_wrong) == 1:
-            raise AnalysisConfigError(self._get_error_message_aws_account_does_not_exist(list(aws_accounts_wrong)[0]))
-        if len(aws_accounts_wrong) > 1:
-            raise AnalysisConfigError(self._get_error_message_aws_accounts_do_not_exist(sorted(aws_accounts_wrong)))
+        accounts_wrong = accounts_wrong_check_copy | accounts_wrong_check_more_files
+        if len(accounts_wrong) == 1:
+            raise AnalysisConfigError(self._get_error_message_account_does_not_exist(list(accounts_wrong)[0]))
+        if len(accounts_wrong) > 1:
+            raise AnalysisConfigError(self._get_error_message_accounts_do_not_exist(sorted(accounts_wrong)))
 
-    def _exists_aws_account(self, aws_account: str) -> bool:
-        return aws_account in self._s3_uris_file_reader.get_aws_accounts()
+    def _exists_account(self, account: str) -> bool:
+        return account in self._s3_uris_file_reader.get_accounts()
 
-    def _get_aws_accounts_not_exist(self, aws_accounts: list[str]) -> set[str]:
-        return {aws_account for aws_account in aws_accounts if not self._exists_aws_account(aws_account)}
+    def _get_accounts_not_exist(self, accounts: list[str]) -> set[str]:
+        return {account for account in accounts if not self._exists_account(account)}
 
-    def _get_error_message_aws_account_does_not_exist(self, aws_account: str) -> str:
-        return self._get_error_message(f"The AWS account '{aws_account}' is")
+    def _get_error_message_account_does_not_exist(self, account: str) -> str:
+        return self._get_error_message(f"The AWS account '{account}' is")
 
-    def _get_error_message_aws_accounts_do_not_exist(self, aws_accounts: list[str]) -> str:
-        aws_accounts_str = "', '".join(aws_accounts)
-        return self._get_error_message(f"The AWS accounts '{aws_accounts_str}' are")
+    def _get_error_message_accounts_do_not_exist(self, accounts: list[str]) -> str:
+        accounts_str = "', '".join(accounts)
+        return self._get_error_message(f"The AWS accounts '{accounts_str}' are")
 
     def _get_error_message(self, text_prefix: str) -> str:
         return f"{text_prefix} defined in {FILE_NAME_ANALYSIS_CONFIG} but not in {FILE_NAME_S3_URIS_TO_ANALYZE}"
@@ -67,13 +67,13 @@ class AnalysisConfigReader:
     def must_run_analysis(self) -> bool:
         return self._analysis_config["run_analysis"] is True
 
-    def get_aws_account_origin(self) -> str:
+    def get_account_origin(self) -> str:
         return self._analysis_config["origin"]
 
-    def get_aws_accounts_that_must_not_have_more_files(self) -> list[str]:
+    def get_accounts_that_must_not_have_more_files(self) -> list[str]:
         return self._analysis_config["can_the_file_exist_in"]
 
-    def get_aws_accounts_where_files_must_be_copied(self) -> list[str]:
+    def get_accounts_where_files_must_be_copied(self) -> list[str]:
         return self._analysis_config["is_the_file_copied_to"]
 
     @property
@@ -96,12 +96,12 @@ class S3UrisFileChecker:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def assert_file_is_correct(self):
-        self._assert_no_empty_aws_account()
+        self._assert_no_empty_account()
         self._assert_no_empty_uris()
         self._assert_no_duplicated_uri_per_account()
 
-    def _assert_no_empty_aws_account(self):
-        if any(aws_account.startswith("Unnamed: ") for aws_account in self._s3_uris_file_reader.get_aws_accounts()):
+    def _assert_no_empty_account(self):
+        if any(account.startswith("Unnamed: ") for account in self._s3_uris_file_reader.get_accounts()):
             raise ValueError("Some AWS account names are empty")
 
     def _assert_no_empty_uris(self):
@@ -109,10 +109,10 @@ class S3UrisFileChecker:
             raise ValueError("Some URIs are empty")
 
     def _assert_no_duplicated_uri_per_account(self):
-        for aws_account in self._s3_uris_file_reader.get_aws_accounts():
-            queries = self._s3_uris_file_reader.get_s3_queries_for_aws_account(aws_account)
+        for account in self._s3_uris_file_reader.get_accounts():
+            queries = self._s3_uris_file_reader.get_s3_queries_for_account(account)
             if len(queries) != len(set(queries)):
-                raise ValueError(f"The AWS account {aws_account} has duplicated URIs")
+                raise ValueError(f"The AWS account {account} has duplicated URIs")
 
 
 class S3UrisFileReader:
@@ -120,24 +120,24 @@ class S3UrisFileReader:
         self._config_directory_path = LocalPaths().config_directory
         self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
 
-    def get_aws_accounts(self) -> list[str]:
+    def get_accounts(self) -> list[str]:
         return self._df_file_what_to_analyze.columns.to_list()
 
-    def get_first_aws_account(self) -> str:
-        return self.get_aws_accounts()[0]
+    def get_first_account(self) -> str:
+        return self.get_accounts()[0]
 
-    def get_last_aws_account(self) -> str:
-        return self.get_aws_accounts()[-1]
+    def get_last_account(self) -> str:
+        return self.get_accounts()[-1]
 
-    def get_s3_queries_for_aws_account(self, aws_account: str) -> list[S3Query]:
-        s3_uris_to_analyze = self._df_file_what_to_analyze[aws_account].to_list()
+    def get_s3_queries_for_account(self, account: str) -> list[S3Query]:
+        s3_uris_to_analyze = self._df_file_what_to_analyze[account].to_list()
         return [self.get_s3_query_from_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
     def get_s3_query_from_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
-    def get_df_s3_uris_map_between_accounts(self, aws_account_origin: str, aws_account_target: str) -> Df:
-        return self._df_file_what_to_analyze[[aws_account_origin, aws_account_target]]
+    def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
+        return self._df_file_what_to_analyze[[account_origin, account_target]]
 
     def is_any_uri_null(self) -> np.bool:
         return self._df_file_what_to_analyze.isnull().values.any()

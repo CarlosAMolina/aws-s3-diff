@@ -13,8 +13,8 @@ class TestAnalysisConfigChecker(unittest.TestCase):
     def test_assert_file_is_correct_raises_expected_exception_if_origin_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
-        mock_analysis_config_reader.return_value.get_aws_account_origin.return_value = "pr"
-        mock_s3_uris_file_reader.return_value.get_aws_accounts.return_value = ["pro", "release"]
+        mock_analysis_config_reader.return_value.get_account_origin.return_value = "pr"
+        mock_s3_uris_file_reader.return_value.get_accounts.return_value = ["pro", "release"]
         with self.assertRaises(AnalysisConfigError) as exception:
             m_config_files.AnalysisConfigChecker().assert_file_is_correct()
         self.assertEqual(
@@ -27,9 +27,9 @@ class TestAnalysisConfigChecker(unittest.TestCase):
     def test_assert_file_is_correct_raises_expected_exception_if_target_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
-        mock_analysis_config_reader.return_value.get_aws_account_origin.return_value = "pro"
-        mock_analysis_config_reader.return_value.get_aws_accounts_where_files_must_be_copied.return_value = ["releas"]
-        mock_s3_uris_file_reader.return_value.get_aws_accounts.return_value = ["pro", "release"]
+        mock_analysis_config_reader.return_value.get_account_origin.return_value = "pro"
+        mock_analysis_config_reader.return_value.get_accounts_where_files_must_be_copied.return_value = ["releas"]
+        mock_s3_uris_file_reader.return_value.get_accounts.return_value = ["pro", "release"]
         with self.assertRaises(AnalysisConfigError) as exception:
             m_config_files.AnalysisConfigChecker().assert_file_is_correct()
         self.assertEqual(
@@ -42,13 +42,13 @@ class TestAnalysisConfigChecker(unittest.TestCase):
     def test_assert_file_is_correct_raises_expected_exception_if_target_accounts_do_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
-        mock_analysis_config_reader.return_value.get_aws_account_origin.return_value = "pro"
-        mock_analysis_config_reader.return_value.get_aws_accounts_where_files_must_be_copied.return_value = [
+        mock_analysis_config_reader.return_value.get_account_origin.return_value = "pro"
+        mock_analysis_config_reader.return_value.get_accounts_where_files_must_be_copied.return_value = [
             "releas",
             "de",
             "pre",
         ]
-        mock_s3_uris_file_reader.return_value.get_aws_accounts.return_value = ["pro", "release", "dev", "pre"]
+        mock_s3_uris_file_reader.return_value.get_accounts.return_value = ["pro", "release", "dev", "pre"]
         with self.assertRaises(AnalysisConfigError) as exception:
             m_config_files.AnalysisConfigChecker().assert_file_is_correct()
         self.assertEqual(
@@ -75,10 +75,10 @@ class TestS3UrisFileReader(unittest.TestCase):
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
-    def test_get_s3_queries_for_aws_account_returns_if_accounts_with_different_buckets(
+    def test_get_s3_queries_for_account_returns_if_accounts_with_different_buckets(
         self, mock_file_path_what_to_analyze
     ):
-        for aws_account, expected_result in {
+        for account, expected_result in {
             "pro": [
                 S3Query("cars", "europe/spain"),
                 S3Query("pets", "dogs/big_size"),
@@ -98,14 +98,14 @@ class TestS3UrisFileReader(unittest.TestCase):
                 S3Query("pets_dev", "non-existent-prefix"),
             ],
         }.items():
-            result = m_config_files.S3UrisFileReader().get_s3_queries_for_aws_account(aws_account)
+            result = m_config_files.S3UrisFileReader().get_s3_queries_for_account(account)
             self.assertEqual(expected_result, result)
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
     @mock.patch("src.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
-    def test_assert_file_is_correct_raises_exception_if_empty_aws_account(self, mock_file_path_what_to_analyze):
-        mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_aws_account.csv")
+    def test_assert_file_is_correct_raises_exception_if_empty_account(self, mock_file_path_what_to_analyze):
+        mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_account.csv")
         with self.assertRaises(ValueError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Some AWS account names are empty", str(exception.exception))
@@ -118,7 +118,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
         self.assertEqual("Some URIs are empty", str(exception.exception))
 
     @mock.patch("src.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
-    def test_assert_file_is_correct_raises_exception_if_duplicated_aws_account(self, mock_file_path_what_to_analyze):
+    def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_file_path_what_to_analyze):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("duplicated_uri.csv")
         with self.assertRaises(ValueError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()

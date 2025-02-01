@@ -35,22 +35,22 @@ class AllAccountsS3DataFactory:
 
 
 class AccountS3DataFactory:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
+    def __init__(self, account: str):
+        self._account = account
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def to_csv_extract_s3_data(self):
         _AccountExtractor(
-            self._local_results.get_file_path_aws_account_results(self._aws_account),
-            self._s3_uris_file_reader.get_s3_queries_for_aws_account(self._aws_account),
+            self._local_results.get_file_path_account_results(self._account),
+            self._s3_uris_file_reader.get_s3_queries_for_account(self._account),
         ).extract()
 
     def get_df_from_csv(self) -> Df:
-        return _AccountS3DataDfBuilder(self._aws_account).with_multi_index().build()
+        return _AccountS3DataDfBuilder(self._account).with_multi_index().build()
 
     def get_df_from_csv_with_original_account_index(self) -> Df:
-        return _AccountS3DataDfBuilder(self._aws_account).with_multi_index().with_origin_account_index().build()
+        return _AccountS3DataDfBuilder(self._account).with_multi_index().with_origin_account_index().build()
 
 
 class _AccountExtractor:
@@ -111,11 +111,11 @@ class _CombinedAccountsS3DataDfToCsv:
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
         result.columns = csv_column_names
-        aws_account_1 = self._s3_uris_file_reader.get_first_aws_account()
+        account_1 = self._s3_uris_file_reader.get_first_account()
         result.index.names = [
-            f"bucket_{aws_account_1}",
-            f"file_path_in_s3_{aws_account_1}",
-            "file_name_all_aws_accounts",
+            f"bucket_{account_1}",
+            f"file_path_in_s3_{account_1}",
+            "file_name_all_accounts",
         ]
         return result
 
@@ -133,14 +133,14 @@ class _CombinedAccountsS3DataCsvToDf:
         result = self._get_df_from_file(file_path_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
 
-    # TODO extract common code with _get_df_aws_account_from_file
+    # TODO extract common code with _get_df_account_from_file
     def _get_df_from_file(self, file_path_name: Path) -> Df:
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
+        accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(
             file_path_name,
-            index_col=[f"bucket_{aws_accounts[0]}", f"file_path_in_s3_{aws_accounts[0]}", "file_name_all_aws_accounts"],
-            parse_dates=[f"{aws_account}_date" for aws_account in aws_accounts],
-        ).astype({f"{aws_account}_size": "Int64" for aws_account in aws_accounts})
+            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
+            parse_dates=[f"{account}_date" for account in accounts],
+        ).astype({f"{account}_size": "Int64" for account in accounts})
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
@@ -151,10 +151,10 @@ class _CombinedAccountsS3DataCsvToDf:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
-        for aws_account in self._s3_uris_file_reader.get_aws_accounts():
-            regex_result = re.match(rf"{aws_account}_(?P<key>.*)", column_name)
+        for account in self._s3_uris_file_reader.get_accounts():
+            regex_result = re.match(rf"{account}_(?P<key>.*)", column_name)
             if regex_result is not None:
-                return aws_account, regex_result.group("key")
+                return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
 
 
@@ -163,14 +163,14 @@ class _AccountsS3DataDfCombinator:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> AllAccountsS3DataDf:
-        result = self._get_df_combine_aws_accounts_results()
+        result = self._get_df_combine_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
 
-    def _get_df_combine_aws_accounts_results(self) -> AllAccountsS3DataDf:
-        aws_accounts = self._s3_uris_file_reader.get_aws_accounts()
-        result = AccountS3DataFactory(aws_accounts[0]).get_df_from_csv()
-        for aws_account in aws_accounts[1:]:
-            account_df = AccountS3DataFactory(aws_account).get_df_from_csv_with_original_account_index()
+    def _get_df_combine_accounts_results(self) -> AllAccountsS3DataDf:
+        accounts = self._s3_uris_file_reader.get_accounts()
+        result = AccountS3DataFactory(accounts[0]).get_df_from_csv()
+        for account in accounts[1:]:
+            account_df = AccountS3DataFactory(account).get_df_from_csv_with_original_account_index()
             result = result.join(account_df, how="outer")
         return result
 
@@ -196,8 +196,8 @@ class _AccountsS3DataDfCombinator:
 
 
 class _AccountS3DataDfBuilder:
-    def __init__(self, aws_account: str):
-        self._aws_account = aws_account
+    def __init__(self, account: str):
+        self._account = account
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
         self.__df = None  # To avoid read file more than once.
@@ -209,7 +209,7 @@ class _AccountS3DataDfBuilder:
     def with_origin_account_index(self) -> "_AccountS3DataDfBuilder":
         """The with_multi_index method must be called before this method is called"""
         self._df = _S3UriDfModifier(
-            self._s3_uris_file_reader.get_first_aws_account(), self._aws_account, self._df
+            self._s3_uris_file_reader.get_first_account(), self._account, self._df
         ).get_df_set_s3_uris_in_origin_account()
         return self
 
@@ -219,11 +219,11 @@ class _AccountS3DataDfBuilder:
     @property
     def _df(self) -> Df:
         if self.__df is None:
-            local_file_path_name = self._local_results.get_file_path_aws_account_results(self._aws_account)
-            self.__df = self._get_df_aws_account_from_file(local_file_path_name)
+            local_file_path_name = self._local_results.get_file_path_account_results(self._account)
+            self.__df = self._get_df_account_from_file(local_file_path_name)
         return self.__df
 
-    def _get_df_aws_account_from_file(self, file_path_name: Path) -> Df:
+    def _get_df_account_from_file(self, file_path_name: Path) -> Df:
         return pd.read_csv(
             file_path_name,
             index_col=["bucket", "prefix", "name"],
@@ -236,17 +236,17 @@ class _AccountS3DataDfBuilder:
 
     @property
     def _column_names_mult_index(self) -> list[tuple[str, str]]:
-        return [(self._aws_account, column_name) for column_name in self._df.columns]
+        return [(self._account, column_name) for column_name in self._df.columns]
 
 
 class _S3UriDfModifier:
     def __init__(self, *args):
-        self._aws_account_origin, self._aws_account_target, self._df = args
+        self._account_origin, self._account_target, self._df = args
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_set_s3_uris_in_origin_account(self) -> Df:
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
-            self._aws_account_origin, self._aws_account_target
+            self._account_origin, self._account_target
         )
         return self._get_df_set_s3_uris_in_origin_account(s3_uris_map_df)
 
@@ -257,10 +257,10 @@ class _S3UriDfModifier:
         result = self._df.copy()
         result = result.reset_index()
         result["bucket_and_prefix"] = "s3://" + result["bucket"] + "/" + result["prefix"].str.rstrip("/")
-        for aws_account in (self._aws_account_origin, self._aws_account_target):
-            s3_uris_map_df.loc[:, aws_account] = s3_uris_map_df[aws_account].str.rstrip("/")
+        for account in (self._account_origin, self._account_target):
+            s3_uris_map_df.loc[:, account] = s3_uris_map_df[account].str.rstrip("/")
         s3_uris_map_df = s3_uris_map_df.rename(
-            columns={self._aws_account_origin: "new_value", self._aws_account_target: "current_value"}
+            columns={self._account_origin: "new_value", self._account_target: "current_value"}
         )
         s3_uris_map_df.columns = [
             s3_uris_map_df.columns,

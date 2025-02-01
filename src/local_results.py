@@ -11,11 +11,11 @@ class LocalResults:
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
         self._analysis_paths = None  # To avoid read/create file in __init__.
 
-    def has_this_aws_account_been_analyzed(self, aws_account: str) -> bool:
-        return self.get_file_path_aws_account_results(aws_account).is_file()
+    def has_this_account_been_analyzed(self, account: str) -> bool:
+        return self.get_file_path_account_results(account).is_file()
 
-    def get_file_path_aws_account_results(self, aws_account: str):
-        return self.analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
+    def get_file_path_account_results(self, account: str):
+        return self.analysis_paths.directory_analysis.joinpath(f"{account}.csv")
 
     def drop_file_with_analysis_date(self):
         self._logger.debug(f"Removing the file: {self._analysis_date_time_file_path}")
