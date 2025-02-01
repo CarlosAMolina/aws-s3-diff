@@ -1,7 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
-from typing import NamedTuple
 
 from pandas import DataFrame as Df
 from pandas import Series
@@ -69,52 +68,58 @@ class _NoMoreFilesAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareF
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
 
-class _AnalysisConfig(NamedTuple):
-    accounts_to_compare_analysis_factory: type["_AccountsToCompareAnalysisFactory"]
-    accounts_array: _ArrayAccountsToCompare
-
-
-class _AnalysisConfigFactory(ABC):
-    @abstractmethod
-    def get_config(self) -> _AnalysisConfig:
-        pass
-
-
-class _FileCopiedAnalysisConfigFactory(_AnalysisConfigFactory):
-    def get_config(self) -> _AnalysisConfig:
-        return _AnalysisConfig(
-            _IsFileCopiedAccountsToCompareAnalysisFactory,
-            _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_accounts(),
-        )
-
-
-class _NoMoreFilesAnalysisConfigFactory(_AnalysisConfigFactory):
-    def get_config(self) -> _AnalysisConfig:
-        return _AnalysisConfig(
-            _CanFileExistAccountsToCompareAnalysisFactory,
-            _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_accounts(),
-        )
-
-
 class _AnalysisBuilder:
     def __init__(self, df: AllAccountsS3DataDf):
         self._df = df
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._set_analysis(_FileCopiedAnalysisConfigFactory())
+        self._df = _FileCopiedTypeAnalysisFactory().get_df(self._df)
         return self
 
     def with_analysis_no_more_files(self) -> "_AnalysisBuilder":
-        self._set_analysis(_NoMoreFilesAnalysisConfigFactory())
+        self._df = _NoMoreFilesTypeAnalysisFactory().get_df(self._df)
         return self
-
-    def _set_analysis(self, config_factory: _AnalysisConfigFactory):
-        config = config_factory.get_config()
-        for accounts in config.accounts_array:
-            self._df = config.accounts_to_compare_analysis_factory(accounts, self._df).get_df_set_analysis()
 
     def build(self) -> Df:
         return self._df
+
+
+class _TypeAnalysisFactory(ABC):
+    def get_df(self, df: AllAccountsS3DataDf) -> Df:
+        result = df.copy()
+        for accounts in self._get_accounts_array():
+            result = self._two_accounts_analysis_factory(accounts, result).get_df_set_analysis()
+        return result
+
+    @abstractmethod
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        pass
+
+    # TODO use _AccountsToCompareAnalysisFactory without " in return type
+    @property
+    @abstractmethod
+    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
+        pass
+
+
+class _FileCopiedTypeAnalysisFactory(_TypeAnalysisFactory):
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        return _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_accounts()
+
+    # TODO rename _AccountsToCompareAnalysis... -> TwoAccountsAnalysis...
+    @property
+    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
+        return _IsFileCopiedAccountsToCompareAnalysisFactory
+
+
+class _NoMoreFilesTypeAnalysisFactory(_TypeAnalysisFactory):
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        return _NoMoreFilesAnalysisArrayAccountsToCompareFactory().get_array_accounts()
+
+    @property
+    def _two_accounts_analysis_factory(self) -> type["_AccountsToCompareAnalysisFactory"]:
+        # TODO rename to NoMoreFiles...
+        return _CanFileExistAccountsToCompareAnalysisFactory
 
 
 class _AccountsToCompareAnalysisFactory(ABC):
