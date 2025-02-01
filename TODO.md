@@ -2,6 +2,6 @@
 - s3-urist-to-analyze.csv. Check if the script can work with an uri without prefix, only the bucket. Example: `s3://bucket/`. If not, implement it
 - aws accounts values. Replace:
   - pro.. -> pro
-  - aws_account_2_release.. -> release
+  - release.. -> release
   - aws_account_3_dev.. -> dev
 

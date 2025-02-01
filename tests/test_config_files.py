@@ -85,7 +85,7 @@ class TestS3UrisFileReader(unittest.TestCase):
                 S3Query("pets", "horses/europe"),
                 S3Query("pets", "non-existent-prefix"),
             ],
-            "aws_account_2_release": [
+            "release": [
                 S3Query("cars", "europe/spain"),
                 S3Query("pets", "dogs/big_size"),
                 S3Query("pets", "horses/europe"),

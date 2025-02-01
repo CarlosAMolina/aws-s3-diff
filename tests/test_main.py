@@ -62,7 +62,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
         return read_csv(path).astype(
             {
                 "pro_size": "Int64",
-                "aws_account_2_release_size": "Int64",
+                "release_size": "Int64",
                 "aws_account_3_dev_size": "Int64",
             }
         )
@@ -70,7 +70,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     def _assert_extracted_aws_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
         for aws_account, file_name_expected_result in {
             "pro": "pro.csv",
-            "aws_account_2_release": "aws_account_2_release.csv",
+            "release": "release.csv",
             "aws_account_3_dev": "aws_account_3_dev.csv",
         }.items():
             file_path_results = analysis_paths.directory_analysis.joinpath(f"{aws_account}.csv")
@@ -82,7 +82,7 @@ class TestFunction_runLocalS3Server(unittest.TestCase):
     def _assert_analysis_file_has_expected_values(self, analysis_paths: _AnalysisPaths):
         result = self._get_df_from_csv(analysis_paths.file_analysis)
         expected_result = self._get_df_from_csv_expected_result()
-        date_column_names = ["pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
+        date_column_names = ["pro_date", "release_date", "aws_account_3_dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
 

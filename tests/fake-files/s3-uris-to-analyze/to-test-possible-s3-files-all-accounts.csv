@@ -1,2 +1,2 @@
-pro,aws_account_2_release
+pro,release
 s3://bucket_1/folder_a/folder_b,s3://bucket_2/folder_a/folder_b

@@ -55,7 +55,7 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
     @property
     def column_name_to_check(self) -> str:
-        return "is_sync_ok_in_aws_account_2_release"
+        return "is_sync_ok_in_release"
 
 
 class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
@@ -74,7 +74,7 @@ class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
     @property
     def column_name_to_check(self) -> str:
-        return "can_exist_in_aws_account_2_release"
+        return "can_exist_in_release"
 
 
 class TestDfAnalysis(unittest.TestCase):
@@ -132,7 +132,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
         expected_result = expected_result.astype(
-            {"is_sync_ok_in_aws_account_2_release": "object", "is_sync_ok_in_aws_account_3_dev": "object"}
+            {"is_sync_ok_in_release": "object", "is_sync_ok_in_aws_account_3_dev": "object"}
         )
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
@@ -142,12 +142,12 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         result = read_csv(expected_result_file_path).astype(
             {
                 "pro_size": "Int64",
-                "aws_account_2_release_size": "Int64",
+                "release_size": "Int64",
                 "aws_account_3_dev_size": "Int64",
             }
         )
         # https://stackoverflow.com/questions/26763344/convert-pandas-column-to-datetime/26763793#26763793
-        date_column_names = ["pro_date", "aws_account_2_release_date", "aws_account_3_dev_date"]
+        date_column_names = ["pro_date", "release_date", "aws_account_3_dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
 
