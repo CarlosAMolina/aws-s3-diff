@@ -143,10 +143,5 @@ class _AccountsS3DataDfCombinator:
 
 
 # TODO deprecate
-class _AccountS3DataDfBuilder(one_account_s3_data._AccountS3DataDfBuilder):
-    pass
-
-
-# TODO deprecate
 class _S3UriDfModifier(one_account_s3_data._S3UriDfModifier):
     pass
