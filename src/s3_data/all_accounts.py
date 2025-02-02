@@ -9,7 +9,7 @@ from pandas import read_csv
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
-from one_account_s3_data import AccountS3DataFactory
+from s3_data.one_account import AccountS3DataFactory
 from types_custom import AllAccountsS3DataDf
 
 

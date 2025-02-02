@@ -3,7 +3,7 @@ import unittest
 from pandas import DataFrame as Df
 from pandas.testing import assert_frame_equal
 
-from src.one_account_s3_data import _S3UriDfModifier
+from src.s3_data.one_account import _S3UriDfModifier
 
 ExpectedResult = list[dict]
 

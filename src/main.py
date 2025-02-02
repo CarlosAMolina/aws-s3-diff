@@ -12,8 +12,8 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
-from one_account_s3_data import AccountS3DataFactory
 from s3_data.all_accounts import AllAccountsS3DataFactory
+from s3_data.one_account import AccountS3DataFactory
 
 
 class _Main:
