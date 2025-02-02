@@ -274,6 +274,7 @@ class _S3UriDfModifier:
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
         result = s3_uris_map_df.copy()
         for account in (self._account_origin, self._account_target):
+            # TODO use regex in config_files
             result[[f"{account}_bucket", f"{account}_prefix"]] = result[account].str.extract(
                 r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
             )
