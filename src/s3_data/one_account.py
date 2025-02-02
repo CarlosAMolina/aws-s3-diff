@@ -21,7 +21,7 @@ class AccountS3DataFactory:
         self._account_s3_data_df_builder = _AccountS3DataDfBuilder(account)
 
     def to_csv_extract_s3_data(self):
-        self._account_extractor.extract()
+        self._account_extractor.extract_s3_data_to_csv()
 
     def get_df_from_csv(self) -> Df:
         return self._account_s3_data_df_builder.reset().with_multi_index().build()
@@ -37,7 +37,7 @@ class _AccountExtractor:
         self._local_results = LocalResults()
         self._logger = get_logger()
 
-    def extract(self):
+    def extract_s3_data_to_csv(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
         for query_index, s3_query in enumerate(self._get_s3_queries(), 1):
             self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
