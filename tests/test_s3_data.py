@@ -12,7 +12,7 @@ _ACCOUNT_TARGET = "dev"
 
 
 class TestS3UriDfModifier(unittest.TestCase):
-    def test_get_df_set_s3_uris_in_origin_account_if_prefixes_end_and_not_end_with_slash(self):
+    def test_get_df_replace_index_with_s3_uris_map_if_prefixes_end_and_not_end_with_slash(self):
         expected_result = _get_df_as_multi_index(
             Df(
                 [
@@ -34,7 +34,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                     expected_result,
                     m_s3_data._S3UriDfModifier(
                         _ACCOUNT_ORIGIN, _ACCOUNT_TARGET, df
-                    )._get_df_set_s3_uris_in_origin_account(s3_uris_map_df),
+                    )._get_df_replace_index_with_s3_uris_map(s3_uris_map_df),
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
