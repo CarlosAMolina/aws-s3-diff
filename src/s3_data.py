@@ -290,5 +290,5 @@ class _S3UriDfModifier:
         s3_uris_map_df.columns = [
             s3_uris_map_df.columns,
             [""] * len(s3_uris_map_df.columns),
-        ]  # To merge to a MultiIndex Df.
+        ]  # To merge to a MultiIndex columns Df.
         return s3_uris_map_df
