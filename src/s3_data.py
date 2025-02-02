@@ -255,7 +255,7 @@ class _S3UriDfModifier:
     def _get_df_set_s3_uris_in_origin_account(self, s3_uris_map_df: Df) -> Df:
         if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
             return self._df
-        original_lenght = len(self._df)
+        original_length = len(self._df)
         assert self._df.index.get_level_values("prefix").str.endswith("/").all()
         result = self._df.copy()
         result = result.reset_index("name")
@@ -268,8 +268,7 @@ class _S3UriDfModifier:
             columns={f"{self._account_origin}_bucket": "bucket", f"{self._account_origin}_prefix": "prefix"}
         )
         result = result.set_index(["bucket", "prefix", "name"])
-        final_length = len(result)
-        assert original_lenght == final_length
+        assert original_length == len(result)
         return result
 
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
