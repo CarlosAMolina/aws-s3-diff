@@ -12,6 +12,8 @@ from types_custom import S3Query
 
 FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
 FILE_NAME_S3_URIS_TO_ANALYZE = "s3-uris-to-analyze.csv"
+# S3 uri regex: https://stackoverflow.com/a/47130367
+REGEX_BUCKET_PREFIX_FROM_S3_URI = r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"
 
 
 class AnalysisConfigChecker:
@@ -169,11 +171,6 @@ class _S3UriParts:
         return self._get_regex_match_s3_uri_parts(self._s3_uri).group("object_key")
 
     def _get_regex_match_s3_uri_parts(self, s3_uri: str) -> re.Match:
-        result = re.match(self._regex_s3_uri_parts, s3_uri)
+        result = re.match(REGEX_BUCKET_PREFIX_FROM_S3_URI, s3_uri)
         assert result is not None
         return result
-
-    @property
-    def _regex_s3_uri_parts(self) -> str:
-        """https://stackoverflow.com/a/47130367"""
-        return r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"

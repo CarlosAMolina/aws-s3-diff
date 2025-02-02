@@ -7,6 +7,7 @@ from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
 
+from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
@@ -271,9 +272,8 @@ class _S3UriDfModifier:
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
         result = s3_uris_map_df.copy()
         for account in (self._account_origin, self._account_target):
-            # TODO use regex in config_files
             result[[f"{account}_bucket", f"{account}_prefix"]] = result[account].str.extract(
-                r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
+                REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False
             )
             result.loc[~result[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
                 result[f"{account}_prefix"] + "/"
