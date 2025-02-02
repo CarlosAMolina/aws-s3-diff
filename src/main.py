@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from botocore.exceptions import ClientError
 
+from all_accounts_s3_data import AllAccountsS3DataFactory
 from analysis import AnalysisS3DataFactory
 from config_files import AnalysisConfigChecker
 from config_files import AnalysisConfigReader
@@ -13,7 +14,6 @@ from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
 from one_account_s3_data import AccountS3DataFactory
-from s3_data import AllAccountsS3DataFactory
 
 
 class _Main:

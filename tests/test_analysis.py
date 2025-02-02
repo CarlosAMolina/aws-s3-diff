@@ -11,7 +11,7 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from s3_data import _CombinedAccountsS3DataCsvToDf
+from all_accounts_s3_data import _CombinedAccountsS3DataCsvToDf
 from src.analysis import _AccountsToCompare
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CanFileExistTwoAccountsAnalysisFactory
