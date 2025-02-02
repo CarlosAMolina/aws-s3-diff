@@ -18,13 +18,9 @@ from types_custom import S3Query
 class AccountS3DataFactory:
     def __init__(self, account: str):
         self._account = account
-        self._s3_uris_file_reader = S3UrisFileReader()
 
     def to_csv_extract_s3_data(self):
-        _AccountExtractor(
-            self._account,
-            self._s3_uris_file_reader.get_s3_queries_for_account(self._account),
-        ).extract()
+        _AccountExtractor(self._account).extract()
 
     def get_df_from_csv(self) -> Df:
         return _AccountS3DataDfBuilder(self._account).with_multi_index().build()
@@ -34,16 +30,16 @@ class AccountS3DataFactory:
 
 
 class _AccountExtractor:
-    def __init__(self, account: str, s3_queries: list[S3Query]):
+    def __init__(self, account: str):
         self._account = account
+        self._s3_uris_file_reader = S3UrisFileReader()
         self._local_results = LocalResults()
         self._logger = get_logger()
-        self._s3_queries = s3_queries
 
     def extract(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
-        for query_index, s3_query in enumerate(self._s3_queries, 1):
-            self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._s3_queries)}: {s3_query}")
+        for query_index, s3_query in enumerate(self._get_s3_queries(), 1):
+            self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
             try:
                 self._extract_s3_data_of_query(s3_query)
             except Exception as exception:
@@ -53,6 +49,9 @@ class _AccountExtractor:
     @property
     def _file_path_results(self) -> Path:
         return self._local_results.get_file_path_account_results(self._account)
+
+    def _get_s3_queries(self) -> list[S3Query]:
+        return self._s3_uris_file_reader.get_s3_queries_for_account(self._account)
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         is_any_result = False
