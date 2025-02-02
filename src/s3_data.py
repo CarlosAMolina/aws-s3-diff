@@ -6,10 +6,10 @@ from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
 
-import one_account_s3_data
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from one_account_s3_data import AccountS3DataFactory
 from types_custom import AllAccountsS3DataDf
 
 
@@ -27,11 +27,6 @@ class AllAccountsS3DataFactory:
         # TODO don't access a property of a property
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
-
-
-# TODO deprecate
-class AccountS3DataFactory(one_account_s3_data.AccountS3DataFactory):
-    pass
 
 
 class _CombinedAccountsS3DataDfToCsv:

@@ -12,7 +12,7 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
-from s3_data import AccountS3DataFactory
+from one_account_s3_data import AccountS3DataFactory
 from s3_data import AllAccountsS3DataFactory
 
 
