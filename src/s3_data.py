@@ -34,11 +34,6 @@ class AccountS3DataFactory(one_account_s3_data.AccountS3DataFactory):
     pass
 
 
-# TODO deprecate
-class _AccountExtractor(one_account_s3_data._AccountExtractor):
-    pass
-
-
 class _CombinedAccountsS3DataDfToCsv:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
