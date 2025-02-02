@@ -272,22 +272,21 @@ class _S3UriDfModifier:
         return result
 
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
+        result = s3_uris_map_df.copy()
         for account in (self._account_origin, self._account_target):
-            s3_uris_map_df[[f"{account}_bucket", f"{account}_prefix"]] = s3_uris_map_df[account].str.extract(
+            result[[f"{account}_bucket", f"{account}_prefix"]] = result[account].str.extract(
                 r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
             )
-            s3_uris_map_df.loc[~s3_uris_map_df[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
-                s3_uris_map_df[f"{account}_prefix"] + "/"
+            result.loc[~result[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
+                result[f"{account}_prefix"] + "/"
             )
-        s3_uris_map_df.drop(
-            columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True
-        )
-        s3_uris_map_df = s3_uris_map_df.rename(
+        result.drop(columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True)
+        result = result.rename(
             columns={f"{self._account_target}_bucket": "bucket", f"{self._account_target}_prefix": "prefix"}
         )
-        s3_uris_map_df = s3_uris_map_df.set_index(["bucket", "prefix"])
-        s3_uris_map_df.columns = [
-            s3_uris_map_df.columns,
-            [""] * len(s3_uris_map_df.columns),
+        result = result.set_index(["bucket", "prefix"])
+        result.columns = [
+            result.columns,
+            [""] * len(result.columns),
         ]  # To merge to a MultiIndex columns Df.
-        return s3_uris_map_df
+        return result
