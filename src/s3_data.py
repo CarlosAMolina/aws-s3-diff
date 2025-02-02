@@ -258,26 +258,14 @@ class _S3UriDfModifier:
         original_lenght = len(self._df)
         assert self._df.index.get_level_values("prefix").str.endswith("/").all()
         result = self._df.copy()
-        result = result.reset_index()
+        result = result.reset_index("name")
         s3_uris_map_df = self._get_s3_uris_map_prepared_for_join(s3_uris_map_df)
-        result = result.merge(
-            s3_uris_map_df,
-            left_on=["bucket", "prefix"],
-            right_on=[f"{self._account_target}_bucket", f"{self._account_target}_prefix"],
-            how="left",
-        )
+        result = result.join(s3_uris_map_df)
         if True in result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().values:
             raise ValueError("Some values could not be replaced")
-        result[["bucket", "prefix"]] = result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]]
-        result.drop(
-            [
-                f"{account}_{suffix}"
-                for account in (self._account_origin, self._account_target)
-                for suffix in ("bucket", "prefix")
-            ],
-            axis="columns",
-            level=0,
-            inplace=True,
+        result = result.reset_index(drop=True)
+        result = result.rename(
+            columns={f"{self._account_origin}_bucket": "bucket", f"{self._account_origin}_prefix": "prefix"}
         )
         result = result.set_index(["bucket", "prefix", "name"])
         final_length = len(result)
@@ -295,6 +283,10 @@ class _S3UriDfModifier:
         s3_uris_map_df.drop(
             columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True
         )
+        s3_uris_map_df = s3_uris_map_df.rename(
+            columns={f"{self._account_target}_bucket": "bucket", f"{self._account_target}_prefix": "prefix"}
+        )
+        s3_uris_map_df = s3_uris_map_df.set_index(["bucket", "prefix"])
         s3_uris_map_df.columns = [
             s3_uris_map_df.columns,
             [""] * len(s3_uris_map_df.columns),
