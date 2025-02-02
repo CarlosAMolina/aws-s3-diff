@@ -263,11 +263,10 @@ class _S3UriDfModifier:
         result = result.join(s3_uris_map_df)
         if True in result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().values:
             raise ValueError("Some values could not be replaced")
-        result = result.reset_index(drop=True)
         result = result.rename(
             columns={f"{self._account_origin}_bucket": "bucket", f"{self._account_origin}_prefix": "prefix"}
         )
-        result = result.set_index(["bucket", "prefix", "name"])
+        result = result.reset_index(drop=True).set_index(["bucket", "prefix", "name"])
         assert original_length == len(result)
         return result
 
