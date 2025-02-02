@@ -248,13 +248,12 @@ class _S3UriDfModifier:
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target
         )
+        if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
+            return self._df
         return self._get_df_set_s3_uris_in_origin_account(s3_uris_map_df)
 
     # TODO rename, it has the same name as the public method
-    # TODO refactor, too long
     def _get_df_set_s3_uris_in_origin_account(self, s3_uris_map_df: Df) -> Df:
-        if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
-            return self._df
         original_length = len(self._df)
         assert self._df.index.get_level_values("prefix").str.endswith("/").all()
         result = self._df.copy()
