@@ -2,6 +2,7 @@ import unittest
 from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
+from unittest.mock import Mock
 from unittest.mock import patch
 from unittest.mock import PropertyMock
 
@@ -148,23 +149,15 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         return result
 
 
-# TODO change with mock
-class FakeAnalysisPaths:
-    def __init__(self, file_path_name: str):
-        self._file_path_name = file_path_name
-
-    @property
-    def file_s3_data_all_accounts(self):
-        return Path(__file__).parent.absolute().joinpath(self._file_path_name)
-
-
 class FakeLocalResults:
     def __init__(self, file_path_name: str):
         self._file_path_name = file_path_name
 
     @property
-    def analysis_paths(self) -> FakeAnalysisPaths:
-        return FakeAnalysisPaths(self._file_path_name)
+    def analysis_paths(self):
+        mock_analysis_paths = Mock()
+        mock_analysis_paths.file_s3_data_all_accounts = Path(__file__).parent.absolute().joinpath(self._file_path_name)
+        return mock_analysis_paths  # FakeAnalysisPaths(self._file_path_name)
 
 
 def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
