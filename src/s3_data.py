@@ -140,8 +140,3 @@ class _AccountsS3DataDfCombinator:
         result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
         result = result.set_index(["bucket", "prefix", "name"])
         return result.drop(columns=(("count", "files_in_bucket_prefix")))
-
-
-# TODO deprecate
-class _S3UriDfModifier(one_account_s3_data._S3UriDfModifier):
-    pass
