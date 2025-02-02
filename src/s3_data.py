@@ -259,20 +259,7 @@ class _S3UriDfModifier:
         result = self._df.copy()
         result = result.reset_index()
         assert result["prefix"].str.endswith("/").all()
-        for account in (self._account_origin, self._account_target):
-            s3_uris_map_df[[f"{account}_bucket", f"{account}_prefix"]] = s3_uris_map_df[account].str.extract(
-                r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
-            )
-            s3_uris_map_df.loc[~s3_uris_map_df[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
-                s3_uris_map_df[f"{account}_prefix"] + "/"
-            )
-        s3_uris_map_df.drop(
-            columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True
-        )
-        s3_uris_map_df.columns = [
-            s3_uris_map_df.columns,
-            [""] * len(s3_uris_map_df.columns),
-        ]  # To merge to a MultiIndex Df.
+        s3_uris_map_df = self._get_s3_uris_map_prepared_for_join(s3_uris_map_df)
         result = result.merge(
             s3_uris_map_df,
             left_on=["bucket", "prefix"],
@@ -297,3 +284,20 @@ class _S3UriDfModifier:
         final_length = len(result)
         assert original_lenght == final_length
         return result
+
+    def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
+        for account in (self._account_origin, self._account_target):
+            s3_uris_map_df[[f"{account}_bucket", f"{account}_prefix"]] = s3_uris_map_df[account].str.extract(
+                r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
+            )
+            s3_uris_map_df.loc[~s3_uris_map_df[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
+                s3_uris_map_df[f"{account}_prefix"] + "/"
+            )
+        s3_uris_map_df.drop(
+            columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True
+        )
+        s3_uris_map_df.columns = [
+            s3_uris_map_df.columns,
+            [""] * len(s3_uris_map_df.columns),
+        ]  # To merge to a MultiIndex Df.
+        return s3_uris_map_df
