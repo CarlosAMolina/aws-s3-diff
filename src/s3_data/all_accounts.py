@@ -17,19 +17,16 @@ class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
         self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
-        self._local_results = LocalResults()
 
     def to_csv(self):
         df = self._get_df_combine_accounts_s3_data()
         self._export_to_csv(df)
 
+    def get_df_from_csv(self) -> AllAccountsS3DataDf:
+        return _CombinedAccountsS3DataCsvToDf().get_df()
+
     def _get_df_combine_accounts_s3_data(self) -> AllAccountsS3DataDf:
         return self._accounts_s3_data_combinator.get_df()
-
-    def get_df_from_csv(self) -> AllAccountsS3DataDf:
-        # TODO don't access a property of a property
-        file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
-        return _CombinedAccountsS3DataCsvToDf().get_df(file_path)
 
 
 class _CombinedAccountsS3DataDfToCsv:
@@ -67,10 +64,12 @@ class _CombinedAccountsS3DataDfToCsv:
 
 class _CombinedAccountsS3DataCsvToDf:
     def __init__(self):
+        self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self, file_path_s3_data_all_accounts: Path) -> AllAccountsS3DataDf:
-        result = self._get_df_from_file(file_path_s3_data_all_accounts)
+    def get_df(self) -> AllAccountsS3DataDf:
+        # TODO don't access a property of a property
+        result = self._get_df_from_file(self._local_results.analysis_paths.file_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
 
     # TODO extract common code with _get_df_account_from_file

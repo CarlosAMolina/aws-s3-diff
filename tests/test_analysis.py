@@ -98,14 +98,11 @@ class TestDfAnalysis(unittest.TestCase):
 
     def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisBuilderConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
-            df = self._get_df_combine_accounts_s3_data_csv(file_name)
+            file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
+            df = _get_df_combine_accounts_s3_data_csv(file_path_name)
             result = config.analysis_class_to_check(self._accounts_to_compare, df).get_df_set_analysis()
             result_to_check = result.loc[:, ("analysis", config.column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
-
-    def _get_df_combine_accounts_s3_data_csv(self, file_name: str) -> Df:
-        file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
-        return _get_df_combine_accounts_s3_data_csv(file_path_name)
 
     @property
     def _accounts_to_compare(self) -> _AccountsToCompare:
@@ -125,7 +122,8 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
     )
     def test_get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
         # TODO try to call AnalysisS3DataFactory()._get_df_s3_data_analyzed(df)
-        df = _get_df_combine_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
+        file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
+        df = _get_df_combine_accounts_s3_data_csv(file_path_name)
         result = AnalysisS3DataFactory()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
@@ -150,6 +148,26 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         return result
 
 
+# TODO change with mock
+class FakeAnalysisPaths:
+    def __init__(self, file_path_name: str):
+        self._file_path_name = file_path_name
+
+    @property
+    def file_s3_data_all_accounts(self):
+        return Path(__file__).parent.absolute().joinpath(self._file_path_name)
+
+
+class FakeLocalResults:
+    def __init__(self, file_path_name: str):
+        self._file_path_name = file_path_name
+
+    @property
+    def analysis_paths(self) -> FakeAnalysisPaths:
+        return FakeAnalysisPaths(self._file_path_name)
+
+
 def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
-    path = Path(__file__).parent.absolute().joinpath(file_path_name)
-    return _CombinedAccountsS3DataCsvToDf().get_df(path)
+    s3_data_csv_to_df = _CombinedAccountsS3DataCsvToDf()
+    s3_data_csv_to_df._local_results = FakeLocalResults(file_path_name)
+    return s3_data_csv_to_df.get_df()
