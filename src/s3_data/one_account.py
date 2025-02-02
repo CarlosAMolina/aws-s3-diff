@@ -17,16 +17,17 @@ from types_custom import S3Query
 
 class AccountS3DataFactory:
     def __init__(self, account: str):
-        self._account = account
+        self._account_extractor = _AccountExtractor(account)
+        self._account_s3_data_df_builder = _AccountS3DataDfBuilder(account)
 
     def to_csv_extract_s3_data(self):
-        _AccountExtractor(self._account).extract()
+        self._account_extractor.extract()
 
     def get_df_from_csv(self) -> Df:
-        return _AccountS3DataDfBuilder(self._account).with_multi_index().build()
+        return self._account_s3_data_df_builder.reset().with_multi_index().build()
 
     def get_df_from_csv_with_original_account_index(self) -> Df:
-        return _AccountS3DataDfBuilder(self._account).with_multi_index().with_origin_account_index().build()
+        return self._account_s3_data_df_builder.reset().with_multi_index().with_origin_account_index().build()
 
 
 class _AccountExtractor:
@@ -96,6 +97,10 @@ class _AccountS3DataDfBuilder:
 
     def build(self) -> AccountS3DataDf:
         return self._df
+
+    def reset(self):
+        self.__df = None
+        return self
 
     @property
     def _df(self) -> Df:
