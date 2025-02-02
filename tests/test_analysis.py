@@ -152,7 +152,6 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
 def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
     s3_data_csv_to_df = _CombinedAccountsS3DataCsvToDf()
     mock_local_results = Mock()
-    mock_local_results.analysis_paths = Mock()
     mock_local_results.analysis_paths.file_s3_data_all_accounts = (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
