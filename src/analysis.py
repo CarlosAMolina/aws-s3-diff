@@ -5,11 +5,11 @@ from collections import namedtuple
 from pandas import DataFrame as Df
 from pandas import Series
 
-from all_accounts_s3_data import AllAccountsS3DataFactory
 from config_files import AnalysisConfigReader
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.all_accounts import AllAccountsS3DataFactory
 from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
 
