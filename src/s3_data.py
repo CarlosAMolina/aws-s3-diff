@@ -256,9 +256,9 @@ class _S3UriDfModifier:
         if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
             return self._df
         original_lenght = len(self._df)
+        assert self._df.index.get_level_values("prefix").str.endswith("/").all()
         result = self._df.copy()
         result = result.reset_index()
-        assert result["prefix"].str.endswith("/").all()
         s3_uris_map_df = self._get_s3_uris_map_prepared_for_join(s3_uris_map_df)
         result = result.merge(
             s3_uris_map_df,
