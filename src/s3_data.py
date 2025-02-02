@@ -253,36 +253,46 @@ class _S3UriDfModifier:
     # TODO rename, it has the same name as the public method
     # TODO refactor, too long
     def _get_df_set_s3_uris_in_origin_account(self, s3_uris_map_df: Df) -> Df:
+        if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
+            return self._df
         original_lenght = len(self._df)
         result = self._df.copy()
         result = result.reset_index()
         assert result["prefix"].str.endswith("/").all()
-        result["bucket_and_prefix"] = "s3://" + result["bucket"] + "/" + result["prefix"].str.rstrip("/")
         for account in (self._account_origin, self._account_target):
-            s3_uris_map_df.loc[:, account] = s3_uris_map_df[account].str.rstrip("/")
-        s3_uris_map_df = s3_uris_map_df.rename(
-            columns={self._account_origin: "new_value", self._account_target: "current_value"}
+            s3_uris_map_df[[f"{account}_bucket", f"{account}_prefix"]] = s3_uris_map_df[account].str.extract(
+                r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
+            )
+            s3_uris_map_df.loc[~s3_uris_map_df[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
+                s3_uris_map_df[f"{account}_prefix"] + "/"
+            )
+        s3_uris_map_df.drop(
+            columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True
         )
         s3_uris_map_df.columns = [
             s3_uris_map_df.columns,
             [""] * len(s3_uris_map_df.columns),
         ]  # To merge to a MultiIndex Df.
-        result = result.merge(s3_uris_map_df, left_on="bucket_and_prefix", right_on="current_value", how="left")
-        if result["new_value"].isnull().any():
-            df = result.loc[result["new_value"].isnull(), ["current_value", "new_value"]]
-            error_text = f"These values have not been replaced:\n{df.to_string(index=False)}"
-            raise ValueError(error_text)
-        result.drop(["bucket_and_prefix", "current_value"], axis="columns", level=0, inplace=True)
-        result = result.rename(columns={"new_value": "bucket_and_prefix"})
-        # TODO use regex defined in config_files.py
-        result[["bucket_new", "prefix_new"]] = result["bucket_and_prefix"].str.extract(
-            r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)", expand=False
+        result = result.merge(
+            s3_uris_map_df,
+            left_on=["bucket", "prefix"],
+            right_on=[f"{self._account_target}_bucket", f"{self._account_target}_prefix"],
+            how="left",
         )
-        result.drop(["bucket", "prefix", "bucket_and_prefix"], axis="columns", level=0, inplace=True)
-        result = result.rename(columns={"bucket_new": "bucket", "prefix_new": "prefix"})
-        result.insert(0, "bucket", result.pop("bucket"))
-        result.insert(1, "prefix", result.pop("prefix"))
-        result["prefix"] = result["prefix"] + "/"
+        if True in result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any():
+            raise ValueError("Some values could not be replaced")
+        result["bucket"] = result[f"{self._account_origin}_bucket"]
+        result["prefix"] = result[f"{self._account_origin}_prefix"]
+        result.drop(
+            [
+                f"{account}_{suffix}"
+                for account in (self._account_origin, self._account_target)
+                for suffix in ("bucket", "prefix")
+            ],
+            axis="columns",
+            level=0,
+            inplace=True,
+        )
         result = result.set_index(["bucket", "prefix", "name"])
         final_length = len(result)
         assert original_lenght == final_length
