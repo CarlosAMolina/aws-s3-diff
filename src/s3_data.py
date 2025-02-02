@@ -268,8 +268,7 @@ class _S3UriDfModifier:
         )
         if True in result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any():
             raise ValueError("Some values could not be replaced")
-        result["bucket"] = result[f"{self._account_origin}_bucket"]
-        result["prefix"] = result[f"{self._account_origin}_prefix"]
+        result[["bucket", "prefix"]] = result[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]]
         result.drop(
             [
                 f"{account}_{suffix}"
