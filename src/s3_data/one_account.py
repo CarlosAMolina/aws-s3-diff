@@ -8,7 +8,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
-from s3_client import S3Client
+from s3_data.s3_client import S3Client
 from types_custom import AccountS3DataDf
 from types_custom import FileS3Data
 from types_custom import S3Data
