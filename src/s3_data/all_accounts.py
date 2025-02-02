@@ -15,13 +15,16 @@ from types_custom import AllAccountsS3DataDf
 
 class AllAccountsS3DataFactory:
     def __init__(self):
-        self._df_generator = _AccountsS3DataDfCombinator()
+        self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
         self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
         self._local_results = LocalResults()
 
     def to_csv(self):
-        df = self._df_generator.get_df()
+        df = self._get_df_combine_accounts_s3_data()
         self._export_to_csv(df)
+
+    def _get_df_combine_accounts_s3_data(self) -> AllAccountsS3DataDf:
+        return self._accounts_s3_data_combinator.get_df()
 
     def get_df_from_csv(self) -> AllAccountsS3DataDf:
         # TODO don't access a property of a property
@@ -95,7 +98,7 @@ class _CombinedAccountsS3DataCsvToDf:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _AccountsS3DataDfCombinator:
+class _AccountsS3DataCombinator:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
