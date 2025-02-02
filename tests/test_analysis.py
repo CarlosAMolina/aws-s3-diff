@@ -149,18 +149,11 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         return result
 
 
-class FakeLocalResults:
-    def __init__(self, file_path_name: str):
-        self._file_path_name = file_path_name
-
-    @property
-    def analysis_paths(self):
-        mock_analysis_paths = Mock()
-        mock_analysis_paths.file_s3_data_all_accounts = Path(__file__).parent.absolute().joinpath(self._file_path_name)
-        return mock_analysis_paths  # FakeAnalysisPaths(self._file_path_name)
-
-
 def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
     s3_data_csv_to_df = _CombinedAccountsS3DataCsvToDf()
-    s3_data_csv_to_df._local_results = FakeLocalResults(file_path_name)
+    mock_analysis_paths = Mock()
+    mock_analysis_paths.file_s3_data_all_accounts = Path(__file__).parent.absolute().joinpath(file_path_name)
+    mock_local_results = Mock()
+    mock_local_results.analysis_paths = mock_analysis_paths
+    s3_data_csv_to_df._local_results = mock_local_results
     return s3_data_csv_to_df.get_df()
