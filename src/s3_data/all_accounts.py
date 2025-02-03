@@ -1,4 +1,6 @@
 import re
+from abc import ABC
+from abc import abstractmethod
 from pathlib import Path
 
 from pandas import DataFrame as Df
@@ -17,7 +19,7 @@ from types_custom import SingleIndexAllAccountsS3DataDf
 class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_merger = _IndividualAccountS3DataMerger()
-        self._accounts_s3_data_transformer = AccountsS3DataTransformer()
+        self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -36,15 +38,13 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
-class AccountsS3DataTransformer:
+class S3DataTransformer(ABC):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
-        result = df.copy()
-        self._set_df_columns_as_single_index(result)
-        self._set_df_index_column_names(result)
-        return result
+    @abstractmethod
+    def get_df_to_export(self, df: Df) -> Df:
+        pass
 
     def _set_df_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
@@ -56,6 +56,14 @@ class AccountsS3DataTransformer:
             f"file_path_in_s3_{account_1}",
             "file_name_all_accounts",
         ]
+
+
+class _AccountsS3DataTransformer(S3DataTransformer):
+    def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
+        result = df.copy()
+        self._set_df_columns_as_single_index(result)
+        self._set_df_index_column_names(result)
+        return result
 
 
 class _AccountsS3DataCsvReader:
