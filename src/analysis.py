@@ -24,10 +24,10 @@ class AnalysisS3DataFactory:
         self._logger = get_logger()
 
     def to_csv(self):
-        s3_analyzed_df = self._get_df_s3_data_analyzed()
         file_path = self._local_results.analysis_paths.file_analysis
-        csv_df = self._analysis_transformer.get_df_to_export(s3_analyzed_df)
         self._logger.info(f"Exporting analysis to {file_path}")
+        df = self._get_df_s3_data_analyzed()
+        csv_df = self._analysis_transformer.get_df_to_export(df)
         csv_df.to_csv(file_path)
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
