@@ -16,13 +16,13 @@ from types_custom import AllAccountsS3DataDf
 class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
-        self._get_df_to_export = _CombinedAccountsS3DataDfToCsv().get_df_to_export
+        self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
     def to_csv(self):
         df = self._get_df_combine_accounts_s3_data()
-        csv_df = self._get_df_to_export(df)
+        csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df.to_csv(file_path)
@@ -34,12 +34,11 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_combinator.get_df()
 
 
-# TODO rename
-class _CombinedAccountsS3DataDfToCsv:
+class _AccountsS3DataTransformer:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: Df) -> Df:
+    def get_df_to_export(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         result = df.copy()
         csv_column_names = ["_".join(values) for values in result.columns]
         csv_column_names = [
