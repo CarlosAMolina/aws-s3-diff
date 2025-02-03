@@ -43,16 +43,19 @@ class _AccountsS3DataTransformer:
     def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
-        account_1 = self._s3_uris_file_reader.get_first_account()
-        result.index.names = [
-            f"bucket_{account_1}",
-            f"file_path_in_s3_{account_1}",
-            "file_name_all_accounts",
-        ]
+        self._set_df_index_column_names(result)
         return result
 
     def _set_df_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
+
+    def _set_df_index_column_names(self, df: Df):
+        account_1 = self._s3_uris_file_reader.get_first_account()
+        df.index.names = [
+            f"bucket_{account_1}",
+            f"file_path_in_s3_{account_1}",
+            "file_name_all_accounts",
+        ]
 
 
 class _AccountsS3DataCsvReader:
