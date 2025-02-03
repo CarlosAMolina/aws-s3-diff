@@ -17,7 +17,7 @@ from types_custom import SingleIndexAllAccountsS3DataDf
 class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_merger = _IndividualAccountS3DataMerger()
-        self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
+        self._accounts_s3_data_transformer = AccountsS3DataTransformer()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -36,7 +36,7 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
-class _AccountsS3DataTransformer:
+class AccountsS3DataTransformer:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 

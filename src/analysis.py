@@ -10,6 +10,7 @@ from config_files import AnalysisConfigReader
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.all_accounts import AccountsS3DataTransformer
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
@@ -273,8 +274,7 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-# TODO refactor extract common code with classes ..CsvToDf (in other files)
-class _AnalysisTransformer:
+class _AnalysisTransformer(AccountsS3DataTransformer):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -282,13 +282,5 @@ class _AnalysisTransformer:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
-        account_1 = self._s3_uris_file_reader.get_first_account()
-        result.index.names = [
-            f"bucket_{account_1}",
-            f"file_path_in_s3_{account_1}",
-            "file_name_all_accounts",
-        ]
+        self._set_df_index_column_names(result)
         return result
-
-    def _set_df_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
