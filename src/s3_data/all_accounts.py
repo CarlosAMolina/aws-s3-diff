@@ -17,12 +17,13 @@ class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
         self._get_df_to_export = _CombinedAccountsS3DataDfToCsv().get_df_to_export
+        self._local_results = LocalResults()
         self._logger = get_logger()
 
     def to_csv(self):
         df = self._get_df_combine_accounts_s3_data()
         csv_df = self._get_df_to_export(df)
-        file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
+        file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df.to_csv(file_path)
 
