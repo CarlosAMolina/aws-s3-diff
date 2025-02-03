@@ -43,9 +43,6 @@ class _AccountsS3DataTransformer:
     def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
         result = df.copy()
         csv_column_names = ["_".join(values) for values in result.columns]
-        csv_column_names = [
-            self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
-        ]
         result.columns = csv_column_names
         account_1 = self._s3_uris_file_reader.get_first_account()
         result.index.names = [
@@ -54,11 +51,6 @@ class _AccountsS3DataTransformer:
             "file_name_all_accounts",
         ]
         return result
-
-    def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
-        if column_name.startswith("analysis_"):
-            return column_name[len("analysis_") :]
-        return column_name
 
 
 class _AccountsS3DataCsvReader:
