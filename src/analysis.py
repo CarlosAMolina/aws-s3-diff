@@ -281,7 +281,7 @@ class _AnalysisDfToCsv:
 
     def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
         result = df.copy()
-        csv_column_names = ["_".join(values) for values in result.columns]
+        csv_column_names = result.columns.map("_".join)
         csv_column_names = [
             self._get_csv_column_name_drop_undesired_text(column_name) for column_name in csv_column_names
         ]
