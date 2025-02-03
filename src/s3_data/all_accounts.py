@@ -21,7 +21,7 @@ class AllAccountsS3DataFactory:
         self._logger = get_logger()
 
     def to_csv(self):
-        df = self._get_df_combine_accounts_s3_data()
+        df = self._get_df_merging_each_account_s3_data()
         csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
@@ -30,7 +30,7 @@ class AllAccountsS3DataFactory:
     def get_df_from_csv(self) -> AllAccountsS3DataDf:
         return _AccountsS3DataCsvReader().get_df()
 
-    def _get_df_combine_accounts_s3_data(self) -> AllAccountsS3DataDf:
+    def _get_df_merging_each_account_s3_data(self) -> AllAccountsS3DataDf:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
