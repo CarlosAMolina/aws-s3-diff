@@ -1,3 +1,4 @@
+import re
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
@@ -282,10 +283,7 @@ class _AnalysisDfToCsv:
     def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
-        csv_column_names = [
-            self._get_csv_column_name_drop_undesired_text(column_name) for column_name in result.columns
-        ]
-        result.columns = csv_column_names
+        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
         account_1 = self._s3_uris_file_reader.get_first_account()
         result.index.names = [
             f"bucket_{account_1}",
@@ -296,8 +294,3 @@ class _AnalysisDfToCsv:
 
     def _set_df_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
-
-    def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
-        if column_name.startswith("analysis_"):
-            return column_name[len("analysis_") :]
-        return column_name
