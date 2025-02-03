@@ -16,11 +16,15 @@ from types_custom import AllAccountsS3DataDf
 class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
-        self._export_to_csv = _CombinedAccountsS3DataDfToCsv().export
+        self._get_df_to_export = _CombinedAccountsS3DataDfToCsv().get_df_to_export
+        self._logger = get_logger()
 
     def to_csv(self):
         df = self._get_df_combine_accounts_s3_data()
-        self._export_to_csv(df)
+        csv_df = self._get_df_to_export(df)
+        file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
+        self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
+        csv_df.to_csv(file_path)
 
     def get_df_from_csv(self) -> AllAccountsS3DataDf:
         return _CombinedAccountsS3DataCsvToDf().get_df()
@@ -29,19 +33,12 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_combinator.get_df()
 
 
+# TODO rename
 class _CombinedAccountsS3DataDfToCsv:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
-        self._logger = get_logger()
 
-    def export(self, df: Df):
-        file_path = LocalResults().analysis_paths.file_s3_data_all_accounts
-        self._logger = get_logger()
-        self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
-        csv_df = self._get_df_to_export(df)
-        csv_df.to_csv(file_path)
-
-    def _get_df_to_export(self, df: Df) -> Df:
+    def get_df_to_export(self, df: Df) -> Df:
         result = df.copy()
         csv_column_names = ["_".join(values) for values in result.columns]
         csv_column_names = [
