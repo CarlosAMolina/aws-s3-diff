@@ -15,7 +15,7 @@ from types_custom import AllAccountsS3DataDf
 
 class AllAccountsS3DataFactory:
     def __init__(self):
-        self._accounts_s3_data_combinator = _AccountsS3DataCombinator()
+        self._accounts_s3_data_merger = _IndividualAccountS3DataMerger()
         self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
         self._local_results = LocalResults()
         self._logger = get_logger()
@@ -31,7 +31,7 @@ class AllAccountsS3DataFactory:
         return _AccountsS3DataCsvReader().get_df()
 
     def _get_df_combine_accounts_s3_data(self) -> AllAccountsS3DataDf:
-        return self._accounts_s3_data_combinator.get_df()
+        return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
 class _AccountsS3DataTransformer:
@@ -94,11 +94,11 @@ class _AccountsS3DataCsvReader:
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _AccountsS3DataCombinator:
+class _IndividualAccountS3DataMerger:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self) -> AllAccountsS3DataDf:
+    def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
         result = self._get_df_combine_accounts_results()
         return self._get_df_drop_incorrect_empty_rows(result)
 
