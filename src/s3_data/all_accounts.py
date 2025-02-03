@@ -11,6 +11,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.one_account import AccountS3DataFactory
 from types_custom import AllAccountsS3DataDf
+from types_custom import SingleIndexAllAccountsS3DataDf
 
 
 class AllAccountsS3DataFactory:
@@ -38,7 +39,7 @@ class _AccountsS3DataTransformer:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
+    def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
         result = df.copy()
         csv_column_names = ["_".join(values) for values in result.columns]
         csv_column_names = [
