@@ -12,7 +12,7 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from s3_data.all_accounts import _CombinedAccountsS3DataCsvToDf
+from s3_data.all_accounts import _AccountsS3DataCsvReader
 from src.analysis import _AccountsToCompare
 from src.analysis import _AnalysisDfToCsv
 from src.analysis import _CanFileExistTwoAccountsAnalysisFactory
@@ -100,7 +100,7 @@ class TestDfAnalysis(unittest.TestCase):
     def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisBuilderConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
-            df = _get_df_combine_accounts_s3_data_csv(file_path_name)
+            df = _get_df_from_accounts_s3_data_csv(file_path_name)
             result = config.analysis_class_to_check(self._accounts_to_compare, df).get_df_set_analysis()
             result_to_check = result.loc[:, ("analysis", config.column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
@@ -124,7 +124,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
     def test_get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
         # TODO try to call AnalysisS3DataFactory()._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
-        df = _get_df_combine_accounts_s3_data_csv(file_path_name)
+        df = _get_df_from_accounts_s3_data_csv(file_path_name)
         result = AnalysisS3DataFactory()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisDfToCsv()._get_df_to_export(result).reset_index()
@@ -149,8 +149,8 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         return result
 
 
-def _get_df_combine_accounts_s3_data_csv(file_path_name: str) -> Df:
-    s3_data_csv_to_df = _CombinedAccountsS3DataCsvToDf()
+def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
+    s3_data_csv_to_df = _AccountsS3DataCsvReader()
     s3_data_csv_to_df._local_results = Mock()
     s3_data_csv_to_df._local_results.analysis_paths.file_s3_data_all_accounts = (
         Path(__file__).parent.absolute().joinpath(file_path_name)

@@ -28,7 +28,7 @@ class AllAccountsS3DataFactory:
         csv_df.to_csv(file_path)
 
     def get_df_from_csv(self) -> AllAccountsS3DataDf:
-        return _CombinedAccountsS3DataCsvToDf().get_df()
+        return _AccountsS3DataCsvReader().get_df()
 
     def _get_df_combine_accounts_s3_data(self) -> AllAccountsS3DataDf:
         return self._accounts_s3_data_combinator.get_df()
@@ -59,7 +59,7 @@ class _AccountsS3DataTransformer:
         return column_name
 
 
-class _CombinedAccountsS3DataCsvToDf:
+class _AccountsS3DataCsvReader:
     def __init__(self):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
