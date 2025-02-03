@@ -271,16 +271,22 @@ class _AnalysisCondition:
 class _AnalysisDfToCsv:
     def __init__(self):
         self._logger = get_logger()
-        self._s3_uris_file_reader = S3UrisFileReader()
         self._local_results = LocalResults()
+        self._analysis_transformer = _AnalysisTransformer()
 
     def export(self, df: AnalysisS3DataDf):
         file_path = self._local_results.analysis_paths.file_analysis
-        csv_df = self._get_df_to_export(df)
+        csv_df = self._analysis_transformer.get_df_to_export(df)
         self._logger.info(f"Exporting analysis to {file_path}")
         csv_df.to_csv(file_path)
 
-    def _get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
+
+# TODO refactor extract common code with classes ..CsvToDf (in other files)
+class _AnalysisTransformer:
+    def __init__(self):
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
