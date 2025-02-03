@@ -18,12 +18,17 @@ from types_custom import AnalysisS3DataDf
 class AnalysisS3DataFactory:
     def __init__(self):
         self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
-        self._analysis_df_to_csv = _AnalysisDfToCsv()
         self._analysis_config_reader = AnalysisConfigReader()
+        self._analysis_transformer = _AnalysisTransformer()
+        self._local_results = LocalResults()
+        self._logger = get_logger()
 
     def to_csv(self):
         s3_analyzed_df = self._get_df_s3_data_analyzed()
-        self._analysis_df_to_csv.export(s3_analyzed_df)
+        file_path = self._local_results.analysis_paths.file_analysis
+        csv_df = self._analysis_transformer.get_df_to_export(s3_analyzed_df)
+        self._logger.info(f"Exporting analysis to {file_path}")
+        csv_df.to_csv(file_path)
 
     def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
         all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
@@ -265,20 +270,6 @@ class _AnalysisCondition:
 
     def _get_column_index_hash_for_account(self, account: str) -> tuple:
         return (account, "hash")
-
-
-# TODO refactor extract common code with classes ..CsvToDf (in other files)
-class _AnalysisDfToCsv:
-    def __init__(self):
-        self._logger = get_logger()
-        self._local_results = LocalResults()
-        self._analysis_transformer = _AnalysisTransformer()
-
-    def export(self, df: AnalysisS3DataDf):
-        file_path = self._local_results.analysis_paths.file_analysis
-        csv_df = self._analysis_transformer.get_df_to_export(df)
-        self._logger.info(f"Exporting analysis to {file_path}")
-        csv_df.to_csv(file_path)
 
 
 # TODO refactor extract common code with classes ..CsvToDf (in other files)
