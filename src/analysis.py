@@ -13,6 +13,7 @@ from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from types_custom import AllAccountsS3DataDf
 from types_custom import AnalysisS3DataDf
+from types_custom import SingleIndexAnalysisS3DataDf
 
 
 class AnalysisS3DataFactory:
@@ -277,7 +278,7 @@ class _AnalysisTransformer:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
+    def get_df_to_export(self, df: AnalysisS3DataDf) -> SingleIndexAnalysisS3DataDf:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
