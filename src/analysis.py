@@ -296,5 +296,5 @@ class _AnalysisDfToCsv:
 
     def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
         if column_name.startswith("analysis_"):
-            return column_name.replace("analysis_", "", 1)
+            return column_name[len("analysis_") :]
         return column_name
