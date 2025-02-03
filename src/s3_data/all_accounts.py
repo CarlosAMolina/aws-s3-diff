@@ -24,6 +24,7 @@ class AllAccountsS3DataFactory:
     def to_csv(self):
         df = self._get_df_merging_each_account_s3_data()
         csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
+        # TODO no access property of property.
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         csv_df.to_csv(file_path)
@@ -56,7 +57,7 @@ class _AccountsS3DataTransformer:
 
     def _get_csv_column_name_drop_undesired_text(self, column_name: str) -> str:
         if column_name.startswith("analysis_"):
-            return column_name.replace("analysis_", "", 1)
+            return column_name[len("analysis_") :]
         return column_name
 
 
