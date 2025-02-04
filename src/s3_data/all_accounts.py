@@ -107,10 +107,6 @@ class _IndividualAccountS3DataMerger:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
-        return self._get_df_combine_accounts_results()
-
-    # TODO refactor too long
-    def _get_df_combine_accounts_results(self) -> AllAccountsS3DataDf:
         accounts = self._s3_uris_file_reader.get_accounts()
         result = self._s3_uris_file_reader.file_df[accounts[0]]
         # TODO refactor extract function, this lines is done in other files.
