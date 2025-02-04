@@ -128,7 +128,7 @@ class _IndividualAccountS3DataMerger:
         ]  # To merge to a MultiIndex columns Df.
         # Maintain all queries despite no results.
         result = result.join(df.reset_index("name"))
-        return result.reset_index().set_index(["bucket", "prefix", "name"])
+        return result.set_index("name", append=True)
 
     def _get_df_with_s3_queries_as_index(self) -> Df:
         result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
