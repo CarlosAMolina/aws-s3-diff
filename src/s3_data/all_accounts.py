@@ -108,7 +108,6 @@ class _IndividualAccountS3DataMerger:
 
     def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
         return self._get_df_combine_accounts_results()
-        # TODO RM return self._get_df_drop_incorrect_empty_rows(result)
 
     # TODO refactor too long
     def _get_df_combine_accounts_results(self) -> AllAccountsS3DataDf:
@@ -149,24 +148,3 @@ class _IndividualAccountS3DataMerger:
         result = result.reset_index().set_index(["bucket", "prefix"])
         result = result_base.join(result)
         return result.reset_index().set_index(["bucket", "prefix", "name"])
-
-    # TODO deprecate
-    def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
-        """
-        Drop null rows caused when merging query results without files in some accounts.
-        Avoid drop queries without results in any aws account.
-        """
-        result = df
-        count_files_per_bucket_and_path_df = (
-            Df(result.index.to_list(), columns=result.index.names).groupby(["bucket", "prefix"]).count()
-        )
-        count_files_per_bucket_and_path_df.columns = MultiIndex.from_tuples(
-            [
-                ("count", "files_in_bucket_prefix"),
-            ]
-        )
-        result = result.join(count_files_per_bucket_and_path_df)
-        result = result.reset_index()
-        result = result.loc[(~result["name"].isna()) | (result[("count", "files_in_bucket_prefix")] == 0)]
-        result = result.set_index(["bucket", "prefix", "name"])
-        return result.drop(columns=(("count", "files_in_bucket_prefix")))
