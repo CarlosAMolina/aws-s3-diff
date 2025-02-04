@@ -129,16 +129,8 @@ class _IndividualAccountS3DataMerger:
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
-        account_df = AccountS3DataFactory(accounts[0]).get_df_from_csv()
-        account_df = account_df.reset_index().set_index(["bucket", "prefix", "name"])
-        result = account_df.copy()
+        result = AccountS3DataFactory(accounts[0]).get_df_from_csv()
         for account in accounts[1:]:
-            account_df = (
-                AccountS3DataFactory(account)
-                .get_df_from_csv_with_original_account_index()
-                .reset_index()
-                .set_index(["bucket", "prefix"])
-            )
-            account_result = account_df.reset_index().set_index(["bucket", "prefix", "name"])
-            result = result.join(account_result, how="outer")
+            account_df = AccountS3DataFactory(account).get_df_from_csv_with_original_account_index()
+            result = result.join(account_df, how="outer")
         return result.dropna(axis="index", how="all")
