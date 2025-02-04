@@ -110,6 +110,7 @@ class _IndividualAccountS3DataMerger:
         return self._get_df_combine_accounts_results()
         # TODO RM return self._get_df_drop_incorrect_empty_rows(result)
 
+    # TODO refactor too long
     def _get_df_combine_accounts_results(self) -> AllAccountsS3DataDf:
         accounts = self._s3_uris_file_reader.get_accounts()
         result = self._s3_uris_file_reader.file_df[accounts[0]]
@@ -129,7 +130,9 @@ class _IndividualAccountS3DataMerger:
         account_df = AccountS3DataFactory(accounts[0]).get_df_from_csv()
         account_df = account_df.reset_index().set_index(result.index.names)
         results = list()
-        results += [result_base.join(account_df).reset_index().set_index(["bucket", "prefix", "name"])]
+        account_result = result_base.join(account_df)
+        account_result = account_result.reset_index().set_index(["bucket", "prefix", "name"])
+        results += [account_result]
         for account in accounts[1:]:
             account_df = (
                 AccountS3DataFactory(account)
@@ -137,9 +140,15 @@ class _IndividualAccountS3DataMerger:
                 .reset_index()
                 .set_index(["bucket", "prefix"])
             )
-            results += [result_base.join(account_df).reset_index().set_index(["bucket", "prefix", "name"])]
-        result = results[0].join(results[1:])
-        return result
+            account_result = result_base.join(account_df)
+            account_result = account_result.reset_index().set_index(["bucket", "prefix", "name"])
+            results += [account_result]
+        result = results[0].join(results[1:], how="outer")
+        # Maintain all queries despite no results.
+        result = result.dropna(axis="index", how="all")
+        result = result.reset_index().set_index(["bucket", "prefix"])
+        result = result_base.join(result)
+        return result.reset_index().set_index(["bucket", "prefix", "name"])
 
     # TODO deprecate
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
