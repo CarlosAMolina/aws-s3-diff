@@ -123,7 +123,7 @@ class S3UrisFileReader:
         self.__df_file_what_to_analyze = None  # To avoid read a file in __init__.
 
     def get_accounts(self) -> list[str]:
-        return self._df_file_what_to_analyze.columns.to_list()
+        return self.file_df.columns.to_list()
 
     def get_first_account(self) -> str:
         return self.get_accounts()[0]
@@ -132,20 +132,20 @@ class S3UrisFileReader:
         return self.get_accounts()[-1]
 
     def get_s3_queries_for_account(self, account: str) -> list[S3Query]:
-        s3_uris_to_analyze = self._df_file_what_to_analyze[account].to_list()
+        s3_uris_to_analyze = self.file_df[account].to_list()
         return [self.get_s3_query_from_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
     def get_s3_query_from_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
     def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
-        return self._df_file_what_to_analyze[[account_origin, account_target]]
+        return self.file_df[[account_origin, account_target]]
 
     def is_any_uri_null(self) -> np.bool:
-        return self._df_file_what_to_analyze.isnull().values.any()
+        return self.file_df.isnull().values.any()
 
     @property
-    def _df_file_what_to_analyze(self) -> Df:
+    def file_df(self) -> Df:
         if self.__df_file_what_to_analyze is None:
             self.__df_file_what_to_analyze = self._get_df_file_what_to_analyze()
         return self.__df_file_what_to_analyze
