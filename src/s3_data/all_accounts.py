@@ -119,7 +119,7 @@ class _AccountsS3DataMerger:
         return result.dropna(axis="index", how="all")
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
-        result = self._get_df_with_s3_queries_as_index()
+        result = self._get_empty_df_original_account_queries_as_index()
         # TODO refactor extract function, this line is done in other files.
         # TODO improve this, use MultiIndex or something better
         result.columns = [
@@ -129,7 +129,7 @@ class _AccountsS3DataMerger:
         result = result.join(df.reset_index("name"))
         return result.set_index("name", append=True)
 
-    def _get_df_with_s3_queries_as_index(self) -> Df:
+    def _get_empty_df_original_account_queries_as_index(self) -> Df:
         result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
         # TODO refactor extract function, this line is done in other files.
         result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
