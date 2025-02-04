@@ -170,5 +170,5 @@ class _S3UriDfModifier:
         result = result.set_index(["bucket", "prefix"])
         result.columns = MultiIndex.from_tuples(
             [(column, "") for column in result.columns]
-        )  # To merge to a MultiIndex columns Df.
+        )  # To merge with a MultiIndex columns Df.
         return result

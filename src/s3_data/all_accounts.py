@@ -120,7 +120,7 @@ class _AccountsS3DataMerger:
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
         result = self._get_empty_df_original_account_queries_as_index()
-        result.columns = MultiIndex.from_arrays([[], []])  # To merge to a MultiIndex columns Df.
+        result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
         result = result.join(df.reset_index("name"))
         return result.set_index("name", append=True)
 
