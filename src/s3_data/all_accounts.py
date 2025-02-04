@@ -8,6 +8,7 @@ from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
 
+from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
@@ -106,17 +107,41 @@ class _IndividualAccountS3DataMerger:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
-        result = self._get_df_combine_accounts_results()
-        return self._get_df_drop_incorrect_empty_rows(result)
+        return self._get_df_combine_accounts_results()
+        # TODO RM return self._get_df_drop_incorrect_empty_rows(result)
 
     def _get_df_combine_accounts_results(self) -> AllAccountsS3DataDf:
         accounts = self._s3_uris_file_reader.get_accounts()
-        result = AccountS3DataFactory(accounts[0]).get_df_from_csv()
+        result = self._s3_uris_file_reader.file_df[accounts[0]]
+        # TODO refactor extract function, this lines is done in other files.
+        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        result.columns = ["bucket", "prefix"]
+        # TODO refactor extract function, this lines is done in other files.
+        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
+        result = result.set_index(result.columns.tolist())
+        # TODO refactor extract function, this lines is done in other files.
+        # TODO improve this, use MultiIndex or something better
+        result.columns = [
+            result.columns,
+            [""] * len(result.columns),
+        ]  # To merge to a MultiIndex columns Df.
+        result_base = result.copy()
+        account_df = AccountS3DataFactory(accounts[0]).get_df_from_csv()
+        account_df = account_df.reset_index().set_index(result.index.names)
+        results = list()
+        results += [result_base.join(account_df).reset_index().set_index(["bucket", "prefix", "name"])]
         for account in accounts[1:]:
-            account_df = AccountS3DataFactory(account).get_df_from_csv_with_original_account_index()
-            result = result.join(account_df, how="outer")
+            account_df = (
+                AccountS3DataFactory(account)
+                .get_df_from_csv_with_original_account_index()
+                .reset_index()
+                .set_index(["bucket", "prefix"])
+            )
+            results += [result_base.join(account_df).reset_index().set_index(["bucket", "prefix", "name"])]
+        result = results[0].join(results[1:])
         return result
 
+    # TODO deprecate
     def _get_df_drop_incorrect_empty_rows(self, df: AllAccountsS3DataDf) -> AllAccountsS3DataDf:
         """
         Drop null rows caused when merging query results without files in some accounts.
