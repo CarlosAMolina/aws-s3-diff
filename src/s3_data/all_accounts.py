@@ -107,8 +107,7 @@ class _IndividualAccountS3DataMerger:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        result = self._s3_uris_file_reader.file_df[accounts[0]]
+        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
         # TODO refactor extract function, this lines is done in other files.
         result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
         result.columns = ["bucket", "prefix"]
@@ -122,12 +121,17 @@ class _IndividualAccountS3DataMerger:
             [""] * len(result.columns),
         ]  # To merge to a MultiIndex columns Df.
         result_base = result.copy()
+        result = self._get_df_merge_accounts_s3_data()
+        # Maintain all queries despite no results.
+        result = result.reset_index().set_index(["bucket", "prefix"])
+        result = result_base.join(result)
+        return result.reset_index().set_index(["bucket", "prefix", "name"])
+
+    def _get_df_merge_accounts_s3_data(self) -> Df:
+        accounts = self._s3_uris_file_reader.get_accounts()
         account_df = AccountS3DataFactory(accounts[0]).get_df_from_csv()
-        account_df = account_df.reset_index().set_index(result.index.names)
-        results = list()
-        account_result = result_base.join(account_df)
-        account_result = account_result.reset_index().set_index(["bucket", "prefix", "name"])
-        results += [account_result]
+        account_df = account_df.reset_index().set_index(["bucket", "prefix", "name"])
+        result = account_df.copy()
         for account in accounts[1:]:
             account_df = (
                 AccountS3DataFactory(account)
@@ -135,12 +139,6 @@ class _IndividualAccountS3DataMerger:
                 .reset_index()
                 .set_index(["bucket", "prefix"])
             )
-            account_result = result_base.join(account_df)
-            account_result = account_result.reset_index().set_index(["bucket", "prefix", "name"])
-            results += [account_result]
-        result = results[0].join(results[1:], how="outer")
-        # Maintain all queries despite no results.
-        result = result.dropna(axis="index", how="all")
-        result = result.reset_index().set_index(["bucket", "prefix"])
-        result = result_base.join(result)
-        return result.reset_index().set_index(["bucket", "prefix", "name"])
+            account_result = account_df.reset_index().set_index(["bucket", "prefix", "name"])
+            result = result.join(account_result, how="outer")
+        return result.dropna(axis="index", how="all")
