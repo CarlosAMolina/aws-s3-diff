@@ -107,25 +107,8 @@ class _IndividualAccountS3DataMerger:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
-        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
-        # TODO refactor extract function, this lines is done in other files.
-        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
-        result.columns = ["bucket", "prefix"]
-        # TODO refactor extract function, this lines is done in other files.
-        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
-        result = result.set_index(result.columns.tolist())
-        # TODO refactor extract function, this lines is done in other files.
-        # TODO improve this, use MultiIndex or something better
-        result.columns = [
-            result.columns,
-            [""] * len(result.columns),
-        ]  # To merge to a MultiIndex columns Df.
-        result_base = result.copy()
         result = self._get_df_merge_accounts_s3_data()
-        # Maintain all queries despite no results.
-        result = result.reset_index().set_index(["bucket", "prefix"])
-        result = result_base.join(result)
-        return result.reset_index().set_index(["bucket", "prefix", "name"])
+        return self._get_df_set_all_queries_despite_without_results(result)
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -134,3 +117,24 @@ class _IndividualAccountS3DataMerger:
             account_df = AccountS3DataFactory(account).get_df_from_csv_with_original_account_index()
             result = result.join(account_df, how="outer")
         return result.dropna(axis="index", how="all")
+
+    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
+        result = self._get_df_with_s3_queries_as_index()
+        # TODO refactor extract function, this lines is done in other files.
+        # TODO improve this, use MultiIndex or something better
+        result.columns = [
+            result.columns,
+            [""] * len(result.columns),
+        ]  # To merge to a MultiIndex columns Df.
+        # Maintain all queries despite no results.
+        result = result.join(df.reset_index().set_index(["bucket", "prefix"]))
+        return result.reset_index().set_index(["bucket", "prefix", "name"])
+
+    def _get_df_with_s3_queries_as_index(self) -> Df:
+        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
+        # TODO refactor extract function, this lines is done in other files.
+        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        result.columns = ["bucket", "prefix"]
+        # TODO refactor extract function, this lines is done in other files.
+        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
+        return result.set_index(["bucket", "prefix"])
