@@ -17,17 +17,24 @@ from types_custom import S3Query
 
 class AccountS3DataFactory:
     def __init__(self, account: str):
+        self._account = account  # TODO deprecate
         self._account_extractor = _AccountExtractor(account)
-        self._account_s3_data_df_builder = _AccountS3DataDfBuilder(account)
+        self._csv_reader = _CsvReader(account)
+        self._multi_index_df_factory = _MultiIndexDfFactory(account)
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def to_csv_extract_s3_data(self):
         self._account_extractor.extract_s3_data_to_csv()
 
     def get_df_from_csv(self) -> MultiIndexDf:
-        return self._account_s3_data_df_builder.reset().with_multi_index().build()
+        df = self._csv_reader.get_df()
+        return self._multi_index_df_factory.get_df(df)
 
     def get_df_from_csv_with_original_account_index(self) -> MultiIndexDf:
-        return self._account_s3_data_df_builder.reset().with_multi_index().with_origin_account_index().build()
+        result = self.get_df_from_csv()
+        return _S3UriDfModifier(
+            self._s3_uris_file_reader.get_first_account(), self._account, result
+        ).get_df_set_s3_uris_in_origin_account()
 
 
 class _AccountExtractor:
@@ -75,43 +82,6 @@ class _AccountExtractor:
 
     def _drop_file(self):
         self._file_path_results.unlink()
-
-
-class _AccountS3DataDfBuilder:
-    def __init__(self, account: str):
-        self._account = account
-        self._multi_index_factory = _MultiIndexDfFactory(account)
-        self._csv_reader = _CsvReader(account)
-        self._s3_uris_file_reader = S3UrisFileReader()
-        self.__df = None  # To avoid read file more than once.
-
-    def with_multi_index(self) -> "_AccountS3DataDfBuilder":
-        self._df = self._multi_index_factory.get_df(self._df)
-        return self
-
-    def with_origin_account_index(self) -> "_AccountS3DataDfBuilder":
-        """The with_multi_index method must be called before this method is called"""
-        self._df = _S3UriDfModifier(
-            self._s3_uris_file_reader.get_first_account(), self._account, self._df
-        ).get_df_set_s3_uris_in_origin_account()
-        return self
-
-    def build(self) -> Df | MultiIndexDf:
-        return self._df
-
-    def reset(self):
-        self.__df = None
-        return self
-
-    @property
-    def _df(self) -> Df:
-        if self.__df is None:
-            self.__df = self._csv_reader.get_df()
-        return self.__df
-
-    @_df.setter
-    def _df(self, df: Df):
-        self.__df = df
 
 
 class _CsvReader:
