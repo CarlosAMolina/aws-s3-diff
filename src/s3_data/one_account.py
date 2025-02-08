@@ -23,10 +23,10 @@ class AccountS3DataFactory:
     def to_csv_extract_s3_data(self):
         self._account_extractor.extract_s3_data_to_csv()
 
-    def get_df_from_csv(self) -> Df:
+    def get_df_from_csv(self) -> MultiIndexDf:
         return self._account_s3_data_df_builder.reset().with_multi_index().build()
 
-    def get_df_from_csv_with_original_account_index(self) -> Df:
+    def get_df_from_csv_with_original_account_index(self) -> MultiIndexDf:
         return self._account_s3_data_df_builder.reset().with_multi_index().with_origin_account_index().build()
 
 
