@@ -13,7 +13,7 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.one_account import AccountS3DataFactory
-from types_custom import AllAccountsS3DataDf
+from types_custom import MultiIndexDf
 
 
 class AllAccountsS3DataFactory:
@@ -31,10 +31,10 @@ class AllAccountsS3DataFactory:
         csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
         csv_df.to_csv(file_path)
 
-    def get_df_from_csv(self) -> AllAccountsS3DataDf:
+    def get_df_from_csv(self) -> MultiIndexDf:
         return _AccountsS3DataCsvReader().get_df()
 
-    def _get_df_merging_each_account_s3_data(self) -> AllAccountsS3DataDf:
+    def _get_df_merging_each_account_s3_data(self) -> MultiIndexDf:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
@@ -59,7 +59,7 @@ class S3DataTransformer(ABC):
 
 
 class _AccountsS3DataTransformer(S3DataTransformer):
-    def get_df_to_export(self, df: AllAccountsS3DataDf) -> Df:
+    def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         self._set_df_index_column_names(result)
@@ -71,7 +71,7 @@ class _AccountsS3DataCsvReader:
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self) -> AllAccountsS3DataDf:
+    def get_df(self) -> MultiIndexDf:
         # TODO don't access a property of a property
         result = self._get_df_from_file(self._local_results.analysis_paths.file_s3_data_all_accounts)
         return self._get_df_set_multi_index_columns(result)
@@ -105,7 +105,7 @@ class _AccountsS3DataMerger:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_merge_each_account_results(self) -> AllAccountsS3DataDf:
+    def get_df_merge_each_account_results(self) -> MultiIndexDf:
         result = self._get_df_merge_accounts_s3_data()
         return self._get_df_set_all_queries_despite_without_results(result)
 

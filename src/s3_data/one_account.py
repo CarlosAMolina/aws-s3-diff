@@ -9,8 +9,8 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.s3_client import S3Client
-from types_custom import AccountS3DataDf
 from types_custom import FileS3Data
+from types_custom import MultiIndexDf
 from types_custom import S3Data
 from types_custom import S3Query
 
@@ -96,7 +96,7 @@ class _AccountS3DataDfBuilder:
         ).get_df_set_s3_uris_in_origin_account()
         return self
 
-    def build(self) -> AccountS3DataDf:
+    def build(self) -> Df | MultiIndexDf:
         return self._df
 
     def reset(self):

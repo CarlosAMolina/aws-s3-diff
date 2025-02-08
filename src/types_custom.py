@@ -33,6 +33,4 @@ class FileS3Data(NamedTuple):
 
 
 S3Data = list[FileS3Data]
-AccountS3DataDf = Df
-AllAccountsS3DataDf = Df  # It is the combination of all AWS accounts S3 data. Df with MultiIndex.
-AnalysisS3DataDf = Df  # It is the AllAccountsS3DataDf plus the analysis result columns. Df with MultiIndex
+MultiIndexDf = Df

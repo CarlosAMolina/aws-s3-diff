@@ -12,8 +12,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from s3_data.all_accounts import S3DataTransformer
-from types_custom import AllAccountsS3DataDf
-from types_custom import AnalysisS3DataDf
+from types_custom import MultiIndexDf
 
 
 class AnalysisS3DataFactory:
@@ -31,11 +30,11 @@ class AnalysisS3DataFactory:
         csv_df = self._analysis_transformer.get_df_to_export(df)
         csv_df.to_csv(file_path)
 
-    def _get_df_s3_data_analyzed(self) -> AnalysisS3DataDf:
+    def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
         all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
-    def _get_df_set_analysis_columns(self, df: AllAccountsS3DataDf) -> Df:
+    def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
         result_builder = _AnalysisBuilder(df)
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
@@ -45,7 +44,7 @@ class AnalysisS3DataFactory:
 
 
 class _AnalysisBuilder:
-    def __init__(self, df: AllAccountsS3DataDf):
+    def __init__(self, df: MultiIndexDf):
         self._df = df
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
@@ -92,7 +91,7 @@ class _CanExistAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFact
 
 
 class _TypeAnalysisFactory(ABC):
-    def get_df(self, df: AllAccountsS3DataDf) -> Df:
+    def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         for accounts in self._get_accounts_array():
             result = self._two_accounts_analysis_factory(accounts, result).get_df_set_analysis()
@@ -128,13 +127,13 @@ class _CanExistTypeAnalysisFactory(_TypeAnalysisFactory):
 
 
 class _TwoAccountsAnalysisFactory(ABC):
-    def __init__(self, accounts: _AccountsToCompare, df: AllAccountsS3DataDf):
+    def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
         self._condition = _AnalysisCondition(accounts, df)
         self._df = df
         self._logger = get_logger()
 
-    def get_df_set_analysis(self) -> AnalysisS3DataDf:
+    def get_df_set_analysis(self) -> MultiIndexDf:
         self._log_analysis()
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
@@ -277,7 +276,7 @@ class _AnalysisTransformer(S3DataTransformer):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: AnalysisS3DataDf) -> Df:
+    def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
