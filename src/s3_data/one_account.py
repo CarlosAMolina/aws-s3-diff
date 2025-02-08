@@ -8,6 +8,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.interface import AsMultiIndexModifier
 from s3_data.interface import CsvReader
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
@@ -66,12 +67,12 @@ class AccountExtractor:
 class AccountS3DataFromCsvFactory:
     def __init__(self, account: str):
         self._csv_reader = _AccountCsvReader(account)
-        self._multi_index_df_factory = _MultiIndexDfFactory(account)
+        self._account_as_multi_index_modifier = _AccountAsMultiIndexModifier(account)
         self._s3_uri_df_modifier = _S3UriDfModifier(account)
 
     def get_df(self) -> MultiIndexDf:
         df = self._csv_reader.get_df()
-        return self._multi_index_df_factory.get_df(df)
+        return self._account_as_multi_index_modifier.get_df(df)
 
     def get_df_with_original_account_index(self) -> MultiIndexDf:
         result = self.get_df()
@@ -92,11 +93,11 @@ class _AccountCsvReader(CsvReader):
         ).astype({"size": "Int64"})
 
 
-class _MultiIndexDfFactory:
+class _AccountAsMultiIndexModifier(AsMultiIndexModifier):
     def __init__(self, account: str):
         self._account = account
 
-    def get_df(self, df: Df) -> Df:
+    def get_df(self, df: Df) -> MultiIndexDf:
         result = df.copy()
         columns = self._get_index_as_mult_index(result.columns)
         result.columns = MultiIndex.from_tuples(columns)
