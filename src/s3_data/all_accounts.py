@@ -11,6 +11,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.interface import AsMultiIndexModifier
 from s3_data.interface import CsvReader
 from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
@@ -73,14 +74,20 @@ class _AccountsS3DataTransformer(S3DataTransformer):
 
 class _AccountsS3DataCsvReader:
     def __init__(self):
-        self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
         self._s3_accounts_csv_reader = _AccountsCsvReader()
+        self._accounts_as_multi_index_modifier = _AccountsAsMultiIndexModifier()
 
     def get_df(self) -> MultiIndexDf:
-        # TODO don't access a property of a property
         result = self._s3_accounts_csv_reader.get_df()
-        return self._get_df_set_multi_index_columns(result)
+        return self._accounts_as_multi_index_modifier.get_df(result)
+
+
+class _AccountsAsMultiIndexModifier(AsMultiIndexModifier):
+    def __init__(self):
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_df(self, df: Df) -> MultiIndexDf:
+        return self._get_df_set_multi_index_columns(df)
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
