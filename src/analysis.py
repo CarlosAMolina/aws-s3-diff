@@ -7,7 +7,6 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from config_files import AnalysisConfigReader
-from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
@@ -273,9 +272,6 @@ class _AnalysisCondition:
 
 
 class _AnalysisTransformer(S3DataTransformer):
-    def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()  # TODO rm
-
     def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)

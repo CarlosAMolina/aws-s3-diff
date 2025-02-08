@@ -3,8 +3,6 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 from unittest.mock import Mock
-from unittest.mock import patch
-from unittest.mock import PropertyMock
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -19,7 +17,6 @@ from src.analysis import _CanFileExistTwoAccountsAnalysisFactory
 from src.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
 from src.analysis import _TwoAccountsAnalysisFactory
 from src.analysis import AnalysisS3DataFactory
-from src.config_files import S3UrisFileReader
 
 
 class _AnalysisBuilderConfig(ABC):
@@ -79,18 +76,7 @@ class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
 
 class TestDfAnalysis(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._s3_uris_file_reader = S3UrisFileReader()
-
-    @patch(
-        "src.analysis.S3UrisFileReader._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__)
-        .parent.absolute()
-        .joinpath("fake-files/s3-uris-to-analyze/to-test-possible-s3-files-all-accounts.csv"),
-    )
-    def test_get_df_set_analysis_result_for_several_df_analysis(self, mock_file_path_what_to_analyze):
+    def test_get_df_set_analysis_result_for_several_df_analysis(self):
         for analysis_config in [
             _IsFileCopiedAnalysisBuilderConfig(),
             _CanFileExistAnalysisBuilderConfig(),
@@ -101,14 +87,9 @@ class TestDfAnalysis(unittest.TestCase):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
             df = _get_df_from_accounts_s3_data_csv(file_path_name)
-            result = config.analysis_class_to_check(self._accounts_to_compare, df).get_df_set_analysis()
+            result = config.analysis_class_to_check(_AccountsToCompare("pro", "release"), df).get_df_set_analysis()
             result_to_check = result.loc[:, ("analysis", config.column_name_to_check)].tolist()
             self.assertEqual(expected_result, result_to_check)
-
-    @property
-    def _accounts_to_compare(self) -> _AccountsToCompare:
-        all_accounts = self._s3_uris_file_reader.get_accounts()
-        return _AccountsToCompare(*all_accounts[:2])
 
 
 class TestAnalysisS3DataFactory(unittest.TestCase):
@@ -116,12 +97,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
 
-    @patch(
-        "src.analysis.S3UrisFileReader._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-    )
-    def test_get_df_set_analysis_columns(self, mock_file_path_what_to_analyze):
+    def test_get_df_set_analysis_columns(self):
         # TODO try to call AnalysisS3DataFactory()._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
         df = _get_df_from_accounts_s3_data_csv(file_path_name)
@@ -130,7 +106,10 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         result_as_csv_export = _AnalysisTransformer().get_df_to_export(result).reset_index()
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
-        expected_result = expected_result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
+        expected_result = expected_result.astype(
+            {"dev_date": str, "is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"}
+        )
+        expected_result = expected_result.replace({"None": None})
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
 
@@ -154,5 +133,9 @@ def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
     s3_data_csv_to_df._s3_accounts_csv_reader._local_results = Mock()
     s3_data_csv_to_df._s3_accounts_csv_reader._local_results.analysis_paths.file_s3_data_all_accounts = (
         Path(__file__).parent.absolute().joinpath(file_path_name)
+    )
+    s3_data_csv_to_df._s3_accounts_csv_reader._s3_uris_file_reader = Mock()
+    s3_data_csv_to_df._s3_accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
+        "pro", "release"
     )
     return s3_data_csv_to_df.get_df()
