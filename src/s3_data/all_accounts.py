@@ -36,7 +36,7 @@ class AllAccountsS3DataFactory:
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         df = self._get_df_merging_each_account_s3_data()
         csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
-        csv_df.to_csv(file_path)
+        csv_df.to_csv(file_path, index=False)
 
     def get_df_from_csv(self) -> MultiIndexDf:
         return self._accounts_s3_data_csv_reader.get_df()
@@ -62,7 +62,7 @@ class _AccountsS3DataTransformer(S3DataTransformer):
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         self._set_df_index_column_names(result)
-        return result
+        return result.reset_index()
 
     def _set_df_index_column_names(self, df: Df):
         account_1 = self._s3_uris_file_reader.get_first_account()
