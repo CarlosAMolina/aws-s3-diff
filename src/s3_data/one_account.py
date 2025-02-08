@@ -99,6 +99,10 @@ class _AccountAsMultiIndexModifier(AsMultiIndexModifier):
 
     def get_df(self, df: Df) -> MultiIndexDf:
         result = df.copy()
+        return self._get_multi_index_columns(result)
+
+    def _get_multi_index_columns(self, df: Df | MultiIndexDf) -> MultiIndexDf:
+        result = df
         columns = self._get_index_as_mult_index(result.columns)
         result.columns = MultiIndex.from_tuples(columns)
         return result
