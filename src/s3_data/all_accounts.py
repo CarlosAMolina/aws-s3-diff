@@ -25,6 +25,7 @@ from types_custom import MultiIndexDf
 class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_merger = _AccountsS3DataMerger()
+        self._accounts_s3_data_csv_reader = _AccountsS3DataCsvReader()
         self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
         self._local_results = LocalResults()
         self._logger = get_logger()
@@ -38,7 +39,7 @@ class AllAccountsS3DataFactory:
         csv_df.to_csv(file_path)
 
     def get_df_from_csv(self) -> MultiIndexDf:
-        return _AccountsS3DataCsvReader().get_df()
+        return self._accounts_s3_data_csv_reader.get_df()
 
     def _get_df_merging_each_account_s3_data(self) -> MultiIndexDf:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
