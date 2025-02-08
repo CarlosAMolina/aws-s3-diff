@@ -15,21 +15,6 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-class AccountS3DataFromCsvFactory:
-    def __init__(self, account: str):
-        self._csv_reader = _CsvReader(account)
-        self._multi_index_df_factory = _MultiIndexDfFactory(account)
-        self._s3_uri_df_modifier = _S3UriDfModifier(account)
-
-    def get_df(self) -> MultiIndexDf:
-        df = self._csv_reader.get_df()
-        return self._multi_index_df_factory.get_df(df)
-
-    def get_df_with_original_account_index(self) -> MultiIndexDf:
-        result = self.get_df()
-        return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
-
-
 class AccountExtractor:
     def __init__(self, account: str):
         self._account = account
@@ -75,6 +60,21 @@ class AccountExtractor:
 
     def _drop_file(self):
         self._file_path_results.unlink()
+
+
+class AccountS3DataFromCsvFactory:
+    def __init__(self, account: str):
+        self._csv_reader = _CsvReader(account)
+        self._multi_index_df_factory = _MultiIndexDfFactory(account)
+        self._s3_uri_df_modifier = _S3UriDfModifier(account)
+
+    def get_df(self) -> MultiIndexDf:
+        df = self._csv_reader.get_df()
+        return self._multi_index_df_factory.get_df(df)
+
+    def get_df_with_original_account_index(self) -> MultiIndexDf:
+        result = self.get_df()
+        return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
 
 
 class _CsvReader:
