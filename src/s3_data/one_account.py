@@ -88,7 +88,6 @@ class _AccountCsvReader(CsvReader):
         local_file_path_name = self._local_results.get_file_path_account_results(self._account)
         return pd.read_csv(
             local_file_path_name,
-            index_col=["bucket", "prefix", "name"],
             parse_dates=["date"],
         ).astype({"size": "Int64"})
 
@@ -99,9 +98,13 @@ class _AccountAsMultiIndexModifier(AsMultiIndexModifier):
 
     def get_df(self, df: Df) -> MultiIndexDf:
         result = df.copy()
-        return self._get_multi_index_columns(result)
+        result = self._get_df_with_multi_index(result)
+        return self._get_df_with_multi_index_columns(result)
 
-    def _get_multi_index_columns(self, df: Df | MultiIndexDf) -> MultiIndexDf:
+    def _get_df_with_multi_index(self, df: Df) -> MultiIndex:
+        return df.set_index(["bucket", "prefix", "name"], drop=True)
+
+    def _get_df_with_multi_index_columns(self, df: Df | MultiIndexDf) -> MultiIndexDf:
         result = df
         columns = self._get_index_as_mult_index(result.columns)
         result.columns = MultiIndex.from_tuples(columns)
