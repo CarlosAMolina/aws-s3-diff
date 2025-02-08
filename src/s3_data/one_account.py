@@ -33,8 +33,8 @@ class AccountS3DataFactory:
     def get_df_from_csv_with_original_account_index(self) -> MultiIndexDf:
         result = self.get_df_from_csv()
         return _S3UriDfModifier(
-            self._s3_uris_file_reader.get_first_account(), self._account, result
-        ).get_df_set_s3_uris_in_origin_account()
+            self._s3_uris_file_reader.get_first_account(), self._account
+        ).get_df_set_s3_uris_in_origin_account(result)
 
 
 class _AccountExtractor:
@@ -114,16 +114,17 @@ class _MultiIndexDfFactory:
 
 class _S3UriDfModifier:
     def __init__(self, *args):
-        self._account_origin, self._account_target, self._df = args
+        self._account_origin, self._account_target = args
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_set_s3_uris_in_origin_account(self) -> Df:
+    def get_df_set_s3_uris_in_origin_account(self, df: Df) -> Df:
+        result = df.copy()
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target
         )
         if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
-            return self._df
-        return self._get_df_replace_index_with_s3_uris_map(self._df, s3_uris_map_df)
+            return result
+        return self._get_df_replace_index_with_s3_uris_map(result, s3_uris_map_df)
 
     def _get_df_replace_index_with_s3_uris_map(self, df: Df, s3_uris_map_df: Df) -> Df:
         original_length = len(df)
