@@ -18,7 +18,7 @@ class AnalysisS3DataFactory:
     def __init__(self):
         self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
         self._analysis_config_reader = AnalysisConfigReader()
-        self._analysis_transformer = _AnalysisTransformer()
+        self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -26,8 +26,8 @@ class AnalysisS3DataFactory:
         file_path = self._local_results.analysis_paths.file_analysis
         self._logger.info(f"Exporting analysis to {file_path}")
         df = self._get_df_s3_data_analyzed()
-        csv_df = self._analysis_transformer.get_df_to_export(df)
-        csv_df.to_csv(file_path)
+        csv_df = self._analysis_as_single_index_factory.get_df(df)
+        csv_df.to_csv(file_path, index=False)
 
     def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
         all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
@@ -271,8 +271,13 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-class _AnalysisTransformer(S3DataTransformer):
+class _AnalysisAsSingleIndexFactory(S3DataTransformer):
+    def get_df(self, df: MultiIndexDf) -> Df:
+        return self.get_df_to_export(df)
+
+    # TODO deprecate
     def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
-        return result.rename(columns=lambda x: re.sub("^analysis_", "", x))
+        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
+        return result.reset_index()

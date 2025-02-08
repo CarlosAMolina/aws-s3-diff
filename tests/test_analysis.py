@@ -12,7 +12,7 @@ from pandas.testing import assert_frame_equal
 
 from s3_data.all_accounts import _AccountsS3DataCsvReader
 from src.analysis import _AccountsToCompare
-from src.analysis import _AnalysisTransformer
+from src.analysis import _AnalysisAsSingleIndexFactory
 from src.analysis import _CanFileExistTwoAccountsAnalysisFactory
 from src.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
 from src.analysis import _TwoAccountsAnalysisFactory
@@ -103,7 +103,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         df = _get_df_from_accounts_s3_data_csv(file_path_name)
         result = AnalysisS3DataFactory()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        result_as_csv_export = _AnalysisTransformer().get_df_to_export(result).reset_index()
+        result_as_csv_export = _AnalysisAsSingleIndexFactory().get_df(result)
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
         expected_result = expected_result.astype(
