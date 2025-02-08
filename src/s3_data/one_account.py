@@ -81,7 +81,7 @@ class _AccountS3DataDfBuilder:
     def __init__(self, account: str):
         self._account = account
         self._multi_index_factory = _MultiIndexDfFactory(account)
-        self._local_results = LocalResults()
+        self._csv_reader = _CsvReader(account)
         self._s3_uris_file_reader = S3UrisFileReader()
         self.__df = None  # To avoid read file more than once.
 
@@ -106,20 +106,26 @@ class _AccountS3DataDfBuilder:
     @property
     def _df(self) -> Df:
         if self.__df is None:
-            local_file_path_name = self._local_results.get_file_path_account_results(self._account)
-            self.__df = self._get_df_account_from_file(local_file_path_name)
+            self.__df = self._csv_reader.get_df()
         return self.__df
-
-    def _get_df_account_from_file(self, file_path_name: Path) -> Df:
-        return pd.read_csv(
-            file_path_name,
-            index_col=["bucket", "prefix", "name"],
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
 
     @_df.setter
     def _df(self, df: Df):
         self.__df = df
+
+
+class _CsvReader:
+    def __init__(self, account: str):
+        self._account = account
+        self._local_results = LocalResults()
+
+    def get_df(self) -> Df:
+        local_file_path_name = self._local_results.get_file_path_account_results(self._account)
+        return pd.read_csv(
+            local_file_path_name,
+            index_col=["bucket", "prefix", "name"],
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
 
 
 class _MultiIndexDfFactory:
