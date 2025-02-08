@@ -46,9 +46,6 @@ class AllAccountsS3DataFactory:
 
 
 class S3DataTransformer(ABC):
-    def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
-
     @abstractmethod
     def get_df_to_export(self, df: Df) -> Df:
         pass
@@ -58,6 +55,9 @@ class S3DataTransformer(ABC):
 
 
 class _AccountsS3DataTransformer(S3DataTransformer):
+    def __init__(self):
+        self._s3_uris_file_reader = S3UrisFileReader()
+
     def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
