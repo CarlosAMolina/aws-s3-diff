@@ -21,3 +21,12 @@ class AsMultiIndexFactory(_IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> MultiIndexDf:
         pass
+
+
+class SingleIndexFactory(_IndexFactory):
+    @abstractmethod
+    def get_df(self, df: Df) -> Df:
+        pass
+
+    def _set_df_columns_as_single_index(self, df: Df):
+        df.columns = df.columns.map("_".join)

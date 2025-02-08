@@ -10,7 +10,7 @@ from config_files import AnalysisConfigReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
-from s3_data.all_accounts import SingleIndexFactory
+from s3_data.interface import SingleIndexFactory
 from types_custom import MultiIndexDf
 
 

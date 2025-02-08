@@ -1,6 +1,4 @@
 import re
-from abc import ABC
-from abc import abstractmethod
 
 from pandas import DataFrame as Df
 from pandas import Index
@@ -13,6 +11,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvReader
+from s3_data.interface import SingleIndexFactory
 from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
 
@@ -43,15 +42,6 @@ class AllAccountsS3DataFactory:
 
     def _get_df_merging_each_account_s3_data(self) -> MultiIndexDf:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
-
-
-class SingleIndexFactory(ABC):
-    @abstractmethod
-    def get_df(self, df: Df) -> Df:
-        pass
-
-    def _set_df_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
 
 
 class _AccountsAsSingleIndexFactory(SingleIndexFactory):
