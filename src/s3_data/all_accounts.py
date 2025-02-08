@@ -14,7 +14,6 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.one_account import AccountS3DataFactory
 from types_custom import AllAccountsS3DataDf
-from types_custom import SingleIndexAllAccountsS3DataDf
 
 
 class AllAccountsS3DataFactory:
@@ -60,7 +59,7 @@ class S3DataTransformer(ABC):
 
 
 class _AccountsS3DataTransformer(S3DataTransformer):
-    def get_df_to_export(self, df: AllAccountsS3DataDf) -> SingleIndexAllAccountsS3DataDf:
+    def get_df_to_export(self, df: AllAccountsS3DataDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         self._set_df_index_column_names(result)
