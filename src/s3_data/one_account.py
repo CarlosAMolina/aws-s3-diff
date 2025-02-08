@@ -123,12 +123,12 @@ class _S3UriDfModifier:
         )
         if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
             return self._df
-        return self._get_df_replace_index_with_s3_uris_map(s3_uris_map_df)
+        return self._get_df_replace_index_with_s3_uris_map(self._df, s3_uris_map_df)
 
-    def _get_df_replace_index_with_s3_uris_map(self, s3_uris_map_df: Df) -> Df:
-        original_length = len(self._df)
-        assert self._df.index.get_level_values("prefix").str.endswith("/").all()
-        result = self._df.copy()
+    def _get_df_replace_index_with_s3_uris_map(self, df: Df, s3_uris_map_df: Df) -> Df:
+        original_length = len(df)
+        assert df.index.get_level_values("prefix").str.endswith("/").all()
+        result = df.copy()
         result = result.reset_index("name")
         s3_uris_map_df = self._get_s3_uris_map_prepared_for_join(s3_uris_map_df)
         result = result.join(s3_uris_map_df)

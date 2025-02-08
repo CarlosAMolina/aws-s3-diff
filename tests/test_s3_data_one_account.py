@@ -33,7 +33,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                 assert_frame_equal(
                     expected_result,
                     _S3UriDfModifier(_ACCOUNT_ORIGIN, _ACCOUNT_TARGET, df)._get_df_replace_index_with_s3_uris_map(
-                        s3_uris_map_df
+                        df, s3_uris_map_df
                     ),
                 )
 
