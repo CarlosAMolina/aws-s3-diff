@@ -1,7 +1,6 @@
 import re
 from abc import ABC
 from abc import abstractmethod
-from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Index
@@ -104,14 +103,11 @@ class _AccountsCsvReader(CsvReader):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self) -> Df:
-        return self._get_df_from_file(self._local_results.analysis_paths.file_s3_data_all_accounts)
-
     # TODO extract common code with _AccountCsvReader
-    def _get_df_from_file(self, file_path_name: Path) -> Df:
+    def get_df(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(
-            file_path_name,
+            self._local_results.analysis_paths.file_s3_data_all_accounts,
             index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
             parse_dates=[f"{account}_date" for account in accounts],
         ).astype({f"{account}_size": "Int64" for account in accounts})
