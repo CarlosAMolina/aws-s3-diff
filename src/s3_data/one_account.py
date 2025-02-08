@@ -17,11 +17,10 @@ from types_custom import S3Query
 
 class AccountS3DataFactory:
     def __init__(self, account: str):
-        self._account = account  # TODO deprecate
         self._account_extractor = _AccountExtractor(account)
         self._csv_reader = _CsvReader(account)
         self._multi_index_df_factory = _MultiIndexDfFactory(account)
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uri_df_modifier = _S3UriDfModifier(account)
 
     def to_csv_extract_s3_data(self):
         self._account_extractor.extract_s3_data_to_csv()
@@ -32,7 +31,7 @@ class AccountS3DataFactory:
 
     def get_df_from_csv_with_original_account_index(self) -> MultiIndexDf:
         result = self.get_df_from_csv()
-        return _S3UriDfModifier(self._account).get_df_set_s3_uris_in_origin_account(result)
+        return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
 
 
 class _AccountExtractor:
