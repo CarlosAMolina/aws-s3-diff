@@ -64,7 +64,7 @@ class AccountExtractor:
 
 class AccountS3DataFromCsvFactory:
     def __init__(self, account: str):
-        self._csv_reader = _CsvReader(account)
+        self._csv_reader = _AccountCsvReader(account)
         self._multi_index_df_factory = _MultiIndexDfFactory(account)
         self._s3_uri_df_modifier = _S3UriDfModifier(account)
 
@@ -77,7 +77,7 @@ class AccountS3DataFromCsvFactory:
         return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
 
 
-class _CsvReader:
+class _AccountCsvReader:
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
