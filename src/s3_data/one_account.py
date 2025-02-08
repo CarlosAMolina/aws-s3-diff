@@ -8,6 +8,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.interface import CsvReader
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
 from types_custom import MultiIndexDf
@@ -77,7 +78,7 @@ class AccountS3DataFromCsvFactory:
         return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
 
 
-class _AccountCsvReader:
+class _AccountCsvReader(CsvReader):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
