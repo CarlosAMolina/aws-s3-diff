@@ -45,7 +45,7 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
-class S3DataTransformer(ABC):
+class SingleIndexFactory(ABC):
     @abstractmethod
     def get_df_to_export(self, df: Df) -> Df:
         pass
@@ -54,7 +54,7 @@ class S3DataTransformer(ABC):
         df.columns = df.columns.map("_".join)
 
 
-class _AccountsAsSingleIndexFactory(S3DataTransformer):
+class _AccountsAsSingleIndexFactory(SingleIndexFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
