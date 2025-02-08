@@ -80,12 +80,13 @@ class _AccountExtractor:
 class _AccountS3DataDfBuilder:
     def __init__(self, account: str):
         self._account = account
+        self._multi_index_factory = _MultiIndexDfFactory(account)
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
         self.__df = None  # To avoid read file more than once.
 
     def with_multi_index(self) -> "_AccountS3DataDfBuilder":
-        self._df.columns = MultiIndex.from_tuples(self._column_names_mult_index)
+        self._df = self._multi_index_factory.get_df(self._df)
         return self
 
     def with_origin_account_index(self) -> "_AccountS3DataDfBuilder":
@@ -120,9 +121,19 @@ class _AccountS3DataDfBuilder:
     def _df(self, df: Df):
         self.__df = df
 
-    @property
-    def _column_names_mult_index(self) -> list[tuple[str, str]]:
-        return [(self._account, column_name) for column_name in self._df.columns]
+
+class _MultiIndexDfFactory:
+    def __init__(self, account: str):
+        self._account = account
+
+    def get_df(self, df: Df) -> Df:
+        result = df.copy()
+        columns = self._get_index_as_mult_index(result.columns)
+        result.columns = MultiIndex.from_tuples(columns)
+        return result
+
+    def _get_index_as_mult_index(self, index: pd.Index) -> list[tuple[str, str]]:
+        return [(self._account, column_name) for column_name in index]
 
 
 class _S3UriDfModifier:
