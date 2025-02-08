@@ -12,7 +12,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
-from s3_data.one_account import AccountS3DataFactory
+from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
 
 
@@ -111,9 +111,9 @@ class _AccountsS3DataMerger:
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
-        result = AccountS3DataFactory(accounts[0]).get_df_from_csv()
+        result = AccountS3DataFromCsvFactory(accounts[0]).get_df()
         for account in accounts[1:]:
-            account_df = AccountS3DataFactory(account).get_df_from_csv_with_original_account_index()
+            account_df = AccountS3DataFromCsvFactory(account).get_df_with_original_account_index()
             result = result.join(account_df, how="outer")
         return result.dropna(axis="index", how="all")
 
