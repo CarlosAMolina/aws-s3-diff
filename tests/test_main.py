@@ -96,7 +96,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
 
     @patch("src.main.LocalResults")
     @patch("src.main._AnalyzedAccounts")
-    @patch("src.main.AccountS3DataFactory.to_csv_extract_s3_data")
+    @patch("src.main.AccountExtractor.extract_s3_data_to_csv")
     @patch(
         "src.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
