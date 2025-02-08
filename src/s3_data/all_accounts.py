@@ -15,6 +15,11 @@ from logger import get_logger
 from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
 
+# TODO apply refactors done in one_account.py:
+# - extract S3DataFromCsvFactory (make pulic _AccountsS3DataCsvReader)
+# - extract _MultiIndexDfFactory
+# - etc
+
 
 class AllAccountsS3DataFactory:
     def __init__(self):
