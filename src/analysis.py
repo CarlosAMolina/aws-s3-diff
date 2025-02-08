@@ -273,10 +273,6 @@ class _AnalysisCondition:
 
 class _AnalysisAsSingleIndexFactory(SingleIndexFactory):
     def get_df(self, df: MultiIndexDf) -> Df:
-        return self.get_df_to_export(df)
-
-    # TODO deprecate
-    def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))

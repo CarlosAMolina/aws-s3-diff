@@ -35,7 +35,7 @@ class AllAccountsS3DataFactory:
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
         df = self._get_df_merging_each_account_s3_data()
-        csv_df = self._accounts_s3_data_transformer.get_df_to_export(df)
+        csv_df = self._accounts_s3_data_transformer.get_df(df)
         csv_df.to_csv(file_path, index=False)
 
     def get_df_from_csv(self) -> MultiIndexDf:
@@ -47,7 +47,7 @@ class AllAccountsS3DataFactory:
 
 class SingleIndexFactory(ABC):
     @abstractmethod
-    def get_df_to_export(self, df: Df) -> Df:
+    def get_df(self, df: Df) -> Df:
         pass
 
     def _set_df_columns_as_single_index(self, df: Df):
@@ -58,7 +58,7 @@ class _AccountsAsSingleIndexFactory(SingleIndexFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_to_export(self, df: MultiIndexDf) -> Df:
+    def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
         account_1 = self._s3_uris_file_reader.get_first_account()
