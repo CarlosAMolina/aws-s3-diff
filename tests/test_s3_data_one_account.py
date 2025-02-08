@@ -32,9 +32,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             with self.subTest(df=df, s3_uris_map_df=s3_uris_map_df):
                 assert_frame_equal(
                     expected_result,
-                    _S3UriDfModifier(_ACCOUNT_ORIGIN, _ACCOUNT_TARGET)._get_df_replace_index_with_s3_uris_map(
-                        df, s3_uris_map_df
-                    ),
+                    _S3UriDfModifier(_ACCOUNT_TARGET)._get_df_replace_index_with_s3_uris_map(df, s3_uris_map_df),
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
