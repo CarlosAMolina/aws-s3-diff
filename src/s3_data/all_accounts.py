@@ -26,7 +26,7 @@ class AllAccountsS3DataFactory:
     def __init__(self):
         self._accounts_s3_data_merger = _AccountsS3DataMerger()
         self._accounts_s3_data_csv_reader = _AccountsS3DataCsvReader()
-        self._accounts_s3_data_transformer = _AccountsS3DataTransformer()
+        self._accounts_s3_data_transformer = _AccountsAsSingleIndexFactory()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -54,8 +54,7 @@ class S3DataTransformer(ABC):
         df.columns = df.columns.map("_".join)
 
 
-# TODO rename to AccountsAsSingleIndexFactory
-class _AccountsS3DataTransformer(S3DataTransformer):
+class _AccountsAsSingleIndexFactory(S3DataTransformer):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
