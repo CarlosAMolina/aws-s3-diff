@@ -54,6 +54,7 @@ class S3DataTransformer(ABC):
         df.columns = df.columns.map("_".join)
 
 
+# TODO rename to AccountsAsSingleIndexFactory
 class _AccountsS3DataTransformer(S3DataTransformer):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
