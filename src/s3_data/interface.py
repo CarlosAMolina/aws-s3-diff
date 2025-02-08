@@ -11,13 +11,13 @@ class CsvReader(ABC):
         pass
 
 
-class _IndexModifier(ABC):
+class _IndexFactory(ABC):
     @abstractmethod
     def get_df(self, df: Df) -> Df | MultiIndexDf:
         pass
 
 
-class AsMultiIndexModifier(_IndexModifier):
+class AsMultiIndexFactory(_IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> MultiIndexDf:
         pass
