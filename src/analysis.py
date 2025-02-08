@@ -274,11 +274,9 @@ class _AnalysisCondition:
 
 class _AnalysisTransformer(S3DataTransformer):
     def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_uris_file_reader = S3UrisFileReader()  # TODO rm
 
     def get_df_to_export(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
-        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
-        self._set_df_index_column_names(result)
-        return result
+        return result.rename(columns=lambda x: re.sub("^analysis_", "", x))
