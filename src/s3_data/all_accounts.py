@@ -12,6 +12,7 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.interface import CsvReader
 from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
 
@@ -75,20 +76,12 @@ class _AccountsS3DataCsvReader:
     def __init__(self):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
+        self._s3_accounts_csv_reader = _AccountsCsvReader()
 
     def get_df(self) -> MultiIndexDf:
         # TODO don't access a property of a property
-        result = self._get_df_from_file(self._local_results.analysis_paths.file_s3_data_all_accounts)
+        result = self._s3_accounts_csv_reader.get_df()
         return self._get_df_set_multi_index_columns(result)
-
-    # TODO extract common code with _get_df_account_from_file
-    def _get_df_from_file(self, file_path_name: Path) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        return read_csv(
-            file_path_name,
-            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
-            parse_dates=[f"{account}_date" for account in accounts],
-        ).astype({f"{account}_size": "Int64" for account in accounts})
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
@@ -104,6 +97,24 @@ class _AccountsS3DataCsvReader:
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
+
+
+class _AccountsCsvReader(CsvReader):
+    def __init__(self):
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_df(self) -> Df:
+        return self._get_df_from_file(self._local_results.analysis_paths.file_s3_data_all_accounts)
+
+    # TODO extract common code with _AccountCsvReader
+    def _get_df_from_file(self, file_path_name: Path) -> Df:
+        accounts = self._s3_uris_file_reader.get_accounts()
+        return read_csv(
+            file_path_name,
+            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
+            parse_dates=[f"{account}_date" for account in accounts],
+        ).astype({f"{account}_size": "Int64" for account in accounts})
 
 
 class _AccountsS3DataMerger:
