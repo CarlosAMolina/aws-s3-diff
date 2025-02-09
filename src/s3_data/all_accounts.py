@@ -45,6 +45,7 @@ class AllAccountsS3DataFactory:
 
 class _AccountsNewDfFactory(NewDfFactory):
     def __init__(self):
+        # TODO deprecate class and move its code here
         self._accounts_s3_data_merger = _AccountsS3DataMerger()
 
     def get_df(self) -> MultiIndexDf:
