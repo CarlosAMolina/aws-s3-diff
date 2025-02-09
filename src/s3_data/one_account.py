@@ -46,6 +46,21 @@ class AccountCsvFactory(CsvFactory):
         self._file_path_results.unlink()
 
 
+class AccountFromCsvFactory(FromCsvDfFactory):
+    def __init__(self, account: str):
+        self._csv_reader = _AccountCsvReader(account)
+        self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
+        self._account_with_origin_s3_uris_index_factory = _AccountWithOriginS3UrisIndexFactory(account)
+
+    def get_df(self) -> MultiIndexDf:
+        df = self._csv_reader.get_df()
+        return self._account_as_multi_index_factory.get_df(df)
+
+    def get_df_with_original_account_index(self) -> MultiIndexDf:
+        result = self.get_df()
+        return self._account_with_origin_s3_uris_index_factory.get_df(result)
+
+
 class _AccountNewDfFactory(NewDfFactory):
     def __init__(self, account: str):
         self._account = account
@@ -78,21 +93,6 @@ class _AccountNewDfFactory(NewDfFactory):
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
-
-
-class AccountFromCsvFactory(FromCsvDfFactory):
-    def __init__(self, account: str):
-        self._csv_reader = _AccountCsvReader(account)
-        self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
-        self._account_with_origin_s3_uris_index_factory = _AccountWithOriginS3UrisIndexFactory(account)
-
-    def get_df(self) -> MultiIndexDf:
-        df = self._csv_reader.get_df()
-        return self._account_as_multi_index_factory.get_df(df)
-
-    def get_df_with_original_account_index(self) -> MultiIndexDf:
-        result = self.get_df()
-        return self._account_with_origin_s3_uris_index_factory.get_df(result)
 
 
 class _AccountCsvReader(CsvReader):
