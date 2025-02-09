@@ -11,11 +11,12 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsFromCsvDfFactory
 from s3_data.interface import AsSingleIndexFactory
+from s3_data.interface import CsvFactory
 from s3_data.interface import NewDfFactory
 from types_custom import MultiIndexDf
 
 
-class AnalysisS3DataFactory:
+class AnalysisCsvFactory(CsvFactory):
     def __init__(self):
         self._analysis_new_df_factory = _AnalysisNewDfFactory()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()

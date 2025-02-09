@@ -12,7 +12,7 @@ from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsCsvFactory
-from s3_data.analysis import AnalysisS3DataFactory
+from s3_data.analysis import AnalysisCsvFactory
 from s3_data.one_account import AccountCsvFactory
 
 
@@ -187,12 +187,12 @@ class _AnalysisProcess(_Process):
         self._logger = get_logger()
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._analysis_s3_data_factory = AnalysisS3DataFactory()
+        self._analysis_csv_factory = AnalysisCsvFactory()
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            self._analysis_s3_data_factory.to_csv()
+            self._analysis_csv_factory.to_csv()
         else:
             self._logger.info("No analysis configured. Omitting")
         LocalResults().drop_file_with_analysis_date()
