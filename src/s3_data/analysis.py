@@ -10,7 +10,6 @@ from config_files import AnalysisConfigReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsFromCsvDfFactory
-from s3_data.all_accounts import AllAccountsS3DataFactory
 from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import NewDfFactory
 from types_custom import MultiIndexDf
@@ -18,10 +17,7 @@ from types_custom import MultiIndexDf
 
 class AnalysisS3DataFactory:
     def __init__(self):
-        self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
-        self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
         self._analysis_new_df_factory = _AnalysisNewDfFactory()
-        self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._local_results = LocalResults()
         self._logger = get_logger()
