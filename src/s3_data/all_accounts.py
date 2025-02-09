@@ -11,16 +11,12 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
+from s3_data.interface import CsvFactory
 from s3_data.interface import CsvReader
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import NewDfFactory
 from s3_data.one_account import AccountFromCsvFactory
 from types_custom import MultiIndexDf
-
-# TODO apply refactors done in one_account.py:
-# - extract S3DataFromCsvFactory (make pulic _AccountsS3DataCsvReader)
-# - extract _MultiIndexDfFactory
-# - etc
 
 
 class AccountsFromCsvDfFactory(FromCsvDfFactory):
@@ -33,8 +29,7 @@ class AccountsFromCsvDfFactory(FromCsvDfFactory):
         return self._accounts_as_multi_index_factory.get_df(result)
 
 
-# TODO? rename drop All (search all `All` and drop them)
-class AllAccountsS3DataFactory:
+class AccountsCsvFactory(CsvFactory):
     def __init__(self):
         self._accounts_new_df_factory = _AccountsNewDfFactory()
         self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
