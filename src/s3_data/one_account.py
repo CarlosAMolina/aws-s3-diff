@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +12,7 @@ from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvReader
 from s3_data.interface import IndexFactory
+from s3_data.interface import NewDfFactory
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
 from types_custom import MultiIndexDf
@@ -21,14 +23,18 @@ from types_custom import S3Query
 class AccountExtractor:
     def __init__(self, account: str):
         self._account = account
-        self._s3_uris_file_reader = S3UrisFileReader()
+        self._account_new_df_factory = _AccountNewDfFactory(account)
         self._local_results = LocalResults()
         self._logger = get_logger()
 
     def extract_s3_data_to_csv(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
-        for query_index, s3_query in enumerate(self._get_s3_queries(), 1):
-            self._logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
+        # TODO not use private
+        for query_index, s3_query in enumerate(self._account_new_df_factory._get_s3_queries(), 1):
+            # TODO not use private
+            self._logger.info(
+                f"Analyzing S3 URI {query_index}/{len(self._account_new_df_factory._get_s3_queries())}: {s3_query}"
+            )
             try:
                 self._extract_s3_data_of_query(s3_query)
             except Exception as exception:
@@ -39,30 +45,45 @@ class AccountExtractor:
     def _file_path_results(self) -> Path:
         return self._local_results.get_file_path_account_results(self._account)
 
-    def _get_s3_queries(self) -> list[S3Query]:
-        return self._s3_uris_file_reader.get_s3_queries_for_account(self._account)
-
     def _extract_s3_data_of_query(self, s3_query: S3Query):
         is_any_result = False
-        for s3_data in S3Client(s3_query).get_s3_data():
+        # TODO not use private
+        for s3_data in self._account_new_df_factory._get_s3_data_of_query(s3_query):
             is_any_result = True
             self._export_s3_data_to_csv(s3_data, s3_query)
+        # TODO try deprecate
         if not is_any_result:
             self._export_s3_data_to_csv([FileS3Data()], s3_query)
 
     def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
-        query_and_data_df = self._get_df_query_and_data(s3_data, s3_query)
+        # TODO not use private
+        query_and_data_df = self._account_new_df_factory._get_df_query_and_data(s3_data, s3_query)
         export_headers = not self._file_path_results.is_file()
         query_and_data_df.to_csv(header=export_headers, index=False, mode="a", path_or_buf=self._file_path_results)
+
+    def _drop_file(self):
+        self._file_path_results.unlink()
+
+
+class _AccountNewDfFactory(NewDfFactory):
+    def __init__(self, account: str):
+        self._account = account
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    def get_df(self) -> Df:
+        raise NotImplementedError  # TODO
+
+    def _get_s3_queries(self) -> list[S3Query]:
+        return self._s3_uris_file_reader.get_s3_queries_for_account(self._account)
+
+    def _get_s3_data_of_query(self, s3_query: S3Query) -> Iterator[S3Data]:
+        yield from S3Client(s3_query).get_s3_data()
 
     def _get_df_query_and_data(self, s3_data: S3Data, s3_query: S3Query) -> Df:
         result = Df(file_data._asdict() for file_data in s3_data)
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
-
-    def _drop_file(self):
-        self._file_path_results.unlink()
 
 
 class AccountS3DataFromCsvFactory:
