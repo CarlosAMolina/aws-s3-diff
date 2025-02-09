@@ -46,14 +46,9 @@ class AccountExtractor:
         return self._local_results.get_file_path_account_results(self._account)
 
     def _extract_s3_data_of_query(self, s3_query: S3Query):
-        is_any_result = False
         # TODO not use private
         for s3_data in self._account_new_df_factory._get_s3_data_of_query(s3_query):
-            is_any_result = True
             self._export_s3_data_to_csv(s3_data, s3_query)
-        # TODO try deprecate
-        if not is_any_result:
-            self._export_s3_data_to_csv([FileS3Data()], s3_query)
 
     def _export_s3_data_to_csv(self, s3_data: S3Data, s3_query: S3Query):
         # TODO not use private
@@ -77,7 +72,13 @@ class _AccountNewDfFactory(NewDfFactory):
         return self._s3_uris_file_reader.get_s3_queries_for_account(self._account)
 
     def _get_s3_data_of_query(self, s3_query: S3Query) -> Iterator[S3Data]:
-        yield from S3Client(s3_query).get_s3_data()
+        is_any_result = False
+        for s3_data in S3Client(s3_query).get_s3_data():
+            is_any_result = True
+            yield s3_data
+        # TODO? try deprecate
+        if not is_any_result:
+            yield [FileS3Data()]
 
     def _get_df_query_and_data(self, s3_data: S3Data, s3_query: S3Query) -> Df:
         result = Df(file_data._asdict() for file_data in s3_data)
