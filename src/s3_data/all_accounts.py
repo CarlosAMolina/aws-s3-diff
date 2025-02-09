@@ -25,8 +25,8 @@ from types_custom import MultiIndexDf
 
 class AccountsFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self):
-        self._s3_accounts_csv_reader = _AccountsCsvReader()
         self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
+        self._s3_accounts_csv_reader = _AccountsCsvReader()
 
     def get_df(self) -> MultiIndexDf:
         result = self._s3_accounts_csv_reader.get_df()
