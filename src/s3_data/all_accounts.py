@@ -19,16 +19,6 @@ from s3_data.one_account import AccountFromCsvFactory
 from types_custom import MultiIndexDf
 
 
-class AccountsFromCsvDfFactory(FromCsvDfFactory):
-    def __init__(self):
-        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
-        self._s3_accounts_csv_reader = _AccountsCsvReader()
-
-    def get_df(self) -> MultiIndexDf:
-        result = self._s3_accounts_csv_reader.get_df()
-        return self._accounts_as_multi_index_factory.get_df(result)
-
-
 class AccountsCsvFactory(CsvFactory):
     def __init__(self):
         self._accounts_new_df_factory = _AccountsNewDfFactory()
@@ -43,6 +33,16 @@ class AccountsCsvFactory(CsvFactory):
         df = self._accounts_new_df_factory.get_df()
         csv_df = self._accounts_as_single_index_factory.get_df(df)
         csv_df.to_csv(file_path, index=False)
+
+
+class AccountsFromCsvDfFactory(FromCsvDfFactory):
+    def __init__(self):
+        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
+        self._s3_accounts_csv_reader = _AccountsCsvReader()
+
+    def get_df(self) -> MultiIndexDf:
+        result = self._s3_accounts_csv_reader.get_df()
+        return self._accounts_as_multi_index_factory.get_df(result)
 
 
 class _AccountsNewDfFactory(NewDfFactory):
