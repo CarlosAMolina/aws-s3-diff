@@ -65,7 +65,6 @@ class _ProcessFactory:
     def __init__(self):
         self._analyzed_accounts = _AnalyzedAccounts()
         self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _Process:
         """
