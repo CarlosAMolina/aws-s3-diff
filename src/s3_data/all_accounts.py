@@ -12,6 +12,7 @@ from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvReader
+from s3_data.interface import NewDfFactory
 from s3_data.one_account import AccountFromCsvFactory
 from types_custom import MultiIndexDf
 
@@ -21,11 +22,12 @@ from types_custom import MultiIndexDf
 # - etc
 
 
+# TODO? rename drop All (search all `All` and drop them)
 class AllAccountsS3DataFactory:
     def __init__(self):
-        self._accounts_s3_data_merger = _AccountsS3DataMerger()
+        self._accounts_new_df_factory = _AccountsNewDfFactory()
         self._accounts_s3_data_csv_reader = _AccountsS3DataCsvReader()
-        self._accounts_s3_data_transformer = _AccountsAsSingleIndexFactory()
+        self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -33,14 +35,19 @@ class AllAccountsS3DataFactory:
         # TODO no access property of property.
         file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
         self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
-        df = self._get_df_merging_each_account_s3_data()
-        csv_df = self._accounts_s3_data_transformer.get_df(df)
+        df = self._accounts_new_df_factory.get_df()
+        csv_df = self._accounts_as_single_index_factory.get_df(df)
         csv_df.to_csv(file_path, index=False)
 
     def get_df_from_csv(self) -> MultiIndexDf:
         return self._accounts_s3_data_csv_reader.get_df()
 
-    def _get_df_merging_each_account_s3_data(self) -> MultiIndexDf:
+
+class _AccountsNewDfFactory(NewDfFactory):
+    def __init__(self):
+        self._accounts_s3_data_merger = _AccountsS3DataMerger()
+
+    def get_df(self) -> MultiIndexDf:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
