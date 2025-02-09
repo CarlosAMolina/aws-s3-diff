@@ -11,6 +11,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvReader
+from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
 from s3_data.interface import NewDfFactory
 from s3_data.s3_client import S3Client
@@ -78,7 +79,7 @@ class _AccountNewDfFactory(NewDfFactory):
         return result
 
 
-class AccountS3DataFromCsvFactory:
+class AccountFromCsvFactory(FromCsvDfFactory):
     def __init__(self, account: str):
         self._csv_reader = _AccountCsvReader(account)
         self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
