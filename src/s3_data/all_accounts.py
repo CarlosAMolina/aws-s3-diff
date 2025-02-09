@@ -45,11 +45,34 @@ class AllAccountsS3DataFactory:
 
 class _AccountsNewDfFactory(NewDfFactory):
     def __init__(self):
-        # TODO deprecate class and move its code here
-        self._accounts_s3_data_merger = _AccountsS3DataMerger()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> MultiIndexDf:
-        return self._accounts_s3_data_merger.get_df_merge_each_account_results()
+        result = self._get_df_merge_accounts_s3_data()
+        return self._get_df_set_all_queries_despite_without_results(result)
+
+    def _get_df_merge_accounts_s3_data(self) -> Df:
+        accounts = self._s3_uris_file_reader.get_accounts()
+        result = AccountFromCsvFactory(accounts[0]).get_df()
+        for account in accounts[1:]:
+            account_df = AccountFromCsvFactory(account).get_df_with_original_account_index()
+            result = result.join(account_df, how="outer")
+        return result.dropna(axis="index", how="all")
+
+    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
+        result = self._get_empty_df_original_account_queries_as_index()
+        result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
+        result = result.join(df.reset_index("name"))
+        return result.set_index("name", append=True)
+
+    def _get_empty_df_original_account_queries_as_index(self) -> Df:
+        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
+        # TODO refactor extract function, this line is done in other files.
+        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        result.columns = ["bucket", "prefix"]
+        # TODO refactor extract function, this line is done in other files.
+        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
+        return result.set_index(["bucket", "prefix"])
 
 
 class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
@@ -115,35 +138,3 @@ class _AccountsCsvReader(CsvReader):
             index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
             parse_dates=[f"{account}_date" for account in accounts],
         ).astype({f"{account}_size": "Int64" for account in accounts})
-
-
-class _AccountsS3DataMerger:
-    def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
-
-    def get_df_merge_each_account_results(self) -> MultiIndexDf:
-        result = self._get_df_merge_accounts_s3_data()
-        return self._get_df_set_all_queries_despite_without_results(result)
-
-    def _get_df_merge_accounts_s3_data(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        result = AccountFromCsvFactory(accounts[0]).get_df()
-        for account in accounts[1:]:
-            account_df = AccountFromCsvFactory(account).get_df_with_original_account_index()
-            result = result.join(account_df, how="outer")
-        return result.dropna(axis="index", how="all")
-
-    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
-        result = self._get_empty_df_original_account_queries_as_index()
-        result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
-        result = result.join(df.reset_index("name"))
-        return result.set_index("name", append=True)
-
-    def _get_empty_df_original_account_queries_as_index(self) -> Df:
-        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
-        # TODO refactor extract function, this line is done in other files.
-        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
-        result.columns = ["bucket", "prefix"]
-        # TODO refactor extract function, this line is done in other files.
-        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
-        return result.set_index(["bucket", "prefix"])
