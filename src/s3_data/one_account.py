@@ -10,6 +10,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvReader
+from s3_data.interface import IndexFactory
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
 from types_custom import MultiIndexDf
@@ -114,7 +115,7 @@ class _AccountAsMultiIndexFactory(AsMultiIndexFactory):
         return [(self._account, column_name) for column_name in index]
 
 
-class _AccountWithOriginS3UrisIndexFactory:
+class _AccountWithOriginS3UrisIndexFactory(IndexFactory):
     def __init__(self, account_target):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
