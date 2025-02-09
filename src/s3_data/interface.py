@@ -11,6 +11,12 @@ class CsvReader(ABC):
         pass
 
 
+class CsvFactory(ABC):
+    @abstractmethod
+    def to_csv(self):
+        pass
+
+
 class _DfFactory(ABC):
     @abstractmethod
     def get_df(self) -> Df | MultiIndexDf:

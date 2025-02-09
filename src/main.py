@@ -13,7 +13,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from s3_data.analysis import AnalysisS3DataFactory
-from s3_data.one_account import AccountExtractor
+from s3_data.one_account import AccountCsvFactory
 
 
 class _Main:
@@ -109,12 +109,12 @@ class _AnalyzedAccounts:
 class _AccountProcess(_Process):
     def __init__(self, account: str):
         self._account = account
-        self._account_extractor = AccountExtractor(account)
+        self._account_csv_fatory = AccountCsvFactory(account)
         self._logger = get_logger()
 
     def run(self):
         self._logger.info(f"Analyzing the AWS account '{self._account}'")
-        self._account_extractor.extract_s3_data_to_csv()
+        self._account_csv_fatory.to_csv()
 
 
 class _AccountProcessFactory:

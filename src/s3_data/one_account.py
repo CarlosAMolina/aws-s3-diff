@@ -10,6 +10,7 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
+from s3_data.interface import CsvFactory
 from s3_data.interface import CsvReader
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
@@ -21,14 +22,14 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-class AccountExtractor:
+class AccountCsvFactory(CsvFactory):
     def __init__(self, account: str):
         self._account = account
         self._account_new_df_factory = _AccountNewDfFactory(account)
         self._local_results = LocalResults()
         self._logger = get_logger()
 
-    def extract_s3_data_to_csv(self):
+    def to_csv(self):
         self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
         try:
             result_df = self._account_new_df_factory.get_df()
