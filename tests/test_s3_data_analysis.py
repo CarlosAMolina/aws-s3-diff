@@ -10,13 +10,13 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from s3_data.all_accounts import _AccountsS3DataCsvReader
-from src.analysis import _AccountsToCompare
-from src.analysis import _AnalysisAsSingleIndexFactory
-from src.analysis import _CanFileExistTwoAccountsAnalysisFactory
-from src.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
-from src.analysis import _TwoAccountsAnalysisFactory
-from src.analysis import AnalysisS3DataFactory
+from src.s3_data.all_accounts import _AccountsS3DataCsvReader
+from src.s3_data.analysis import _AccountsToCompare
+from src.s3_data.analysis import _AnalysisAsSingleIndexFactory
+from src.s3_data.analysis import _CanFileExistTwoAccountsAnalysisFactory
+from src.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
+from src.s3_data.analysis import _TwoAccountsAnalysisFactory
+from src.s3_data.analysis import AnalysisS3DataFactory
 
 
 class _AnalysisBuilderConfig(ABC):
