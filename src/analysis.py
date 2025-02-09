@@ -10,7 +10,7 @@ from config_files import AnalysisConfigReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AllAccountsS3DataFactory
-from s3_data.interface import SingleIndexFactory
+from s3_data.interface import AsSingleIndexFactory
 from types_custom import MultiIndexDf
 
 
@@ -271,7 +271,7 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-class _AnalysisAsSingleIndexFactory(SingleIndexFactory):
+class _AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)

@@ -23,7 +23,7 @@ class AsMultiIndexFactory(_IndexFactory):
         pass
 
 
-class SingleIndexFactory(_IndexFactory):
+class AsSingleIndexFactory(_IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> Df:
         pass

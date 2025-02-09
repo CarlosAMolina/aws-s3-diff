@@ -10,8 +10,8 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
+from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvReader
-from s3_data.interface import SingleIndexFactory
 from s3_data.one_account import AccountS3DataFromCsvFactory
 from types_custom import MultiIndexDf
 
@@ -44,7 +44,7 @@ class AllAccountsS3DataFactory:
         return self._accounts_s3_data_merger.get_df_merge_each_account_results()
 
 
-class _AccountsAsSingleIndexFactory(SingleIndexFactory):
+class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
