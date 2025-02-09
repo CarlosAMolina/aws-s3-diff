@@ -68,7 +68,7 @@ class AccountS3DataFromCsvFactory:
     def __init__(self, account: str):
         self._csv_reader = _AccountCsvReader(account)
         self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
-        self._s3_uri_df_modifier = _S3UriDfModifier(account)
+        self._account_with_origin_s3_uris_index_factory = _AccountWithOriginS3UrisIndexFactory(account)
 
     def get_df(self) -> MultiIndexDf:
         df = self._csv_reader.get_df()
@@ -76,7 +76,7 @@ class AccountS3DataFromCsvFactory:
 
     def get_df_with_original_account_index(self) -> MultiIndexDf:
         result = self.get_df()
-        return self._s3_uri_df_modifier.get_df_set_s3_uris_in_origin_account(result)
+        return self._account_with_origin_s3_uris_index_factory.get_df(result)
 
 
 class _AccountCsvReader(CsvReader):
@@ -114,12 +114,12 @@ class _AccountAsMultiIndexFactory(AsMultiIndexFactory):
         return [(self._account, column_name) for column_name in index]
 
 
-class _S3UriDfModifier:
+class _AccountWithOriginS3UrisIndexFactory:
     def __init__(self, account_target):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_set_s3_uris_in_origin_account(self, df: Df) -> Df:
+    def get_df(self, df: Df) -> Df:
         result = df.copy()
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target
