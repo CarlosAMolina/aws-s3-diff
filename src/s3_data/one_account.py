@@ -120,7 +120,7 @@ class _AccountWithOriginS3UrisIndexFactory(IndexFactory):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self, df: Df) -> Df:
+    def get_df(self, df: Df) -> MultiIndexDf:
         result = df.copy()
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target
