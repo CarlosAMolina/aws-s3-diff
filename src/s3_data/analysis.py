@@ -9,6 +9,7 @@ from pandas import Series
 from config_files import AnalysisConfigReader
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.all_accounts import AccountsFromCsvDfFactory
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from s3_data.interface import AsSingleIndexFactory
 from types_custom import MultiIndexDf
@@ -16,6 +17,7 @@ from types_custom import MultiIndexDf
 
 class AnalysisS3DataFactory:
     def __init__(self):
+        self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
         self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
@@ -30,7 +32,7 @@ class AnalysisS3DataFactory:
         csv_df.to_csv(file_path, index=False)
 
     def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
-        all_accounts_s3_data_df = self._all_accounts_s3_data_factory.get_df_from_csv()
+        all_accounts_s3_data_df = self._accounts_from_csv_df_factory.get_df()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:

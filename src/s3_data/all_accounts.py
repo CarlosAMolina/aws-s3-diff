@@ -23,7 +23,7 @@ from types_custom import MultiIndexDf
 # - etc
 
 
-class _AccountsFromCsvDfFactory(FromCsvDfFactory):
+class AccountsFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self):
         self._s3_accounts_csv_reader = _AccountsCsvReader()
         self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
@@ -48,9 +48,6 @@ class AllAccountsS3DataFactory:
         df = self._accounts_new_df_factory.get_df()
         csv_df = self._accounts_as_single_index_factory.get_df(df)
         csv_df.to_csv(file_path, index=False)
-
-    def get_df_from_csv(self) -> MultiIndexDf:
-        return _AccountsFromCsvDfFactory().get_df()
 
 
 class _AccountsNewDfFactory(NewDfFactory):
