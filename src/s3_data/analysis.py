@@ -12,6 +12,7 @@ from logger import get_logger
 from s3_data.all_accounts import AccountsFromCsvDfFactory
 from s3_data.all_accounts import AllAccountsS3DataFactory
 from s3_data.interface import AsSingleIndexFactory
+from s3_data.interface import NewDfFactory
 from types_custom import MultiIndexDf
 
 
@@ -19,6 +20,7 @@ class AnalysisS3DataFactory:
     def __init__(self):
         self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
         self._all_accounts_s3_data_factory = AllAccountsS3DataFactory()
+        self._analysis_new_df_factory = _AnalysisNewDfFactory()
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._local_results = LocalResults()
@@ -27,15 +29,25 @@ class AnalysisS3DataFactory:
     def to_csv(self):
         file_path = self._local_results.analysis_paths.file_analysis
         self._logger.info(f"Exporting analysis to {file_path}")
-        df = self._get_df_s3_data_analyzed()
+        df = self._analysis_new_df_factory.get_df()
         csv_df = self._analysis_as_single_index_factory.get_df(df)
         csv_df.to_csv(file_path, index=False)
+
+
+class _AnalysisNewDfFactory(NewDfFactory):
+    def __init__(self):
+        self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
+        self._analysis_config_reader = AnalysisConfigReader()
+        self._logger = get_logger()
+
+    def get_df(self) -> MultiIndexDf:
+        return self._get_df_s3_data_analyzed()
 
     def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
         all_accounts_s3_data_df = self._accounts_from_csv_df_factory.get_df()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
-    def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
+    def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> MultiIndexDf:
         result_builder = _AnalysisBuilder(df)
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()

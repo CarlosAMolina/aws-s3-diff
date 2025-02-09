@@ -13,10 +13,10 @@ from pandas.testing import assert_frame_equal
 from src.s3_data.all_accounts import AccountsFromCsvDfFactory
 from src.s3_data.analysis import _AccountsToCompare
 from src.s3_data.analysis import _AnalysisAsSingleIndexFactory
+from src.s3_data.analysis import _AnalysisNewDfFactory
 from src.s3_data.analysis import _CanFileExistTwoAccountsAnalysisFactory
 from src.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
 from src.s3_data.analysis import _TwoAccountsAnalysisFactory
-from src.s3_data.analysis import AnalysisS3DataFactory
 
 
 class _AnalysisBuilderConfig(ABC):
@@ -101,7 +101,7 @@ class TestAnalysisS3DataFactory(unittest.TestCase):
         # TODO try to call AnalysisS3DataFactory()._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
         df = _get_df_from_accounts_s3_data_csv(file_path_name)
-        result = AnalysisS3DataFactory()._get_df_set_analysis_columns(df)
+        result = _AnalysisNewDfFactory()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisAsSingleIndexFactory().get_df(result)
         expected_result = self._get_df_from_csv_expected_result()
