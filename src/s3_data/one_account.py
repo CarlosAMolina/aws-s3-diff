@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame as Df
@@ -10,7 +9,6 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
-from s3_data.interface import CsvFactory
 from s3_data.interface import CsvReader
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
@@ -20,30 +18,6 @@ from types_custom import FileS3Data
 from types_custom import MultiIndexDf
 from types_custom import S3Data
 from types_custom import S3Query
-
-
-class AccountCsvFactory(CsvFactory):
-    def __init__(self, account: str):
-        self._account = account
-        self._account_new_df_factory = _AccountNewDfFactory(account)
-        self._local_results = LocalResults()
-        self._logger = get_logger()
-
-    def to_csv(self):
-        self._logger.info(f"Exporting AWS account information to {self._file_path_results}")
-        try:
-            result_df = self._account_new_df_factory.get_df()
-            result_df.to_csv(index=False, path_or_buf=self._file_path_results)
-        except Exception as exception:
-            self._drop_file()
-            raise exception
-
-    @property
-    def _file_path_results(self) -> Path:
-        return self._local_results.get_file_path_account_results(self._account)
-
-    def _drop_file(self):
-        self._file_path_results.unlink()
 
 
 class AccountFromCsvFactory(FromCsvDfFactory):
@@ -61,7 +35,7 @@ class AccountFromCsvFactory(FromCsvDfFactory):
         return self._account_with_origin_s3_uris_index_factory.get_df(result)
 
 
-class _AccountNewDfFactory(NewDfFactory):
+class AccountNewDfFactory(NewDfFactory):
     def __init__(self, account: str):
         self._account = account
         self._s3_uris_file_reader = S3UrisFileReader()
