@@ -68,11 +68,7 @@ class _CsvCreator(ABC):
         df = self._get_df_creator().get_df()
         file_path = self._get_file_path()
         self._logger.info(f"Exporting {file_path}")
-        try:
-            df.to_csv(index=False, path_or_buf=file_path)
-        except Exception as exception:
-            self._drop_file()
-            raise exception
+        df.to_csv(index=False, path_or_buf=file_path)
 
     def _get_file_path(self) -> Path:
         # TODO avoid access values of attribute of a class
@@ -87,10 +83,6 @@ class _CsvCreator(ABC):
     @abstractmethod
     def _get_file_name_creator(self) -> _FileNameCreator:
         pass
-
-    # TODO check if drop an unexistent file raises an excepction, add try-except in that case
-    def _drop_file(self):
-        self._get_file_path().unlink()
 
 
 class AccountCsvCreator(_CsvCreator):
