@@ -14,10 +14,20 @@ from types_custom import Df
 # TODO deprecate `account` argument, replace with _FileNameCreator and genereate it by checking the files
 
 
-class _SimpleIndexDfCreator(ABC):
+class _DfCreator(ABC):
     @abstractmethod
     def get_df(self) -> Df:
         pass
+
+
+class _SimpleIndexDfCreator(_DfCreator):
+    # TODO add logic: return read_file() if file exists else create_df()
+    pass
+
+
+class _MultiIndexDfCreator(_DfCreator):
+    # add logic: 1º get simple index, 2º convert index
+    pass
 
 
 class _AccountSimpleIndexDfCreator(_SimpleIndexDfCreator):
@@ -40,6 +50,17 @@ class _AccountsSimpleIndexDfCreator(_SimpleIndexDfCreator):
         return self._accounts_as_single_index_factory.get_df(df)
 
 
+# TODO
+class _AccountMultiIndexDfCreator(_MultiIndexDfCreator):
+    pass
+
+
+# TODO
+class _AccountsMultiIndexDfCreator(_MultiIndexDfCreator):
+    pass
+
+
+# TODO
 class _AnalysisSimpleIndexDfCreator(_SimpleIndexDfCreator):
     pass
 
@@ -51,6 +72,10 @@ class _FileNameCreator(ABC):
 
 
 class _AccountFileNameCreator(_FileNameCreator):
+    # TODO move here the logic of
+    # - read config file
+    # - read results paths
+    # - get 1º account in config file not in results path
     def __init__(self, account: str):
         self._account = account
 
@@ -65,6 +90,7 @@ class _AccountsFileNameCreator(_FileNameCreator):
         return "s3-files-all-accounts.csv"
 
 
+# TODO
 class _AnalysisFileNameCreator(_FileNameCreator):
     pass
 
