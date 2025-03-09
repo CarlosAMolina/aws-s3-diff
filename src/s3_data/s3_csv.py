@@ -4,6 +4,8 @@ from pathlib import Path
 
 from local_results import LocalResults
 from logger import get_logger
+from s3_data.all_accounts import AccountsAsSingleIndexFactory
+from s3_data.all_accounts import AccountsNewDfFactory
 from s3_data.one_account import AccountNewDfFactory
 from types_custom import Df
 
@@ -28,7 +30,14 @@ class _AccountSimpleIndexDfCreator(_SimpleIndexDfCreator):
 
 
 class _AccountsSimpleIndexDfCreator(_SimpleIndexDfCreator):
-    pass
+    def __init__(self):
+        # TODO deprecate these classes, rename
+        self._accounts_new_df_factory = AccountsNewDfFactory()
+        self._accounts_as_single_index_factory = AccountsAsSingleIndexFactory()
+
+    def get_df(self) -> Df:
+        df = self._accounts_new_df_factory.get_df()
+        return self._accounts_as_single_index_factory.get_df(df)
 
 
 class _AnalysisSimpleIndexDfCreator(_SimpleIndexDfCreator):
@@ -51,7 +60,9 @@ class _AccountFileNameCreator(_FileNameCreator):
 
 
 class _AccountsFileNameCreator(_FileNameCreator):
-    pass
+    # TODO deprecate file_s3_data_all_accounts with this
+    def get_file_name(self) -> str:
+        return "s3-files-all-accounts.csv"
 
 
 class _AnalysisFileNameCreator(_FileNameCreator):
@@ -97,21 +108,17 @@ class AccountCsvCreator(_CsvCreator):
         return _AccountFileNameCreator(self._account)
 
 
-class _AccountsCsvCreator(_CsvCreator):
-    @abstractmethod
+class AccountsCsvCreator(_CsvCreator):
     def _get_df_creator(self) -> _SimpleIndexDfCreator:
         return _AccountsSimpleIndexDfCreator()
 
-    @abstractmethod
     def _get_file_name_creator(self) -> _FileNameCreator:
         return _AccountsFileNameCreator()
 
 
 class _AnalysisCsvCreator(_CsvCreator):
-    @abstractmethod
     def _get_df_creator(self) -> _SimpleIndexDfCreator:
         return _AnalysisSimpleIndexDfCreator()
 
-    @abstractmethod
     def _get_file_name_creator(self) -> _FileNameCreator:
         return _AnalysisFileNameCreator()

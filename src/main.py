@@ -11,9 +11,9 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
-from s3_data.all_accounts import AccountsCsvFactory
 from s3_data.analysis import AnalysisCsvFactory
 from s3_data.s3_csv import AccountCsvCreator
+from s3_data.s3_csv import AccountsCsvCreator
 
 
 class _Main:
@@ -177,7 +177,7 @@ class _LastAccountProcess(_AccountProcess):
 
 class _NoCombinedS3DataProcess(_Process):
     def run(self):
-        AccountsCsvFactory().to_csv()
+        AccountsCsvCreator().export_csv()
         _AnalysisProcess().run()
 
 

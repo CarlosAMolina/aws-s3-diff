@@ -8,31 +8,13 @@ from pandas import read_csv
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
-from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
-from s3_data.interface import CsvFactory
 from s3_data.interface import CsvReader
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import NewDfFactory
 from s3_data.one_account import AccountFromCsvFactory
 from types_custom import MultiIndexDf
-
-
-class AccountsCsvFactory(CsvFactory):
-    def __init__(self):
-        self._accounts_new_df_factory = _AccountsNewDfFactory()
-        self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
-        self._local_results = LocalResults()
-        self._logger = get_logger()
-
-    def to_csv(self):
-        # TODO no access property of property.
-        file_path = self._local_results.analysis_paths.file_s3_data_all_accounts
-        self._logger.info(f"Exporting all AWS accounts S3 files information to {file_path}")
-        df = self._accounts_new_df_factory.get_df()
-        csv_df = self._accounts_as_single_index_factory.get_df(df)
-        csv_df.to_csv(file_path, index=False)
 
 
 class AccountsFromCsvDfFactory(FromCsvDfFactory):
@@ -45,7 +27,7 @@ class AccountsFromCsvDfFactory(FromCsvDfFactory):
         return self._accounts_as_multi_index_factory.get_df(result)
 
 
-class _AccountsNewDfFactory(NewDfFactory):
+class AccountsNewDfFactory(NewDfFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -77,7 +59,7 @@ class _AccountsNewDfFactory(NewDfFactory):
         return result.set_index(["bucket", "prefix"])
 
 
-class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
+class AccountsAsSingleIndexFactory(AsSingleIndexFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
