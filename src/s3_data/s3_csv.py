@@ -96,9 +96,6 @@ class AccountCsvCreator(_CsvCreator):
     def _get_file_name_creator(self) -> _FileNameCreator:
         return _AccountFileNameCreator(self._account)
 
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_account_results(self._account)
-
 
 class _AccountsCsvCreator(_CsvCreator):
     @abstractmethod
