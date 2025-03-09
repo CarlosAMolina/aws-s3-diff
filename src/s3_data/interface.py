@@ -45,6 +45,8 @@ class AsMultiIndexFactory(IndexFactory):
         pass
 
 
+# TODO rename to SimpleIndexDfCreator and add:
+# return read_file if file.exists else creat_df()
 class AsSingleIndexFactory(IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> Df:
