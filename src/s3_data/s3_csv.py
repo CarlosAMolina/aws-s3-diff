@@ -70,15 +70,15 @@ class _CsvCreator(ABC):
         self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
+    @abstractmethod
+    def _get_df_creator(self) -> _SimpleIndexDfCreator:
+        pass
+
     def _get_file_path(self) -> Path:
         # TODO avoid access values of attribute of a class
         return self._local_results.analysis_paths.directory_analysis.joinpath(
             self._get_file_name_creator().get_file_name()
         )
-
-    @abstractmethod
-    def _get_df_creator(self) -> _SimpleIndexDfCreator:
-        pass
 
     @abstractmethod
     def _get_file_name_creator(self) -> _FileNameCreator:
