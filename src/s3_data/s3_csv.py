@@ -8,6 +8,7 @@ from s3_data.all_accounts import AccountsAsSingleIndexFactory
 from s3_data.all_accounts import AccountsNewDfFactory
 from s3_data.analysis import AnalysisAsSingleIndexFactory
 from s3_data.analysis import AnalysisNewDfFactory
+from s3_data.one_account import _AccountCsvReader  # TODO not private
 from s3_data.one_account import AccountNewDfFactory
 from types_custom import Df
 
@@ -35,9 +36,13 @@ class _MultiIndexDfCreator(_DfCreator):
 
 class _AccountSimpleIndexDfCreator(_SimpleIndexDfCreator):
     def __init__(self, account: str):
+        self._account_csv_reader = _AccountCsvReader(account)
         self._account = account
+        self._local_results = LocalResults()
 
     def get_df(self) -> Df:
+        if self._local_results.get_file_path_account_results(self._account).is_file():
+            return self._account_csv_reader.get_df()
         # TODO deprecate, rename as _AccountSimpleIndexDfCreator
         return AccountNewDfFactory(self._account).get_df()
 
