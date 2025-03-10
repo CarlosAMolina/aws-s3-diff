@@ -7,31 +7,14 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from config_files import AnalysisConfigReader
-from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsFromCsvDfFactory
 from s3_data.interface import AsSingleIndexFactory
-from s3_data.interface import CsvFactory
 from s3_data.interface import NewDfFactory
 from types_custom import MultiIndexDf
 
 
-class AnalysisCsvFactory(CsvFactory):
-    def __init__(self):
-        self._analysis_new_df_factory = _AnalysisNewDfFactory()
-        self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
-        self._local_results = LocalResults()
-        self._logger = get_logger()
-
-    def to_csv(self):
-        file_path = self._local_results.analysis_paths.file_analysis
-        self._logger.info(f"Exporting analysis to {file_path}")
-        df = self._analysis_new_df_factory.get_df()
-        csv_df = self._analysis_as_single_index_factory.get_df(df)
-        csv_df.to_csv(file_path, index=False)
-
-
-class _AnalysisNewDfFactory(NewDfFactory):
+class AnalysisNewDfFactory(NewDfFactory):
     def __init__(self):
         self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
         self._analysis_config_reader = AnalysisConfigReader()
@@ -282,7 +265,7 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-class _AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
+class AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)

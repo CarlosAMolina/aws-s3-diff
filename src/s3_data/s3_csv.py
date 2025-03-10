@@ -6,12 +6,15 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsAsSingleIndexFactory
 from s3_data.all_accounts import AccountsNewDfFactory
+from s3_data.analysis import AnalysisAsSingleIndexFactory
+from s3_data.analysis import AnalysisNewDfFactory
 from s3_data.one_account import AccountNewDfFactory
 from types_custom import Df
 
 # TODO implement these classes
 # TODO replace all classes with the ones in this file
 # TODO deprecate `account` argument, replace with _FileNameCreator and genereate it by checking the files
+# TODO move the classes in this file to the one_account.py, all_accounts.py and analysis.py files
 
 
 class _DfCreator(ABC):
@@ -50,6 +53,17 @@ class _AccountsSimpleIndexDfCreator(_SimpleIndexDfCreator):
         return self._accounts_as_single_index_factory.get_df(df)
 
 
+class _AnalysisSimpleIndexDfCreator(_SimpleIndexDfCreator):
+    def __init__(self):
+        self._analysis_new_df_factory = AnalysisNewDfFactory()
+        self._analysis_as_single_index_factory = AnalysisAsSingleIndexFactory()
+        self._logger = get_logger()
+
+    def get_df(self) -> Df:
+        df = self._analysis_new_df_factory.get_df()
+        return self._analysis_as_single_index_factory.get_df(df)
+
+
 # TODO
 class _AccountMultiIndexDfCreator(_MultiIndexDfCreator):
     pass
@@ -57,11 +71,6 @@ class _AccountMultiIndexDfCreator(_MultiIndexDfCreator):
 
 # TODO
 class _AccountsMultiIndexDfCreator(_MultiIndexDfCreator):
-    pass
-
-
-# TODO
-class _AnalysisSimpleIndexDfCreator(_SimpleIndexDfCreator):
     pass
 
 
@@ -92,7 +101,9 @@ class _AccountsFileNameCreator(_FileNameCreator):
 
 # TODO
 class _AnalysisFileNameCreator(_FileNameCreator):
-    pass
+    # TODO deprecate file_analysis() with this
+    def get_file_name(self) -> str:
+        return "analysis.csv"
 
 
 # TODO replace all CsvFactory with this class
@@ -142,7 +153,7 @@ class AccountsCsvCreator(_CsvCreator):
         return _AccountsFileNameCreator()
 
 
-class _AnalysisCsvCreator(_CsvCreator):
+class AnalysisCsvCreator(_CsvCreator):
     def _get_df_creator(self) -> _SimpleIndexDfCreator:
         return _AnalysisSimpleIndexDfCreator()
 
