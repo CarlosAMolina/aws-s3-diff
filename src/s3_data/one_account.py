@@ -20,7 +20,7 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
-class AccountFromCsvFactory(FromCsvDfFactory):
+class AccountFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self, account: str):
         self._csv_reader = _AccountCsvReader(account)
         self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
