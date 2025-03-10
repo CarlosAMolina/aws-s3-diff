@@ -98,7 +98,7 @@ class TestAnalysisCsvFactory(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     def test_get_df_set_analysis_columns(self):
-        # TODO try to call AnalysisCsvFactory()._get_df_s3_data_analyzed(df)
+        # TODO try to call AnalysisNewDfFactory._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
         df = _get_df_from_accounts_s3_data_csv(file_path_name)
         result = AnalysisNewDfFactory()._get_df_set_analysis_columns(df)
