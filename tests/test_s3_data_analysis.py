@@ -130,8 +130,7 @@ class TestAnalysisCsvFactory(unittest.TestCase):
 
 def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
     accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
-    accounts_from_csv_df_factory._s3_accounts_csv_reader._local_results = Mock()
-    accounts_from_csv_df_factory._s3_accounts_csv_reader._local_results.analysis_paths.file_s3_data_all_accounts = (
+    accounts_from_csv_df_factory._s3_accounts_csv_reader._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
     accounts_from_csv_df_factory._s3_accounts_csv_reader._s3_uris_file_reader = Mock()

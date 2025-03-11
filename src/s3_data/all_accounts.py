@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Index
@@ -142,7 +143,17 @@ class _AccountsCsvReader(CsvReader):
     def get_df(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(
-            self._local_results.analysis_paths.file_s3_data_all_accounts,
+            self._get_file_path(),
             index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
             parse_dates=[f"{account}_date" for account in accounts],
         ).astype({f"{account}_size": "Int64" for account in accounts})
+
+    # TODO refator, code duplicated in other files
+    def _get_file_path(self) -> Path:
+        # TODO avoid access values of attribute of a class
+        return self._local_results.analysis_paths.directory_analysis.joinpath(
+            self._get_file_name_creator().get_file_name()
+        )
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountsFileNameCreator()
