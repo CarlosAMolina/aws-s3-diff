@@ -10,11 +10,45 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
+from s3_data.interface import CsvCreator
 from s3_data.interface import CsvReader
+from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfFactory
+from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
+from s3_data.interface import SimpleIndexDfCreator
 from s3_data.one_account import AccountFromCsvDfFactory
 from types_custom import MultiIndexDf
+
+
+# TODO
+class _AccountsMultiIndexDfCreator(MultiIndexDfCreator):
+    pass
+
+
+class AccountsCsvCreator(CsvCreator):
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        return _AccountsSimpleIndexDfCreator()
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountsFileNameCreator()
+
+
+class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
+    def __init__(self):
+        # TODO deprecate these classes, rename
+        self._accounts_new_df_factory = AccountsNewDfFactory()
+        self._accounts_as_single_index_factory = AccountsAsSingleIndexFactory()
+
+    def get_df(self) -> Df:
+        df = self._accounts_new_df_factory.get_df()
+        return self._accounts_as_single_index_factory.get_df(df)
+
+
+class _AccountsFileNameCreator(FileNameCreator):
+    # TODO deprecate file_s3_data_all_accounts with this
+    def get_file_name(self) -> str:
+        return "s3-files-all-accounts.csv"
 
 
 class AccountsFromCsvDfFactory(FromCsvDfFactory):

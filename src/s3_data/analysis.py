@@ -10,8 +10,43 @@ from config_files import AnalysisConfigReader
 from logger import get_logger
 from s3_data.all_accounts import AccountsFromCsvDfFactory
 from s3_data.interface import AsSingleIndexFactory
+from s3_data.interface import CsvCreator
+from s3_data.interface import FileNameCreator
+from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
+from s3_data.interface import SimpleIndexDfCreator
 from types_custom import MultiIndexDf
+
+
+# TODO
+class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
+    pass
+
+
+class AnalysisCsvCreator(CsvCreator):
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        return _AnalysisSimpleIndexDfCreator()
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AnalysisFileNameCreator()
+
+
+class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
+    def __init__(self):
+        self._analysis_new_df_factory = AnalysisNewDfFactory()
+        self._analysis_as_single_index_factory = AnalysisAsSingleIndexFactory()
+        self._logger = get_logger()
+
+    def get_df(self) -> Df:
+        df = self._analysis_new_df_factory.get_df()
+        return self._analysis_as_single_index_factory.get_df(df)
+
+
+# TODO
+class _AnalysisFileNameCreator(FileNameCreator):
+    # TODO deprecate file_analysis() with this
+    def get_file_name(self) -> str:
+        return "analysis.csv"
 
 
 class AnalysisNewDfFactory(NewDfFactory):

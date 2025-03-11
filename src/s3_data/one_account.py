@@ -21,6 +21,8 @@ from types_custom import MultiIndexDf
 from types_custom import S3Data
 from types_custom import S3Query
 
+# TODO deprecate `account` argument in all classes, replace with FileNameCreator and genereate it by checking the files
+
 
 class AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
