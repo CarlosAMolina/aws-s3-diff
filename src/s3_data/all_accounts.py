@@ -41,6 +41,7 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
         self._accounts_new_df_factory = AccountsNewDfFactory()
         self._accounts_as_single_index_factory = AccountsAsSingleIndexFactory()
 
+    # TODO continue here, add if file exists like in one_account.py
     def get_df(self) -> Df:
         df = self._accounts_new_df_factory.get_df()
         return self._accounts_as_single_index_factory.get_df(df)
