@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame as Df
@@ -10,6 +11,7 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvCreator
+from s3_data.interface import CsvReader  # TODO rename to FromCsvDfCreater (subclassess too)
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
@@ -56,24 +58,30 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
-        # TODO deprecate, rename
+        # TODO rename `factory`
         self._account_new_df_creator = AccountNewDfFactory(self._account)
+        self._account_df_from_csv_creator = _AccountCsvReader(self._account)
 
     def get_df(self) -> Df:
-        if self._local_results.get_file_path_account_results(self._account).is_file():
+        if self._get_file_path().is_file():
             return self._get_df_from_csv()
         return self._get_df_create_new()
 
-    # TODO? extract class CsvReader or deprecate CsvReader classes
     def _get_df_from_csv(self) -> Df:
-        local_file_path_name = self._local_results.get_file_path_account_results(self._account)
-        return pd.read_csv(
-            local_file_path_name,
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
+        return self._account_df_from_csv_creator.get_df()
 
     def _get_df_create_new(self) -> Df:
         return self._account_new_df_creator.get_df()
+
+    # TODO refator, code duplicated in other files (in this file too)
+    def _get_file_path(self) -> Path:
+        # TODO avoid access values of attribute of a class
+        return self._local_results.analysis_paths.directory_analysis.joinpath(
+            self._get_file_name_creator().get_file_name()
+        )
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountFileNameCreator(self._account)
 
 
 class _AccountFileNameCreator(FileNameCreator):
@@ -197,3 +205,25 @@ class _AccountWithOriginS3UrisIndexFactory(IndexFactory):
             [(column, "") for column in result.columns]
         )  # To merge with a MultiIndex columns Df.
         return result
+
+
+class _AccountCsvReader(CsvReader):
+    def __init__(self, account: str):
+        self._account = account
+        self._local_results = LocalResults()
+
+    def get_df(self) -> Df:
+        return pd.read_csv(
+            self._get_file_path(),
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
+
+    # TODO refator, code duplicated in other files
+    def _get_file_path(self) -> Path:
+        # TODO avoid access values of attribute of a class
+        return self._local_results.analysis_paths.directory_analysis.joinpath(
+            self._get_file_name_creator().get_file_name()
+        )
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountFileNameCreator(self._account)
