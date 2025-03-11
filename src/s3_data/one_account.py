@@ -54,12 +54,13 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
+        # TODO deprecate, rename
+        self._account_new_df_creator = AccountNewDfFactory(self._account)
 
     def get_df(self) -> Df:
         if self._local_results.get_file_path_account_results(self._account).is_file():
             return self._get_df_from_csv()
-        # TODO deprecate, rename as _AccountSimpleIndexDfCreator
-        return AccountNewDfFactory(self._account).get_df()
+        return self._get_df_create_new()
 
     # TODO? extract class CsvReader or deprecate CsvReader classes
     def _get_df_from_csv(self) -> Df:
@@ -68,6 +69,9 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
             local_file_path_name,
             parse_dates=["date"],
         ).astype({"size": "Int64"})
+
+    def _get_df_create_new(self) -> Df:
+        return self._account_new_df_creator.get_df()
 
 
 class _AccountFileNameCreator(FileNameCreator):
