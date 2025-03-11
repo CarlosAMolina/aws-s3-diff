@@ -11,7 +11,7 @@ from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
 from local_results import LocalResults
 from logger import get_logger
-from s3_data.s3_csv import AccountCsvCreator
+from s3_data.one_account import AccountCsvCreator
 from s3_data.s3_csv import AccountsCsvCreator
 from s3_data.s3_csv import AnalysisCsvCreator
 

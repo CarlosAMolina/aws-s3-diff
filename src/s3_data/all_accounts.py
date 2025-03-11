@@ -104,7 +104,7 @@ class _AccountsCsvReader(CsvReader):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    # TODO extract common code with _AccountCsvReader
+    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
     def get_df(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(

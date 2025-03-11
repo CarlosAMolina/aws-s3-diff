@@ -9,10 +9,12 @@ from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
-from s3_data.interface import CsvReader
+from s3_data.interface import CsvCreator
+from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
 from s3_data.interface import NewDfFactory
+from s3_data.interface import SimpleIndexDfCreator
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
 from types_custom import MultiIndexDf
@@ -20,19 +22,65 @@ from types_custom import S3Data
 from types_custom import S3Query
 
 
+class AccountCsvCreator(CsvCreator):
+    def __init__(self, account: str):
+        self._account = account
+        super().__init__()
+
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        return _AccountSimpleIndexDfCreator(self._account)
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountFileNameCreator(self._account)
+
+
+# TODO deprecate
 class AccountFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self, account: str):
-        self._csv_reader = _AccountCsvReader(account)
+        self._df_creator = _AccountSimpleIndexDfCreator(account)
         self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
         self._account_with_origin_s3_uris_index_factory = _AccountWithOriginS3UrisIndexFactory(account)
 
     def get_df(self) -> MultiIndexDf:
-        df = self._csv_reader.get_df()
+        df = self._df_creator.get_df()
         return self._account_as_multi_index_factory.get_df(df)
 
     def get_df_with_original_account_index(self) -> MultiIndexDf:
         result = self.get_df()
         return self._account_with_origin_s3_uris_index_factory.get_df(result)
+
+
+class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
+    def __init__(self, account: str):
+        self._account = account
+        self._local_results = LocalResults()
+
+    def get_df(self) -> Df:
+        if self._local_results.get_file_path_account_results(self._account).is_file():
+            return self._get_df_from_csv()
+        # TODO deprecate, rename as _AccountSimpleIndexDfCreator
+        return AccountNewDfFactory(self._account).get_df()
+
+    # TODO? extract class CsvReader or deprecate CsvReader classes
+    def _get_df_from_csv(self) -> Df:
+        local_file_path_name = self._local_results.get_file_path_account_results(self._account)
+        return pd.read_csv(
+            local_file_path_name,
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
+
+
+class _AccountFileNameCreator(FileNameCreator):
+    # TODO move here the logic of
+    # - read config file
+    # - read results paths
+    # - get 1º account in config file not in results path
+    def __init__(self, account: str):
+        self._account = account
+
+    # TODO deprecate get_file_path_account_results, use this method instead
+    def get_file_name(self) -> str:
+        return f"{self._account}.csv"
 
 
 class AccountNewDfFactory(NewDfFactory):
@@ -67,19 +115,6 @@ class AccountNewDfFactory(NewDfFactory):
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
-
-
-class _AccountCsvReader(CsvReader):
-    def __init__(self, account: str):
-        self._account = account
-        self._local_results = LocalResults()
-
-    def get_df(self) -> Df:
-        local_file_path_name = self._local_results.get_file_path_account_results(self._account)
-        return pd.read_csv(
-            local_file_path_name,
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
 
 
 class _AccountAsMultiIndexFactory(AsMultiIndexFactory):
