@@ -35,6 +35,16 @@ class AccountsCsvCreator(CsvCreator):
         return _AccountsFileNameCreator()
 
 
+class AccountsFromCsvDfFactory(FromCsvDfFactory):
+    def __init__(self):
+        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
+        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
+
+    def get_df(self) -> MultiIndexDf:
+        result = self._accounts_simple_index_df_creator.get_df()
+        return self._accounts_as_multi_index_factory.get_df(result)
+
+
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
@@ -70,16 +80,6 @@ class _AccountsFileNameCreator(FileNameCreator):
     # TODO deprecate file_s3_data_all_accounts with this
     def get_file_name(self) -> str:
         return "s3-files-all-accounts.csv"
-
-
-class AccountsFromCsvDfFactory(FromCsvDfFactory):
-    def __init__(self):
-        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
-        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
-
-    def get_df(self) -> MultiIndexDf:
-        result = self._accounts_simple_index_df_creator.get_df()
-        return self._accounts_as_multi_index_factory.get_df(result)
 
 
 class _AccountsNewDfFactory(NewDfFactory):
