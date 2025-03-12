@@ -41,7 +41,7 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
         self._df_from_csv_creator = _AccountsCsvReader()
         self._local_results = LocalResults()
         # TODO deprecate these classes, rename factory
-        self._new_df_creator = AccountsNewDfFactory()
+        self._new_df_creator = _AccountsNewDfFactory()
 
     def get_df(self) -> Df:
         if self._get_file_path().is_file():
@@ -82,7 +82,7 @@ class AccountsFromCsvDfFactory(FromCsvDfFactory):
         return self._accounts_as_multi_index_factory.get_df(result)
 
 
-class AccountsNewDfFactory(NewDfFactory):
+class _AccountsNewDfFactory(NewDfFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
