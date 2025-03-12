@@ -75,10 +75,10 @@ class _AccountsFileNameCreator(FileNameCreator):
 class AccountsFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self):
         self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
-        self._s3_accounts_csv_reader = _AccountsCsvReader()
+        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
 
     def get_df(self) -> MultiIndexDf:
-        result = self._s3_accounts_csv_reader.get_df()
+        result = self._accounts_simple_index_df_creator.get_df()
         return self._accounts_as_multi_index_factory.get_df(result)
 
 

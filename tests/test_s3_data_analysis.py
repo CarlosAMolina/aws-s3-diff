@@ -130,11 +130,14 @@ class TestAnalysisCsvFactory(unittest.TestCase):
 
 def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
     accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
-    accounts_from_csv_df_factory._s3_accounts_csv_reader._get_file_path = lambda: (
+    accounts_from_csv_df_factory._accounts_simple_index_df_creator._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
-    accounts_from_csv_df_factory._s3_accounts_csv_reader._s3_uris_file_reader = Mock()
-    accounts_from_csv_df_factory._s3_accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = (
-        _AccountsToCompare("pro", "release")
+    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._get_file_path = lambda: (
+        Path(__file__).parent.absolute().joinpath(file_path_name)
+    )
+    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader = Mock()
+    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
+        "pro", "release"
     )
     return accounts_from_csv_df_factory.get_df()
