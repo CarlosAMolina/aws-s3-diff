@@ -37,7 +37,7 @@ class AccountsCsvCreator(CsvCreator):
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        self._accounts_as_single_index_factory = AccountsAsSingleIndexFactory()
+        self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
         self._df_from_csv_creator = _AccountsCsvReader()
         self._local_results = LocalResults()
         # TODO deprecate these classes, rename factory
@@ -114,7 +114,7 @@ class _AccountsNewDfFactory(NewDfFactory):
         return result.set_index(["bucket", "prefix"])
 
 
-class AccountsAsSingleIndexFactory(AsSingleIndexFactory):
+class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
