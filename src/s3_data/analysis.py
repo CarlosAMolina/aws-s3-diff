@@ -34,7 +34,7 @@ class AnalysisCsvCreator(CsvCreator):
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._analysis_new_df_factory = _AnalysisNewDfFactory()
-        self._analysis_as_single_index_factory = AnalysisAsSingleIndexFactory()
+        self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
@@ -300,7 +300,7 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-class AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
+class _AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
