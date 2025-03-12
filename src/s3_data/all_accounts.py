@@ -37,14 +37,33 @@ class AccountsCsvCreator(CsvCreator):
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        # TODO deprecate these classes, rename
-        self._accounts_new_df_factory = AccountsNewDfFactory()
         self._accounts_as_single_index_factory = AccountsAsSingleIndexFactory()
+        self._df_from_csv_creator = _AccountsCsvReader()
+        self._local_results = LocalResults()
+        # TODO deprecate these classes, rename factory
+        self._new_df_creator = AccountsNewDfFactory()
 
-    # TODO continue here, add if file exists like in one_account.py
     def get_df(self) -> Df:
-        df = self._accounts_new_df_factory.get_df()
+        if self._get_file_path().is_file():
+            return self._get_df_from_csv()
+        return self._get_df_create_new()
+
+    def _get_df_from_csv(self) -> Df:
+        return self._df_from_csv_creator.get_df()
+
+    def _get_df_create_new(self) -> Df:
+        df = self._new_df_creator.get_df()
         return self._accounts_as_single_index_factory.get_df(df)
+
+    # TODO refator, code duplicated in other files (in this file too)
+    def _get_file_path(self) -> Path:
+        # TODO avoid access values of attribute of a class
+        return self._local_results.analysis_paths.directory_analysis.joinpath(
+            self._get_file_name_creator().get_file_name()
+        )
+
+    def _get_file_name_creator(self) -> FileNameCreator:
+        return _AccountsFileNameCreator()
 
 
 class _AccountsFileNameCreator(FileNameCreator):

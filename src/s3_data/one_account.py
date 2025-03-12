@@ -57,10 +57,10 @@ class AccountFromCsvDfFactory(FromCsvDfFactory):
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
-        self._local_results = LocalResults()
+        self._df_from_csv_creator = _AccountCsvReader(self._account)
         # TODO rename `factory`
-        self._account_new_df_creator = AccountNewDfFactory(self._account)
-        self._account_df_from_csv_creator = _AccountCsvReader(self._account)
+        self._new_df_creator = AccountNewDfFactory(self._account)
+        self._local_results = LocalResults()
 
     def get_df(self) -> Df:
         if self._get_file_path().is_file():
@@ -68,10 +68,10 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
         return self._get_df_create_new()
 
     def _get_df_from_csv(self) -> Df:
-        return self._account_df_from_csv_creator.get_df()
+        return self._df_from_csv_creator.get_df()
 
     def _get_df_create_new(self) -> Df:
-        return self._account_new_df_creator.get_df()
+        return self._new_df_creator.get_df()
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
