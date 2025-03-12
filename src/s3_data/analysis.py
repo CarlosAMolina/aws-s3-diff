@@ -33,7 +33,7 @@ class AnalysisCsvCreator(CsvCreator):
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        self._analysis_new_df_factory = AnalysisNewDfFactory()
+        self._analysis_new_df_factory = _AnalysisNewDfFactory()
         self._analysis_as_single_index_factory = AnalysisAsSingleIndexFactory()
         self._logger = get_logger()
 
@@ -49,7 +49,7 @@ class _AnalysisFileNameCreator(FileNameCreator):
         return "analysis.csv"
 
 
-class AnalysisNewDfFactory(NewDfFactory):
+class _AnalysisNewDfFactory(NewDfFactory):
     def __init__(self):
         self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
         self._analysis_config_reader = AnalysisConfigReader()
