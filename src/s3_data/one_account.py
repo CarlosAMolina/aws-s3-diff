@@ -59,7 +59,7 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
         self._account = account
         self._df_from_csv_creator = _AccountCsvReader(self._account)
         # TODO rename `factory`
-        self._new_df_creator = AccountNewDfFactory(self._account)
+        self._new_df_creator = _AccountNewDfFactory(self._account)
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
@@ -97,7 +97,7 @@ class _AccountFileNameCreator(FileNameCreator):
         return f"{self._account}.csv"
 
 
-class AccountNewDfFactory(NewDfFactory):
+class _AccountNewDfFactory(NewDfFactory):
     def __init__(self, account: str):
         self._account = account
         self._s3_uris_file_reader = S3UrisFileReader()
