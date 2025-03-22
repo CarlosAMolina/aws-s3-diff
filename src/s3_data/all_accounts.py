@@ -19,7 +19,6 @@ from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
 from s3_data.one_account import AccountDf
-from s3_data.one_account import AccountFromCsvDfFactory
 from types_custom import MultiIndexDf
 
 
@@ -93,7 +92,7 @@ class _AccountsNewDfFactory(NewDfFactory):
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
-        result = AccountFromCsvDfFactory(accounts[0]).get_df()
+        result = AccountDf().get_df_for_account(accounts[0])
         for account in accounts[1:]:
             account_df = AccountDf().with_original_account_index(account)
             result = AccountDf().join(result, account_df)

@@ -27,6 +27,9 @@ from types_custom import S3Query
 
 
 class AccountDf:
+    def get_df_for_account(self, account: str) -> Df:
+        return AccountFromCsvDfFactory(account).get_df()
+
     def with_original_account_index(self, account: str) -> Df:
         return AccountFromCsvDfFactory(account).get_df_with_original_account_index()
 
