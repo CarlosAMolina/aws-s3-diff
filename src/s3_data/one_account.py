@@ -36,8 +36,11 @@ class AccountDf:
     def join(self, df_1, df_2: Df) -> Df:
         return df_1.join(df_2, how="outer")
 
+    def to_csv(self, account: str):
+        _AccountCsvCreator(account).export_csv()
 
-class AccountCsvCreator(CsvCreator):
+
+class _AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
         self._account = account
         super().__init__()
