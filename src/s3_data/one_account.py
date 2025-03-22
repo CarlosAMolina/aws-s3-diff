@@ -28,10 +28,10 @@ from types_custom import S3Query
 
 class AccountDf:
     def get_df_for_account(self, account: str) -> Df:
-        return AccountFromCsvDfFactory(account).get_df()
+        return _AccountFromCsvDfFactory(account).get_df()
 
     def with_original_account_index(self, account: str) -> Df:
-        return AccountFromCsvDfFactory(account).get_df_with_original_account_index()
+        return _AccountFromCsvDfFactory(account).get_df_with_original_account_index()
 
     def join(self, df_1, df_2: Df) -> Df:
         return df_1.join(df_2, how="outer")
@@ -50,7 +50,7 @@ class AccountCsvCreator(CsvCreator):
 
 
 # TODO deprecate
-class AccountFromCsvDfFactory(FromCsvDfFactory):
+class _AccountFromCsvDfFactory(FromCsvDfFactory):
     def __init__(self, account: str):
         self._df_creator = _AccountSimpleIndexDfCreator(account)
         self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
