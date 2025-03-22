@@ -95,8 +95,8 @@ class _AccountsNewDfFactory(NewDfFactory):
         accounts = self._s3_uris_file_reader.get_accounts()
         result = AccountFromCsvDfFactory(accounts[0]).get_df()
         for account in accounts[1:]:
-            account_df = AccountFromCsvDfFactory(account).get_df_with_original_account_index()
-            result = AccountDf(result).join(account_df)
+            account_df = AccountDf().with_original_account_index(account)
+            result = AccountDf().join(result, account_df)
         return result.dropna(axis="index", how="all")
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:

@@ -27,11 +27,11 @@ from types_custom import S3Query
 
 
 class AccountDf:
-    def __init__(self, df: Df):
-        self._df = df
+    def with_original_account_index(self, account: str) -> Df:
+        return AccountFromCsvDfFactory(account).get_df_with_original_account_index()
 
-    def join(self, df: Df) -> Df:
-        return self._df.join(df, how="outer")
+    def join(self, df_1, df_2: Df) -> Df:
+        return df_1.join(df_2, how="outer")
 
 
 class AccountCsvCreator(CsvCreator):
