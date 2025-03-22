@@ -13,7 +13,6 @@ from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import CsvReader  # TODO rename to FromCsvDfCreater (subclassess too)
 from s3_data.interface import FileNameCreator
-from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import IndexFactory
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
@@ -26,12 +25,15 @@ from types_custom import S3Query
 # TODO deprecate `account` argument in all classes, replace with FileNameCreator and genereate it by checking the files
 
 
+# TODO everywhere where it is used, initialize in __init__
 class AccountDf:
     def get_df_for_account(self, account: str) -> Df:
-        return _AccountFromCsvDfFactory(account).get_df()
+        df = _AccountSimpleIndexDfCreator(account).get_df()
+        return _AccountAsMultiIndexFactory(account).get_df(df)
 
     def with_original_account_index(self, account: str) -> Df:
-        return _AccountFromCsvDfFactory(account).get_df_with_original_account_index()
+        result = self.get_df_for_account(account)
+        return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
     def join(self, df_1, df_2: Df) -> Df:
         return df_1.join(df_2, how="outer")
@@ -50,22 +52,6 @@ class _AccountCsvCreator(CsvCreator):
 
     def _get_file_name_creator(self) -> FileNameCreator:
         return _AccountFileNameCreator(self._account)
-
-
-# TODO deprecate
-class _AccountFromCsvDfFactory(FromCsvDfFactory):
-    def __init__(self, account: str):
-        self._df_creator = _AccountSimpleIndexDfCreator(account)
-        self._account_as_multi_index_factory = _AccountAsMultiIndexFactory(account)
-        self._account_with_origin_s3_uris_index_factory = _AccountWithOriginS3UrisIndexFactory(account)
-
-    def get_df(self) -> MultiIndexDf:
-        df = self._df_creator.get_df()
-        return self._account_as_multi_index_factory.get_df(df)
-
-    def get_df_with_original_account_index(self) -> MultiIndexDf:
-        result = self.get_df()
-        return self._account_with_origin_s3_uris_index_factory.get_df(result)
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
