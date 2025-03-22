@@ -26,6 +26,14 @@ from types_custom import S3Query
 # TODO deprecate `account` argument in all classes, replace with FileNameCreator and genereate it by checking the files
 
 
+class AccountDf:
+    def __init__(self, df: Df):
+        self._df = df
+
+    def join(self, df: Df) -> Df:
+        return self._df.join(df, how="outer")
+
+
 class AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
         self._account = account

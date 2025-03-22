@@ -18,6 +18,7 @@ from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
+from s3_data.one_account import AccountDf
 from s3_data.one_account import AccountFromCsvDfFactory
 from types_custom import MultiIndexDf
 
@@ -95,7 +96,7 @@ class _AccountsNewDfFactory(NewDfFactory):
         result = AccountFromCsvDfFactory(accounts[0]).get_df()
         for account in accounts[1:]:
             account_df = AccountFromCsvDfFactory(account).get_df_with_original_account_index()
-            result = result.join(account_df, how="outer")
+            result = AccountDf(result).join(account_df)
         return result.dropna(axis="index", how="all")
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
