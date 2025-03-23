@@ -9,9 +9,9 @@ from pandas import Series
 from config_files import AnalysisConfigReader
 from logger import get_logger
 from s3_data.all_accounts import AccountsDf
-from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
+from s3_data.interface import FromMultiSimpleIndexDfCreator
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
@@ -34,7 +34,7 @@ class AnalysisCsvCreator(CsvCreator):
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._analysis_new_df_creator = _AnalysisNewDfCreator()
-        self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
+        self._analysis_as_single_index_factory = _AnalysisFromMultiSimpleIndexDfCreator()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
@@ -301,7 +301,7 @@ class _AnalysisCondition:
         return (account, "hash")
 
 
-class _AnalysisAsSingleIndexFactory(AsSingleIndexFactory):
+class _AnalysisFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)

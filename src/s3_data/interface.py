@@ -73,9 +73,9 @@ class IndexFactory(ABC):
         pass
 
 
-# TODO rename to SimpleIndexDfCreator and add:
-# return read_file if file.exists else creat_df()
-class AsSingleIndexFactory(IndexFactory):
+# TODO rename in all files all `factory` to creator
+# TODO add return read_file if file.exists else creat_df()
+class FromMultiSimpleIndexDfCreator(IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> Df:
         pass

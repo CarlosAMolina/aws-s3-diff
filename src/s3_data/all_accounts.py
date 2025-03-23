@@ -9,10 +9,10 @@ from pandas import read_csv
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
-from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
+from s3_data.interface import FromMultiSimpleIndexDfCreator
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
@@ -43,7 +43,7 @@ class _AccountsCsvCreator(CsvCreator):
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
+        self._accounts_as_single_index_factory = _AccountsFromMultiSimpleIndexDfCreator()
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
         self._local_results = LocalResults()
         # TODO deprecate these classes
@@ -108,7 +108,7 @@ class _AccountsNewDfCreator(NewDfCreator):
         return result.set_index(["bucket", "prefix"])
 
 
-class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
+class _AccountsFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
