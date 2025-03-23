@@ -48,6 +48,11 @@ class FromMultiSimpleIndexDfCreator(DfCreator):
         df.columns = df.columns.map("_".join)
 
 
+class FromSimpleMultiIndexDfCreator(DfCreator):
+    def __init__(self, df: Df):
+        self._df = df
+
+
 # TODO replace all CsvFactory with this class
 class CsvCreator(ABC):
     def __init__(self):

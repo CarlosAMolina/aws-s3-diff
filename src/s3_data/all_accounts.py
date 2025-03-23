@@ -13,21 +13,22 @@ from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import FromMultiSimpleIndexDfCreator
-from s3_data.interface import MultiIndexDfCreator
+from s3_data.interface import FromSimpleMultiIndexDfCreator
 from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
 from s3_data.one_account import AccountDf
 from types_custom import MultiIndexDf
 
 
+# TODO deprecate
 class AccountsDf:
     def __init__(self):
-        self._accounts_as_multi_index_creator = _AccountsMultiIndexDfCreator()
         self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
 
     def get_df(self) -> MultiIndexDf:
         result = self._accounts_simple_index_df_creator.get_df()
-        return self._accounts_as_multi_index_creator.get_df(result)
+        # TODO initialize in __init__
+        return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
 
     def to_csv(self):
         _AccountsCsvCreator().export_csv()
@@ -126,12 +127,13 @@ class _AccountsFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
         )
 
 
-class _AccountsMultiIndexDfCreator(MultiIndexDfCreator):
-    def __init__(self):
+class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
+    def __init__(self, df: Df):
+        self._df = df
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self, df: Df) -> MultiIndexDf:
-        return self._get_df_set_multi_index_columns(df)
+    def get_df(self) -> MultiIndexDf:
+        return self._get_df_set_multi_index_columns(self._df)
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
