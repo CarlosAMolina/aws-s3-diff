@@ -1,5 +1,4 @@
 import re
-from functools import reduce
 from pathlib import Path
 
 from pandas import DataFrame as Df
@@ -96,7 +95,7 @@ class _AccountsNewDfCreator(NewDfCreator):
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         account_df_array = [AccountDf().get_account_df_to_join(account, accounts[0]) for account in accounts]
-        result = reduce(lambda left_df, right_df: AccountDf().join(left_df, right_df), account_df_array)
+        result = account_df_array[0].join(account_df_array[1:], how="outer")
         return result.dropna(axis="index", how="all")
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:

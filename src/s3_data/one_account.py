@@ -36,9 +36,6 @@ class AccountDf:
             return result
         return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
-    def join(self, df_1, df_2: Df) -> Df:
-        return df_1.join(df_2, how="outer")
-
     def to_csv(self, account: str):
         _AccountCsvCreator(account).export_csv()
 
