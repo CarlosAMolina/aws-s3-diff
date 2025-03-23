@@ -29,17 +29,17 @@ from types_custom import S3Query
 
 # TODO everywhere where it is used, initialize in __init__
 class AccountDf:
-    def get_df_for_account(self, account: str) -> Df:
+    def _get_df_for_account(self, account: str) -> Df:
         df = _AccountSimpleIndexDfCreator(account).get_df()
         return _AccountAsMultiIndexFactory(account).get_df(df)
 
     def get_account_df_to_join(self, account: str, first_account: str):
         if account == first_account:
-            return self.get_df_for_account(account)
+            return self._get_df_for_account(account)
         return self.with_original_account_index(account)
 
     def with_original_account_index(self, account: str) -> Df:
-        result = self.get_df_for_account(account)
+        result = self._get_df_for_account(account)
         return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
     def join(self, df_1, df_2: Df) -> Df:
