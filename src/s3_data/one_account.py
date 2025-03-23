@@ -24,6 +24,8 @@ from types_custom import S3Query
 
 # TODO deprecate `account` argument in all classes, replace with FileNameCreator and genereate it by checking the files
 
+# TODO everywhere where a class is initialized, initialize it in __init__
+
 
 # TODO everywhere where it is used, initialize in __init__
 class AccountDf:

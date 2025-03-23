@@ -8,7 +8,7 @@ from pandas import Series
 
 from config_files import AnalysisConfigReader
 from logger import get_logger
-from s3_data.all_accounts import AccountsFromCsvDfFactory
+from s3_data.all_accounts import AccountsDf
 from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
@@ -51,7 +51,8 @@ class _AnalysisFileNameCreator(FileNameCreator):
 
 class _AnalysisNewDfFactory(NewDfFactory):
     def __init__(self):
-        self._accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
+        # TODO rename attribute
+        self._accounts_from_csv_df_factory = AccountsDf()
         self._analysis_config_reader = AnalysisConfigReader()
         self._logger = get_logger()
 

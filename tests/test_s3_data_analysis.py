@@ -10,7 +10,7 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from src.s3_data.all_accounts import AccountsFromCsvDfFactory
+from src.s3_data.all_accounts import AccountsDf
 from src.s3_data.analysis import _AccountsToCompare
 from src.s3_data.analysis import _AnalysisAsSingleIndexFactory
 from src.s3_data.analysis import _AnalysisNewDfFactory
@@ -129,7 +129,8 @@ class TestAnalysisCsvFactory(unittest.TestCase):
 
 
 def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
-    accounts_from_csv_df_factory = AccountsFromCsvDfFactory()
+    # TODO rename variable
+    accounts_from_csv_df_factory = AccountsDf()
     accounts_from_csv_df_factory._accounts_simple_index_df_creator._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )

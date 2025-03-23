@@ -14,12 +14,21 @@ from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import CsvReader
 from s3_data.interface import FileNameCreator
-from s3_data.interface import FromCsvDfFactory
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
 from s3_data.one_account import AccountDf
 from types_custom import MultiIndexDf
+
+
+class AccountsDf:
+    def __init__(self):
+        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
+        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
+
+    def get_df(self) -> MultiIndexDf:
+        result = self._accounts_simple_index_df_creator.get_df()
+        return self._accounts_as_multi_index_factory.get_df(result)
 
 
 # TODO
@@ -33,16 +42,6 @@ class AccountsCsvCreator(CsvCreator):
 
     def _get_file_name_creator(self) -> FileNameCreator:
         return _AccountsFileNameCreator()
-
-
-class AccountsFromCsvDfFactory(FromCsvDfFactory):
-    def __init__(self):
-        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
-        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
-
-    def get_df(self) -> MultiIndexDf:
-        result = self._accounts_simple_index_df_creator.get_df()
-        return self._accounts_as_multi_index_factory.get_df(result)
 
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
