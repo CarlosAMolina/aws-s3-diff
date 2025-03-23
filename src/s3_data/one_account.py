@@ -28,6 +28,7 @@ from types_custom import S3Query
 
 
 # TODO everywhere where it is used, initialize in __init__
+# TODO deprecate
 class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str) -> Df:
         account_df = _AccountSimpleIndexDfCreator(account).get_df()

@@ -66,12 +66,14 @@ class CsvCreator(ABC):
         pass
 
 
+# TODO? deprecate
 class IndexFactory(ABC):
     @abstractmethod
     def get_df(self, df: Df) -> Df | MultiIndexDf:
         pass
 
 
+# TODO? relace to MultiIndexDfCreator
 class AsMultiIndexFactory(IndexFactory):
     @abstractmethod
     def get_df(self, df: Df) -> MultiIndexDf:
