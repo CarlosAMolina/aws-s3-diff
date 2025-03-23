@@ -30,13 +30,16 @@ class AccountsDf:
         result = self._accounts_simple_index_df_creator.get_df()
         return self._accounts_as_multi_index_factory.get_df(result)
 
+    def to_csv(self):
+        _AccountsCsvCreator().export_csv()
+
 
 # TODO
 class _AccountsMultiIndexDfCreator(MultiIndexDfCreator):
     pass
 
 
-class AccountsCsvCreator(CsvCreator):
+class _AccountsCsvCreator(CsvCreator):
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AccountsSimpleIndexDfCreator()
 
