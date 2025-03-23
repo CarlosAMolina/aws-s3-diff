@@ -5,7 +5,6 @@ from pathlib import Path
 from local_results import LocalResults
 from logger import get_logger
 from types_custom import Df
-from types_custom import MultiIndexDf
 
 
 class DfCreator(ABC):
@@ -73,11 +72,4 @@ class CsvCreator(ABC):
 
     @abstractmethod
     def _get_file_name_creator(self) -> FileNameCreator:
-        pass
-
-
-# TODO? deprecate
-class IndexFactory(ABC):
-    @abstractmethod
-    def get_df(self, df: Df) -> Df | MultiIndexDf:
         pass

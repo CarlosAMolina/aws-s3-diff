@@ -12,7 +12,6 @@ from logger import get_logger
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
-from s3_data.interface import IndexFactory
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
@@ -32,10 +31,10 @@ from types_custom import S3Query
 class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str) -> Df:
         account_df = _AccountSimpleIndexDfCreator(account).get_df()
-        result = _AccountMultiIndexDfCreator(account).get_df(account_df)
+        result = _AccountMultiIndexDfCreator(account, account_df).get_df()
         if account == first_account:
             return result
-        return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
+        return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
 
 
 class AccountCsvCreator(CsvCreator):
@@ -127,11 +126,12 @@ class _AccountNewDfCreator(NewDfCreator):
 
 
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
-    def __init__(self, account: str):
+    def __init__(self, account: str, df: Df):
         self._account = account
+        self._df = df
 
-    def get_df(self, df: Df) -> MultiIndexDf:
-        result = df.copy()
+    def get_df(self) -> MultiIndexDf:
+        result = self._df.copy()
         result = self._get_df_with_multi_index(result)
         return self._get_df_with_multi_index_columns(result)
 
@@ -148,7 +148,7 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
         return [(self._account, column_name) for column_name in index]
 
 
-class _AccountWithOriginS3UrisIndexFactory(IndexFactory):
+class _AccountWithOriginS3UrisMultiIndexDfCreator(MultiIndexDfCreator):
     def __init__(self, account_target):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
