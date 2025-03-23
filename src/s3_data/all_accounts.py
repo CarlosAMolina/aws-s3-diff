@@ -22,12 +22,12 @@ from types_custom import MultiIndexDf
 
 class AccountsDf:
     def __init__(self):
-        self._accounts_as_multi_index_factory = _AccountsMultiIndexDfCreator()
+        self._accounts_as_multi_index_creator = _AccountsMultiIndexDfCreator()
         self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
 
     def get_df(self) -> MultiIndexDf:
         result = self._accounts_simple_index_df_creator.get_df()
-        return self._accounts_as_multi_index_factory.get_df(result)
+        return self._accounts_as_multi_index_creator.get_df(result)
 
     def to_csv(self):
         _AccountsCsvCreator().export_csv()
