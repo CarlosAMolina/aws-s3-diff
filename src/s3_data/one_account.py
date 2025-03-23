@@ -30,23 +30,17 @@ from types_custom import S3Query
 # TODO everywhere where it is used, initialize in __init__
 class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str):
+        account_df = _AccountSimpleIndexDfCreator(account).get_df()
+        result = _AccountAsMultiIndexFactory(account).get_df(account_df)
         if account == first_account:
-            return self._get_df_for_account(account)
-        return self._with_original_account_index(account)
+            return result
+        return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
     def join(self, df_1, df_2: Df) -> Df:
         return df_1.join(df_2, how="outer")
 
     def to_csv(self, account: str):
         _AccountCsvCreator(account).export_csv()
-
-    def _get_df_for_account(self, account: str) -> Df:
-        df = _AccountSimpleIndexDfCreator(account).get_df()
-        return _AccountAsMultiIndexFactory(account).get_df(df)
-
-    def _with_original_account_index(self, account: str) -> Df:
-        result = self._get_df_for_account(account)
-        return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
 
 class _AccountCsvCreator(CsvCreator):
