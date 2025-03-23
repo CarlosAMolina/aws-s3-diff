@@ -95,14 +95,9 @@ class _AccountsNewDfCreator(NewDfCreator):
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
-        account_df_array = [self._get_account_df_prepared_for_join(account, accounts[0]) for account in accounts]
+        account_df_array = [AccountDf().get_account_df_to_join(account, accounts[0]) for account in accounts]
         result = reduce(lambda left_df, right_df: AccountDf().join(left_df, right_df), account_df_array)
         return result.dropna(axis="index", how="all")
-
-    def _get_account_df_prepared_for_join(self, account: str, first_account: str):
-        if account == first_account:
-            return AccountDf().get_df_for_account(account)
-        return AccountDf().with_original_account_index(account)
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
         result = self._get_empty_df_original_account_queries_as_index()
