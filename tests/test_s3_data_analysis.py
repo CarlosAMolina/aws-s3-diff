@@ -103,7 +103,7 @@ class TestAnalysisCsvFactory(unittest.TestCase):
         df = _get_df_from_accounts_s3_data_csv(file_path_name)
         result = _AnalysisNewDfCreator()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        result_as_csv_export = _AnalysisFromMultiSimpleIndexDfCreator().get_df(result)
+        result_as_csv_export = _AnalysisFromMultiSimpleIndexDfCreator(result).get_df()
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
         expected_result = expected_result.astype(

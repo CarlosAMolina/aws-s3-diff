@@ -43,7 +43,6 @@ class _AccountsCsvCreator(CsvCreator):
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        self._accounts_as_single_index_factory = _AccountsFromMultiSimpleIndexDfCreator()
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
         self._local_results = LocalResults()
         # TODO deprecate these classes
@@ -59,7 +58,8 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
 
     def _get_df_create_new(self) -> Df:
         df = self._new_df_creator.get_df()
-        return self._accounts_as_single_index_factory.get_df(df)
+        # TODO initialize in __init__
+        return _AccountsFromMultiSimpleIndexDfCreator(df).get_df()
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
@@ -109,11 +109,12 @@ class _AccountsNewDfCreator(NewDfCreator):
 
 
 class _AccountsFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
-    def __init__(self):
+    def __init__(self, df: Df):
         self._s3_uris_file_reader = S3UrisFileReader()
+        super().__init__(df)
 
-    def get_df(self, df: MultiIndexDf) -> Df:
-        result = df.copy()
+    def get_df(self) -> Df:
+        result = self._df.copy()
         self._set_df_columns_as_single_index(result)
         account_1 = self._s3_uris_file_reader.get_first_account()
         return result.reset_index(

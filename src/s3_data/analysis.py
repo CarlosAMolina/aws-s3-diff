@@ -34,12 +34,12 @@ class AnalysisCsvCreator(CsvCreator):
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._analysis_new_df_creator = _AnalysisNewDfCreator()
-        self._analysis_as_single_index_factory = _AnalysisFromMultiSimpleIndexDfCreator()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
         df = self._analysis_new_df_creator.get_df()
-        return self._analysis_as_single_index_factory.get_df(df)
+        # TODO initialize in __init__
+        return _AnalysisFromMultiSimpleIndexDfCreator(df).get_df()
 
 
 # TODO
@@ -302,8 +302,8 @@ class _AnalysisCondition:
 
 
 class _AnalysisFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
-    def get_df(self, df: MultiIndexDf) -> Df:
-        result = df.copy()
+    def get_df(self) -> Df:
+        result = self._df.copy()
         self._set_df_columns_as_single_index(result)
         result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
         return result.reset_index()

@@ -39,6 +39,16 @@ class MultiIndexDfCreator(DfCreator):
     pass
 
 
+# TODO rename in all files all `factory` to creator
+# TODO add return read_file if file.exists else creat_df()
+class FromMultiSimpleIndexDfCreator(DfCreator):
+    def __init__(self, df: Df):
+        self._df = df
+
+    def _set_df_columns_as_single_index(self, df: Df):
+        df.columns = df.columns.map("_".join)
+
+
 # TODO replace all CsvFactory with this class
 class CsvCreator(ABC):
     def __init__(self):
@@ -71,14 +81,3 @@ class IndexFactory(ABC):
     @abstractmethod
     def get_df(self, df: Df) -> Df | MultiIndexDf:
         pass
-
-
-# TODO rename in all files all `factory` to creator
-# TODO add return read_file if file.exists else creat_df()
-class FromMultiSimpleIndexDfCreator(IndexFactory):
-    @abstractmethod
-    def get_df(self, df: Df) -> Df:
-        pass
-
-    def _set_df_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
