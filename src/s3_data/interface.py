@@ -14,6 +14,10 @@ class DfCreator(ABC):
         pass
 
 
+class NewDfCreator(DfCreator):
+    pass
+
+
 class FromCsvDfCreator(DfCreator):
     pass
 
@@ -60,17 +64,6 @@ class CsvCreator(ABC):
     @abstractmethod
     def _get_file_name_creator(self) -> FileNameCreator:
         pass
-
-
-# TODO deprecate
-class _DfFactory(ABC):
-    @abstractmethod
-    def get_df(self) -> Df | MultiIndexDf:
-        pass
-
-
-class NewDfFactory(_DfFactory):
-    pass
 
 
 class IndexFactory(ABC):

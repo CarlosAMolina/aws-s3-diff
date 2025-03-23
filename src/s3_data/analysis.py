@@ -13,7 +13,7 @@ from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import MultiIndexDfCreator
-from s3_data.interface import NewDfFactory
+from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
 from types_custom import MultiIndexDf
 
@@ -33,7 +33,8 @@ class AnalysisCsvCreator(CsvCreator):
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        self._analysis_new_df_factory = _AnalysisNewDfFactory()
+        # TODO rename `factory`
+        self._analysis_new_df_factory = _AnalysisNewDfCreator()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._logger = get_logger()
 
@@ -49,7 +50,7 @@ class _AnalysisFileNameCreator(FileNameCreator):
         return "analysis.csv"
 
 
-class _AnalysisNewDfFactory(NewDfFactory):
+class _AnalysisNewDfCreator(NewDfCreator):
     def __init__(self):
         # TODO rename attribute
         self._accounts_from_csv_df_factory = AccountsDf()

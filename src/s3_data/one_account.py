@@ -14,7 +14,7 @@ from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import IndexFactory
-from s3_data.interface import NewDfFactory
+from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
 from s3_data.s3_client import S3Client
 from types_custom import FileS3Data
@@ -60,8 +60,7 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._df_from_csv_creator = _AccountFromCsvDfCreator(self._account)
-        # TODO rename `factory`
-        self._new_df_creator = _AccountNewDfFactory(self._account)
+        self._new_df_creator = _AccountNewDfCreator(self._account)
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
@@ -99,7 +98,7 @@ class _AccountFileNameCreator(FileNameCreator):
         return f"{self._account}.csv"
 
 
-class _AccountNewDfFactory(NewDfFactory):
+class _AccountNewDfCreator(NewDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._s3_uris_file_reader = S3UrisFileReader()
