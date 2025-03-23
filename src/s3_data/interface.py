@@ -73,13 +73,6 @@ class IndexFactory(ABC):
         pass
 
 
-# TODO? relace to MultiIndexDfCreator
-class AsMultiIndexFactory(IndexFactory):
-    @abstractmethod
-    def get_df(self, df: Df) -> MultiIndexDf:
-        pass
-
-
 # TODO rename to SimpleIndexDfCreator and add:
 # return read_file if file.exists else creat_df()
 class AsSingleIndexFactory(IndexFactory):

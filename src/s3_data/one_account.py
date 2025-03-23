@@ -9,11 +9,11 @@ from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
 from logger import get_logger
-from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import IndexFactory
+from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfCreator
 from s3_data.interface import SimpleIndexDfCreator
 from s3_data.s3_client import S3Client
@@ -32,7 +32,7 @@ from types_custom import S3Query
 class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str) -> Df:
         account_df = _AccountSimpleIndexDfCreator(account).get_df()
-        result = _AccountAsMultiIndexFactory(account).get_df(account_df)
+        result = _AccountMultiIndexDfCreator(account).get_df(account_df)
         if account == first_account:
             return result
         return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
@@ -126,7 +126,7 @@ class _AccountNewDfCreator(NewDfCreator):
         return result
 
 
-class _AccountAsMultiIndexFactory(AsMultiIndexFactory):
+class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
 

@@ -9,7 +9,6 @@ from pandas import read_csv
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
-from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
 from s3_data.interface import FileNameCreator
@@ -23,7 +22,7 @@ from types_custom import MultiIndexDf
 
 class AccountsDf:
     def __init__(self):
-        self._accounts_as_multi_index_factory = _AccountsAsMultiIndexFactory()
+        self._accounts_as_multi_index_factory = _AccountsMultiIndexDfCreator()
         self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
 
     def get_df(self) -> MultiIndexDf:
@@ -32,11 +31,6 @@ class AccountsDf:
 
     def to_csv(self):
         _AccountsCsvCreator().export_csv()
-
-
-# TODO
-class _AccountsMultiIndexDfCreator(MultiIndexDfCreator):
-    pass
 
 
 class _AccountsCsvCreator(CsvCreator):
@@ -131,7 +125,7 @@ class _AccountsAsSingleIndexFactory(AsSingleIndexFactory):
         )
 
 
-class _AccountsAsMultiIndexFactory(AsMultiIndexFactory):
+class _AccountsMultiIndexDfCreator(MultiIndexDfCreator):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
