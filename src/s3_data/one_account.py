@@ -36,9 +36,9 @@ class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str):
         if account == first_account:
             return self._get_df_for_account(account)
-        return self.with_original_account_index(account)
+        return self._with_original_account_index(account)
 
-    def with_original_account_index(self, account: str) -> Df:
+    def _with_original_account_index(self, account: str) -> Df:
         result = self._get_df_for_account(account)
         return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
