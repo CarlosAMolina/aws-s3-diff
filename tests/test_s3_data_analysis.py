@@ -14,15 +14,15 @@ from src.s3_data.all_accounts import AccountsDf
 from src.s3_data.analysis import _AccountsToCompare
 from src.s3_data.analysis import _AnalysisFromMultiSimpleIndexDfCreator
 from src.s3_data.analysis import _AnalysisNewDfCreator
-from src.s3_data.analysis import _CanFileExistTwoAccountsAnalysisFactory
-from src.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisFactory
-from src.s3_data.analysis import _TwoAccountsAnalysisFactory
+from src.s3_data.analysis import _CanFileExistTwoAccountsAnalysisCreator
+from src.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisCreator
+from src.s3_data.analysis import _TwoAccountsAnalysisCreator
 
 
 class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisFactory]:
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
         pass
 
     @property
@@ -38,8 +38,8 @@ class _AnalysisBuilderConfig(ABC):
 
 class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisFactory]:
-        return _IsFileCopiedTwoAccountsAnalysisFactory
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
+        return _IsFileCopiedTwoAccountsAnalysisCreator
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -58,8 +58,8 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
 class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisFactory]:
-        return _CanFileExistTwoAccountsAnalysisFactory
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
+        return _CanFileExistTwoAccountsAnalysisCreator
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -92,7 +92,7 @@ class TestDfAnalysis(unittest.TestCase):
             self.assertEqual(expected_result, result_to_check)
 
 
-class TestAnalysisCsvFactory(unittest.TestCase):
+class TestAnalysisCsvCreator(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()
@@ -130,15 +130,15 @@ class TestAnalysisCsvFactory(unittest.TestCase):
 
 def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
     # TODO rename variable
-    accounts_from_csv_df_factory = AccountsDf()
-    accounts_from_csv_df_factory._accounts_simple_index_df_creator._get_file_path = lambda: (
+    accounts_from_csv_df_creator = AccountsDf()
+    accounts_from_csv_df_creator._accounts_simple_index_df_creator._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
-    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._get_file_path = lambda: (
+    accounts_from_csv_df_creator._accounts_simple_index_df_creator._df_from_csv_creator._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
-    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader = Mock()
-    accounts_from_csv_df_factory._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
+    accounts_from_csv_df_creator._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader = Mock()
+    accounts_from_csv_df_creator._accounts_simple_index_df_creator._df_from_csv_creator._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
         "pro", "release"
     )
-    return accounts_from_csv_df_factory.get_df()
+    return accounts_from_csv_df_creator.get_df()

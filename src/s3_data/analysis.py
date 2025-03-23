@@ -51,8 +51,7 @@ class _AnalysisFileNameCreator(FileNameCreator):
 
 class _AnalysisNewDfCreator(NewDfCreator):
     def __init__(self):
-        # TODO rename attribute
-        self._accounts_from_csv_df_factory = AccountsDf()
+        self._accounts_from_csv_df_creator = AccountsDf()
         self._analysis_config_reader = AnalysisConfigReader()
         self._logger = get_logger()
 
@@ -60,7 +59,7 @@ class _AnalysisNewDfCreator(NewDfCreator):
         return self._get_df_s3_data_analyzed()
 
     def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
-        all_accounts_s3_data_df = self._accounts_from_csv_df_factory.get_df()
+        all_accounts_s3_data_df = self._accounts_from_csv_df_creator.get_df()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> MultiIndexDf:
@@ -77,11 +76,11 @@ class _AnalysisBuilder:
         self._df = df
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._df = _FileCopiedTypeAnalysisFactory().get_df(self._df)
+        self._df = _FileCopiedTypeAnalysisCreator().get_df(self._df)
         return self
 
     def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
-        self._df = _CanExistTypeAnalysisFactory().get_df(self._df)
+        self._df = _CanExistTypeAnalysisCreator().get_df(self._df)
         return self
 
     def build(self) -> Df:
@@ -93,7 +92,7 @@ _ArrayAccountsToCompare = list[_AccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
 
 
-class _ArrayAccountsToCompareFactory(ABC):
+class _ArrayAccountsToCompareCreator(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
@@ -109,53 +108,53 @@ class _ArrayAccountsToCompareFactory(ABC):
         pass
 
 
-class _FileCopiedAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
+class _FileCopiedAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
 
-class _CanExistAnalysisArrayAccountsToCompareFactory(_ArrayAccountsToCompareFactory):
+class _CanExistAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
 
-class _TypeAnalysisFactory(ABC):
+class _TypeAnalysisCreator(ABC):
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         for accounts in self._get_accounts_array():
-            result = self._two_accounts_analysis_factory(accounts, result).get_df_set_analysis()
+            result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
 
     @abstractmethod
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
         pass
 
-    # TODO use _TwoAccountsAnalysisFactory without " in return type
+    # TODO use _TwoAccountsAnalysisCreator without " in return type
     @property
     @abstractmethod
-    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
         pass
 
 
-class _FileCopiedTypeAnalysisFactory(_TypeAnalysisFactory):
+class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _FileCopiedAnalysisArrayAccountsToCompareFactory().get_array_accounts()
+        return _FileCopiedAnalysisArrayAccountsToCompareCreator().get_array_accounts()
 
     @property
-    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
-        return _IsFileCopiedTwoAccountsAnalysisFactory
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+        return _IsFileCopiedTwoAccountsAnalysisCreator
 
 
-class _CanExistTypeAnalysisFactory(_TypeAnalysisFactory):
+class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _CanExistAnalysisArrayAccountsToCompareFactory().get_array_accounts()
+        return _CanExistAnalysisArrayAccountsToCompareCreator().get_array_accounts()
 
     @property
-    def _two_accounts_analysis_factory(self) -> type["_TwoAccountsAnalysisFactory"]:
-        return _CanFileExistTwoAccountsAnalysisFactory
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+        return _CanFileExistTwoAccountsAnalysisCreator
 
 
-class _TwoAccountsAnalysisFactory(ABC):
+class _TwoAccountsAnalysisCreator(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
         self._condition = _AnalysisCondition(accounts, df)
@@ -194,7 +193,7 @@ class _TwoAccountsAnalysisFactory(ABC):
         pass
 
 
-class _IsFileCopiedTwoAccountsAnalysisFactory(_TwoAccountsAnalysisFactory):
+class _IsFileCopiedTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
@@ -215,7 +214,7 @@ class _IsFileCopiedTwoAccountsAnalysisFactory(_TwoAccountsAnalysisFactory):
         }
 
 
-class _CanFileExistTwoAccountsAnalysisFactory(_TwoAccountsAnalysisFactory):
+class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
     def _log_analysis(self):
         self._logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
