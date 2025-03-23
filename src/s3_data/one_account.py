@@ -11,8 +11,8 @@ from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import CsvCreator
-from s3_data.interface import CsvReader  # TODO rename to FromCsvDfCreater (subclassess too)
 from s3_data.interface import FileNameCreator
+from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import IndexFactory
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
@@ -59,7 +59,7 @@ class _AccountCsvCreator(CsvCreator):
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
-        self._df_from_csv_creator = _AccountCsvReader(self._account)
+        self._df_from_csv_creator = _AccountFromCsvDfCreator(self._account)
         # TODO rename `factory`
         self._new_df_creator = _AccountNewDfFactory(self._account)
         self._local_results = LocalResults()
@@ -209,7 +209,7 @@ class _AccountWithOriginS3UrisIndexFactory(IndexFactory):
         return result
 
 
-class _AccountCsvReader(CsvReader):
+class _AccountFromCsvDfCreator(FromCsvDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()

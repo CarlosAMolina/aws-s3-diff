@@ -12,8 +12,8 @@ from local_results import LocalResults
 from s3_data.interface import AsMultiIndexFactory
 from s3_data.interface import AsSingleIndexFactory
 from s3_data.interface import CsvCreator
-from s3_data.interface import CsvReader
 from s3_data.interface import FileNameCreator
+from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfFactory
 from s3_data.interface import SimpleIndexDfCreator
@@ -50,7 +50,7 @@ class _AccountsCsvCreator(CsvCreator):
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._accounts_as_single_index_factory = _AccountsAsSingleIndexFactory()
-        self._df_from_csv_creator = _AccountsCsvReader()
+        self._df_from_csv_creator = _AccountsFromCsvDfCreator()
         self._local_results = LocalResults()
         # TODO deprecate these classes, rename factory
         self._new_df_creator = _AccountsNewDfFactory()
@@ -156,7 +156,7 @@ class _AccountsAsMultiIndexFactory(AsMultiIndexFactory):
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class _AccountsCsvReader(CsvReader):
+class _AccountsFromCsvDfCreator(FromCsvDfCreator):
     def __init__(self):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()

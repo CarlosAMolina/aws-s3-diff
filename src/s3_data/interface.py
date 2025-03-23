@@ -14,7 +14,7 @@ class DfCreator(ABC):
         pass
 
 
-class CsvReader(DfCreator):
+class FromCsvDfCreator(DfCreator):
     pass
 
 
