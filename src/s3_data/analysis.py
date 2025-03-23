@@ -33,13 +33,12 @@ class AnalysisCsvCreator(CsvCreator):
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
-        # TODO rename `factory`
-        self._analysis_new_df_factory = _AnalysisNewDfCreator()
+        self._analysis_new_df_creator = _AnalysisNewDfCreator()
         self._analysis_as_single_index_factory = _AnalysisAsSingleIndexFactory()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
-        df = self._analysis_new_df_factory.get_df()
+        df = self._analysis_new_df_creator.get_df()
         return self._analysis_as_single_index_factory.get_df(df)
 
 
