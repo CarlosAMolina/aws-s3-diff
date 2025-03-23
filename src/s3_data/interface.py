@@ -52,7 +52,6 @@ class FromSimpleMultiIndexDfCreator(DfCreator):
         self._df = df
 
 
-# TODO replace all CsvFactory with this class
 class CsvCreator(ABC):
     def __init__(self):
         self._local_results = LocalResults()
