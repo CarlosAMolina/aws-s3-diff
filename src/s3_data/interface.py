@@ -38,7 +38,6 @@ class MultiIndexDfCreator(DfCreator):
     pass
 
 
-# TODO rename in all files all `factory` to creator
 # TODO add return read_file if file.exists else creat_df()
 class FromMultiSimpleIndexDfCreator(DfCreator):
     def __init__(self, df: Df):

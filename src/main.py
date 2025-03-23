@@ -19,7 +19,7 @@ from s3_data.one_account import AccountCsvCreator
 class _Main:
     def __init__(self):
         self._logger = get_logger()
-        self._process_factory = _ProcessFactory()
+        self._process_creator = _ProcessCreator()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
@@ -47,7 +47,7 @@ class _Main:
         self._logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_accounts_to_analyze()
-        self._process_factory.get_process().run()
+        self._process_creator.get_process().run()
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -61,7 +61,7 @@ class _Process(ABC):
         pass
 
 
-class _ProcessFactory:
+class _ProcessCreator:
     def __init__(self):
         self._analyzed_accounts = _AnalyzedAccounts()
         self._local_results = LocalResults()
@@ -75,7 +75,7 @@ class _ProcessFactory:
             return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
-        return _AccountProcessFactory().get_process()
+        return _AccountProcessCreator().get_process()
 
 
 class _AnalyzedAccounts:
@@ -116,7 +116,7 @@ class _AccountProcess(_Process):
         AccountCsvCreator(self._account).export_csv()
 
 
-class _AccountProcessFactory:
+class _AccountProcessCreator:
     def __init__(self):
         self._analyzed_accounts = _AnalyzedAccounts()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -186,12 +186,12 @@ class _AnalysisProcess(_Process):
         self._logger = get_logger()
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._analysis_csv_factory = AnalysisCsvCreator()
+        self._analysis_csv_creator = AnalysisCsvCreator()
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            self._analysis_csv_factory.export_csv()
+            self._analysis_csv_creator.export_csv()
         else:
             self._logger.info("No analysis configured. Omitting")
         LocalResults().drop_file_with_analysis_date()
