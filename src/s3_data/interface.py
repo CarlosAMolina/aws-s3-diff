@@ -8,16 +8,14 @@ from types_custom import Df
 from types_custom import MultiIndexDf
 
 
-class CsvReader(ABC):
-    @abstractmethod
-    def get_df(self) -> Df:
-        pass
-
-
 class DfCreator(ABC):
     @abstractmethod
     def get_df(self) -> Df:
         pass
+
+
+class CsvReader(DfCreator):
+    pass
 
 
 class FileNameCreator(ABC):
