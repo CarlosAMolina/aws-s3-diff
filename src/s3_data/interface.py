@@ -75,12 +75,6 @@ class NewDfFactory(_DfFactory):
     pass
 
 
-class FromCsvDfFactory(_DfFactory):
-    @abstractmethod
-    def get_df(self) -> MultiIndexDf:
-        pass
-
-
 class IndexFactory(ABC):
     @abstractmethod
     def get_df(self, df: Df) -> Df | MultiIndexDf:
