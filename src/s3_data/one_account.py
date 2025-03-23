@@ -29,18 +29,15 @@ from types_custom import S3Query
 
 # TODO everywhere where it is used, initialize in __init__
 class AccountDf:
-    def get_account_df_to_join(self, account: str, first_account: str):
+    def get_account_df_to_join(self, account: str, first_account: str) -> Df:
         account_df = _AccountSimpleIndexDfCreator(account).get_df()
         result = _AccountAsMultiIndexFactory(account).get_df(account_df)
         if account == first_account:
             return result
         return _AccountWithOriginS3UrisIndexFactory(account).get_df(result)
 
-    def to_csv(self, account: str):
-        _AccountCsvCreator(account).export_csv()
 
-
-class _AccountCsvCreator(CsvCreator):
+class AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
         self._account = account
         super().__init__()
