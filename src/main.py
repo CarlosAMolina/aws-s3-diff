@@ -106,10 +106,9 @@ class _AnalyzedAccounts:
 
 
 class _AccountProcess(_Process):
-    def __init__(self, account: str):  # TODO deprecate
+    def __init__(self):
         self._analyzed_accounts = _AnalyzedAccounts()
-        assert account == self._analyzed_accounts.get_account_to_analyze()
-        self._logger = get_logger()
+        self._logger = get_logger()  # TODO? as global variable
 
     def run(self):
         self._logger.info(f"Analyzing the AWS account '{self._account}'")
@@ -129,16 +128,16 @@ class _AccountProcessCreator:
     def get_process(self) -> _AccountProcess:
         account = self._analyzed_accounts.get_account_to_analyze()
         if account == self._s3_uris_file_reader.get_first_account():
-            return _FirstAccountProcess(account)
+            return _FirstAccountProcess()
         if account == self._s3_uris_file_reader.get_last_account():
-            return _LastAccountProcess(account)
-        return _IntermediateAccountProcess(account)
+            return _LastAccountProcess()
+        return _IntermediateAccountProcess()
 
 
 class _NoLastAccountProcess(_AccountProcess):
-    def __init__(self, account: str):
+    def __init__(self):
         self._analyzed_accounts = _AnalyzedAccounts()
-        super().__init__(account)
+        super().__init__()
 
     def run(self):
         super().run()
@@ -152,9 +151,9 @@ class _NoLastAccountProcess(_AccountProcess):
 
 
 class _FirstAccountProcess(_NoLastAccountProcess):
-    def __init__(self, account: str):
-        super().__init__(account)
+    def __init__(self):
         self._local_results = LocalResults()
+        super().__init__()
 
     def run(self):
         # The folder may exist but not the result file if an error occurred in the previous run,
