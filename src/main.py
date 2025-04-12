@@ -106,14 +106,19 @@ class _AnalyzedAccounts:
 
 
 class _AccountProcess(_Process):
-    def __init__(self, account: str):
-        self._account = account
+    def __init__(self, account: str):  # TODO deprecate
+        self._analyzed_accounts = _AnalyzedAccounts()
+        assert account == self._analyzed_accounts.get_account_to_analyze()
         self._logger = get_logger()
 
     def run(self):
         self._logger.info(f"Analyzing the AWS account '{self._account}'")
         # TODO initialize class in __init__
         AccountCsvCreator(self._account).export_csv()
+
+    @property
+    def _account(self) -> str:
+        return self._analyzed_accounts.get_account_to_analyze()
 
 
 class _AccountProcessCreator:
