@@ -84,6 +84,7 @@ class _AnalyzedAccounts:
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
+    # TODO replace in all files the account variable with a call to this method
     def get_account_to_analyze(self) -> str:
         accounts_to_analyze = self._s3_uris_file_reader.get_accounts()
         last_account_analyzed = self._get_last_account_analyzed()
