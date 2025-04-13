@@ -12,9 +12,9 @@ class LocalResults:
         self._analysis_paths = None  # To avoid read/create file in __init__.
 
     def has_this_account_been_analyzed(self, account: str) -> bool:
-        return self.get_file_path_account_results(account).is_file()
+        return self._get_file_path_account_results(account).is_file()
 
-    def get_file_path_account_results(self, account: str):
+    def _get_file_path_account_results(self, account: str):
         return self.analysis_paths.directory_analysis.joinpath(f"{account}.csv")
 
     def drop_file_with_analysis_date(self):
