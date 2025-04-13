@@ -40,8 +40,6 @@ class AccountDf:
 
 class AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
-        assert account == AnalyzedAccounts().get_account_to_analyze()  # TODO rm
-        self._account = account
         super().__init__()
 
     def _get_df_creator(self) -> SimpleIndexDfCreator:
@@ -49,6 +47,10 @@ class AccountCsvCreator(CsvCreator):
 
     def _get_file_name_creator(self) -> FileNameCreator:
         return _AccountFileNameCreator(self._account)
+
+    @property
+    def _account(self) -> str:
+        return AnalyzedAccounts().get_account_to_analyze()
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
