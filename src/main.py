@@ -83,11 +83,11 @@ class _ProcessCreator:
 class _AccountProcess(_Process):
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
+        self._account_csv_creator = AccountCsvCreator()
 
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._account}'")
-        # TODO initialize class in __init__
-        AccountCsvCreator().export_csv()
+        self._account_csv_creator.export_csv()
 
     @property
     def _account(self) -> str:
