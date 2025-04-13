@@ -53,6 +53,7 @@ class AccountCsvCreator(CsvCreator):
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
         self._account = account
+        self._account_file_name_creator = _AccountFileNameCreator(self._account)
         self._df_from_csv_creator = _AccountFromCsvDfCreator(self._account)
         self._new_df_creator = _AccountNewDfCreator(self._account)
         self._local_results = LocalResults()
@@ -72,11 +73,8 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def _get_file_path(self) -> Path:
         # TODO avoid access values of attribute of a class
         return self._local_results.analysis_paths.directory_analysis.joinpath(
-            self._get_file_name_creator().get_file_name()
+            self._account_file_name_creator.get_file_name()
         )
-
-    def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountFileNameCreator(self._account)
 
 
 class _AccountFileNameCreator(FileNameCreator):
