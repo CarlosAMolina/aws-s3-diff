@@ -39,9 +39,6 @@ class AccountDf:
 
 
 class AccountCsvCreator(CsvCreator):
-    def __init__(self, account: str):
-        super().__init__()
-
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AccountSimpleIndexDfCreator(self._account)
 
