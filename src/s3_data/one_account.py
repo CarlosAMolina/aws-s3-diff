@@ -5,6 +5,7 @@ import pandas as pd
 from pandas import DataFrame as Df
 from pandas import MultiIndex
 
+from accounts import AnalyzedAccounts
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import LocalResults
@@ -39,6 +40,7 @@ class AccountDf:
 
 class AccountCsvCreator(CsvCreator):
     def __init__(self, account: str):
+        assert account == AnalyzedAccounts().get_account_to_analyze()  # TODO rm
         self._account = account
         super().__init__()
 
