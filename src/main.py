@@ -86,12 +86,8 @@ class _AccountProcess(_Process):
         self._account_csv_creator = AccountCsvCreator()
 
     def run(self):
-        _logger.info(f"Analyzing the AWS account '{self._account}'")
+        _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
         self._account_csv_creator.export_csv()
-
-    @property
-    def _account(self) -> str:
-        return self._analyzed_accounts.get_account_to_analyze()
 
 
 class _AccountProcessCreator:
