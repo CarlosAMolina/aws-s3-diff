@@ -52,10 +52,9 @@ class AccountCsvCreator(CsvCreator):
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
-        self._account = account
-        self._account_file_name_creator = _AccountFileNameCreator(self._account)
-        self._df_from_csv_creator = _AccountFromCsvDfCreator(self._account)
-        self._new_df_creator = _AccountNewDfCreator(self._account)
+        self._account_file_name_creator = _AccountFileNameCreator(account)
+        self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
+        self._new_df_creator = _AccountNewDfCreator(account)
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
