@@ -11,8 +11,8 @@ from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
 from src.config_files import S3UrisFileReader
-from src.local_paths import LocalPaths
 from src.local_results import _AnalysisPaths
+from src.local_results import LocalPaths
 from src.local_results import LocalResults
 from src.main import _Main
 from src.main import AnalysisConfigError

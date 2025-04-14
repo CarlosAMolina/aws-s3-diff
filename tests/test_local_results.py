@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from src.local_paths import LocalPaths
+from src.local_results import LocalPaths
 
 
 class TestLocalPaths(unittest.TestCase):

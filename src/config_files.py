@@ -7,7 +7,7 @@ from pandas import DataFrame as Df
 from pandas import read_csv
 
 from exceptions import AnalysisConfigError
-from local_paths import LocalPaths
+from local_results import LocalPaths
 from types_custom import S3Query
 
 FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
