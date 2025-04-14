@@ -9,6 +9,7 @@ from accounts import AnalyzedAccounts
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import AccountFileNameCreator
+from local_results import get_account_file_name
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import CsvCreator
@@ -53,7 +54,7 @@ class AccountCsvCreator(CsvCreator):
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
-        self._account_file_name_creator = AccountFileNameCreator(account)
+        self._account = account
         self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
         self._new_df_creator = _AccountNewDfCreator(account)
         self._local_results = LocalResults()
@@ -71,7 +72,7 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._account_file_name_creator.get_file_name())
+        return self._local_results.get_file_path_results(get_account_file_name(self._account))
 
 
 class _AccountNewDfCreator(NewDfCreator):
