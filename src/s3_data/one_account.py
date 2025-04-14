@@ -71,10 +71,7 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
-        # TODO avoid access values of attribute of a class
-        return self._local_results.analysis_paths.directory_analysis.joinpath(
-            self._account_file_name_creator.get_file_name()
-        )
+        return self._local_results.get_file_path_results(self._account_file_name_creator.get_file_name())
 
 
 class _AccountNewDfCreator(NewDfCreator):
