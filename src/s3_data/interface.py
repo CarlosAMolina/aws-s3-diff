@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 
+from local_results import FileNameCreator
 from local_results import LocalResults
 from logger import get_logger
 from types_custom import Df
@@ -19,12 +20,6 @@ class NewDfCreator(DfCreator):
 
 class FromCsvDfCreator(DfCreator):
     pass
-
-
-class FileNameCreator(ABC):
-    @abstractmethod
-    def get_file_name(self) -> str:
-        pass
 
 
 class SimpleIndexDfCreator(DfCreator):
