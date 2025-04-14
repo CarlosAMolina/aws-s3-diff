@@ -158,9 +158,4 @@ class _AccountsFromCsvDfCreator(FromCsvDfCreator):
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
         # TODO avoid access values of attribute of a class
-        return self._local_results.analysis_paths.directory_analysis.joinpath(
-            self._get_file_name_creator().get_file_name()
-        )
-
-    def _get_file_name_creator(self) -> FileNameCreator:
-        return AccountsFileNameCreator()
+        return self._local_results.analysis_paths.directory_analysis.joinpath(ACCOUNTS_FILE_NAME)
