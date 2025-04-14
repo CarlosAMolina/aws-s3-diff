@@ -68,6 +68,10 @@ class CsvCreator(ABC):
             self._get_file_name_creator().get_file_name()
         )
 
+    # TODO@abstractmethod
+    # TODOdef _get_file_name(self) -> str:
+    # TODO    pass
+
     @abstractmethod
     def _get_file_name_creator(self) -> FileNameCreator:
         pass

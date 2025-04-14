@@ -5,6 +5,7 @@ from pathlib import Path
 
 from logger import get_logger
 
+ACCOUNTS_FILE_NAME = "s3-files-all-accounts.csv"
 ANALYSIS_FILE_NAME = "analysis.md"
 
 
@@ -47,7 +48,7 @@ class AccountFileNameCreator(FileNameCreator):
 class AccountsFileNameCreator(FileNameCreator):
     # TODO deprecate file_s3_data_all_accounts with this
     def get_file_name(self) -> str:
-        return "s3-files-all-accounts.csv"
+        return ACCOUNTS_FILE_NAME
 
 
 class AnalysisFileNameCreator(FileNameCreator):
@@ -131,8 +132,7 @@ class _AnalysisPaths:
 
     @property
     def file_s3_data_all_accounts(self) -> Path:
-        file_name = AccountsFileNameCreator().get_file_name()
-        return self.directory_analysis.joinpath(file_name)
+        return self.directory_analysis.joinpath(ACCOUNTS_FILE_NAME)
 
     def _get_analysis_date_time_str(self) -> str:
         # TODO use _AnalysisDateTimeCreator and drop __init__ argument
