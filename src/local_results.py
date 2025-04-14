@@ -48,7 +48,8 @@ class LocalResults:
         return self._get_file_path_account_results(account).is_file()
 
     def _get_file_path_account_results(self, account: str):
-        return self.analysis_paths.directory_analysis.joinpath(f"{account}.csv")
+        file_name = AccountFileNameCreator(account).get_file_name()
+        return self.analysis_paths.directory_analysis.joinpath(file_name)
 
     def drop_file_with_analysis_date(self):
         self._logger.debug(f"Removing the file: {self._analysis_date_time_file_path}")
