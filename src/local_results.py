@@ -109,7 +109,7 @@ class _AnalysisPaths:
 
     @property
     def directory_analysis(self) -> Path:
-        return self._all_results_directory_path.joinpath(self._analysis_date_time_str)
+        return self._all_results_directory_path.joinpath(self._get_analysis_date_time_str())
 
     @property
     def file_analysis(self) -> Path:
@@ -120,3 +120,6 @@ class _AnalysisPaths:
     def file_s3_data_all_accounts(self) -> Path:
         file_name = AccountsFileNameCreator().get_file_name()
         return self.directory_analysis.joinpath(file_name)
+
+    def _get_analysis_date_time_str(self) -> str:
+        return self._analysis_date_time_str
