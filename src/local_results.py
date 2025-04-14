@@ -47,6 +47,9 @@ class LocalResults:
     def has_this_account_been_analyzed(self, account: str) -> bool:
         return self._get_file_path_account_results(account).is_file()
 
+    def get_file_path_results(self, file_name: str):
+        return self.analysis_paths.directory_analysis.joinpath(file_name)
+
     def _get_file_path_account_results(self, account: str):
         file_name = AccountFileNameCreator(account).get_file_name()
         return self.analysis_paths.directory_analysis.joinpath(file_name)
