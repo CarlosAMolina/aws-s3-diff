@@ -8,6 +8,7 @@ from pandas import MultiIndex
 from accounts import AnalyzedAccounts
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
+from local_results import AccountFileNameCreator
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import CsvCreator
@@ -43,7 +44,7 @@ class AccountCsvCreator(CsvCreator):
         return _AccountSimpleIndexDfCreator(self._account)
 
     def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountFileNameCreator(self._account)
+        return AccountFileNameCreator(self._account)
 
     @property
     def _account(self) -> str:
@@ -52,7 +53,7 @@ class AccountCsvCreator(CsvCreator):
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self, account: str):
-        self._account_file_name_creator = _AccountFileNameCreator(account)
+        self._account_file_name_creator = AccountFileNameCreator(account)
         self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
         self._new_df_creator = _AccountNewDfCreator(account)
         self._local_results = LocalResults()
@@ -74,19 +75,6 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
         return self._local_results.analysis_paths.directory_analysis.joinpath(
             self._account_file_name_creator.get_file_name()
         )
-
-
-class _AccountFileNameCreator(FileNameCreator):
-    # TODO move here the logic of
-    # - read config file
-    # - read results paths
-    # - get 1º account in config file not in results path
-    def __init__(self, account: str):
-        self._account = account
-
-    # TODO deprecate get_file_path_account_results, use this method instead
-    def get_file_name(self) -> str:
-        return f"{self._account}.csv"
 
 
 class _AccountNewDfCreator(NewDfCreator):
@@ -219,4 +207,4 @@ class _AccountFromCsvDfCreator(FromCsvDfCreator):
         )
 
     def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountFileNameCreator(self._account)
+        return AccountFileNameCreator(self._account)

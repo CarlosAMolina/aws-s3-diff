@@ -8,9 +8,10 @@ from pandas import read_csv
 
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
+from local_results import AccountsFileNameCreator
+from local_results import FileNameCreator
 from local_results import LocalResults
 from s3_data.interface import CsvCreator
-from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import FromMultiSimpleIndexDfCreator
 from s3_data.interface import FromSimpleMultiIndexDfCreator
@@ -39,7 +40,7 @@ class _AccountsCsvCreator(CsvCreator):
         return _AccountsSimpleIndexDfCreator()
 
     def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountsFileNameCreator()
+        return AccountsFileNameCreator()
 
 
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
@@ -70,13 +71,7 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
         )
 
     def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountsFileNameCreator()
-
-
-class _AccountsFileNameCreator(FileNameCreator):
-    # TODO deprecate file_s3_data_all_accounts with this
-    def get_file_name(self) -> str:
-        return "s3-files-all-accounts.csv"
+        return AccountsFileNameCreator()
 
 
 class _AccountsNewDfCreator(NewDfCreator):
@@ -173,4 +168,4 @@ class _AccountsFromCsvDfCreator(FromCsvDfCreator):
         )
 
     def _get_file_name_creator(self) -> FileNameCreator:
-        return _AccountsFileNameCreator()
+        return AccountsFileNameCreator()

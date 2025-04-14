@@ -1,8 +1,41 @@
 import datetime
+from abc import ABC
+from abc import abstractmethod
 from pathlib import Path
 
 from local_paths import LocalPaths
 from logger import get_logger
+
+
+class FileNameCreator(ABC):
+    @abstractmethod
+    def get_file_name(self) -> str:
+        pass
+
+
+class AccountFileNameCreator(FileNameCreator):
+    # TODO move here the logic of
+    # - read config file
+    # - read results paths
+    # - get 1º account in config file not in results path
+    def __init__(self, account: str):
+        self._account = account
+
+    # TODO deprecate get_file_path_account_results, use this method instead
+    def get_file_name(self) -> str:
+        return f"{self._account}.csv"
+
+
+class AccountsFileNameCreator(FileNameCreator):
+    # TODO deprecate file_s3_data_all_accounts with this
+    def get_file_name(self) -> str:
+        return "s3-files-all-accounts.csv"
+
+
+class AnalysisFileNameCreator(FileNameCreator):
+    # TODO deprecate file_analysis() with this
+    def get_file_name(self) -> str:
+        return "analysis.csv"
 
 
 class LocalResults:
