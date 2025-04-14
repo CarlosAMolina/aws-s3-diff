@@ -8,12 +8,10 @@ from pandas import MultiIndex
 from accounts import AnalyzedAccounts
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
-from local_results import AccountFileNameCreator
 from local_results import get_account_file_name
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.interface import CsvCreator
-from s3_data.interface import FileNameCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import MultiIndexDfCreator
 from s3_data.interface import NewDfCreator
@@ -24,7 +22,7 @@ from types_custom import MultiIndexDf
 from types_custom import S3Data
 from types_custom import S3Query
 
-# TODO deprecate `account` argument in all classes, replace with FileNameCreator and genereate it by checking the files
+# TODO deprecate `account` argument in all classes, genereate it by checking the files
 
 # TODO everywhere where a class is initialized, initialize it in __init__
 
@@ -44,8 +42,9 @@ class AccountCsvCreator(CsvCreator):
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AccountSimpleIndexDfCreator(self._account)
 
-    def _get_file_name_creator(self) -> FileNameCreator:
-        return AccountFileNameCreator(self._account)
+    @property
+    def _file_name(self) -> str:
+        return get_account_file_name(self._account)
 
     @property
     def _account(self) -> str:

@@ -7,8 +7,7 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from config_files import AnalysisConfigReader
-from local_results import AnalysisFileNameCreator
-from local_results import FileNameCreator
+from local_results import ANALYSIS_FILE_NAME
 from logger import get_logger
 from s3_data.all_accounts import AccountsDf
 from s3_data.interface import CsvCreator
@@ -28,8 +27,9 @@ class AnalysisCsvCreator(CsvCreator):
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AnalysisSimpleIndexDfCreator()
 
-    def _get_file_name_creator(self) -> FileNameCreator:
-        return AnalysisFileNameCreator()
+    @property
+    def _file_name(self) -> str:
+        return ANALYSIS_FILE_NAME
 
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):

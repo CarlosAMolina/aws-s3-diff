@@ -2,7 +2,6 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 
-from local_results import FileNameCreator
 from local_results import LocalResults
 from logger import get_logger
 from types_custom import Df
@@ -64,14 +63,9 @@ class CsvCreator(ABC):
 
     def _get_file_path(self) -> Path:
         # TODO avoid access values of attribute of a class
-        return self._local_results.analysis_paths.directory_analysis.joinpath(
-            self._get_file_name_creator().get_file_name()
-        )
+        return self._local_results.analysis_paths.directory_analysis.joinpath(self._file_name)
 
-    # TODO@abstractmethod
-    # TODOdef _get_file_name(self) -> str:
-    # TODO    pass
-
+    @property
     @abstractmethod
-    def _get_file_name_creator(self) -> FileNameCreator:
+    def _file_name(self) -> str:
         pass

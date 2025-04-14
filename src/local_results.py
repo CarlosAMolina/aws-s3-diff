@@ -1,6 +1,4 @@
 import datetime
-from abc import ABC
-from abc import abstractmethod
 from pathlib import Path
 
 from logger import get_logger
@@ -28,37 +26,6 @@ class LocalPaths:
     @property
     def analysis_date_time_file(self) -> Path:
         return self.all_results_directory.joinpath("analysis_date_time.txt")
-
-
-class FileNameCreator(ABC):
-    @abstractmethod
-    def get_file_name(self) -> str:
-        pass
-
-
-class AccountFileNameCreator(FileNameCreator):
-    # TODO move here the logic of
-    # - read config file
-    # - read results paths
-    # - get 1º account in config file not in results path
-    def __init__(self, account: str):
-        self._account = account
-
-    # TODO deprecate get_file_path_account_results, use this method instead
-    def get_file_name(self) -> str:
-        return get_account_file_name(self._account)
-
-
-class AccountsFileNameCreator(FileNameCreator):
-    # TODO deprecate file_s3_data_all_accounts with this
-    def get_file_name(self) -> str:
-        return ACCOUNTS_FILE_NAME
-
-
-class AnalysisFileNameCreator(FileNameCreator):
-    # TODO deprecate file_analysis() with this
-    def get_file_name(self) -> str:
-        return ANALYSIS_FILE_NAME
 
 
 class LocalResults:
