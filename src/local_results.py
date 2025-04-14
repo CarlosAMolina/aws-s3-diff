@@ -127,8 +127,7 @@ class _AnalysisPaths:
 
     @property
     def file_analysis(self) -> Path:
-        file_name = AnalysisFileNameCreator().get_file_name()
-        return self.directory_analysis.joinpath(file_name)
+        return self.directory_analysis.joinpath(ANALYSIS_FILE_NAME)
 
     @property
     def file_s3_data_all_accounts(self) -> Path:
