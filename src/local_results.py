@@ -42,7 +42,7 @@ class LocalResults:
     def __init__(self):
         self._logger = get_logger()
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
-        self._analysis_paths = None  # To avoid read/create file in __init__.
+        self._analysis_paths_cache = None  # To avoid read/create file in __init__.
 
     def has_this_account_been_analyzed(self, account: str) -> bool:
         return self._get_file_path_account_results(account).is_file()
@@ -68,11 +68,11 @@ class LocalResults:
 
     @property
     def analysis_paths(self) -> "_AnalysisPaths":
-        if self._analysis_paths is None:
+        if self._analysis_paths_cache is None:
             # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
             analysis_date_time_str = _AnalysisDateTime().get_analysis_date_time_str()
-            self._analysis_paths = _AnalysisPaths(analysis_date_time_str)
-        return self._analysis_paths
+            self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
+        return self._analysis_paths_cache
 
 
 class _AnalysisDateTime:
