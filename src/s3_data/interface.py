@@ -62,8 +62,7 @@ class CsvCreator(ABC):
         pass
 
     def _get_file_path(self) -> Path:
-        # TODO avoid access values of attribute of a class
-        return self._local_results.analysis_paths.directory_analysis.joinpath(self._file_name)
+        return self._local_results.get_file_path_results(self._file_name)
 
     @property
     @abstractmethod
