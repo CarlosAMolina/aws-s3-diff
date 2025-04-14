@@ -8,6 +8,7 @@ from pandas import read_csv
 
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
+from local_results import ACCOUNTS_FILE_NAME
 from local_results import AccountsFileNameCreator
 from local_results import FileNameCreator
 from local_results import LocalResults
@@ -47,7 +48,6 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
         self._local_results = LocalResults()
-        self._file_name_creator = AccountsFileNameCreator()
         # TODO deprecate these classes
         self._new_df_creator = _AccountsNewDfCreator()
 
@@ -66,7 +66,7 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._file_name_creator.get_file_name())
+        return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
 
 
 class _AccountsNewDfCreator(NewDfCreator):
