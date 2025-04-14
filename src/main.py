@@ -73,6 +73,7 @@ class _ProcessCreator:
         Some conditions avoid to generate a file if it exists.
         For example: the user drops the analysis file in order to run the program and generate the analysis again.
         """
+        # TODO not access attribute of attribute
         if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
             return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
@@ -124,6 +125,7 @@ class _FirstAccountProcess(_NoLastAccountProcess):
     def run(self):
         # The folder may exist but not the result file if an error occurred in the previous run,
         # e.g. errors interacting with S3.
+        # TODO not access attribute of attribute
         if not self._local_results.analysis_paths.directory_analysis.is_dir():
             self._local_results.create_directory_analysis()
         try:
