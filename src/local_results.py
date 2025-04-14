@@ -9,6 +9,10 @@ ACCOUNTS_FILE_NAME = "s3-files-all-accounts.csv"
 ANALYSIS_FILE_NAME = "analysis.md"
 
 
+def get_account_file_name(account: str) -> str:
+    return f"{account}.csv"
+
+
 class LocalPaths:
     def __init__(self):
         self._current_path = Path(__file__).parent.absolute()
@@ -42,7 +46,7 @@ class AccountFileNameCreator(FileNameCreator):
 
     # TODO deprecate get_file_path_account_results, use this method instead
     def get_file_name(self) -> str:
-        return f"{self._account}.csv"
+        return get_account_file_name(self._account)
 
 
 class AccountsFileNameCreator(FileNameCreator):
