@@ -122,4 +122,5 @@ class _AnalysisPaths:
         return self.directory_analysis.joinpath(file_name)
 
     def _get_analysis_date_time_str(self) -> str:
+        # TODO use _AnalysisDateTimeCreator and drop __init__ argument
         return self._analysis_date_time_str
