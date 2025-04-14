@@ -90,11 +90,7 @@ class _AnalysisDateTimeCreator:
 
     @property
     def _new_date_time_str(self) -> str:
-        return datetime.datetime.now().strftime(self._date_time_format)
-
-    @property
-    def _date_time_format(self) -> str:
-        return "%Y%m%d%H%M%S"
+        return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_date_time_str_stored(self) -> str:
         with open(self._analysis_date_time_file_path) as file:
