@@ -87,14 +87,17 @@ class _AnalysisDateTimeCreator:
             return file.read().strip()
 
 
+# TODO deprecate
 class _AnalysisPaths:
     def __init__(self, analysis_date_time_str: str):
-        self._analysis_date_time_str = analysis_date_time_str
+        self._analysis_date_time_str = (
+            analysis_date_time_str  # TODO use _AnalysisDateTimeCreator and drop __init__ argument
+        )
         self._all_results_directory_path = LocalPaths().all_results_directory
 
     @property
     def directory_analysis(self) -> Path:
-        return self._all_results_directory_path.joinpath(self._get_analysis_date_time_str())
+        return self._all_results_directory_path.joinpath(self._analysis_date_time_str)
 
     @property
     def file_analysis(self) -> Path:
@@ -103,7 +106,3 @@ class _AnalysisPaths:
     @property
     def file_s3_data_all_accounts(self) -> Path:
         return self.directory_analysis.joinpath(ACCOUNTS_FILE_NAME)
-
-    def _get_analysis_date_time_str(self) -> str:
-        # TODO use _AnalysisDateTimeCreator and drop __init__ argument
-        return self._analysis_date_time_str
