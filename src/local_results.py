@@ -5,6 +5,8 @@ from pathlib import Path
 
 from logger import get_logger
 
+ANALYSIS_FILE_NAME = "analysis.md"
+
 
 class LocalPaths:
     def __init__(self):
@@ -51,7 +53,7 @@ class AccountsFileNameCreator(FileNameCreator):
 class AnalysisFileNameCreator(FileNameCreator):
     # TODO deprecate file_analysis() with this
     def get_file_name(self) -> str:
-        return "analysis.csv"
+        return ANALYSIS_FILE_NAME
 
 
 class LocalResults:
