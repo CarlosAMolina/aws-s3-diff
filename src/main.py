@@ -10,6 +10,7 @@ from config_files import S3UrisFileChecker
 from config_files import S3UrisFileReader
 from exceptions import AnalysisConfigError
 from exceptions import FolderInS3UriError
+from local_results import ACCOUNTS_FILE_NAME
 from local_results import LocalResults
 from logger import get_logger
 from s3_data.all_accounts import AccountsDf
@@ -74,7 +75,7 @@ class _ProcessCreator:
         For example: the user drops the analysis file in order to run the program and generate the analysis again.
         """
         # TODO not access attribute of attribute
-        if self._local_results.analysis_paths.file_s3_data_all_accounts.is_file():
+        if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _NoCombinedS3DataProcess()
