@@ -52,7 +52,7 @@ class LocalResults:
 
     def _get_file_path_account_results(self, account: str):
         file_name = AccountFileNameCreator(account).get_file_name()
-        return self.analysis_paths.directory_analysis.joinpath(file_name)
+        return self.get_file_path_results(file_name)
 
     def drop_file_with_analysis_date(self):
         self._logger.debug(f"Removing the file: {self._analysis_date_time_file_path}")
