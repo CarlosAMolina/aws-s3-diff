@@ -27,8 +27,7 @@ class TestS3UriDfModifier(unittest.TestCase):
                 columns=["bucket", "prefix", "name", "date", "size", "hash"],
             )
         )
-        for test_data in self._get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash():
-            df, s3_uris_map_df = test_data
+        for df, s3_uris_map_df in self._get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash():
             with self.subTest(df=df, s3_uris_map_df=s3_uris_map_df):
                 assert_frame_equal(
                     expected_result,

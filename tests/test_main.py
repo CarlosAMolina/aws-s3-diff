@@ -109,7 +109,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/"
         )
-        for test_data in (
+        for expected_error_message, aws_error in (
             (
                 "Incorrect AWS credentials. Authenticate and run the program again",
                 _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build(),
@@ -130,7 +130,6 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                 FolderInS3UriError(message_error_subfolder),
             ),
         ):
-            expected_error_message, aws_error = test_data
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_extract.side_effect = aws_error
                 self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
