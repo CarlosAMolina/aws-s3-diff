@@ -1,7 +1,11 @@
+import importlib.util
 import os
+import pathlib
 import shutil
+import sys
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from unittest.mock import PropertyMock
 
@@ -31,11 +35,41 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
 
+    def test_run_if_should_work_ok_new(self):
+        # TODO refactor all lines in this function
+        current_path = pathlib.Path(__file__).parent.absolute()
+        src_path = current_path.parent.joinpath("src")
+        main_project_path = Path(__file__).parent.parent
+        with TemporaryDirectory() as tmp_directory_path_name:
+            # TODO copy fake test config  to tmp
+            print("Created temporary directory", tmp_directory_path_name)  # TODO rm
+            tmp_directory_path = Path(tmp_directory_path_name)
+            # Modify path to work with temporal directory #   # TODO do it in a better way
+            sys.path.remove(str(main_project_path))
+            sys.path.remove(str(src_path))
+            sys.path.append(str(tmp_directory_path))
+            sys.path.append(str(tmp_directory_path.joinpath("src")))
+            for folder_name in ["config", "s3-results", "src"]:
+                shutil.copytree(
+                    main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
+                )  # TODO ignore __pycache__
+            module_name = "tmp_main"
+            spec = importlib.util.spec_from_file_location(module_name, tmp_directory_path.joinpath("src/main.py"))
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+            with self._local_s3_server:
+                for account in S3UrisFileReader().get_accounts():  # TODO use tmp dir
+                    self._local_s3_server.create_objects(account)
+                    module._Main().run()
+                    # TODO add assertions
+
     @patch(
         "src.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
+    # TODO replace with test_run_if_should_work_ok_new
     def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
         with self._local_s3_server:
             for account in S3UrisFileReader().get_accounts():
