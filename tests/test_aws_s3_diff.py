@@ -49,29 +49,24 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 shutil.copytree(
                     main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
                 )  # TODO ignore __pycache__
-
-            module_name = "tmp_aws_s3_diff"
-            spec = importlib.util.spec_from_file_location(
-                module_name, tmp_directory_path.joinpath("aws_s3_diff/aws_s3_diff.py")
-            )
-            module = importlib.util.module_from_spec(spec)
-            sys.modules[module_name] = module
-
-            module_name = "tmp_local_results"
-            spec_local_results = importlib.util.spec_from_file_location(
-                module_name, tmp_directory_path.joinpath("aws_s3_diff/local_results.py")
-            )
-            module_local_results = importlib.util.module_from_spec(spec_local_results)
-            sys.modules[module_name] = module_local_results
-
-            spec.loader.exec_module(module)
-            spec_local_results.loader.exec_module(module_local_results)
+            modules = dict()
+            for module_name, module_file_path_name in [
+                ("tmp_aws_s3_diff", "aws_s3_diff/aws_s3_diff.py"),
+                ("tmp_local_results", "aws_s3_diff/local_results.py"),
+            ]:
+                spec = importlib.util.spec_from_file_location(
+                    module_name, tmp_directory_path.joinpath(module_file_path_name)
+                )
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = module
+                spec.loader.exec_module(module)
+                modules[module_name] = module
             with self._local_s3_server:
                 for account in S3UrisFileReader().get_accounts():  # TODO use tmp dir
                     self._local_s3_server.create_objects(account)
                     # TODO i think that the analyzed date time is not created in tmp path
-                    module.Main().run()
-                    analysis_paths = module_local_results._AnalysisPaths(
+                    modules["tmp_aws_s3_diff"].Main().run()
+                    analysis_paths = modules["tmp_local_results"]._AnalysisPaths(
                         self._get_analysis_date_time_str_new(tmp_directory_path.joinpath("s3-results"))
                     )
                     self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
