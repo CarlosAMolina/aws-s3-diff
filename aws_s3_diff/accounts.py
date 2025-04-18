@@ -1,5 +1,5 @@
-from config_files import S3UrisFileReader
-from local_results import LocalResults
+from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.local_results import LocalResults
 
 
 class AnalyzedAccounts:

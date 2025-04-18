@@ -1,20 +1,21 @@
 from abc import ABC
 from abc import abstractmethod
 
-from accounts import AnalyzedAccounts
 from botocore.exceptions import ClientError
-from config_files import AnalysisConfigChecker
-from config_files import AnalysisConfigReader
-from config_files import S3UrisFileChecker
-from config_files import S3UrisFileReader
-from exceptions import AnalysisConfigError
-from exceptions import FolderInS3UriError
-from local_results import ACCOUNTS_FILE_NAME
-from local_results import LocalResults
-from logger import get_logger
-from s3_data.all_accounts import AccountsDf
-from s3_data.analysis import AnalysisCsvCreator
-from s3_data.one_account import AccountCsvCreator
+
+from aws_s3_diff.accounts import AnalyzedAccounts
+from aws_s3_diff.config_files import AnalysisConfigChecker
+from aws_s3_diff.config_files import AnalysisConfigReader
+from aws_s3_diff.config_files import S3UrisFileChecker
+from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.exceptions import AnalysisConfigError
+from aws_s3_diff.exceptions import FolderInS3UriError
+from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
+from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.logger import get_logger
+from aws_s3_diff.s3_data.all_accounts import AccountsDf
+from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
+from aws_s3_diff.s3_data.one_account import AccountCsvCreator
 
 _logger = get_logger()
 

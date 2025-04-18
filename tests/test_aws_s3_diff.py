@@ -1,6 +1,5 @@
 import importlib.util
 import os
-import pathlib
 import shutil
 import sys
 import unittest
@@ -37,16 +36,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
     def test_run_if_should_work_ok_new(self):
         # TODO refactor all lines in this function
-        current_path = pathlib.Path(__file__).parent.absolute()
-        src_path = current_path.parent.joinpath("aws_s3_diff")
         main_project_path = Path(__file__).parent.parent
         with TemporaryDirectory() as tmp_directory_path_name:
             # TODO copy fake test config  to tmp
             print("Created temporary directory", tmp_directory_path_name)  # TODO rm
             tmp_directory_path = Path(tmp_directory_path_name)
-            # Modify path to work with temporal directory #   # TODO do it in a better way
-            sys.path.remove(str(main_project_path))
-            sys.path.remove(str(src_path))
             sys.path.append(str(tmp_directory_path))
             sys.path.append(str(tmp_directory_path.joinpath("aws_s3_diff")))
             for folder_name in ["config", "s3-results", "aws_s3_diff"]:

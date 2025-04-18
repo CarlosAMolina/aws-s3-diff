@@ -3,11 +3,12 @@ import re
 from pathlib import Path
 
 import numpy as np
-from exceptions import AnalysisConfigError
-from local_results import LocalPaths
 from pandas import DataFrame as Df
 from pandas import read_csv
-from types_custom import S3Query
+
+from aws_s3_diff.exceptions import AnalysisConfigError
+from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.types_custom import S3Query
 
 FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
 FILE_NAME_S3_URIS_TO_ANALYZE = "s3-uris-to-analyze.csv"

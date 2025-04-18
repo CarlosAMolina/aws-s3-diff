@@ -1,7 +1,7 @@
 import datetime
 from pathlib import Path
 
-from logger import get_logger
+from aws_s3_diff.logger import get_logger
 
 ACCOUNTS_FILE_NAME = "s3-files-all-accounts.csv"
 ANALYSIS_FILE_NAME = "analysis.md"

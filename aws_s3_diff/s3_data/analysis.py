@@ -3,18 +3,19 @@ from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
 
-from config_files import AnalysisConfigReader
-from local_results import ANALYSIS_FILE_NAME
-from logger import get_logger
 from pandas import DataFrame as Df
 from pandas import Series
-from s3_data.all_accounts import AccountsDf
-from s3_data.interface import CsvCreator
-from s3_data.interface import FromMultiSimpleIndexDfCreator
-from s3_data.interface import MultiIndexDfCreator
-from s3_data.interface import NewDfCreator
-from s3_data.interface import SimpleIndexDfCreator
-from types_custom import MultiIndexDf
+
+from aws_s3_diff.config_files import AnalysisConfigReader
+from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
+from aws_s3_diff.logger import get_logger
+from aws_s3_diff.s3_data.all_accounts import AccountsDf
+from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
+from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
+from aws_s3_diff.s3_data.interface import NewDfCreator
+from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
+from aws_s3_diff.types_custom import MultiIndexDf
 
 
 # TODO

@@ -3,10 +3,11 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import boto3
-from exceptions import FolderInS3UriError
-from types_custom import FileS3Data
-from types_custom import S3Data
-from types_custom import S3Query
+
+from aws_s3_diff.exceptions import FolderInS3UriError
+from aws_s3_diff.types_custom import FileS3Data
+from aws_s3_diff.types_custom import S3Data
+from aws_s3_diff.types_custom import S3Query
 
 
 class S3Client:

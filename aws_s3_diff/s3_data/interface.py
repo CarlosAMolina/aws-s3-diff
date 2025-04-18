@@ -2,9 +2,9 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 
-from local_results import LocalResults
-from logger import get_logger
-from types_custom import Df
+from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.logger import get_logger
+from aws_s3_diff.types_custom import Df
 
 
 class DfCreator(ABC):

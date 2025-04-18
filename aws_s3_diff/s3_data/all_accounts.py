@@ -1,22 +1,23 @@
 import re
 from pathlib import Path
 
-from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
-from config_files import S3UrisFileReader
-from local_results import ACCOUNTS_FILE_NAME
-from local_results import LocalResults
 from pandas import DataFrame as Df
 from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
-from s3_data.interface import CsvCreator
-from s3_data.interface import FromCsvDfCreator
-from s3_data.interface import FromMultiSimpleIndexDfCreator
-from s3_data.interface import FromSimpleMultiIndexDfCreator
-from s3_data.interface import NewDfCreator
-from s3_data.interface import SimpleIndexDfCreator
-from s3_data.one_account import AccountDf
-from types_custom import MultiIndexDf
+
+from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
+from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
+from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.s3_data.interface import FromCsvDfCreator
+from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
+from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
+from aws_s3_diff.s3_data.interface import NewDfCreator
+from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
+from aws_s3_diff.s3_data.one_account import AccountDf
+from aws_s3_diff.types_custom import MultiIndexDf
 
 
 # TODO deprecate

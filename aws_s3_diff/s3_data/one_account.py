@@ -2,24 +2,25 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pandas as pd
-from accounts import AnalyzedAccounts
-from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
-from config_files import S3UrisFileReader
-from local_results import get_account_file_name
-from local_results import LocalResults
-from logger import get_logger
 from pandas import DataFrame as Df
 from pandas import MultiIndex
-from s3_data.interface import CsvCreator
-from s3_data.interface import FromCsvDfCreator
-from s3_data.interface import MultiIndexDfCreator
-from s3_data.interface import NewDfCreator
-from s3_data.interface import SimpleIndexDfCreator
-from s3_data.s3_client import S3Client
-from types_custom import FileS3Data
-from types_custom import MultiIndexDf
-from types_custom import S3Data
-from types_custom import S3Query
+
+from aws_s3_diff.accounts import AnalyzedAccounts
+from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
+from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.local_results import get_account_file_name
+from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.logger import get_logger
+from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.s3_data.interface import FromCsvDfCreator
+from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
+from aws_s3_diff.s3_data.interface import NewDfCreator
+from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
+from aws_s3_diff.s3_data.s3_client import S3Client
+from aws_s3_diff.types_custom import FileS3Data
+from aws_s3_diff.types_custom import MultiIndexDf
+from aws_s3_diff.types_custom import S3Data
+from aws_s3_diff.types_custom import S3Query
 
 # TODO deprecate `account` argument in all classes, genereate it by checking the files
 

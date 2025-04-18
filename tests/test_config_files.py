@@ -2,10 +2,9 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from exceptions import AnalysisConfigError
-from types_custom import S3Query
-
 from aws_s3_diff import config_files as m_config_files
+from aws_s3_diff.exceptions import AnalysisConfigError
+from aws_s3_diff.types_custom import S3Query
 
 
 class TestAnalysisConfigChecker(unittest.TestCase):
