@@ -1,15 +1,14 @@
 import re
 from pathlib import Path
 
-from pandas import DataFrame as Df
-from pandas import Index
-from pandas import MultiIndex
-from pandas import read_csv
-
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import ACCOUNTS_FILE_NAME
 from local_results import LocalResults
+from pandas import DataFrame as Df
+from pandas import Index
+from pandas import MultiIndex
+from pandas import read_csv
 from s3_data.interface import CsvCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import FromMultiSimpleIndexDfCreator

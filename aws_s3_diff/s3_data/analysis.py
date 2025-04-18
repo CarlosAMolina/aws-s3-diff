@@ -3,12 +3,11 @@ from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
 
-from pandas import DataFrame as Df
-from pandas import Series
-
 from config_files import AnalysisConfigReader
 from local_results import ANALYSIS_FILE_NAME
 from logger import get_logger
+from pandas import DataFrame as Df
+from pandas import Series
 from s3_data.all_accounts import AccountsDf
 from s3_data.interface import CsvCreator
 from s3_data.interface import FromMultiSimpleIndexDfCreator

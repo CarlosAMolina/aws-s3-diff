@@ -15,10 +15,10 @@ ruff-format:
 	poetry run ruff format
 
 run:
-	poetry run python src/main.py
+	poetry run python aws_s3_diff/main.py
 
 run-using-local-s3-server:
-	export AWS_ENDPOINT=http://localhost:5000 && poetry run python src/main.py
+	export AWS_ENDPOINT=http://localhost:5000 && poetry run python aws_s3_diff/main.py
 
 start-local-s3-server:
 	poetry run python tests/run_local_s3_server.py

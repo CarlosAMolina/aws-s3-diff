@@ -2,15 +2,14 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pandas as pd
-from pandas import DataFrame as Df
-from pandas import MultiIndex
-
 from accounts import AnalyzedAccounts
 from config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from config_files import S3UrisFileReader
 from local_results import get_account_file_name
 from local_results import LocalResults
 from logger import get_logger
+from pandas import DataFrame as Df
+from pandas import MultiIndex
 from s3_data.interface import CsvCreator
 from s3_data.interface import FromCsvDfCreator
 from s3_data.interface import MultiIndexDfCreator

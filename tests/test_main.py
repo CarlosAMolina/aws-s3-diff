@@ -14,13 +14,13 @@ from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
-from src.config_files import S3UrisFileReader
-from src.local_results import _AnalysisPaths
-from src.local_results import LocalPaths
-from src.local_results import LocalResults
-from src.main import _Main
-from src.main import AnalysisConfigError
-from src.main import FolderInS3UriError
+from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.local_results import _AnalysisPaths
+from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.main import _Main
+from aws_s3_diff.main import AnalysisConfigError
+from aws_s3_diff.main import FolderInS3UriError
 from tests.aws import S3Server
 
 
@@ -38,7 +38,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def test_run_if_should_work_ok_new(self):
         # TODO refactor all lines in this function
         current_path = pathlib.Path(__file__).parent.absolute()
-        src_path = current_path.parent.joinpath("src")
+        src_path = current_path.parent.joinpath("aws_s3_diff")
         main_project_path = Path(__file__).parent.parent
         with TemporaryDirectory() as tmp_directory_path_name:
             # TODO copy fake test config  to tmp
@@ -48,13 +48,15 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             sys.path.remove(str(main_project_path))
             sys.path.remove(str(src_path))
             sys.path.append(str(tmp_directory_path))
-            sys.path.append(str(tmp_directory_path.joinpath("src")))
-            for folder_name in ["config", "s3-results", "src"]:
+            sys.path.append(str(tmp_directory_path.joinpath("aws_s3_diff")))
+            for folder_name in ["config", "s3-results", "aws_s3_diff"]:
                 shutil.copytree(
                     main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
                 )  # TODO ignore __pycache__
             module_name = "tmp_main"
-            spec = importlib.util.spec_from_file_location(module_name, tmp_directory_path.joinpath("src/main.py"))
+            spec = importlib.util.spec_from_file_location(
+                module_name, tmp_directory_path.joinpath("aws_s3_diff/main.py")
+            )
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
@@ -65,7 +67,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                     # TODO add assertions
 
     @patch(
-        "src.main.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
@@ -121,18 +123,18 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
 
 class TestMainWithoutLocalS3Server(unittest.TestCase):
-    @patch("src.main._Main._run_without_catching_exceptions")
+    @patch("aws_s3_diff.main._Main._run_without_catching_exceptions")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
         mock_run.side_effect = AnalysisConfigError("foo")
         with self.assertLogs(level="ERROR") as cm:
             _Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
-    @patch("src.main.LocalResults")
-    @patch("src.main.AnalyzedAccounts")
-    @patch("src.main.AccountCsvCreator.export_csv")
+    @patch("aws_s3_diff.main.LocalResults")
+    @patch("aws_s3_diff.main.AnalyzedAccounts")
+    @patch("aws_s3_diff.main.AccountCsvCreator.export_csv")
     @patch(
-        "src.main.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.main.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )

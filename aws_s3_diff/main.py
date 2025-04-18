@@ -1,9 +1,8 @@
 from abc import ABC
 from abc import abstractmethod
 
-from botocore.exceptions import ClientError
-
 from accounts import AnalyzedAccounts
+from botocore.exceptions import ClientError
 from config_files import AnalysisConfigChecker
 from config_files import AnalysisConfigReader
 from config_files import S3UrisFileChecker

@@ -3,13 +3,14 @@ from pathlib import Path
 from unittest import mock
 
 from exceptions import AnalysisConfigError
-from src import config_files as m_config_files
 from types_custom import S3Query
+
+from aws_s3_diff import config_files as m_config_files
 
 
 class TestAnalysisConfigChecker(unittest.TestCase):
-    @mock.patch("src.config_files.AnalysisConfigReader")
-    @mock.patch("src.config_files.S3UrisFileReader")
+    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_origin_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -22,8 +23,8 @@ class TestAnalysisConfigChecker(unittest.TestCase):
             str(exception.exception),
         )
 
-    @mock.patch("src.config_files.AnalysisConfigReader")
-    @mock.patch("src.config_files.S3UrisFileReader")
+    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_target_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -37,8 +38,8 @@ class TestAnalysisConfigChecker(unittest.TestCase):
             str(exception.exception),
         )
 
-    @mock.patch("src.config_files.AnalysisConfigReader")
-    @mock.patch("src.config_files.S3UrisFileReader")
+    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_target_accounts_do_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -71,7 +72,7 @@ class TestS3UriParts(unittest.TestCase):
 
 class TestS3UrisFileReader(unittest.TestCase):
     @mock.patch(
-        "src.config_files.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
@@ -103,21 +104,21 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
-    @mock.patch("src.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
     def test_assert_file_is_correct_raises_exception_if_empty_account(self, mock_file_path_what_to_analyze):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_account.csv")
         with self.assertRaises(ValueError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Some AWS account names are empty", str(exception.exception))
 
-    @mock.patch("src.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
     def test_assert_file_is_correct_raises_exception_if_empty_uri(self, mock_file_path_what_to_analyze):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_uri.csv")
         with self.assertRaises(ValueError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Some URIs are empty", str(exception.exception))
 
-    @mock.patch("src.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
+    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
     def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_file_path_what_to_analyze):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("duplicated_uri.csv")
         with self.assertRaises(ValueError) as exception:

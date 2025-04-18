@@ -3,11 +3,10 @@ import re
 from pathlib import Path
 
 import numpy as np
-from pandas import DataFrame as Df
-from pandas import read_csv
-
 from exceptions import AnalysisConfigError
 from local_results import LocalPaths
+from pandas import DataFrame as Df
+from pandas import read_csv
 from types_custom import S3Query
 
 FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"

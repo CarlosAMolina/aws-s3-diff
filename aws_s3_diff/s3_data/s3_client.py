@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import boto3
-
 from exceptions import FolderInS3UriError
 from types_custom import FileS3Data
 from types_custom import S3Data

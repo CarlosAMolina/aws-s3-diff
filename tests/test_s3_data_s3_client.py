@@ -1,13 +1,14 @@
 import unittest
 from unittest.mock import patch
 
-from src.s3_data.s3_client import FolderInS3UriError
-from src.s3_data.s3_client import S3Client
 from types_custom import S3Query
+
+from aws_s3_diff.s3_data.s3_client import FolderInS3UriError
+from aws_s3_diff.s3_data.s3_client import S3Client
 
 
 class TestS3Client(unittest.TestCase):
-    @patch("src.s3_data.s3_client.boto3")
+    @patch("aws_s3_diff.s3_data.s3_client.boto3")
     def test_get_s3_data_raises_folder_error(self, mock_boto3):
         mock_boto3.Session().client().list_objects_v2.return_value = {
             "ResponseMetadata": {
