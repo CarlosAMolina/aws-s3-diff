@@ -34,6 +34,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
 
+    # TODO rename drop new
+    # TODO uncomment
     def test_run_if_should_work_ok_new(self):
         # TODO refactor all lines in this function
         main_project_path = Path(__file__).parent.parent
@@ -47,18 +49,33 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 shutil.copytree(
                     main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
                 )  # TODO ignore __pycache__
+
             module_name = "tmp_aws_s3_diff"
             spec = importlib.util.spec_from_file_location(
                 module_name, tmp_directory_path.joinpath("aws_s3_diff/aws_s3_diff.py")
             )
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
+
+            module_name = "tmp_local_results"
+            spec_local_results = importlib.util.spec_from_file_location(
+                module_name, tmp_directory_path.joinpath("aws_s3_diff/local_results.py")
+            )
+            module_local_results = importlib.util.module_from_spec(spec_local_results)
+            sys.modules[module_name] = module_local_results
+
             spec.loader.exec_module(module)
+            spec_local_results.loader.exec_module(module_local_results)
             with self._local_s3_server:
                 for account in S3UrisFileReader().get_accounts():  # TODO use tmp dir
                     self._local_s3_server.create_objects(account)
+                    # TODO i think that the analyzed date time is not created in tmp path
                     module.Main().run()
-                    # TODO add assertions
+                    analysis_paths = module_local_results._AnalysisPaths(
+                        self._get_analysis_date_time_str_new(tmp_directory_path.joinpath("s3-results"))
+                    )
+                    self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
+                    self._assert_analysis_file_has_expected_values(analysis_paths)
 
     @patch(
         "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
@@ -76,10 +93,18 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._assert_analysis_file_has_expected_values(analysis_paths)
         shutil.rmtree(analysis_paths.directory_analysis)
 
+    # TODO replace with _get_analysis_date_time_str_new
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
             directory_path.name for directory_path in LocalPaths().all_results_directory.glob("20*")
         ]
+        analysis_directory_names.sort()
+        return analysis_directory_names[-1]
+
+    # TODO rename drop new
+    def _get_analysis_date_time_str_new(self, all_results_directory_path: Path) -> str:
+        analysis_directory_names = [directory_path.name for directory_path in all_results_directory_path.glob("20*")]
+        # TODO? assert only 1 date folder and drop lines below
         analysis_directory_names.sort()
         return analysis_directory_names[-1]
 
