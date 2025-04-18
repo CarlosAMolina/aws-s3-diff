@@ -167,7 +167,3 @@ class _AnalysisProcess(_Process):
         else:
             _logger.info("No analysis configured. Omitting")
         LocalResults().drop_file_with_analysis_date()
-
-
-if __name__ == "__main__":
-    Main().run()
