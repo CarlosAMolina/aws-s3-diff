@@ -19,7 +19,7 @@ from s3_data.one_account import AccountCsvCreator
 _logger = get_logger()
 
 
-class _Main:
+class Main:
     def __init__(self):
         self._process_creator = _ProcessCreator()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -169,4 +169,4 @@ class _AnalysisProcess(_Process):
 
 
 if __name__ == "__main__":
-    _Main().run()
+    Main().run()

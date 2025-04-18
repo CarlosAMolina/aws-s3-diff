@@ -14,13 +14,13 @@ from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
+from aws_s3_diff.aws_s3_diff import AnalysisConfigError
+from aws_s3_diff.aws_s3_diff import FolderInS3UriError
+from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import _AnalysisPaths
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.local_results import LocalResults
-from aws_s3_diff.main import _Main
-from aws_s3_diff.main import AnalysisConfigError
-from aws_s3_diff.main import FolderInS3UriError
 from tests.aws import S3Server
 
 
@@ -53,9 +53,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 shutil.copytree(
                     main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
                 )  # TODO ignore __pycache__
-            module_name = "tmp_main"
+            module_name = "tmp_aws_s3_diff"
             spec = importlib.util.spec_from_file_location(
-                module_name, tmp_directory_path.joinpath("aws_s3_diff/main.py")
+                module_name, tmp_directory_path.joinpath("aws_s3_diff/aws_s3_diff.py")
             )
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
@@ -63,11 +63,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             with self._local_s3_server:
                 for account in S3UrisFileReader().get_accounts():  # TODO use tmp dir
                     self._local_s3_server.create_objects(account)
-                    module._Main().run()
+                    module.Main().run()
                     # TODO add assertions
 
     @patch(
-        "aws_s3_diff.main.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
@@ -76,7 +76,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         with self._local_s3_server:
             for account in S3UrisFileReader().get_accounts():
                 self._local_s3_server.create_objects(account)
-                _Main().run()
+                Main().run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
@@ -123,18 +123,18 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
 
 class TestMainWithoutLocalS3Server(unittest.TestCase):
-    @patch("aws_s3_diff.main._Main._run_without_catching_exceptions")
+    @patch("aws_s3_diff.aws_s3_diff.Main._run_without_catching_exceptions")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_run):
         mock_run.side_effect = AnalysisConfigError("foo")
         with self.assertLogs(level="ERROR") as cm:
-            _Main().run()
+            Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
-    @patch("aws_s3_diff.main.LocalResults")
-    @patch("aws_s3_diff.main.AnalyzedAccounts")
-    @patch("aws_s3_diff.main.AccountCsvCreator.export_csv")
+    @patch("aws_s3_diff.aws_s3_diff.LocalResults")
+    @patch("aws_s3_diff.aws_s3_diff.AnalyzedAccounts")
+    @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.export_csv")
     @patch(
-        "aws_s3_diff.main.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
@@ -170,7 +170,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                 mock_extract.side_effect = aws_error
                 self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
-                    _Main().run()
+                    Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
     def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):
