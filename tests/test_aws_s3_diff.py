@@ -52,6 +52,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             modules = dict()
             for module_name, module_file_path_name in [
                 ("tmp_aws_s3_diff", "aws_s3_diff/aws_s3_diff.py"),
+                ("tmp_config_files", "aws_s3_diff/config_files.py"),
                 ("tmp_local_results", "aws_s3_diff/local_results.py"),
             ]:
                 spec = importlib.util.spec_from_file_location(
@@ -62,7 +63,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 spec.loader.exec_module(module)
                 modules[module_name] = module
             with self._local_s3_server:
-                for account in S3UrisFileReader().get_accounts():  # TODO use tmp dir
+                for account in modules["tmp_config_files"].S3UrisFileReader().get_accounts():
                     self._local_s3_server.create_objects(account)
                     # TODO i think that the analyzed date time is not created in tmp path
                     modules["tmp_aws_s3_diff"].Main().run()
