@@ -43,9 +43,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
                 Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
             )
-            with S3Server():
+            with S3Server() as local_s3_server:
                 for account in S3UrisFileReader().get_accounts():
-                    S3Server.create_objects(account)
+                    local_s3_server.create_objects(account)
                     Main().run()
             analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
             self._assert_extracted_accounts_data_have_expected_values(analysis_paths)

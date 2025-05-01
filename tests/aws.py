@@ -11,14 +11,14 @@ class S3Server:
         set_aws_credentials()
         self._mock_aws = mock_aws()
 
-    def __enter__(self):
+    def __enter__(self) -> "S3Server":
         self._start()
+        return self
 
     def __exit__(self, *args):
         self._stop()
 
-    @staticmethod
-    def create_objects(folder_name_with_files):
+    def create_objects(self, folder_name_with_files):
         S3(folder_name_with_files).create_objects()
 
     def _start(self):
