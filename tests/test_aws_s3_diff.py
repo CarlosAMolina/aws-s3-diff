@@ -1,10 +1,8 @@
-import importlib.util
 import os
 import shutil
-import sys
+import tempfile
 import unittest
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from unittest.mock import PropertyMock
 
@@ -30,64 +28,35 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         if LocalPaths().analysis_date_time_file.is_file():
             LocalResults().drop_file_with_analysis_date()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
+        self._original_current_path = LocalPaths._current_path
 
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
+        LocalPaths._current_path = self._original_current_path
 
-    # TODO rename drop new
-    # TODO uncomment
-    def test_run_if_should_work_ok_new(self):
-        # TODO refactor all lines in this function
-        main_project_path = Path(__file__).parent.parent
-        with TemporaryDirectory() as tmp_directory_path_name:
-            # TODO copy fake test config  to tmp
-            print("Created temporary directory", tmp_directory_path_name)  # TODO rm
-            tmp_directory_path = Path(tmp_directory_path_name)
-            sys.path.append(str(tmp_directory_path))
-            sys.path.append(str(tmp_directory_path.joinpath("aws_s3_diff")))
-            for folder_name in ["config", "s3-results", "aws_s3_diff"]:
-                shutil.copytree(
-                    main_project_path.joinpath(folder_name), tmp_directory_path.joinpath(folder_name)
-                )  # TODO ignore __pycache__
-            modules = dict()
-            for module_name, module_file_path_name in [
-                ("tmp_aws_s3_diff", "aws_s3_diff/aws_s3_diff.py"),
-                ("tmp_config_files", "aws_s3_diff/config_files.py"),
-                ("tmp_local_results", "aws_s3_diff/local_results.py"),
-            ]:
-                spec = importlib.util.spec_from_file_location(
-                    module_name, tmp_directory_path.joinpath(module_file_path_name)
-                )
-                module = importlib.util.module_from_spec(spec)
-                sys.modules[module_name] = module
-                spec.loader.exec_module(module)
-                modules[module_name] = module
-            with self._local_s3_server:
-                for account in modules["tmp_config_files"].S3UrisFileReader().get_accounts():
-                    self._local_s3_server.create_objects(account)
-                    # TODO i think that the analyzed date time is not created in tmp path
-                    modules["tmp_aws_s3_diff"].Main().run()
-                    analysis_paths = modules["tmp_local_results"]._AnalysisPaths(
-                        self._get_analysis_date_time_str_new(tmp_directory_path.joinpath("s3-results"))
-                    )
-                    self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
-                    self._assert_analysis_file_has_expected_values(analysis_paths)
-
+    # TODO rm patch, use tmp instead
     @patch(
         "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
-    # TODO replace with test_run_if_should_work_ok_new
     def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
-        with self._local_s3_server:
-            for account in S3UrisFileReader().get_accounts():
-                self._local_s3_server.create_objects(account)
-                Main().run()
-        analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
-        self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
-        self._assert_analysis_file_has_expected_values(analysis_paths)
-        shutil.rmtree(analysis_paths.directory_analysis)
+        with tempfile.TemporaryDirectory() as tmp_directory_path_name:
+            Path(tmp_directory_path_name).joinpath("s3-results").mkdir()
+            Path(tmp_directory_path_name).joinpath("config").mkdir()
+            Path(tmp_directory_path_name).joinpath("aws_s3_diff").mkdir()
+            LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
+            shutil.copyfile(
+                Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
+                Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
+            )
+            with self._local_s3_server:
+                for account in S3UrisFileReader().get_accounts():
+                    self._local_s3_server.create_objects(account)
+                    Main().run()
+            analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+            self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
+            self._assert_analysis_file_has_expected_values(analysis_paths)
 
     # TODO replace with _get_analysis_date_time_str_new
     def _get_analysis_date_time_str(self) -> str:

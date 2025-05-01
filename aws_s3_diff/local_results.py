@@ -12,8 +12,7 @@ def get_account_file_name(account: str) -> str:
 
 
 class LocalPaths:
-    def __init__(self):
-        self._current_path = Path(__file__).parent.absolute()
+    _current_path = Path(__file__).parent.absolute()
 
     @property
     def config_directory(self) -> Path:
