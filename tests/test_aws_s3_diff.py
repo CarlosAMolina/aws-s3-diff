@@ -24,32 +24,32 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def setUp(self):
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
         self._original_current_path = LocalPaths._current_path
+        tmp_directory_path_name = self.enterContext(tempfile.TemporaryDirectory())
+        LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
+        Path(tmp_directory_path_name).joinpath("s3-results").mkdir()
+        Path(tmp_directory_path_name).joinpath("config").mkdir()
+        Path(tmp_directory_path_name).joinpath("aws_s3_diff").mkdir()
+        shutil.copyfile(
+            Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
+            Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
+        )
+        shutil.copyfile(
+            Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
+            Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
+        )
 
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
 
     def test_run_if_should_work_ok(self):
-        with tempfile.TemporaryDirectory() as tmp_directory_path_name:
-            Path(tmp_directory_path_name).joinpath("s3-results").mkdir()
-            Path(tmp_directory_path_name).joinpath("config").mkdir()
-            Path(tmp_directory_path_name).joinpath("aws_s3_diff").mkdir()
-            LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
-            shutil.copyfile(
-                Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
-                Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
-            )
-            shutil.copyfile(
-                Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-                Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
-            )
-            with S3Server() as local_s3_server:
-                for account in S3UrisFileReader().get_accounts():
-                    local_s3_server.create_objects(account)
-                    Main().run()
-            analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
-            self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
-            self._assert_analysis_file_has_expected_values(analysis_paths)
+        with S3Server() as local_s3_server:
+            for account in S3UrisFileReader().get_accounts():
+                local_s3_server.create_objects(account)
+                Main().run()
+        analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
+        self._assert_analysis_file_has_expected_values(analysis_paths)
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
