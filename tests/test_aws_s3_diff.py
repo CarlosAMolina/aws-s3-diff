@@ -44,7 +44,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
 
-    def test_run_if_should_work_ok(self):
+    def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:
             for account in S3UrisFileReader().get_accounts():
                 local_s3_server.create_objects(account)
