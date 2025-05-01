@@ -28,14 +28,17 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
             Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
-        shutil.copyfile(
-            Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
-            Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
-        )
-        shutil.copyfile(
-            Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-            Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
-        )
+        for origin_path, final_path in [
+            (
+                Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
+                Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
+            ),
+            (
+                Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
+                Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
+            ),
+        ]:
+            shutil.copyfile(origin_path, final_path)
 
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
