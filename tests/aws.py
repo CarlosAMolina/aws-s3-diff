@@ -17,7 +17,8 @@ class S3Server:
     def __exit__(self, *args):
         self._stop()
 
-    def create_objects(self, folder_name_with_files):
+    @staticmethod
+    def create_objects(folder_name_with_files):
         S3(folder_name_with_files).create_objects()
 
     def _start(self):

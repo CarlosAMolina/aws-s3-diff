@@ -22,7 +22,6 @@ from tests.aws import S3Server
 
 class TestMainWithLocalS3Server(unittest.TestCase):
     def setUp(self):
-        self._local_s3_server = S3Server()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
         self._original_current_path = LocalPaths._current_path
 
@@ -44,9 +43,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
                 Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
             )
-            with self._local_s3_server:
+            with S3Server():
                 for account in S3UrisFileReader().get_accounts():
-                    self._local_s3_server.create_objects(account)
+                    S3Server.create_objects(account)
                     Main().run()
             analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
             self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
