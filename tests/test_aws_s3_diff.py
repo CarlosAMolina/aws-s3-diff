@@ -56,18 +56,10 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
             self._assert_analysis_file_has_expected_values(analysis_paths)
 
-    # TODO replace with _get_analysis_date_time_str_new
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
             directory_path.name for directory_path in LocalPaths().all_results_directory.glob("20*")
         ]
-        analysis_directory_names.sort()
-        return analysis_directory_names[-1]
-
-    # TODO rename drop new
-    def _get_analysis_date_time_str_new(self, all_results_directory_path: Path) -> str:
-        analysis_directory_names = [directory_path.name for directory_path in all_results_directory_path.glob("20*")]
-        # TODO? assert only 1 date folder and drop lines below
         analysis_directory_names.sort()
         return analysis_directory_names[-1]
 
