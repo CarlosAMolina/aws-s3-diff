@@ -17,16 +17,12 @@ from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import _AnalysisPaths
 from aws_s3_diff.local_results import LocalPaths
-from aws_s3_diff.local_results import LocalResults
 from tests.aws import S3Server
 
 
 class TestMainWithLocalS3Server(unittest.TestCase):
     def setUp(self):
         self._local_s3_server = S3Server()
-        # Drop file created by the user
-        if LocalPaths().analysis_date_time_file.is_file():
-            LocalResults().drop_file_with_analysis_date()
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
         self._original_current_path = LocalPaths._current_path
 
