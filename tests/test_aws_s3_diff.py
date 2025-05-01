@@ -34,13 +34,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
 
-    # TODO rm patch, use tmp instead
-    @patch(
-        "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-    )
-    def test_run_if_should_work_ok(self, mock_file_path_what_to_analyze):
+    def test_run_if_should_work_ok(self):
         with tempfile.TemporaryDirectory() as tmp_directory_path_name:
             Path(tmp_directory_path_name).joinpath("s3-results").mkdir()
             Path(tmp_directory_path_name).joinpath("config").mkdir()
@@ -49,6 +43,10 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             shutil.copyfile(
                 Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
                 Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
+            )
+            shutil.copyfile(
+                Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
+                Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
             )
             with self._local_s3_server:
                 for account in S3UrisFileReader().get_accounts():
