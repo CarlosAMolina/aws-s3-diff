@@ -26,9 +26,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._original_current_path = LocalPaths._current_path
         tmp_directory_path_name = self.enterContext(tempfile.TemporaryDirectory())
         LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
-        Path(tmp_directory_path_name).joinpath("s3-results").mkdir()
-        Path(tmp_directory_path_name).joinpath("config").mkdir()
-        Path(tmp_directory_path_name).joinpath("aws_s3_diff").mkdir()
+        for folder_name in ["aws_s3_diff", "config", "s3-results"]:
+            Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
         shutil.copyfile(
             Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
             Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
