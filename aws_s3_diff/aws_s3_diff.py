@@ -73,6 +73,7 @@ class Main:
         _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
 
+# TODO rename to _State
 class _Process(ABC):
     @abstractmethod
     def run(self):
