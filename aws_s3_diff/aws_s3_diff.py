@@ -59,7 +59,7 @@ class Main:
             process.run()
             if isinstance(process, _AnalysisProcess):
                 break
-            if isinstance(process, _NoLastAccountProcess):
+            if isinstance(process, (_FirstAccountProcess, _IntermediateAccountProcess)):
                 break
 
     def _show_accounts_to_analyze(self):
