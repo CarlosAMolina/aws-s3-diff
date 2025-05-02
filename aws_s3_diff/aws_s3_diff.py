@@ -108,16 +108,21 @@ class _AccountProcess(_Process):
         self._account_csv_creator.export_csv()
 
 
-class _NoLastAccountProcess(_AccountProcess):
-    def run(self):
-        super().run()
-        self._show_next_account_to_analyze()
+class _NextAccountToAnalize:
+    def __init__(self):
+        self._analyzed_accounts = AnalyzedAccounts()
 
-    def _show_next_account_to_analyze(self):
+    def log(self):
         _logger.info(
             f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
             ". Authenticate and run the program again"
         )
+
+
+class _NoLastAccountProcess(_AccountProcess):
+    def run(self):
+        super().run()
+        _NextAccountToAnalize().log()  # TODO? initialice in init
 
 
 class _FirstAccountProcess(_NoLastAccountProcess):
