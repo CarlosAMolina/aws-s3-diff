@@ -78,7 +78,7 @@ class _ProcessCreator:
         if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
-            return _NoCombinedS3DataProcess()
+            return _CombineS3DataProcess()
         return _AccountProcessCreator().get_process()
 
 
@@ -145,10 +145,10 @@ class _IntermediateAccountProcess(_NoLastAccountProcess):
 class _LastAccountProcess(_AccountProcess):
     def run(self):
         super().run()
-        _NoCombinedS3DataProcess().run()
+        _CombineS3DataProcess().run()
 
 
-class _NoCombinedS3DataProcess(_Process):
+class _CombineS3DataProcess(_Process):
     def run(self):
         AccountsDf().to_csv()
         _AnalysisProcess().run()
