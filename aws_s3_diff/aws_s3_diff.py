@@ -59,7 +59,7 @@ class Main:
             process.run()
             if isinstance(process, _AnalysisProcess):
                 break
-            if not isinstance(process, (_LastAccountProcess, _CombineS3DataProcess)):  # TODO improve
+            if isinstance(process, _NoLastAccountProcess):
                 break
 
     def _show_accounts_to_analyze(self):
