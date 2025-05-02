@@ -113,12 +113,7 @@ class _AccountProcess(_Process):
         self._account_csv_creator.export_csv()
 
 
-class _NoLastAccountProcess(_AccountProcess):
-    def run(self):
-        super().run()
-
-
-class _FirstAccountProcess(_NoLastAccountProcess):
+class _FirstAccountProcess(_AccountProcess):
     def __init__(self):
         self._local_results = LocalResults()
         super().__init__()
@@ -133,7 +128,7 @@ class _FirstAccountProcess(_NoLastAccountProcess):
             raise exception
 
 
-class _IntermediateAccountProcess(_NoLastAccountProcess):
+class _IntermediateAccountProcess(_AccountProcess):
     def run(self):
         super().run()
 
