@@ -78,6 +78,7 @@ class _ProcessSimpleFactory:
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
         self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_process(self) -> _Process:
         """
@@ -89,7 +90,12 @@ class _ProcessSimpleFactory:
             return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _CombineS3DataProcess()
-        return _AccountProcessCreator().get_process()
+        account = self._analyzed_accounts.get_account_to_analyze()
+        if account == self._s3_uris_file_reader.get_first_account():
+            return _FirstAccountProcess()
+        if account == self._s3_uris_file_reader.get_last_account():
+            return _LastAccountProcess()
+        return _IntermediateAccountProcess()
 
 
 class _AccountProcess(_Process):
@@ -100,20 +106,6 @@ class _AccountProcess(_Process):
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
         self._account_csv_creator.export_csv()
-
-
-class _AccountProcessCreator:
-    def __init__(self):
-        self._analyzed_accounts = AnalyzedAccounts()
-        self._s3_uris_file_reader = S3UrisFileReader()
-
-    def get_process(self) -> _AccountProcess:
-        account = self._analyzed_accounts.get_account_to_analyze()
-        if account == self._s3_uris_file_reader.get_first_account():
-            return _FirstAccountProcess()
-        if account == self._s3_uris_file_reader.get_last_account():
-            return _LastAccountProcess()
-        return _IntermediateAccountProcess()
 
 
 class _NoLastAccountProcess(_AccountProcess):
