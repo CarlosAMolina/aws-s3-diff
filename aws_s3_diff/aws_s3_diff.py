@@ -99,7 +99,7 @@ class _ProcessSimpleFactory:
         if account == self._s3_uris_file_reader.get_first_account():
             return _FirstAccountProcess()
         if account == self._s3_uris_file_reader.get_last_account():
-            return _LastAccountProcess()
+            return _AccountProcess()
         return _IntermediateAccountProcess()
 
 
@@ -129,10 +129,6 @@ class _FirstAccountProcess(_AccountProcess):
 
 
 class _IntermediateAccountProcess(_AccountProcess):
-    pass
-
-
-class _LastAccountProcess(_AccountProcess):
     pass
 
 
