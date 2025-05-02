@@ -54,7 +54,13 @@ class Main:
         _logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_accounts_to_analyze()
-        self._process_creator.get_process().run()
+        while True:
+            process = self._process_creator.get_process()
+            process.run()
+            if isinstance(process, _AnalysisProcess):
+                break
+            if not isinstance(process, (_LastAccountProcess, _CombineS3DataProcess)):  # TODO improve
+                break
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -145,13 +151,11 @@ class _IntermediateAccountProcess(_NoLastAccountProcess):
 class _LastAccountProcess(_AccountProcess):
     def run(self):
         super().run()
-        _CombineS3DataProcess().run()
 
 
 class _CombineS3DataProcess(_Process):
     def run(self):
         AccountsDf().to_csv()
-        _AnalysisProcess().run()
 
 
 class _AnalysisProcess(_Process):
