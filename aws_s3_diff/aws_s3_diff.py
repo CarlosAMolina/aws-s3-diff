@@ -60,6 +60,7 @@ class Main:
             if isinstance(process, _AnalysisProcess):
                 break
             if isinstance(process, (_FirstAccountProcess, _IntermediateAccountProcess)):
+                _NextAccountToAnalize().log()  # TODO? initialice in init
                 break
 
     def _show_accounts_to_analyze(self):
@@ -122,7 +123,6 @@ class _NextAccountToAnalize:
 class _NoLastAccountProcess(_AccountProcess):
     def run(self):
         super().run()
-        _NextAccountToAnalize().log()  # TODO? initialice in init
 
 
 class _FirstAccountProcess(_NoLastAccountProcess):
