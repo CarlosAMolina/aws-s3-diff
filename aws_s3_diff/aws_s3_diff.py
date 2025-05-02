@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 
 from botocore.exceptions import ClientError
+from botocore.exceptions import EndpointConnectionError
 
 from aws_s3_diff.accounts import AnalyzedAccounts
 from aws_s3_diff.config_files import AnalysisConfigChecker
@@ -44,6 +45,9 @@ class Main:
                 _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                 return
             raise Exception from exception
+        # TODO add test
+        except EndpointConnectionError as exception:
+            _logger.error(exception)
 
     def _run_without_catching_exceptions(self):
         _logger.info("Welcome to the AWS S3 Diff tool!")

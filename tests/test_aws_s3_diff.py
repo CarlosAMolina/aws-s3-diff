@@ -144,6 +144,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                     Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
+    # TODO try avoid this method using temporal directories
     def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):
         mock_analyzed_accounts().get_account_to_analyze.return_value = S3UrisFileReader().get_first_account()
         mock_analyzed_accounts().have_all_accounts_been_analyzed.return_value = False
