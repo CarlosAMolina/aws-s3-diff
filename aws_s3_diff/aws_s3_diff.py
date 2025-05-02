@@ -129,13 +129,11 @@ class _FirstAccountProcess(_AccountProcess):
 
 
 class _IntermediateAccountProcess(_AccountProcess):
-    def run(self):
-        super().run()
+    pass
 
 
 class _LastAccountProcess(_AccountProcess):
-    def run(self):
-        super().run()
+    pass
 
 
 class _CombineS3DataProcess(_Process):
