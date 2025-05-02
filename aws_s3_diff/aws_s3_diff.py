@@ -23,6 +23,7 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
+        self._analyzed_accounts = AnalyzedAccounts()
         self._process_creator = _ProcessSimpleFactory()
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -60,7 +61,10 @@ class Main:
             if isinstance(process, _AnalysisProcess):
                 break
             if isinstance(process, (_FirstAccountProcess, _IntermediateAccountProcess)):
-                _NextAccountToAnalize().log()  # TODO? initialice in init
+                _logger.info(
+                    f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
+                    ". Authenticate and run the program again"
+                )
                 break
 
     def _show_accounts_to_analyze(self):
@@ -107,17 +111,6 @@ class _AccountProcess(_Process):
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
         self._account_csv_creator.export_csv()
-
-
-class _NextAccountToAnalize:
-    def __init__(self):
-        self._analyzed_accounts = AnalyzedAccounts()
-
-    def log(self):
-        _logger.info(
-            f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
-            ". Authenticate and run the program again"
-        )
 
 
 class _NoLastAccountProcess(_AccountProcess):
