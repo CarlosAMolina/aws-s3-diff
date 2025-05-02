@@ -128,11 +128,7 @@ class _FirstAccountProcess(_NoLastAccountProcess):
         super().__init__()
 
     def run(self):
-        # The folder may exist but not the result file if an error occurred in the previous run,
-        # e.g. errors interacting with S3.
-        # TODO not access attribute of attribute
-        if not self._local_results.analysis_paths.directory_analysis.is_dir():
-            self._local_results.create_directory_analysis()
+        self._local_results.create_directory_analysis()
         try:
             super().run()
         except Exception as exception:
