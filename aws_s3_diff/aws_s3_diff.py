@@ -23,7 +23,7 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
-        self._process_creator = _ProcessCreator()
+        self._process_creator = _ProcessSimpleFactory()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
@@ -74,7 +74,7 @@ class _Process(ABC):
         pass
 
 
-class _ProcessCreator:
+class _ProcessSimpleFactory:
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
         self._local_results = LocalResults()
