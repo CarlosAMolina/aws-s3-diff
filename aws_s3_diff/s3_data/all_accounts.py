@@ -24,6 +24,7 @@ from aws_s3_diff.types_custom import MultiIndexDf
 class AccountsDf:
     def __init__(self):
         self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
+        self._accounts_csv_extractor = _AccountsCsvCreator()
 
     def get_df(self) -> MultiIndexDf:
         result = self._accounts_simple_index_df_creator.get_df()
@@ -31,7 +32,8 @@ class AccountsDf:
         return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
 
     def to_csv(self):
-        _AccountsCsvCreator().export_csv()
+        df = self._accounts_csv_extractor.get_df()
+        self._accounts_csv_extractor.export_csv(df)
 
 
 class _AccountsCsvCreator(CsvCreator):
