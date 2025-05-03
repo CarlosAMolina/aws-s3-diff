@@ -111,7 +111,8 @@ class _AccountProcess(_Process):
 
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
-        self._account_csv_creator.export_csv()
+        df = self._account_csv_creator.get_df()
+        self._account_csv_creator.export_csv(df)
 
 
 class _FirstAccountProcess(_AccountProcess):

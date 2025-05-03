@@ -103,14 +103,14 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
 
     @patch("aws_s3_diff.aws_s3_diff.LocalResults")
     @patch("aws_s3_diff.aws_s3_diff.AnalyzedAccounts")
-    @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.export_csv")
+    @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.get_df")
     @patch(
         "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
-        self, mock_file_path_what_to_analyze, mock_extract, mock_analyzed_accounts, mock_local_results
+        self, mock_file_path_what_to_analyze, mock_get_df, mock_analyzed_accounts, mock_local_results
     ):
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
@@ -138,7 +138,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             ),
         ):
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
-                mock_extract.side_effect = aws_error
+                mock_get_df.side_effect = aws_error
                 self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
                 with self.assertLogs(level="ERROR") as cm:
                     Main().run()
