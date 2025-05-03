@@ -36,6 +36,7 @@ class AccountsDf:
         self._accounts_csv_extractor.export_csv(df)
 
 
+# TODO make public
 class _AccountsCsvCreator(CsvCreator):
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AccountsSimpleIndexDfCreator()
