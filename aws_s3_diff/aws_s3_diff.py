@@ -65,7 +65,7 @@ class Main:
             if isinstance(process, _AnalysisProcess):
                 self._local_results.drop_file_with_analysis_date()
                 return
-            if isinstance(process, (_FirstAccountProcess, _IntermediateAccountProcess)):
+            if isinstance(process, _AccountProcess) and not isinstance(process, _LastAccountProcess):
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
                     ". Authenticate and run the program again"
