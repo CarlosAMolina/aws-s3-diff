@@ -60,15 +60,14 @@ class Main:
             process = self._process_creator.get_process()
             process.run()
             if isinstance(process, _AnalysisProcess):
-                break
+                self._local_results.drop_file_with_analysis_date()
+                return
             if isinstance(process, (_FirstAccountProcess, _IntermediateAccountProcess)):
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
                     ". Authenticate and run the program again"
                 )
-                break
-        if isinstance(process, _AnalysisProcess):
-            self._local_results.drop_file_with_analysis_date()
+                return
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
