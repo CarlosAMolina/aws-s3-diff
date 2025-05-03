@@ -56,6 +56,9 @@ class Main:
         _logger.debug("Checking if the URIs to analyze configuration file is correct")
         S3UrisFileChecker().assert_file_is_correct()
         self._show_accounts_to_analyze()
+        # TODO not access property of property
+        if not self._local_results.analysis_paths.directory_analysis.exists():
+            self._local_results.create_directory_analysis()
         while True:
             process = self._process_creator.get_process()
             process.run()
@@ -124,9 +127,7 @@ class _AccountProcess(_Process):
 
 
 class _FirstAccountProcess(_AccountProcess):
-    def run(self):
-        self._local_results.create_directory_analysis()
-        super().run()
+    pass
 
 
 class _IntermediateAccountProcess(_AccountProcess):
