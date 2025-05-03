@@ -102,11 +102,9 @@ class _ProcessSimpleFactory:
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _CombineS3DataProcess()
         account = self._analyzed_accounts.get_account_to_analyze()
-        if account == self._s3_uris_file_reader.get_first_account():
-            return _FirstAccountProcess()
         if account == self._s3_uris_file_reader.get_last_account():
             return _LastAccountProcess()
-        return _IntermediateAccountProcess()
+        return _AccountProcess()
 
 
 class _AccountProcess(_Process):
@@ -124,14 +122,6 @@ class _AccountProcess(_Process):
             if self._csv_creator.get_file_path().exists():
                 self._local_results.drop_file(self._csv_creator.get_file_path())
             raise exception
-
-
-class _FirstAccountProcess(_AccountProcess):
-    pass
-
-
-class _IntermediateAccountProcess(_AccountProcess):
-    pass
 
 
 class _LastAccountProcess(_AccountProcess):
