@@ -24,6 +24,7 @@ _logger = get_logger()
 class Main:
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
+        self._local_results = LocalResults()
         self._process_creator = _ProcessSimpleFactory()
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -66,6 +67,8 @@ class Main:
                     ". Authenticate and run the program again"
                 )
                 break
+        if isinstance(process, _AnalysisProcess):
+            self._local_results.drop_file_with_analysis_date()
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -152,4 +155,3 @@ class _AnalysisProcess(_Process):
             self._analysis_csv_creator.export_csv(df)
         else:
             _logger.info("No analysis configured. Omitting")
-        LocalResults().drop_file_with_analysis_date()
