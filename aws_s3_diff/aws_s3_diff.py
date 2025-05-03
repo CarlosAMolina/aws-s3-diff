@@ -16,6 +16,7 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
+from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.one_account import AccountCsvCreator
 
 _logger = get_logger()
@@ -110,18 +111,11 @@ class _ProcessSimpleFactory:
 class _AccountProcess(_Process):
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
-        self._csv_creator = AccountCsvCreator()
-        self._local_results = LocalResults()
+        self._csv_creator = _StateCsvCreator(AccountCsvCreator())
 
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
-        try:
-            df = self._csv_creator.get_df()
-            self._csv_creator.export_csv(df)
-        except Exception as exception:
-            if self._csv_creator.get_file_path().exists():
-                self._local_results.drop_file(self._csv_creator.get_file_path())
-            raise exception
+        self._csv_creator.create_csv()
 
 
 class _LastAccountProcess(_AccountProcess):
@@ -130,23 +124,36 @@ class _LastAccountProcess(_AccountProcess):
 
 class _CombineS3DataProcess(_Process):
     def __init__(self):
-        self._csv_creator = AccountsCsvCreator()
+        self._csv_creator = _StateCsvCreator(AccountsCsvCreator())
 
     def run(self):
-        df = self._csv_creator.get_df()
-        self._csv_creator.export_csv(df)
+        self._csv_creator.create_csv()
 
 
 class _AnalysisProcess(_Process):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._csv_creator = AnalysisCsvCreator()
+        self._csv_creator = _StateCsvCreator(AnalysisCsvCreator())
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            df = self._csv_creator.get_df()
-            self._csv_creator.export_csv(df)
+            self._csv_creator.create_csv()
         else:
             _logger.info("No analysis configured. Omitting")
+
+
+class _StateCsvCreator:
+    def __init__(self, csv_creator: CsvCreator):
+        self._csv_creator = csv_creator
+        self._local_results = LocalResults()
+
+    def create_csv(self):
+        try:
+            df = self._csv_creator.get_df()
+            self._csv_creator.export_csv(df)
+        except Exception as exception:
+            if self._csv_creator.get_file_path().exists():
+                self._local_results.drop_file(self._csv_creator.get_file_path())
+            raise exception
