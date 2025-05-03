@@ -127,7 +127,6 @@ class _FirstAccountProcess(_AccountProcess):
         try:
             super().run()
         except Exception as exception:
-            self._local_results.drop_file_with_analysis_date()
             self._local_results.drop_directory_analysis()
             raise exception
 
