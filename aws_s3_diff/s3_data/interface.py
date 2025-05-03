@@ -53,10 +53,7 @@ class CsvCreator(ABC):
     def get_df(self) -> Df:
         return self._get_df_creator().get_df()
 
-    # TODO make df obligatory
-    def export_csv(self, df: Df | None = None):
-        if df is None:
-            df = self.get_df()
+    def export_csv(self, df: Df):
         file_path = self._local_results.get_file_path_results(self._file_name)
         self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
