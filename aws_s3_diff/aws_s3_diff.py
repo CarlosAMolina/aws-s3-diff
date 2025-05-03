@@ -109,12 +109,12 @@ class _ProcessSimpleFactory:
 class _AccountProcess(_Process):
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
-        self._account_csv_creator = AccountCsvCreator()
+        self._csv_creator = AccountCsvCreator()
 
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
-        df = self._account_csv_creator.get_df()
-        self._account_csv_creator.export_csv(df)
+        df = self._csv_creator.get_df()
+        self._csv_creator.export_csv(df)
 
 
 class _FirstAccountProcess(_AccountProcess):
@@ -137,23 +137,23 @@ class _IntermediateAccountProcess(_AccountProcess):
 
 class _CombineS3DataProcess(_Process):
     def __init__(self):
-        self._accounts_csv_creator = AccountsCsvCreator()
+        self._csv_creator = AccountsCsvCreator()
 
     def run(self):
-        df = self._accounts_csv_creator.get_df()
-        self._accounts_csv_creator.export_csv(df)
+        df = self._csv_creator.get_df()
+        self._csv_creator.export_csv(df)
 
 
 class _AnalysisProcess(_Process):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._analysis_csv_creator = AnalysisCsvCreator()
+        self._csv_creator = AnalysisCsvCreator()
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            df = self._analysis_csv_creator.get_df()
-            self._analysis_csv_creator.export_csv(df)
+            df = self._csv_creator.get_df()
+            self._csv_creator.export_csv(df)
         else:
             _logger.info("No analysis configured. Omitting")
