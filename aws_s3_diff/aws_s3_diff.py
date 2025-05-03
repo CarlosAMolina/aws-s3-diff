@@ -127,7 +127,8 @@ class _FirstAccountProcess(_AccountProcess):
         try:
             super().run()
         except Exception as exception:
-            self._local_results.drop_directory_analysis()
+            if self._csv_creator.get_file_path().exists():
+                self._local_results.drop_file(self._csv_creator.get_file_path())
             raise exception
 
 

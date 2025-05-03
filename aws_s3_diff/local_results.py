@@ -42,17 +42,16 @@ class LocalResults:
     def _get_file_path_account_results(self, account: str):
         return self.get_file_path_results(get_account_file_name(account))
 
+    def drop_file(self, file_path: Path):
+        self._logger.debug(f"Removing: {file_path}")
+        file_path.unlink()
+
     def drop_file_with_analysis_date(self):
-        self._logger.debug(f"Removing the file: {self._analysis_date_time_file_path}")
-        self._analysis_date_time_file_path.unlink()
+        self.drop_file(self._analysis_date_time_file_path)
 
     def create_directory_analysis(self):
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
-
-    def drop_directory_analysis(self):
-        self._logger.debug(f"Removing the directory: {self.analysis_paths.directory_analysis}")
-        self.analysis_paths.directory_analysis.rmdir()
 
     @property
     def analysis_paths(self) -> "_AnalysisPaths":
