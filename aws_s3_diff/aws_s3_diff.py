@@ -14,7 +14,7 @@ from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
-from aws_s3_diff.s3_data.all_accounts import _AccountsCsvCreator
+from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
 from aws_s3_diff.s3_data.one_account import AccountCsvCreator
 
@@ -137,7 +137,7 @@ class _IntermediateAccountProcess(_AccountProcess):
 
 class _CombineS3DataProcess(_Process):
     def __init__(self):
-        self._accounts_csv_creator = _AccountsCsvCreator()
+        self._accounts_csv_creator = AccountsCsvCreator()
 
     def run(self):
         df = self._accounts_csv_creator.get_df()
