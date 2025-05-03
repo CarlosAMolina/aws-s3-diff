@@ -148,7 +148,8 @@ class _AnalysisProcess(_Process):
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            self._analysis_csv_creator.export_csv()
+            df = self._analysis_csv_creator.get_df()
+            self._analysis_csv_creator.export_csv(df)
         else:
             _logger.info("No analysis configured. Omitting")
         LocalResults().drop_file_with_analysis_date()
