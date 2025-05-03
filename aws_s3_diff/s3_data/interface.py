@@ -1,6 +1,5 @@
 from abc import ABC
 from abc import abstractmethod
-from pathlib import Path
 
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
@@ -52,17 +51,18 @@ class CsvCreator(ABC):
         self._logger = get_logger()
 
     def export_csv(self):
-        df = self._get_df_creator().get_df()
-        file_path = self._get_file_path()
+        df = self.get_df()
+        file_path = self._local_results.get_file_path_results(self._file_name)
         self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
+
+    # TODO use out of this class
+    def get_df(self) -> Df:
+        return self._get_df_creator().get_df()
 
     @abstractmethod
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         pass
-
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._file_name)
 
     @property
     @abstractmethod
