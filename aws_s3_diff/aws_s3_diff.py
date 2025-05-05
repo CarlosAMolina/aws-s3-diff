@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from botocore.exceptions import ClientError
 from botocore.exceptions import EndpointConnectionError
+from pandas import DataFrame as Df
 
 from aws_s3_diff.accounts import AnalyzedAccounts
 from aws_s3_diff.config_files import AnalysisConfigChecker
@@ -12,6 +13,7 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
+from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
@@ -72,6 +74,11 @@ class Main:
                     ". Authenticate and run the program again"
                 )
                 return
+        # TODO
+        s3_data_context = _S3DataContext()
+        while not self._local_results.get_file_path_results(ANALYSIS_FILE_NAME).is_file():
+            df = s3_data_context.get_df()
+            s3_data_context.export_csv(df)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -79,7 +86,85 @@ class Main:
         _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
 
-# TODO rename to _State
+class _State(ABC):
+    @abstractmethod
+    def get_df(self) -> Df:
+        pass
+
+    @abstractmethod
+    def export_csv(self, df: Df) -> Df:
+        pass
+
+
+class _S3DataContext:
+    def __init__(self):
+        self._account_state = _AccountState(self)
+        self._analysis_state = _AnalysisState(self)
+        self._combine_state = _CombineState(self)
+        # TODO i prefer to not do it in __init__
+        if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+            self._state = self._analysis_state
+        elif AnalyzedAccounts().have_all_accounts_been_analyzed():
+            self._state = self._combine_state
+        else:
+            self._state = self._account_state
+
+    def get_df(self) -> Df:
+        return self._state.get_df()
+
+    def export_csv(self, df: Df):
+        self._state.export_csv(df)
+
+    def set_state(self, state: _State):
+        self._state = state
+
+
+# TODO
+class _AccountState(_State):
+    def __init__(self, s3_data_context: _S3DataContext):
+        self._s3_data_context = s3_data_context
+        self._analyzed_accounts = AnalyzedAccounts()
+
+    def get_df(self) -> Df:
+        raise NotImplementedError
+
+    def export_csv(self, df: Df) -> Df:
+        if self._analyzed_accounts.have_all_accounts_been_analyzed():
+            self._s3_data_context.set_state(self._s3_data_context._combine_state)
+        self._s3_data_context.set_state(self._s3_data_context._analysis_state)
+        raise NotImplementedError
+
+    # TODO call
+    def _get_account(self) -> str:
+        return self._analyzed_accounts.get_account_to_analyze()
+
+
+# TODO
+class _CombineState(_State):
+    def __init__(self, s3_data_context: _S3DataContext):
+        self._s3_data_context = s3_data_context
+
+    def get_df(self) -> Df:
+        raise NotImplementedError
+
+    def export_csv(self, df: Df) -> Df:
+        self._s3_data_context.set_state(self._s3_data_context._analysis_state)
+        raise NotImplementedError
+
+
+# TODO
+class _AnalysisState(_State):
+    def __init__(self, s3_data_context: _S3DataContext):
+        self._s3_data_context = s3_data_context
+
+    def get_df(self) -> Df:
+        raise NotImplementedError
+
+    def export_csv(self, df: Df) -> Df:
+        raise NotImplementedError
+
+
+# TODO deprecate, use _State instead
 class _Process(ABC):
     @abstractmethod
     def run(self):
