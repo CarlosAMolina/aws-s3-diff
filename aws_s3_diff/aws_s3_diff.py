@@ -209,10 +209,17 @@ class _LastAccountProcess(_AccountProcess):
 
 class _CombineS3DataProcess(_Process):
     def __init__(self):
-        self._csv_creator = _StateCsvCreator(AccountsCsvCreator())
+        self._csv_creator = AccountsCsvCreator()
+        self._local_results = LocalResults()
 
     def run(self):
-        self._csv_creator.create_csv()
+        try:
+            df = self._csv_creator.get_df()
+            self._csv_creator.export_csv(df)
+        except Exception as exception:
+            if self._csv_creator.get_file_path().exists():
+                self._local_results.drop_file(self._csv_creator.get_file_path())
+            raise exception
 
 
 class _AnalysisProcess(_Process):
