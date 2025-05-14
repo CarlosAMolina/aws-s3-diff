@@ -166,6 +166,7 @@ class _AnalysisState(_State):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
         self._csv_creator = AnalysisCsvCreator()
+        self._local_results = LocalResults()
 
     def get_df(self) -> Df:
         if self._analysis_config_reader.must_run_analysis():
@@ -178,6 +179,7 @@ class _AnalysisState(_State):
         if df.empty:
             return
         self._csv_creator.export_csv(df)
+        self._local_results.drop_file_with_analysis_date()
 
 
 # TODO deprecate, use _State instead
