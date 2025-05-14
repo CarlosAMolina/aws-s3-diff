@@ -247,12 +247,7 @@ class _CombineS3DataProcess(_Process):
 
 
 class _AnalysisProcess(_Process):
-    def __init__(self):
-        self._analysis_config_reader = AnalysisConfigReader()
-        self._analysis_config_checker = AnalysisConfigChecker()
-        self._csv_creator = AnalysisCsvCreator()
-        self._state = _AnalysisState(_FakeS3DataContext())
-
     def run(self):
-        df = self._state.get_df()
-        self._state.export_csv(df)
+        state = _AnalysisState(_FakeS3DataContext())
+        df = state.get_df()
+        state.export_csv(df)
