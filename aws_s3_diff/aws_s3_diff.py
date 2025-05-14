@@ -64,7 +64,6 @@ class Main:
             process = self._process_creator.get_process()
             process.run()
             if isinstance(process, _AnalysisProcess):
-                self._local_results.drop_file_with_analysis_date()
                 return
             if isinstance(process, _AccountProcess) and not isinstance(process, _LastAccountProcess):
                 _logger.info(
@@ -127,6 +126,12 @@ class _S3DataContext:
         self._is_completed = True
 
 
+# TODO rm
+class _FakeS3DataContext(_S3DataContext):
+    def set_state(self, *args, **kwargs):
+        pass
+
+
 # TODO
 class _AccountState(_State):
     def __init__(self, s3_data_context: _S3DataContext):
@@ -180,6 +185,7 @@ class _AnalysisState(_State):
             return
         self._csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
+        self._s3_data_context.set_is_completed()
 
 
 # TODO deprecate, use _State instead
@@ -245,11 +251,12 @@ class _AnalysisProcess(_Process):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
         self._csv_creator = AnalysisCsvCreator()
+        self._state = _AnalysisState(_FakeS3DataContext())
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            df = self._csv_creator.get_df()
-            self._csv_creator.export_csv(df)
+            df = self._state.get_df()
+            self._state.export_csv(df)
         else:
             _logger.info("No analysis configured. Omitting")
