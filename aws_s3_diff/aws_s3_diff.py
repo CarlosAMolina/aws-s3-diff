@@ -254,9 +254,5 @@ class _AnalysisProcess(_Process):
         self._state = _AnalysisState(_FakeS3DataContext())
 
     def run(self):
-        if self._analysis_config_reader.must_run_analysis():
-            self._analysis_config_checker.assert_file_is_correct()
-            df = self._state.get_df()
-            self._state.export_csv(df)
-        else:
-            _logger.info("No analysis configured. Omitting")
+        df = self._state.get_df()
+        self._state.export_csv(df)
