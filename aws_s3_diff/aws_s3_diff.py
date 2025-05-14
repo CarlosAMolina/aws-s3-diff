@@ -218,14 +218,10 @@ class _ProcessSimpleFactory:
 
 
 class _AccountProcess(_Process):
-    def __init__(self):
-        self._analyzed_accounts = AnalyzedAccounts()
-        self._csv_creator = AccountCsvCreator()
-
     def run(self):
-        _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
-        df = self._csv_creator.get_df()
-        self._csv_creator.export_csv(df)
+        state = _AccountState(_FakeS3DataContext())
+        df = state.get_df()
+        state.export_csv(df)
 
 
 class _LastAccountProcess(_AccountProcess):
