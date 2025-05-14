@@ -219,12 +219,20 @@ class _AnalysisProcess(_Process):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._csv_creator = _StateCsvCreator(AnalysisCsvCreator())
+        self._csv_creator = AnalysisCsvCreator()
+        self._local_results = LocalResults()
 
     def run(self):
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            self._csv_creator.create_csv()
+            # TODO refactor try-except duplicated in other code
+            try:
+                df = self._csv_creator.get_df()
+                self._csv_creator.export_csv(df)
+            except Exception as exception:
+                if self._csv_creator.get_file_path().exists():
+                    self._local_results.drop_file(self._csv_creator.get_file_path())
+                raise exception
         else:
             _logger.info("No analysis configured. Omitting")
 
