@@ -233,17 +233,10 @@ class _LastAccountProcess(_AccountProcess):
 
 
 class _CombineS3DataProcess(_Process):
-    def __init__(self):
-        self._csv_creator = AccountsCsvCreator()
-
     def run(self):
-        self.export_csv(self.get_df())
-
-    def get_df(self) -> Df:
-        return self._csv_creator.get_df()
-
-    def export_csv(self, df: Df):
-        self._csv_creator.export_csv(df)
+        state = _CombineState(_FakeS3DataContext())
+        df = state.get_df()
+        state.export_csv(df)
 
 
 class _AnalysisProcess(_Process):
