@@ -127,7 +127,7 @@ class _AccountState(_State):
     def get_df(self) -> Df:
         raise NotImplementedError
 
-    def export_csv(self, df: Df) -> Df:
+    def export_csv(self, df: Df):
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             self._s3_data_context.set_state(self._s3_data_context._combine_state)
         self._s3_data_context.set_state(self._s3_data_context._analysis_state)
@@ -146,7 +146,7 @@ class _CombineState(_State):
     def get_df(self) -> Df:
         raise NotImplementedError
 
-    def export_csv(self, df: Df) -> Df:
+    def export_csv(self, df: Df):
         self._s3_data_context.set_state(self._s3_data_context._analysis_state)
         raise NotImplementedError
 
@@ -159,7 +159,7 @@ class _AnalysisState(_State):
     def get_df(self) -> Df:
         raise NotImplementedError
 
-    def export_csv(self, df: Df) -> Df:
+    def export_csv(self, df: Df):
         raise NotImplementedError
 
 
@@ -212,7 +212,12 @@ class _CombineS3DataProcess(_Process):
         self._csv_creator = AccountsCsvCreator()
 
     def run(self):
-        df = self._csv_creator.get_df()
+        self.export_csv(self.get_df())
+
+    def get_df(self) -> Df:
+        return self._csv_creator.get_df()
+
+    def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
 
 
