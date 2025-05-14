@@ -196,11 +196,18 @@ class _ProcessSimpleFactory:
 class _AccountProcess(_Process):
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
-        self._csv_creator = _StateCsvCreator(AccountCsvCreator())
+        self._csv_creator = AccountCsvCreator()
+        self._local_results = LocalResults()
 
     def run(self):
         _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
-        self._csv_creator.create_csv()
+        try:
+            df = self._csv_creator.get_df()
+            self._csv_creator.export_csv(df)
+        except Exception as exception:
+            if self._csv_creator.get_file_path().exists():
+                self._local_results.drop_file(self._csv_creator.get_file_path())
+            raise exception
 
 
 class _LastAccountProcess(_AccountProcess):
