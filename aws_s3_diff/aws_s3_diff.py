@@ -13,7 +13,6 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
-from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
@@ -75,9 +74,11 @@ class Main:
                 return
         # TODO
         s3_data_context = _S3DataContext()
-        while not self._local_results.get_file_path_results(ANALYSIS_FILE_NAME).is_file():
+        while True:
             df = s3_data_context.get_df()
             s3_data_context.export_csv(df)
+            if s3_data_context.is_completed:
+                break
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -100,6 +101,7 @@ class _S3DataContext:
         self._account_state = _AccountState(self)
         self._analysis_state = _AnalysisState(self)
         self._combine_state = _CombineState(self)
+        self._is_completed = False
         # TODO i prefer to not do it in __init__
         if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             self._state = self._analysis_state
@@ -116,6 +118,13 @@ class _S3DataContext:
 
     def set_state(self, state: _State):
         self._state = state
+
+    @property
+    def is_completed(self) -> bool:
+        return self._is_completed
+
+    def set_is_completed(self):
+        self._is_completed = True
 
 
 # TODO
