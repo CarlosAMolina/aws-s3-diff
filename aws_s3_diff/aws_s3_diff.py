@@ -92,7 +92,7 @@ class _State(ABC):
         pass
 
     @abstractmethod
-    def export_csv(self, df: Df) -> Df:
+    def export_csv(self, df: Df):
         pass
 
 
@@ -132,44 +132,52 @@ class _AccountState(_State):
     def __init__(self, s3_data_context: _S3DataContext):
         self._s3_data_context = s3_data_context
         self._analyzed_accounts = AnalyzedAccounts()
+        self._csv_creator = AccountCsvCreator()
 
     def get_df(self) -> Df:
-        raise NotImplementedError
+        _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
+        return self._csv_creator.get_df()
 
     def export_csv(self, df: Df):
+        self._csv_creator.export_csv(df)
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             self._s3_data_context.set_state(self._s3_data_context._combine_state)
         self._s3_data_context.set_state(self._s3_data_context._analysis_state)
-        raise NotImplementedError
-
-    # TODO call
-    def _get_account(self) -> str:
-        return self._analyzed_accounts.get_account_to_analyze()
 
 
 # TODO
 class _CombineState(_State):
     def __init__(self, s3_data_context: _S3DataContext):
         self._s3_data_context = s3_data_context
+        self._csv_creator = AccountsCsvCreator()
 
     def get_df(self) -> Df:
-        raise NotImplementedError
+        return self._csv_creator.get_df()
 
     def export_csv(self, df: Df):
+        self._csv_creator.export_csv(df)
         self._s3_data_context.set_state(self._s3_data_context._analysis_state)
-        raise NotImplementedError
 
 
 # TODO
 class _AnalysisState(_State):
     def __init__(self, s3_data_context: _S3DataContext):
         self._s3_data_context = s3_data_context
+        self._analysis_config_reader = AnalysisConfigReader()
+        self._analysis_config_checker = AnalysisConfigChecker()
+        self._csv_creator = AnalysisCsvCreator()
 
     def get_df(self) -> Df:
-        raise NotImplementedError
+        if self._analysis_config_reader.must_run_analysis():
+            self._analysis_config_checker.assert_file_is_correct()
+            return self._csv_creator.get_df()
+        _logger.info("No analysis configured. Omitting")
+        return Df()
 
     def export_csv(self, df: Df):
-        raise NotImplementedError
+        if df.empty:
+            return
+        self._csv_creator.export_csv(df)
 
 
 # TODO deprecate, use _State instead
