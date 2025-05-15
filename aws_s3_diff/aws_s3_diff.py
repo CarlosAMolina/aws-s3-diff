@@ -111,7 +111,6 @@ class _S3DiffProcess:
         self._must_run_next_state = False
 
 
-# TODO
 class _AccountState(_State):
     def __init__(self, s3_diff_process: _S3DiffProcess):
         self._s3_diff_process = s3_diff_process
@@ -124,17 +123,17 @@ class _AccountState(_State):
 
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
-        if not self._analyzed_accounts.have_all_accounts_been_analyzed():
+        if self._analyzed_accounts.have_all_accounts_been_analyzed():
+            # TODO no access private attribute
+            self._s3_diff_process.set_state(self._s3_diff_process._combine_state)
+        else:
             _logger.info(
                 f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
                 ". Authenticate and run the program again"
             )
             self._s3_diff_process.set_must_not_run_next_state()
-        # TODO no access private attribute
-        self._s3_diff_process.set_state(self._s3_diff_process._combine_state)
 
 
-# TODO
 class _CombineState(_State):
     def __init__(self, s3_diff_process: _S3DiffProcess):
         self._s3_diff_process = s3_diff_process
@@ -148,7 +147,6 @@ class _CombineState(_State):
         self._s3_diff_process.set_state(self._s3_diff_process._analysis_state)
 
 
-# TODO
 class _AnalysisState(_State):
     def __init__(self, s3_diff_process: _S3DiffProcess):
         self._s3_diff_process = s3_diff_process
