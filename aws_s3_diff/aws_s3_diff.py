@@ -60,16 +60,10 @@ class Main:
         if not self._local_results.analysis_paths.directory_analysis.exists():
             self._local_results.create_directory_analysis()
         s3_data_context = _S3DataContext()
-        while True:
+        while s3_data_context.must_run_next_state:
             if not self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
                 df = s3_data_context.get_df()
                 s3_data_context.export_csv(df)
-                if not self._analyzed_accounts.have_all_accounts_been_analyzed():
-                    _logger.info(
-                        f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
-                        ". Authenticate and run the program again"
-                    )
-                    return
                 continue
             # TODO not access attribute of attribute
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
@@ -117,7 +111,7 @@ class _S3DataContext:
         self._account_state = _AccountState(self)
         self._analysis_state = _AnalysisState(self)
         self._combine_state = _CombineState(self)
-        self._is_completed = False
+        self._must_run_next_state = True
         # TODO i prefer to not do it in __init__
         if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             self._state = self._analysis_state
@@ -136,11 +130,11 @@ class _S3DataContext:
         self._state = state
 
     @property
-    def is_completed(self) -> bool:
-        return self._is_completed
+    def must_run_next_state(self) -> bool:
+        return self._must_run_next_state
 
-    def set_is_completed(self):
-        self._is_completed = True
+    def set_must_not_run_next_state(self):
+        self._must_run_next_state = False
 
 
 # TODO
@@ -156,9 +150,14 @@ class _AccountState(_State):
 
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
-        if self._analyzed_accounts.have_all_accounts_been_analyzed():
-            # TODO no access private attribute
-            self._s3_data_context.set_state(self._s3_data_context._combine_state)
+        if not self._analyzed_accounts.have_all_accounts_been_analyzed():
+            _logger.info(
+                f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
+                ". Authenticate and run the program again"
+            )
+            self._s3_data_context.set_must_not_run_next_state()
+        # TODO no access private attribute
+        self._s3_data_context.set_state(self._s3_data_context._combine_state)
 
 
 # TODO
@@ -196,4 +195,4 @@ class _AnalysisState(_State):
             return
         self._csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
-        self._s3_data_context.set_is_completed()
+        self._s3_data_context.set_must_not_run_next_state()
