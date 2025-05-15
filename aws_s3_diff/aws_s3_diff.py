@@ -40,7 +40,7 @@ class Main:
             if not self._local_results.analysis_paths.directory_analysis.exists():
                 self._local_results.create_directory_analysis()
             s3_diff_process = _S3DiffProcess()
-            while s3_diff_process.must_run_next_state():
+            while s3_diff_process.must_run_next_state:
                 try:
                     df = s3_diff_process.get_df()
                 except AnalysisConfigError as exception:
@@ -112,6 +112,7 @@ class _S3DiffProcess:
     def set_state_combine(self):
         self._state = self._combine_state
 
+    @property
     def must_run_next_state(self) -> bool:
         return self._must_run_next_state
 
