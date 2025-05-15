@@ -59,10 +59,10 @@ class Main:
         # TODO not access property of property
         if not self._local_results.analysis_paths.directory_analysis.exists():
             self._local_results.create_directory_analysis()
-        s3_data_context = _S3DataContext()
-        while s3_data_context.must_run_next_state:
-            df = s3_data_context.get_df()
-            s3_data_context.export_csv(df)
+        s3_diff_process = _S3DiffProcess()
+        while s3_diff_process.must_run_next_state:
+            df = s3_diff_process.get_df()
+            s3_diff_process.export_csv(df)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -80,7 +80,7 @@ class _State(ABC):
         pass
 
 
-class _S3DataContext:
+class _S3DiffProcess:
     def __init__(self):
         self._account_state = _AccountState(self)
         self._analysis_state = _AnalysisState(self)
@@ -113,8 +113,8 @@ class _S3DataContext:
 
 # TODO
 class _AccountState(_State):
-    def __init__(self, s3_data_context: _S3DataContext):
-        self._s3_data_context = s3_data_context
+    def __init__(self, s3_diff_process: _S3DiffProcess):
+        self._s3_diff_process = s3_diff_process
         self._analyzed_accounts = AnalyzedAccounts()
         self._csv_creator = AccountCsvCreator()
 
@@ -129,15 +129,15 @@ class _AccountState(_State):
                 f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
                 ". Authenticate and run the program again"
             )
-            self._s3_data_context.set_must_not_run_next_state()
+            self._s3_diff_process.set_must_not_run_next_state()
         # TODO no access private attribute
-        self._s3_data_context.set_state(self._s3_data_context._combine_state)
+        self._s3_diff_process.set_state(self._s3_diff_process._combine_state)
 
 
 # TODO
 class _CombineState(_State):
-    def __init__(self, s3_data_context: _S3DataContext):
-        self._s3_data_context = s3_data_context
+    def __init__(self, s3_diff_process: _S3DiffProcess):
+        self._s3_diff_process = s3_diff_process
         self._csv_creator = AccountsCsvCreator()
 
     def get_df(self) -> Df:
@@ -145,13 +145,13 @@ class _CombineState(_State):
 
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
-        self._s3_data_context.set_state(self._s3_data_context._analysis_state)
+        self._s3_diff_process.set_state(self._s3_diff_process._analysis_state)
 
 
 # TODO
 class _AnalysisState(_State):
-    def __init__(self, s3_data_context: _S3DataContext):
-        self._s3_data_context = s3_data_context
+    def __init__(self, s3_diff_process: _S3DiffProcess):
+        self._s3_diff_process = s3_diff_process
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
         self._csv_creator = AnalysisCsvCreator()
@@ -169,4 +169,4 @@ class _AnalysisState(_State):
             return
         self._csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
-        self._s3_data_context.set_must_not_run_next_state()
+        self._s3_diff_process.set_must_not_run_next_state()
