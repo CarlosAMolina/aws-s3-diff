@@ -157,9 +157,8 @@ class _AccountState(_State):
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
+            # TODO no access private attribute
             self._s3_data_context.set_state(self._s3_data_context._combine_state)
-        # TODO no access private attribute
-        self._s3_data_context.set_state(self._s3_data_context._analysis_state)
 
 
 # TODO
