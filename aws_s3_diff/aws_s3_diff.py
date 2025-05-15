@@ -64,6 +64,9 @@ class Main:
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
                 _AnalysisProcess().run()
                 return
+            if self._analyzed_accounts.have_all_accounts_been_analyzed():
+                _CombineS3DataProcess().run()
+                continue
             process = self._get_process()
             process.run()
             if isinstance(process, _AccountProcess) and not isinstance(process, _LastAccountProcess):
@@ -81,8 +84,6 @@ class Main:
                 break
 
     def _get_process(self):
-        if self._analyzed_accounts.have_all_accounts_been_analyzed():
-            return _CombineS3DataProcess()
         account = self._analyzed_accounts.get_account_to_analyze()
         if account == self._s3_uris_file_reader.get_last_account():
             return _LastAccountProcess()
