@@ -75,19 +75,6 @@ class Main:
                 s3_data_context.export_csv(df)
                 continue
             raise Exception("must not be here")  # TODO rm
-        # TODO
-        while True:
-            df = s3_data_context.get_df()
-            s3_data_context.export_csv(df)
-            if s3_data_context.is_completed:
-                break
-            if not self._analyzed_accounts.have_all_accounts_been_analyzed():
-                # TODO try to rm
-                _logger.info(
-                    f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
-                    ". Authenticate and run the program again"
-                )
-                return
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
