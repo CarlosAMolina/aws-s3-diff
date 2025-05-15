@@ -26,6 +26,7 @@ class Main:
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
         self._local_results = LocalResults()
+        self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
@@ -54,7 +55,7 @@ class Main:
     def _run_without_catching_exceptions(self):
         _logger.info("Welcome to the AWS S3 Diff tool!")
         _logger.debug("Checking if the URIs to analyze configuration file is correct")
-        S3UrisFileChecker().assert_file_is_correct()
+        self._s3_uris_file_checker.assert_file_is_correct()
         self._show_accounts_to_analyze()
         # TODO not access property of property
         if not self._local_results.analysis_paths.directory_analysis.exists():
