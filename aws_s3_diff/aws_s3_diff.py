@@ -79,9 +79,6 @@ class Main:
                 break
 
     def _get_process(self):
-        self._analyzed_accounts = AnalyzedAccounts()
-        self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
         # TODO not access attribute of attribute
         if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             return _AnalysisProcess()
