@@ -26,7 +26,6 @@ class Main:
     def __init__(self):
         self._analyzed_accounts = AnalyzedAccounts()
         self._local_results = LocalResults()
-        self._process_creator = _ProcessSimpleFactory()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
@@ -61,7 +60,7 @@ class Main:
         if not self._local_results.analysis_paths.directory_analysis.exists():
             self._local_results.create_directory_analysis()
         while True:
-            process = self._process_creator.get_process()
+            process = self._get_process()
             process.run()
             if isinstance(process, _AnalysisProcess):
                 return
@@ -78,6 +77,20 @@ class Main:
             s3_data_context.export_csv(df)
             if s3_data_context.is_completed:
                 break
+
+    def _get_process(self):
+        self._analyzed_accounts = AnalyzedAccounts()
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+        # TODO not access attribute of attribute
+        if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+            return _AnalysisProcess()
+        if self._analyzed_accounts.have_all_accounts_been_analyzed():
+            return _CombineS3DataProcess()
+        account = self._analyzed_accounts.get_account_to_analyze()
+        if account == self._s3_uris_file_reader.get_last_account():
+            return _LastAccountProcess()
+        return _AccountProcess()
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
@@ -193,28 +206,6 @@ class _Process(ABC):
     @abstractmethod
     def run(self):
         pass
-
-
-class _ProcessSimpleFactory:
-    def __init__(self):
-        self._analyzed_accounts = AnalyzedAccounts()
-        self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
-
-    def get_process(self) -> _Process:
-        """
-        Some conditions avoid to generate a file if it exists.
-        For example: the user drops the analysis file in order to run the program and generate the analysis again.
-        """
-        # TODO not access attribute of attribute
-        if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-            return _AnalysisProcess()
-        if self._analyzed_accounts.have_all_accounts_been_analyzed():
-            return _CombineS3DataProcess()
-        account = self._analyzed_accounts.get_account_to_analyze()
-        if account == self._s3_uris_file_reader.get_last_account():
-            return _LastAccountProcess()
-        return _AccountProcess()
 
 
 class _AccountProcess(_Process):
