@@ -61,20 +61,8 @@ class Main:
             self._local_results.create_directory_analysis()
         s3_data_context = _S3DataContext()
         while s3_data_context.must_run_next_state:
-            if not self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                df = s3_data_context.get_df()
-                s3_data_context.export_csv(df)
-                continue
-            # TODO not access attribute of attribute
-            if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                df = s3_data_context.get_df()
-                s3_data_context.export_csv(df)
-                continue
-            if self._analyzed_accounts.have_all_accounts_been_analyzed():
-                df = s3_data_context.get_df()
-                s3_data_context.export_csv(df)
-                continue
-            raise Exception("must not be here")  # TODO rm
+            df = s3_data_context.get_df()
+            s3_data_context.export_csv(df)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
