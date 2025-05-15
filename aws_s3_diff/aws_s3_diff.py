@@ -30,8 +30,8 @@ class Main:
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
+        _logger.info("Welcome to the AWS S3 Diff tool!")
         try:
-            _logger.info("Welcome to the AWS S3 Diff tool!")
             _logger.debug("Checking if the URIs to analyze configuration file is correct")
             self._s3_uris_file_checker.assert_file_is_correct()
             self._show_accounts_to_analyze()
