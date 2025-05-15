@@ -216,14 +216,6 @@ class _ProcessParent(_Process):
         pass
 
 
-class _AccountProcess(_ProcessParent):
-    pass
-
-
-class _LastAccountProcess(_AccountProcess):
-    pass
-
-
 class _CombineS3DataProcess(_Process):
     def run(self):
         state = _CombineState(_FakeS3DataContext())
