@@ -65,7 +65,7 @@ class Main:
                 _AnalysisProcess().run()
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
-                _CombineS3DataProcess().run()
+                _ProcessParent().run(_CombineState(_FakeS3DataContext()))
                 continue
             account = self._analyzed_accounts.get_account_to_analyze()
             if account == self._s3_uris_file_reader.get_last_account():
@@ -214,13 +214,6 @@ class _ProcessParent(_Process):
         df = state.get_df()
         state.export_csv(df)
         pass
-
-
-class _CombineS3DataProcess(_Process):
-    def run(self):
-        state = _CombineState(_FakeS3DataContext())
-        df = state.get_df()
-        state.export_csv(df)
 
 
 class _AnalysisProcess(_Process):
