@@ -69,7 +69,7 @@ class Main:
                 continue
             account = self._analyzed_accounts.get_account_to_analyze()
             if account == self._s3_uris_file_reader.get_last_account():
-                _LastAccountProcess().run(_AccountState(_FakeS3DataContext()))
+                _ProcessParent().run(_AccountState(_FakeS3DataContext()))
                 continue
             _ProcessParent().run(_AccountState(_FakeS3DataContext()))
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
