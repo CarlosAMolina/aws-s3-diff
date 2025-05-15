@@ -31,18 +31,23 @@ class Main:
 
     def run(self):
         _logger.info("Welcome to the AWS S3 Diff tool!")
+        _logger.debug("Checking if the URIs to analyze configuration file is correct")
+        # TODO create custom exceptionand manage to avoid large exception message
+        self._s3_uris_file_checker.assert_file_is_correct()
         try:
-            _logger.debug("Checking if the URIs to analyze configuration file is correct")
-            self._s3_uris_file_checker.assert_file_is_correct()
             self._show_accounts_to_analyze()
             # TODO not access property of property
             if not self._local_results.analysis_paths.directory_analysis.exists():
                 self._local_results.create_directory_analysis()
             s3_diff_process = _S3DiffProcess()
-            while s3_diff_process.must_run_next_state:
-                df = s3_diff_process.get_df()
+            while s3_diff_process.must_run_next_state():
+                try:
+                    df = s3_diff_process.get_df()
+                except AnalysisConfigError as exception:
+                    _logger.error(exception)
+                    return
                 s3_diff_process.export_csv(df)
-        except (AnalysisConfigError, FolderInS3UriError) as exception:
+        except FolderInS3UriError as exception:
             _logger.error(exception)
             return
         # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
@@ -107,7 +112,6 @@ class _S3DiffProcess:
     def set_state_combine(self):
         self._state = self._combine_state
 
-    @property
     def must_run_next_state(self) -> bool:
         return self._must_run_next_state
 

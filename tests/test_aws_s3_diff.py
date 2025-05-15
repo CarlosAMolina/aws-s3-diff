@@ -94,9 +94,10 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
 
 class TestMainWithoutLocalS3Server(unittest.TestCase):
-    @patch("aws_s3_diff.aws_s3_diff.AnalysisConfigChecker")
-    def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_checker):
-        mock_checker.side_effect = AnalysisConfigError("foo")
+    @patch("aws_s3_diff.aws_s3_diff._S3DiffProcess")
+    def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_s3_diff_process):
+        mock_s3_diff_process().get_df.side_effect = AnalysisConfigError("foo")
+        mock_s3_diff_process().must_run_next_state.side_effect = [True, False]
         with self.assertLogs(level="ERROR") as cm:
             Main().run()
         self.assertEqual("foo", cm.records[0].message)
