@@ -67,16 +67,14 @@ class Main:
                 s3_data_context.export_csv(df)
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
+                # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
                 _ProcessParent().run(_CombineState(s3_data_context))
                 continue
             account = self._analyzed_accounts.get_account_to_analyze()
-            if account == self._s3_uris_file_reader.get_last_account():
-                df = s3_data_context.get_df()
-                s3_data_context.export_csv(df)
-                continue
-            assert isinstance(s3_data_context._state, _AccountState)  # TODO
             df = s3_data_context.get_df()
             s3_data_context.export_csv(df)
+            if account == self._s3_uris_file_reader.get_last_account():
+                continue
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
@@ -159,6 +157,7 @@ class _AccountState(_State):
         self._csv_creator.export_csv(df)
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             self._s3_data_context.set_state(self._s3_data_context._combine_state)
+        # TODO no access private attribute
         self._s3_data_context.set_state(self._s3_data_context._analysis_state)
 
 
