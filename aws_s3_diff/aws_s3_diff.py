@@ -70,11 +70,8 @@ class Main:
                 # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
                 _ProcessParent().run(_CombineState(s3_data_context))
                 continue
-            account = self._analyzed_accounts.get_account_to_analyze()
             df = s3_data_context.get_df()
             s3_data_context.export_csv(df)
-            if account == self._s3_uris_file_reader.get_last_account():
-                continue
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
