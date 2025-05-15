@@ -63,7 +63,8 @@ class Main:
         while True:
             # TODO not access attribute of attribute
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                _ProcessParent().run(_AnalysisState(s3_data_context))
+                df = s3_data_context.get_df()
+                s3_data_context.export_csv(df)
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _ProcessParent().run(_CombineState(s3_data_context))
