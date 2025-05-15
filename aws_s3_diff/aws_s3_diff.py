@@ -71,14 +71,17 @@ class Main:
                 df = _CombineState(s3_data_context).get_df()
                 _CombineState(s3_data_context).export_csv(df)
                 continue
-            df = s3_data_context.get_df()
-            s3_data_context.export_csv(df)
-            if not self._analyzed_accounts.have_all_accounts_been_analyzed():
-                _logger.info(
-                    f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
-                    ". Authenticate and run the program again"
-                )
-                return
+            if not self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+                df = s3_data_context.get_df()
+                s3_data_context.export_csv(df)
+                if not self._analyzed_accounts.have_all_accounts_been_analyzed():
+                    _logger.info(
+                        f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
+                        ". Authenticate and run the program again"
+                    )
+                    return
+                continue
+            raise Exception("must not be here")  # TODO rm
         # TODO
         while True:
             df = s3_data_context.get_df()
