@@ -71,9 +71,8 @@ class Main:
                 s3_data_context.export_csv(df)
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
-                # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
-                df = _CombineState(s3_data_context).get_df()
-                _CombineState(s3_data_context).export_csv(df)
+                df = s3_data_context.get_df()
+                s3_data_context.export_csv(df)
                 continue
             raise Exception("must not be here")  # TODO rm
         # TODO
