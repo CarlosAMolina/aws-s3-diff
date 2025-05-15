@@ -68,7 +68,8 @@ class Main:
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
                 # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
-                _ProcessParent().run(_CombineState(s3_data_context))
+                df = _CombineState(s3_data_context).get_df()
+                _CombineState(s3_data_context).export_csv(df)
                 continue
             df = s3_data_context.get_df()
             s3_data_context.export_csv(df)
@@ -194,17 +195,3 @@ class _AnalysisState(_State):
         self._csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
         self._s3_data_context.set_is_completed()
-
-
-# TODO deprecate, use _State instead
-class _Process(ABC):
-    @abstractmethod
-    def run(self):
-        pass
-
-
-class _ProcessParent(_Process):
-    def run(self, state: _State):
-        df = state.get_df()
-        state.export_csv(df)
-        pass
