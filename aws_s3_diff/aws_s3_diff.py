@@ -69,7 +69,7 @@ class Main:
                 continue
             process = self._get_process()
             process.run()
-            if isinstance(process, _AccountProcess) and not isinstance(process, _LastAccountProcess):
+            if not self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
                     ". Authenticate and run the program again"
