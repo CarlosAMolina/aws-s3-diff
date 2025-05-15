@@ -59,19 +59,20 @@ class Main:
         # TODO not access property of property
         if not self._local_results.analysis_paths.directory_analysis.exists():
             self._local_results.create_directory_analysis()
+        s3_data_context = _S3DataContext()
         while True:
             # TODO not access attribute of attribute
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                _ProcessParent().run(_AnalysisState(_FakeS3DataContext()))
+                _ProcessParent().run(_AnalysisState(s3_data_context))
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
-                _ProcessParent().run(_CombineState(_FakeS3DataContext()))
+                _ProcessParent().run(_CombineState(s3_data_context))
                 continue
             account = self._analyzed_accounts.get_account_to_analyze()
             if account == self._s3_uris_file_reader.get_last_account():
-                _ProcessParent().run(_AccountState(_FakeS3DataContext()))
+                _ProcessParent().run(_AccountState(s3_data_context))
                 continue
-            _ProcessParent().run(_AccountState(_FakeS3DataContext()))
+            _ProcessParent().run(_AccountState(s3_data_context))
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
@@ -79,7 +80,6 @@ class Main:
                 )
                 return
         # TODO
-        s3_data_context = _S3DataContext()
         while True:
             df = s3_data_context.get_df()
             s3_data_context.export_csv(df)
@@ -138,12 +138,6 @@ class _S3DataContext:
 
     def set_is_completed(self):
         self._is_completed = True
-
-
-# TODO rm
-class _FakeS3DataContext(_S3DataContext):
-    def set_state(self, *args, **kwargs):
-        pass
 
 
 # TODO
