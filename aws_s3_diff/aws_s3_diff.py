@@ -61,16 +61,6 @@ class Main:
             self._local_results.create_directory_analysis()
         s3_data_context = _S3DataContext()
         while True:
-            # TODO not access attribute of attribute
-            if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                df = s3_data_context.get_df()
-                s3_data_context.export_csv(df)
-                return
-            if self._analyzed_accounts.have_all_accounts_been_analyzed():
-                # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
-                df = _CombineState(s3_data_context).get_df()
-                _CombineState(s3_data_context).export_csv(df)
-                continue
             if not self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
                 df = s3_data_context.get_df()
                 s3_data_context.export_csv(df)
@@ -80,6 +70,16 @@ class Main:
                         ". Authenticate and run the program again"
                     )
                     return
+                continue
+            # TODO not access attribute of attribute
+            if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+                df = s3_data_context.get_df()
+                s3_data_context.export_csv(df)
+                return
+            if self._analyzed_accounts.have_all_accounts_been_analyzed():
+                # TODO assert isinstance(s3_data_context._state, _CombineState)  # TODO
+                df = _CombineState(s3_data_context).get_df()
+                _CombineState(s3_data_context).export_csv(df)
                 continue
             raise Exception("must not be here")  # TODO rm
         # TODO
