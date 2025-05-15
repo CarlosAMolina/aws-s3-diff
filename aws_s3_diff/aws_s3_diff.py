@@ -31,7 +31,17 @@ class Main:
 
     def run(self):
         try:
-            self._run_without_catching_exceptions()
+            _logger.info("Welcome to the AWS S3 Diff tool!")
+            _logger.debug("Checking if the URIs to analyze configuration file is correct")
+            self._s3_uris_file_checker.assert_file_is_correct()
+            self._show_accounts_to_analyze()
+            # TODO not access property of property
+            if not self._local_results.analysis_paths.directory_analysis.exists():
+                self._local_results.create_directory_analysis()
+            s3_diff_process = _S3DiffProcess()
+            while s3_diff_process.must_run_next_state:
+                df = s3_diff_process.get_df()
+                s3_diff_process.export_csv(df)
         except (AnalysisConfigError, FolderInS3UriError) as exception:
             _logger.error(exception)
             return
@@ -51,19 +61,6 @@ class Main:
         # TODO add test
         except EndpointConnectionError as exception:
             _logger.error(exception)
-
-    def _run_without_catching_exceptions(self):
-        _logger.info("Welcome to the AWS S3 Diff tool!")
-        _logger.debug("Checking if the URIs to analyze configuration file is correct")
-        self._s3_uris_file_checker.assert_file_is_correct()
-        self._show_accounts_to_analyze()
-        # TODO not access property of property
-        if not self._local_results.analysis_paths.directory_analysis.exists():
-            self._local_results.create_directory_analysis()
-        s3_diff_process = _S3DiffProcess()
-        while s3_diff_process.must_run_next_state:
-            df = s3_diff_process.get_df()
-            s3_diff_process.export_csv(df)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
