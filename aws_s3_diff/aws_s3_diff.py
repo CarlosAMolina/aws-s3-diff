@@ -60,10 +60,12 @@ class Main:
         if not self._local_results.analysis_paths.directory_analysis.exists():
             self._local_results.create_directory_analysis()
         while True:
+            # TODO not access attribute of attribute
+            if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+                _AnalysisProcess().run()
+                return
             process = self._get_process()
             process.run()
-            if isinstance(process, _AnalysisProcess):
-                return
             if isinstance(process, _AccountProcess) and not isinstance(process, _LastAccountProcess):
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
@@ -79,9 +81,6 @@ class Main:
                 break
 
     def _get_process(self):
-        # TODO not access attribute of attribute
-        if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-            return _AnalysisProcess()
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
             return _CombineS3DataProcess()
         account = self._analyzed_accounts.get_account_to_analyze()
