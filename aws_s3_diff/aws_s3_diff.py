@@ -71,7 +71,9 @@ class Main:
                 continue
             account = self._analyzed_accounts.get_account_to_analyze()
             if account == self._s3_uris_file_reader.get_last_account():
-                _ProcessParent().run(_AccountState(s3_data_context))
+                # assert isinstance(s3_data_context._state, _AccountState)  # TODO
+                df = s3_data_context.get_df()
+                s3_data_context.export_csv(df)
                 continue
             _ProcessParent().run(_AccountState(s3_data_context))
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
