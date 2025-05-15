@@ -69,7 +69,7 @@ class Main:
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
                 df = s3_data_context.get_df()
                 s3_data_context.export_csv(df)
-                return
+                continue
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
                 df = s3_data_context.get_df()
                 s3_data_context.export_csv(df)
