@@ -88,11 +88,11 @@ class _S3DiffProcess:
         self._must_run_next_state = True
         # TODO i prefer to not do it in __init__
         if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-            self._state = self._analysis_state
+            self.set_state_analysis()
         elif AnalyzedAccounts().have_all_accounts_been_analyzed():
-            self._state = self._combine_state
+            self.set_state_combine()
         else:
-            self._state = self._account_state
+            self.set_state_account()
 
     def get_df(self) -> Df:
         return self._state.get_df()
@@ -100,8 +100,14 @@ class _S3DiffProcess:
     def export_csv(self, df: Df):
         self._state.export_csv(df)
 
-    def set_state(self, state: _State):
-        self._state = state
+    def set_state_account(self):
+        self._state = self._account_state
+
+    def set_state_analysis(self):
+        self._state = self._analysis_state
+
+    def set_state_combine(self):
+        self._state = self._combine_state
 
     @property
     def must_run_next_state(self) -> bool:
@@ -124,8 +130,7 @@ class _AccountState(_State):
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
         if self._analyzed_accounts.have_all_accounts_been_analyzed():
-            # TODO no access private attribute
-            self._s3_diff_process.set_state(self._s3_diff_process._combine_state)
+            self._s3_diff_process.set_state_combine()
         else:
             _logger.info(
                 f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
@@ -144,7 +149,7 @@ class _CombineState(_State):
 
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
-        self._s3_diff_process.set_state(self._s3_diff_process._analysis_state)
+        self._s3_diff_process.set_state_analysis()
 
 
 class _AnalysisState(_State):
