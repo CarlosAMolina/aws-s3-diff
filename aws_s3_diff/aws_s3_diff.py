@@ -67,8 +67,7 @@ class Main:
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _CombineS3DataProcess().run()
                 continue
-            process = self._get_process()
-            process.run()
+            self._run_process()
             if not self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _logger.info(
                     f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
@@ -83,11 +82,12 @@ class Main:
             if s3_data_context.is_completed:
                 break
 
-    def _get_process(self):
+    def _run_process(self):
         account = self._analyzed_accounts.get_account_to_analyze()
         if account == self._s3_uris_file_reader.get_last_account():
-            return _LastAccountProcess()
-        return _AccountProcess()
+            _LastAccountProcess().run()
+            return
+        _AccountProcess().run()
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
