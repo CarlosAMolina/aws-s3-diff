@@ -62,7 +62,7 @@ class Main:
         while True:
             # TODO not access attribute of attribute
             if self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
-                _AnalysisProcess().run()
+                _ProcessParent().run(_AnalysisState(_FakeS3DataContext()))
                 return
             if self._analyzed_accounts.have_all_accounts_been_analyzed():
                 _ProcessParent().run(_CombineState(_FakeS3DataContext()))
@@ -214,10 +214,3 @@ class _ProcessParent(_Process):
         df = state.get_df()
         state.export_csv(df)
         pass
-
-
-class _AnalysisProcess(_Process):
-    def run(self):
-        state = _AnalysisState(_FakeS3DataContext())
-        df = state.get_df()
-        state.export_csv(df)
