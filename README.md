@@ -84,7 +84,7 @@ poetry run python run.py
 [DEBUG] Creating the directory: /home/user/Software/aws-s3-diff/s3-results/20250519224348
 [INFO] Analyzing the AWS account 'pro'
 [INFO] Analyzing S3 URI 1/2: s3://pets/dogs/
-[INFO] Analyzing S3 URI 2/2: s3://pets/inbound/cats/
+[INFO] Analyzing S3 URI 2/2: s3://pets/cats/
 [INFO] Exporting /home/user/Software/aws-s3-diff/s3-results/20250519224348/pro.csv
 [INFO] The next account to be analyzed is 'dev'. Authenticate and run the program again
 
