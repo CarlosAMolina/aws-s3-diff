@@ -69,6 +69,55 @@ We repeat the previous steps per each configured AWS account:
 
 The analysis results are stored in the [s3-results](s3-results) folder, a folder with the current analysis timestamp is created and all the accounts results are stored in that folder. The final file with all the results and the analysis is called `analysis.csv`, you can open and examine that file ([example](tests/expected-results/analysis.csv)).
 
+Example of the CLI output if three accounts have been analyzed:
+
+```bash
+$ awsume pro
+
+$ make run
+poetry run python run.py
+[INFO] Welcome to the AWS S3 Diff tool!
+[DEBUG] Checking if the URIs to analyze configuration file is correct
+[INFO] AWS accounts configured to be analyzed:
+1. pro
+2. dev
+[DEBUG] Creating the directory: /home/user/Software/aws-s3-diff/s3-results/20250519224348
+[INFO] Analyzing the AWS account 'pro'
+[INFO] Analyzing S3 URI 1/2: s3://pets/dogs/
+[INFO] Analyzing S3 URI 2/2: s3://pets/inbound/cats/
+[INFO] Exporting /home/user/Software/aws-s3-diff/s3-results/20250519224348/pro.csv
+[INFO] The next account to be analyzed is 'dev'. Authenticate and run the program again
+
+$ awsume dev
+
+$ make run
+poetry run python run.py
+[INFO] Welcome to the AWS S3 Diff tool!
+[DEBUG] Checking if the URIs to analyze configuration file is correct
+[INFO] AWS accounts configured to be analyzed:
+1. pro
+2. dev
+[INFO] Analyzing the AWS account 'dev'
+[INFO] Analyzing S3 URI 1/2: s3://pets-dev/doggies/
+[INFO] Analyzing S3 URI 2/2: s3://pets-dev/kitties/
+[INFO] Exporting /home/user/Software/aws-s3-diff/s3-results/20250519224348/dev.csv
+[INFO] Exporting /home/user/Software/aws-s3-diff/s3-results/20250519224348/s3-files-all-accounts.csv
+[INFO] Analyzing if files of the account 'pro' have been copied to the account 'dev'
+[INFO] Analyzing if files in account 'dev' can exist, compared to account 'pro'
+[INFO] Exporting /home/user/Software/aws-s3-diff/s3-results/20250519224348/analysis.csv
+[DEBUG] Removing: /home/user/Software/aws-s3-diff/s3-results/analysis_date_time.txt
+```
+
+## FAQ
+
+- Can I analyze different paths for the same account?
+
+  Yes, instead of managing each s3-uris-to-analyze.csv column as a different account, configure them using the desired paths of the target AWS account. Despite being the same AWS account, a different name must be used in the first row for each column.
+
+- Can I analyze a path that contains subfolders?
+
+  No, this is a current limitation. The analyzed paths must contain files only, not folders.
+
 ## Develop
 
 ```bash
