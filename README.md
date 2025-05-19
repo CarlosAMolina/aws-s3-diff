@@ -1,8 +1,12 @@
 # AWS S3 Diff
 
+Warning. This project is working correctly but is under development. It will change until the version 1.0.0 is released.
+
 ## Introduction
 
 This project allows you to compare AWS S3 files between different AWS accounts.
+
+Example of results file: [here](tests/expected-results/analysis.csv).
 
 ## How to run the program
 
