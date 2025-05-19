@@ -84,13 +84,13 @@ make start-local-s3-server
 
 After that, you can:
 
-    - List files:
+- List files:
 
     ```bash
     make awscli-local-s3-ls
     ```
 
-    - Run the CLI:
+- Run the CLI:
 
     ```bash
     make run-using-local-s3-server
