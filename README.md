@@ -22,7 +22,7 @@ File structure:
 
 - It is a `.csv` file separated by `,`.
 - Each column represents an AWS account configuration.
-- The first row is special, is where the account names are specified.
+- The first row is special, is where the account names are specified. This information will be used in the CLI outputs and in the result files to organize the data.
 - The other rows are the S3 URIs to be analyzed.
 
 The order in which the AWS accounts are specified is the order in which they will be analyzed.
@@ -46,13 +46,19 @@ can_the_file_exist_in | Array of strings  | If the file does not exist in the or
 
 In this step we have already update the previous configuration files with the desired values.
 
-Authenticate in the terminal to the first AWS account that will be analyzed, this is required in order to allow botocore to connect with your AWS account. Execute:
+Authenticate in the terminal to the first AWS account that will be analyzed, this is required in order to allow botocore to connect with your AWS account. For examle:
+
+```bash
+awsume dev
+```
+
+After that, execute:
 
 ```bash
 make run
 ```
 
-Now, we have the results for the buckets of the first account. Let's create the second AWS account results!
+Now, we have the results for the buckets of the first account ([file example](tests/expected-results/dev.csv)). Let's create the second AWS account results!
 
 We authenticate in the terminal to the second AWS account and run `make run` again. The script will detect that the first account results exist and will analyze the second account.
 
