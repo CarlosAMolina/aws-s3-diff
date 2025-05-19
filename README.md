@@ -116,7 +116,7 @@ poetry run python run.py
 
 - Can I analyze a path that contains subfolders?
 
-  No, this is a current limitation. The analyzed paths must contain files only, not folders.
+  No, this is a current limitation. The analyzed paths must contain only files, not folders.
 
 ## Develop
 
