@@ -67,7 +67,7 @@ We repeat the previous steps per each configured AWS account:
 1. Authenticate in the terminal to the AWS account to analyze.
 2. Execute `make run`
 
-The analysis results are stored in the [s3-results](s3-results) folder, a folder with the current analysis timestamp is created and all the accounts results are stored in that folder. The final file with all the results and the analysis is called `analysis.csv`, you can open and examine that file.
+The analysis results are stored in the [s3-results](s3-results) folder, a folder with the current analysis timestamp is created and all the accounts results are stored in that folder. The final file with all the results and the analysis is called `analysis.csv`, you can open and examine that file ([example](tests/expected-results/analysis.csv)).
 
 ## Develop
 
