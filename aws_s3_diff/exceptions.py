@@ -6,13 +6,13 @@ class AnalysisConfigError(ValueError):
     pass
 
 
-class DuplicatedUriAnalysisConfigError(ValueError):
+class DuplicatedUriS3UrisFileError(ValueError):
     pass
 
 
-class EmptyAccountNameAnalysisConfigError(ValueError):
+class EmptyAccountNameS3UrisFileError(ValueError):
     pass
 
 
-class EmptyUriAnalysisConfigError(ValueError):
+class EmptyUriS3UrisFileError(ValueError):
     pass
