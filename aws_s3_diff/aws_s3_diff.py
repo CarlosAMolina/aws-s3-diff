@@ -38,6 +38,7 @@ class Main:
         except S3UrisFileError as exception:
             _logger.error(exception)
             return
+        # TODO move out of this try-except block the code that does not raise FolderInS3UriError
         try:
             self._show_accounts_to_analyze()
             if not self._local_results.exist_directory_analysis():
