@@ -12,6 +12,7 @@ from aws_s3_diff.config_files import S3UrisFileChecker
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
+from aws_s3_diff.exceptions import S3UrisFileError
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
@@ -32,8 +33,11 @@ class Main:
     def run(self):
         _logger.info("Welcome to the AWS S3 Diff tool!")
         _logger.debug("Checking if the URIs to analyze configuration file is correct")
-        # TODO create custom exception and manage to avoid large exception message
-        self._s3_uris_file_checker.assert_file_is_correct()
+        try:
+            self._s3_uris_file_checker.assert_file_is_correct()
+        except S3UrisFileError as exception:
+            _logger.error(exception)
+            return
         try:
             self._show_accounts_to_analyze()
             if not self._local_results.exist_directory_analysis():
