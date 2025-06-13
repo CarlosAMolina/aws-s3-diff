@@ -107,17 +107,21 @@ class S3UrisFileChecker:
 
     def _assert_no_empty_account(self):
         if any(account.startswith("Unnamed: ") for account in self._s3_uris_file_reader.get_accounts()):
-            raise EmptyAccountNameS3UrisFileError("Some AWS account names are empty")
+            raise EmptyAccountNameS3UrisFileError(
+                f"Some AWS account names are empty (file {FILE_NAME_S3_URIS_TO_ANALYZE})"
+            )
 
     def _assert_no_empty_uris(self):
         if self._s3_uris_file_reader.is_any_uri_null():
-            raise EmptyUriS3UrisFileError("Some URIs are empty")
+            raise EmptyUriS3UrisFileError(f"Some URIs are empty (file {FILE_NAME_S3_URIS_TO_ANALYZE})")
 
     def _assert_no_duplicated_uri_per_account(self):
         for account in self._s3_uris_file_reader.get_accounts():
             queries = self._s3_uris_file_reader.get_s3_queries_for_account(account)
             if len(queries) != len(set(queries)):
-                raise DuplicatedUriS3UrisFileError(f"The AWS account {account} has duplicated URIs")
+                raise DuplicatedUriS3UrisFileError(
+                    f"The AWS account {account} has duplicated URIs (file {FILE_NAME_S3_URIS_TO_ANALYZE})"
+                )
 
 
 class S3UrisFileReader:
