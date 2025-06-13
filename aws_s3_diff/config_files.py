@@ -7,6 +7,7 @@ from pandas import DataFrame as Df
 from pandas import read_csv
 
 from aws_s3_diff.exceptions import AnalysisConfigError
+from aws_s3_diff.exceptions import EmptyAwsAccountNameAnalysisConfigError
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.types_custom import S3Query
 
@@ -104,7 +105,7 @@ class S3UrisFileChecker:
 
     def _assert_no_empty_account(self):
         if any(account.startswith("Unnamed: ") for account in self._s3_uris_file_reader.get_accounts()):
-            raise ValueError("Some AWS account names are empty")
+            raise EmptyAwsAccountNameAnalysisConfigError("Some AWS account names are empty")
 
     def _assert_no_empty_uris(self):
         if self._s3_uris_file_reader.is_any_uri_null():

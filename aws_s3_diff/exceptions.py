@@ -4,3 +4,7 @@ class FolderInS3UriError(IsADirectoryError):
 
 class AnalysisConfigError(ValueError):
     pass
+
+
+class EmptyAwsAccountNameAnalysisConfigError(ValueError):
+    pass
