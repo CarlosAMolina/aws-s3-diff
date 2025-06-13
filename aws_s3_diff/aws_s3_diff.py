@@ -32,12 +32,11 @@ class Main:
     def run(self):
         _logger.info("Welcome to the AWS S3 Diff tool!")
         _logger.debug("Checking if the URIs to analyze configuration file is correct")
-        # TODO create custom exceptionand manage to avoid large exception message
+        # TODO create custom exception and manage to avoid large exception message
         self._s3_uris_file_checker.assert_file_is_correct()
         try:
             self._show_accounts_to_analyze()
-            # TODO not access property of property
-            if not self._local_results.analysis_paths.directory_analysis.exists():
+            if not self._local_results.exist_directory_analysis():
                 self._local_results.create_directory_analysis()
             s3_diff_process = _S3DiffProcess()
             while s3_diff_process.must_run_next_state:

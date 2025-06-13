@@ -53,6 +53,9 @@ class LocalResults:
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
 
+    def exist_directory_analysis(self) -> bool:
+        return self.analysis_paths.directory_analysis.exists()
+
     @property
     def analysis_paths(self) -> "_AnalysisPaths":
         if self._analysis_paths_cache is None:
