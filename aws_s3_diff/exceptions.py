@@ -6,5 +6,13 @@ class AnalysisConfigError(ValueError):
     pass
 
 
-class EmptyAwsAccountNameAnalysisConfigError(ValueError):
+class EmptyAccountNameAnalysisConfigError(ValueError):
+    pass
+
+
+class EmptyUriAnalysisConfigError(ValueError):
+    pass
+
+
+class DuplicatedUriAnalysisConfigError(ValueError):
     pass
