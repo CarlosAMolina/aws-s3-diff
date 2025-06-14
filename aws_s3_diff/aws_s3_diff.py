@@ -41,7 +41,6 @@ class Main:
         self._show_accounts_to_analyze()
         if not self._local_results.exist_directory_analysis():
             self._local_results.create_directory_analysis()
-        # TODO move out of this try-except block the code that does not raise FolderInS3UriError
         s3_diff_process = _S3DiffProcess()
         while s3_diff_process.must_run_next_state:
             try:
@@ -54,10 +53,7 @@ class Main:
             except ClientError as exception:
                 error_code = exception.response["Error"]["Code"]
                 if error_code == "NoSuchBucket":
-                    bucket_name = exception.response["Error"]["BucketName"]
-                    _logger.error(
-                        f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
-                    )
+                    _logger.error(self._get_error_message_no_such_bucket(exception))
                     return
                 if error_code in ("AccessDenied", "InvalidAccessKeyId"):
                     _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
@@ -69,6 +65,10 @@ class Main:
         accounts = self._s3_uris_file_reader.get_accounts()
         accounts_list = [f"\n{index}. {account}" for index, account in enumerate(accounts, 1)]
         _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
+
+    def _get_error_message_no_such_bucket(self, exception: ClientError) -> str:
+        bucket_name = exception.response["Error"]["BucketName"]
+        return f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
 
 
 class _State(ABC):
