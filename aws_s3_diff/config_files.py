@@ -117,9 +117,7 @@ class S3UrisFileChecker:
         for account in self._s3_uris_file_reader.get_accounts():
             queries = self._s3_uris_file_reader.get_s3_queries_for_account(account)
             if len(queries) != len(set(queries)):
-                raise DuplicatedUriS3UrisFileError(
-                    f"The AWS account {account} has duplicated URIs (file {FILE_NAME_S3_URIS_TO_ANALYZE})"
-                )
+                raise DuplicatedUriS3UrisFileError(account)
 
 
 class S3UrisFileReader:
