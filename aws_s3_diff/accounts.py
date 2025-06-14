@@ -16,12 +16,7 @@ class AnalyzedAccounts:
         raise RuntimeError("All AWS accounts have been analyzed")
 
     def have_all_accounts_been_analyzed(self) -> bool:
-        return self._get_last_account_analyzed() == self._s3_uris_file_reader.get_last_account()
-
-    def _get_last_account_analyzed(self) -> str | None:
-        result = None
-        for account in self._s3_uris_file_reader.get_accounts():
-            if not self._local_results.has_this_account_been_analyzed(account):
-                return result
-            result = account
-        return result
+        for account_to_analyze in self._s3_uris_file_reader.get_accounts():
+            if not self._local_results.has_this_account_been_analyzed(account_to_analyze):
+                return False
+        return True
