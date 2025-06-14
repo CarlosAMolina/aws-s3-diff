@@ -50,7 +50,6 @@ class Main:
                 except AnalysisConfigError as exception:
                     _logger.error(exception)
                     return
-                s3_diff_process.export_csv(df)
             except FolderInS3UriError as exception:
                 _logger.error(exception)
                 return
@@ -70,6 +69,8 @@ class Main:
             # TODO add test
             except EndpointConnectionError as exception:
                 _logger.error(exception)
+                return
+            s3_diff_process.export_csv(df)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
