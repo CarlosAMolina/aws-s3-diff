@@ -25,7 +25,6 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
-        self._analyzed_accounts = AnalyzedAccounts()
         self._local_results = LocalResults()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
