@@ -22,4 +22,7 @@ class EmptyAccountNameS3UrisFileError(S3UrisFileError):
 
 
 class EmptyUriS3UrisFileError(S3UrisFileError):
-    pass
+    _message = "Some URIs are empty (file s3-uris-to-analyze.csv)"
+
+    def __init__(self, *args):
+        super().__init__(self._message)

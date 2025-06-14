@@ -111,7 +111,7 @@ class S3UrisFileChecker:
 
     def _assert_no_empty_uris(self):
         if self._s3_uris_file_reader.is_any_uri_null():
-            raise EmptyUriS3UrisFileError(f"Some URIs are empty (file {FILE_NAME_S3_URIS_TO_ANALYZE})")
+            raise EmptyUriS3UrisFileError()
 
     def _assert_no_duplicated_uri_per_account(self):
         for account in self._s3_uris_file_reader.get_accounts():
