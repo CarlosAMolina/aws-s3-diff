@@ -137,6 +137,10 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                 message_error_subfolder,
                 FolderInS3UriError(message_error_subfolder),
             ),
+            (
+                'Could not connect to the endpoint URL: "foo"',
+                EndpointConnectionError(endpoint_url="foo"),
+            ),
         ):
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_get_df.side_effect = aws_error
@@ -144,13 +148,6 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                 with self.assertLogs(level="ERROR") as cm:
                     Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
-
-    @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.get_df")
-    def test_export_csvs_catches_exception(self, mock_get_df):
-        mock_get_df.side_effect = EndpointConnectionError(endpoint_url="foo")
-        with self.assertLogs(level="ERROR") as cm:
-            Main()._export_csvs()
-        self.assertEqual('Could not connect to the endpoint URL: "foo"', cm.records[0].message)
 
     # TODO try avoid this method using temporal directories
     def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):
