@@ -30,8 +30,7 @@ test-filter:
 	#poetry run python -m unittest discover -p test_config_files.py -k TestAnalysisConfigChecker
 	#poetry run python -m unittest discover -p test_s3_data.py -k TestS3UriDfModifier
 	#poetry run python -m unittest discover -p test_s3_data_analysis.py -k TestDfAnalysis.test_get_df_set_analysis_result_for_several_df_analysis
-	poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithLocalS3Server.test_export_csvs_catches_exception
-	#poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithoutLocalS3Server.test_run_manages_analysis_config_error_and_generates_expected_error_messages
 	#poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithLocalS3Server.test_run_all_acounts_generates_expected_results
+	poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithoutLocalS3Server.test_export_csvs_catches_exception
 	#poetry run python -m unittest discover -p test_s3_client.py
 
