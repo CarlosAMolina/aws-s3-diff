@@ -90,7 +90,7 @@ class _S3DiffProcess:
         self._analysis_state = _AnalysisState(self)
         self._combine_state = _CombineState(self)
         self._must_run_next_state = True
-        # TODO i prefer to not do it in __init__
+        # TODO I prefer not to it in __init__
         if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             self.set_state_analysis()
         elif AnalyzedAccounts().have_all_accounts_been_analyzed():
