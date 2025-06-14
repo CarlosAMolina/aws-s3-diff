@@ -45,12 +45,8 @@ class Main:
         s3_diff_process = _S3DiffProcess()
         while s3_diff_process.must_run_next_state:
             try:
-                try:
-                    df = s3_diff_process.get_df()
-                except AnalysisConfigError as exception:
-                    _logger.error(exception)
-                    return
-            except FolderInS3UriError as exception:
+                df = s3_diff_process.get_df()
+            except (AnalysisConfigError, FolderInS3UriError) as exception:
                 _logger.error(exception)
                 return
             # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
