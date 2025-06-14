@@ -7,17 +7,22 @@ class AnalysisConfigError(ValueError):
 
 
 class S3UrisFileError(ValueError):
+    _message = "Error in s3-uris-to-analyze.csv"
+    _error_detail = "No error specified"
+
     def __init__(self, **kwargs):
-        super().__init__(self._message.format(**kwargs))
+        error_detail = self._error_detail.format(**kwargs)
+        message = self._message + ". " + error_detail
+        super().__init__(message)
 
 
 class DuplicatedUriS3UrisFileError(S3UrisFileError):
-    _message = "Error in s3-uris-to-analyze.csv. The AWS account {account} has duplicated URIs"
+    _error_detail = "The AWS account {account} has duplicated URIs"
 
 
 class EmptyAccountNameS3UrisFileError(S3UrisFileError):
-    _message = "Error in s3-uris-to-analyze.csv. Some AWS account names are empty"
+    _error_detail = "Some AWS account names are empty"
 
 
 class EmptyUriS3UrisFileError(S3UrisFileError):
-    _message = "Error in s3-uris-to-analyze.csv. Some URIs are empty"
+    _error_detail = "Some URIs are empty"
