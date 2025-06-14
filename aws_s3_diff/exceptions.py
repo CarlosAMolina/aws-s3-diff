@@ -15,7 +15,9 @@ class DuplicatedUriS3UrisFileError(S3UrisFileError):
 
 
 class EmptyAccountNameS3UrisFileError(S3UrisFileError):
-    pass
+    def __init__(self):
+        message = "Some AWS account names are empty (file s3-uris-to-analyze.csv)"
+        super().__init__(message)
 
 
 class EmptyUriS3UrisFileError(S3UrisFileError):

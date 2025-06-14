@@ -107,9 +107,7 @@ class S3UrisFileChecker:
 
     def _assert_no_empty_account(self):
         if any(account.startswith("Unnamed: ") for account in self._s3_uris_file_reader.get_accounts()):
-            raise EmptyAccountNameS3UrisFileError(
-                f"Some AWS account names are empty (file {FILE_NAME_S3_URIS_TO_ANALYZE})"
-            )
+            raise EmptyAccountNameS3UrisFileError()
 
     def _assert_no_empty_uris(self):
         if self._s3_uris_file_reader.is_any_uri_null():
