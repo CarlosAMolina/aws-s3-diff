@@ -13,8 +13,8 @@ class S3UrisFileError(ValueError):
 class DuplicatedUriS3UrisFileError(S3UrisFileError):
     _message = "The AWS account {account} has duplicated URIs (file s3-uris-to-analyze.csv)"
 
-    def __init__(self, *args):
-        super().__init__(self._message.format(account=args[0]))
+    def __init__(self, **kwargs):
+        super().__init__(self._message.format(**kwargs))
 
 
 class EmptyAccountNameS3UrisFileError(S3UrisFileError):

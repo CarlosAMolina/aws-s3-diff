@@ -116,7 +116,7 @@ class S3UrisFileChecker:
         for account in self._s3_uris_file_reader.get_accounts():
             queries = self._s3_uris_file_reader.get_s3_queries_for_account(account)
             if len(queries) != len(set(queries)):
-                raise DuplicatedUriS3UrisFileError(account)
+                raise DuplicatedUriS3UrisFileError(account=account)
 
 
 class S3UrisFileReader:
