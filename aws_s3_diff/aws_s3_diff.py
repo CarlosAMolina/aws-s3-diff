@@ -41,9 +41,9 @@ class Main:
         self._show_accounts_to_analyze()
         if not self._local_results.exist_directory_analysis():
             self._local_results.create_directory_analysis()
-        self._export_csv()
+        self._export_csvs()
 
-    def _export_csv(self):
+    def _export_csvs(self):
         s3_diff_process = _S3DiffProcess()
         while s3_diff_process.must_run_next_state:
             try:
