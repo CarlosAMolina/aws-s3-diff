@@ -12,6 +12,7 @@ from pandas import read_csv
 from pandas.testing import assert_frame_equal
 
 from aws_s3_diff.aws_s3_diff import AnalysisConfigError
+from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
@@ -52,6 +53,13 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(analysis_paths)
+
+    @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.get_df")
+    def test_export_csvs_catches_exception(self, mock_get_df):
+        mock_get_df.side_effect = EndpointConnectionError(endpoint_url="foo")
+        with self.assertLogs(level="ERROR") as cm:
+            Main()._export_csvs()
+        self.assertEqual('Could not connect to the endpoint URL: "foo"', cm.records[0].message)
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [

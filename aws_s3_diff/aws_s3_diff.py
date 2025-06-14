@@ -52,7 +52,6 @@ class Main:
         while s3_diff_process.must_run_next_state:
             try:
                 df = s3_diff_process.get_df()
-            # TODO add test for EndpointConnectionError
             except (AnalysisConfigError, EndpointConnectionError, FolderInS3UriError) as exception:
                 _logger.error(exception)
                 return
