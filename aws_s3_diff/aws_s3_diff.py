@@ -42,8 +42,8 @@ class Main:
         if not self._local_results.exist_directory_analysis():
             self._local_results.create_directory_analysis()
         # TODO move out of this try-except block the code that does not raise FolderInS3UriError
+        s3_diff_process = _S3DiffProcess()
         try:
-            s3_diff_process = _S3DiffProcess()
             while s3_diff_process.must_run_next_state:
                 try:
                     df = s3_diff_process.get_df()
