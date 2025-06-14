@@ -43,33 +43,33 @@ class Main:
             self._local_results.create_directory_analysis()
         # TODO move out of this try-except block the code that does not raise FolderInS3UriError
         s3_diff_process = _S3DiffProcess()
-        try:
-            while s3_diff_process.must_run_next_state:
+        while s3_diff_process.must_run_next_state:
+            try:
                 try:
                     df = s3_diff_process.get_df()
                 except AnalysisConfigError as exception:
                     _logger.error(exception)
                     return
                 s3_diff_process.export_csv(df)
-        except FolderInS3UriError as exception:
-            _logger.error(exception)
-            return
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
-        except ClientError as exception:
-            error_code = exception.response["Error"]["Code"]
-            if error_code == "NoSuchBucket":
-                bucket_name = exception.response["Error"]["BucketName"]
-                _logger.error(
-                    f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
-                )
+            except FolderInS3UriError as exception:
+                _logger.error(exception)
                 return
-            if error_code in ("AccessDenied", "InvalidAccessKeyId"):
-                _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
-                return
-            raise Exception from exception
-        # TODO add test
-        except EndpointConnectionError as exception:
-            _logger.error(exception)
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
+            except ClientError as exception:
+                error_code = exception.response["Error"]["Code"]
+                if error_code == "NoSuchBucket":
+                    bucket_name = exception.response["Error"]["BucketName"]
+                    _logger.error(
+                        f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
+                    )
+                    return
+                if error_code in ("AccessDenied", "InvalidAccessKeyId"):
+                    _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                    return
+                raise Exception from exception
+            # TODO add test
+            except EndpointConnectionError as exception:
+                _logger.error(exception)
 
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
