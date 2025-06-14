@@ -46,7 +46,8 @@ class Main:
         while s3_diff_process.must_run_next_state:
             try:
                 df = s3_diff_process.get_df()
-            except (AnalysisConfigError, FolderInS3UriError) as exception:
+            # TODO add test for EndpointConnectionError
+            except (AnalysisConfigError, EndpointConnectionError, FolderInS3UriError) as exception:
                 _logger.error(exception)
                 return
             # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
@@ -62,10 +63,6 @@ class Main:
                     _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                     return
                 raise Exception from exception
-            # TODO add test
-            except EndpointConnectionError as exception:
-                _logger.error(exception)
-                return
             s3_diff_process.export_csv(df)
 
     def _show_accounts_to_analyze(self):
