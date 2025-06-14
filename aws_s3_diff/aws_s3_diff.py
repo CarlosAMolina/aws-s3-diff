@@ -39,10 +39,10 @@ class Main:
             _logger.error(exception)
             return
         self._show_accounts_to_analyze()
+        if not self._local_results.exist_directory_analysis():
+            self._local_results.create_directory_analysis()
         # TODO move out of this try-except block the code that does not raise FolderInS3UriError
         try:
-            if not self._local_results.exist_directory_analysis():
-                self._local_results.create_directory_analysis()
             s3_diff_process = _S3DiffProcess()
             while s3_diff_process.must_run_next_state:
                 try:
