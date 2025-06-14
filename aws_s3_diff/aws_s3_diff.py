@@ -43,6 +43,11 @@ class Main:
             self._local_results.create_directory_analysis()
         self._export_csvs()
 
+    def _show_accounts_to_analyze(self):
+        accounts = self._s3_uris_file_reader.get_accounts()
+        accounts_list = [f"\n{index}. {account}" for index, account in enumerate(accounts, 1)]
+        _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
+
     def _export_csvs(self):
         s3_diff_process = _S3DiffProcess()
         while s3_diff_process.must_run_next_state:
@@ -63,11 +68,6 @@ class Main:
                     return
                 raise Exception from exception
             s3_diff_process.export_csv(df)
-
-    def _show_accounts_to_analyze(self):
-        accounts = self._s3_uris_file_reader.get_accounts()
-        accounts_list = [f"\n{index}. {account}" for index, account in enumerate(accounts, 1)]
-        _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
     def _get_error_message_no_such_bucket(self, exception: ClientError) -> str:
         bucket_name = exception.response["Error"]["BucketName"]
