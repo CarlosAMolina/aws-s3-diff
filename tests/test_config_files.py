@@ -111,14 +111,14 @@ class TestS3UrisFileChecker(unittest.TestCase):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_account.csv")
         with self.assertRaises(EmptyAccountNameS3UrisFileError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
-        self.assertEqual("Some AWS account names are empty (file s3-uris-to-analyze.csv)", str(exception.exception))
+        self.assertEqual("Error in s3-uris-to-analyze.csv. Some AWS account names are empty", str(exception.exception))
 
     @mock.patch("aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
     def test_assert_file_is_correct_raises_exception_if_empty_uri(self, mock_file_path_what_to_analyze):
         mock_file_path_what_to_analyze.return_value = self._get_file_path_s3_uri_to_analyze("empty_uri.csv")
         with self.assertRaises(EmptyUriS3UrisFileError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
-        self.assertEqual("Some URIs are empty (file s3-uris-to-analyze.csv)", str(exception.exception))
+        self.assertEqual("Error in s3-uris-to-analyze.csv. Some URIs are empty", str(exception.exception))
 
     @mock.patch("aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze", new_callable=mock.PropertyMock)
     def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_file_path_what_to_analyze):
@@ -126,7 +126,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
         with self.assertRaises(DuplicatedUriS3UrisFileError) as exception:
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual(
-            "The AWS account foo has duplicated URIs (file s3-uris-to-analyze.csv)", str(exception.exception)
+            "Error in s3-uris-to-analyze.csv. The AWS account foo has duplicated URIs", str(exception.exception)
         )
 
     @staticmethod
