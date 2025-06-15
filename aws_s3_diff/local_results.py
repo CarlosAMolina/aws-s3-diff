@@ -39,9 +39,6 @@ class LocalResults:
     def get_file_path_results(self, file_name: str):
         return self.analysis_paths.directory_analysis.joinpath(file_name)
 
-    def _get_file_path_account_results(self, account: str):
-        return self.get_file_path_results(get_account_file_name(account))
-
     def drop_file(self, file_path: Path):
         self._logger.debug(f"Removing: {file_path}")
         file_path.unlink()
@@ -63,6 +60,9 @@ class LocalResults:
             analysis_date_time_str = _AnalysisDateTimeCreator().get_analysis_date_time_str()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache
+
+    def _get_file_path_account_results(self, account: str):
+        return self.get_file_path_results(get_account_file_name(account))
 
 
 class _AnalysisDateTimeCreator:
