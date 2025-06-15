@@ -103,7 +103,8 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         self.assertEqual("foo", cm.records[0].message)
 
     @patch("aws_s3_diff.aws_s3_diff.LocalResults")
-    @patch("aws_s3_diff.aws_s3_diff.AnalyzedAccounts")
+    @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed")
+    @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze")
     @patch("aws_s3_diff.aws_s3_diff.AccountCsvCreator.get_df")
     @patch(
         "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
@@ -111,7 +112,12 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
     )
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
-        self, mock_file_path_what_to_analyze, mock_get_df, mock_analyzed_accounts, mock_local_results
+        self,
+        mock_file_path_what_to_analyze,
+        mock_get_df,
+        mock_get_account_to_analyze,
+        mock_have_all_accounts_been_analyzed,
+        mock_local_results,
     ):
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
@@ -144,15 +150,19 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         ):
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_get_df.side_effect = aws_error
-                self._mock_to_not_generate_analysis_date_time_file(mock_analyzed_accounts, mock_local_results)
+                self._mock_to_not_generate_analysis_date_time_file(
+                    mock_get_account_to_analyze, mock_have_all_accounts_been_analyzed, mock_local_results
+                )
                 with self.assertLogs(level="ERROR") as cm:
                     Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
 
     # TODO try avoid this method using temporal directories
-    def _mock_to_not_generate_analysis_date_time_file(self, mock_analyzed_accounts, mock_local_results):
-        mock_analyzed_accounts().get_account_to_analyze.return_value = S3UrisFileReader().get_first_account()
-        mock_analyzed_accounts().have_all_accounts_been_analyzed.return_value = False
+    def _mock_to_not_generate_analysis_date_time_file(
+        self, mock_get_account_to_analyze, mock_have_all_accounts_been_analyzed, mock_local_results
+    ):
+        mock_get_account_to_analyze.return_value = S3UrisFileReader().get_first_account()
+        mock_have_all_accounts_been_analyzed.return_value = False
         mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
         mock_local_results().get_file_path_results().is_file.return_value = False
         mock_local_results().directory_analysis.is_dir.return_value = True

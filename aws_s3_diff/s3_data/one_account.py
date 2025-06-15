@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import DataFrame as Df
 from pandas import MultiIndex
 
-from aws_s3_diff.accounts import AnalyzedAccounts
+from aws_s3_diff.accounts import get_account_to_analyze
 from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import get_account_file_name
@@ -48,7 +48,7 @@ class AccountCsvCreator(CsvCreator):
 
     @property
     def _account(self) -> str:
-        return AnalyzedAccounts().get_account_to_analyze()
+        return get_account_to_analyze()
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):

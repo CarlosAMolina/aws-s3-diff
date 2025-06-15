@@ -5,7 +5,8 @@ from botocore.exceptions import ClientError
 from botocore.exceptions import EndpointConnectionError
 from pandas import DataFrame as Df
 
-from aws_s3_diff.accounts import AnalyzedAccounts
+from aws_s3_diff.accounts import get_account_to_analyze
+from aws_s3_diff.accounts import have_all_accounts_been_analyzed
 from aws_s3_diff.config_files import AnalysisConfigChecker
 from aws_s3_diff.config_files import AnalysisConfigReader
 from aws_s3_diff.config_files import S3UrisFileChecker
@@ -91,7 +92,7 @@ class _S3DiffProcess:
         # TODO I prefer not to do it in __init__
         if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
             self.set_state_analysis()
-        elif AnalyzedAccounts().have_all_accounts_been_analyzed():
+        elif have_all_accounts_been_analyzed():
             self.set_state_combine()
         else:
             self.set_state_account()
@@ -122,20 +123,19 @@ class _S3DiffProcess:
 class _AccountState(_State):
     def __init__(self, s3_diff_process: _S3DiffProcess):
         self._s3_diff_process = s3_diff_process
-        self._analyzed_accounts = AnalyzedAccounts()
         self._csv_creator = AccountCsvCreator()
 
     def get_df(self) -> Df:
-        _logger.info(f"Analyzing the AWS account '{self._analyzed_accounts.get_account_to_analyze()}'")
+        _logger.info(f"Analyzing the AWS account '{get_account_to_analyze()}'")
         return self._csv_creator.get_df()
 
     def export_csv(self, df: Df):
         self._csv_creator.export_csv(df)
-        if self._analyzed_accounts.have_all_accounts_been_analyzed():
+        if have_all_accounts_been_analyzed():
             self._s3_diff_process.set_state_combine()
         else:
             _logger.info(
-                f"The next account to be analyzed is '{self._analyzed_accounts.get_account_to_analyze()}'"
+                f"The next account to be analyzed is '{get_account_to_analyze()}'"
                 ". Authenticate and run the program again"
             )
             self._s3_diff_process.set_must_not_run_next_state()
