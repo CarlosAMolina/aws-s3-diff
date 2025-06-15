@@ -49,10 +49,10 @@ class Main:
         _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
     def _export_csvs(self):
-        csv_generator = _CsvGenerator()
-        while csv_generator.must_run_next_state:
+        csvs_generator = _CsvsGenerator()
+        while csvs_generator.must_run_next_state:
             try:
-                df = csv_generator.get_df()
+                df = csvs_generator.get_df()
             except (AnalysisConfigError, EndpointConnectionError, FolderInS3UriError) as exception:
                 _logger.error(exception)
                 return
@@ -66,14 +66,14 @@ class Main:
                     _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                     return
                 raise Exception from exception
-            csv_generator.export_csv(df)
+            csvs_generator.export_csv(df)
 
     def _get_error_message_no_such_bucket(self, exception: ClientError) -> str:
         bucket_name = exception.response["Error"]["BucketName"]
         return f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
 
 
-class _CsvGenerator:
+class _CsvsGenerator:
     def __init__(self):
         self._account_state = _AccountState(self)
         self._analysis_state = _AnalysisState(self)
@@ -121,8 +121,8 @@ class _State(ABC):
 
 
 class _AccountState(_State):
-    def __init__(self, csv_generator: _CsvGenerator):
-        self._csv_generator = csv_generator
+    def __init__(self, csvs_generator: _CsvsGenerator):
+        self._csvs_generator = csvs_generator
         self._account_csv_creator = AccountCsvCreator()
 
     def get_df(self) -> Df:
@@ -132,18 +132,18 @@ class _AccountState(_State):
     def export_csv(self, df: Df):
         self._account_csv_creator.export_csv(df)
         if have_all_accounts_been_analyzed():
-            self._csv_generator.set_state_combine()
+            self._csvs_generator.set_state_combine()
         else:
             _logger.info(
                 f"The next account to be analyzed is '{get_account_to_analyze()}'"
                 ". Authenticate and run the program again"
             )
-            self._csv_generator.set_must_not_run_next_state()
+            self._csvs_generator.set_must_not_run_next_state()
 
 
 class _CombineState(_State):
-    def __init__(self, csv_generator: _CsvGenerator):
-        self._csv_generator = csv_generator
+    def __init__(self, csvs_generator: _CsvsGenerator):
+        self._csvs_generator = csvs_generator
         self._accounts_csv_creator = AccountsCsvCreator()
 
     def get_df(self) -> Df:
@@ -151,12 +151,12 @@ class _CombineState(_State):
 
     def export_csv(self, df: Df):
         self._accounts_csv_creator.export_csv(df)
-        self._csv_generator.set_state_analysis()
+        self._csvs_generator.set_state_analysis()
 
 
 class _AnalysisState(_State):
-    def __init__(self, csv_generator: _CsvGenerator):
-        self._csv_generator = csv_generator
+    def __init__(self, csvs_generator: _CsvsGenerator):
+        self._csvs_generator = csvs_generator
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
         self._analysis_csv_creator = AnalysisCsvCreator()
@@ -174,4 +174,4 @@ class _AnalysisState(_State):
             return
         self._analysis_csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
-        self._csv_generator.set_must_not_run_next_state()
+        self._csvs_generator.set_must_not_run_next_state()
