@@ -123,14 +123,14 @@ class _State(ABC):
 class _AccountState(_State):
     def __init__(self, csv_generator: _CsvGenerator):
         self._csv_generator = csv_generator
-        self._csv_creator = AccountCsvCreator()
+        self._account_csv_creator = AccountCsvCreator()
 
     def get_df(self) -> Df:
         _logger.info(f"Analyzing the AWS account '{get_account_to_analyze()}'")
-        return self._csv_creator.get_df()
+        return self._account_csv_creator.get_df()
 
     def export_csv(self, df: Df):
-        self._csv_creator.export_csv(df)
+        self._account_csv_creator.export_csv(df)
         if have_all_accounts_been_analyzed():
             self._csv_generator.set_state_combine()
         else:
@@ -144,13 +144,13 @@ class _AccountState(_State):
 class _CombineState(_State):
     def __init__(self, csv_generator: _CsvGenerator):
         self._csv_generator = csv_generator
-        self._csv_creator = AccountsCsvCreator()
+        self._accounts_csv_creator = AccountsCsvCreator()
 
     def get_df(self) -> Df:
-        return self._csv_creator.get_df()
+        return self._accounts_csv_creator.get_df()
 
     def export_csv(self, df: Df):
-        self._csv_creator.export_csv(df)
+        self._accounts_csv_creator.export_csv(df)
         self._csv_generator.set_state_analysis()
 
 
@@ -159,19 +159,19 @@ class _AnalysisState(_State):
         self._csv_generator = csv_generator
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._csv_creator = AnalysisCsvCreator()
+        self._analysis_csv_creator = AnalysisCsvCreator()
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            return self._csv_creator.get_df()
+            return self._analysis_csv_creator.get_df()
         _logger.info("No analysis configured. Omitting")
         return Df()
 
     def export_csv(self, df: Df):
         if df.empty:
             return
-        self._csv_creator.export_csv(df)
+        self._analysis_csv_creator.export_csv(df)
         self._local_results.drop_file_with_analysis_date()
         self._csv_generator.set_must_not_run_next_state()
