@@ -73,16 +73,6 @@ class Main:
         return f"The bucket '{bucket_name}' does not exist. Specify a correct bucket and run the program again"
 
 
-class _State(ABC):
-    @abstractmethod
-    def get_df(self) -> Df:
-        pass
-
-    @abstractmethod
-    def export_csv(self, df: Df):
-        pass
-
-
 class _S3DiffProcess:
     def __init__(self):
         self._account_state = _AccountState(self)
@@ -118,6 +108,16 @@ class _S3DiffProcess:
 
     def set_must_not_run_next_state(self):
         self._must_run_next_state = False
+
+
+class _State(ABC):
+    @abstractmethod
+    def get_df(self) -> Df:
+        pass
+
+    @abstractmethod
+    def export_csv(self, df: Df):
+        pass
 
 
 class _AccountState(_State):
