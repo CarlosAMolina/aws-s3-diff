@@ -3,12 +3,13 @@ from pathlib import Path
 
 from aws_s3_diff.logger import get_logger
 
-ACCOUNTS_FILE_NAME = "s3-files-all-accounts.csv"
-ANALYSIS_FILE_NAME = "analysis.csv"
+_EXTENSION_FILE_NAME = ".csv"
+ACCOUNTS_FILE_NAME = f"s3-files-all-accounts{_EXTENSION_FILE_NAME}"
+ANALYSIS_FILE_NAME = f"analysis{_EXTENSION_FILE_NAME}"
 
 
 def get_account_file_name(account: str) -> str:
-    return f"{account}.csv"
+    return f"{account}{_EXTENSION_FILE_NAME}"
 
 
 class LocalPaths:
@@ -33,10 +34,11 @@ class LocalResults:
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
         self._analysis_paths_cache = None  # To avoid read/create file in __init__.
 
-    def has_this_account_been_analyzed(self, account: str) -> bool:
-        return self._get_file_path_account_results(account).is_file()
+    def get_file_names_results(self) -> list[str]:
+        paths = self.analysis_paths.directory_analysis.glob(f"*{_EXTENSION_FILE_NAME}")
+        return [path.name for path in paths]
 
-    def get_file_path_results(self, file_name: str):
+    def get_file_path_results(self, file_name: str) -> Path:
         return self.analysis_paths.directory_analysis.joinpath(file_name)
 
     def drop_file(self, file_path: Path):
@@ -60,9 +62,6 @@ class LocalResults:
             analysis_date_time_str = _AnalysisDateTimeCreator().get_analysis_date_time_str()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache
-
-    def _get_file_path_account_results(self, account: str):
-        return self.get_file_path_results(get_account_file_name(account))
 
 
 class _AnalysisDateTimeCreator:
