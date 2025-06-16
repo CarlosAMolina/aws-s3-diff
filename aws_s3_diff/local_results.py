@@ -70,10 +70,10 @@ class AnalysisDateTimeCreator:
 
     def get_analysis_date_time_str(self) -> str:
         if not self._analysis_date_time_file_path.is_file():
-            self._export_date_time_str()
+            self.export_date_time_str()
         return self._get_date_time_str_stored()
 
-    def _export_date_time_str(self):
+    def export_date_time_str(self):
         with open(self._analysis_date_time_file_path, "w") as file:
             file.write(self._new_date_time_str)
 
