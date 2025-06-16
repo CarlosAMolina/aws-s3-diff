@@ -71,15 +71,15 @@ class AnalysisDateTimeCreator:
     def __init__(self):
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
-    def get_analysis_date_time_str(self) -> str:
-        with open(self._analysis_date_time_file_path) as file:
-            # `strip()` to avoid errors if the file is modified manually by te user.
-            return file.read().strip()
-
     def export_date_time_str(self):
         with open(self._analysis_date_time_file_path, "w") as file:
             date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             file.write(date_time_str)
+
+    def get_analysis_date_time_str(self) -> str:
+        with open(self._analysis_date_time_file_path) as file:
+            # `strip()` to avoid errors if the file is modified manually by te user.
+            return file.read().strip()
 
 
 # TODO deprecate
