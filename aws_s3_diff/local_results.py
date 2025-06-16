@@ -72,8 +72,6 @@ class AnalysisDateTimeCreator:
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
     def get_analysis_date_time_str(self) -> str:
-        if not self._analysis_date_time_file_path.is_file():
-            self.export_date_time_str()
         return self._get_date_time_str_stored()
 
     def export_date_time_str(self):
