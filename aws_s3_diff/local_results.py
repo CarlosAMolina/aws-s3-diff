@@ -78,11 +78,8 @@ class AnalysisDateTimeCreator:
 
     def export_date_time_str(self):
         with open(self._analysis_date_time_file_path, "w") as file:
-            file.write(self._new_date_time_str)
-
-    @property
-    def _new_date_time_str(self) -> str:
-        return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            file.write(date_time_str)
 
 
 # TODO deprecate
