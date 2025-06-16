@@ -52,6 +52,9 @@ class LocalResults:
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
 
+    def exist_analysis_date_time_file(self) -> bool:
+        return self._analysis_date_time_file_path.is_file()
+
     def exist_directory_analysis(self) -> bool:
         return self.analysis_paths.directory_analysis.exists()
 
