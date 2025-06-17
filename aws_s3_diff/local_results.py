@@ -71,7 +71,7 @@ class AnalysisDateTimeGenerator:
     def __init__(self):
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
-    def export_date_time_str(self):
+    def export_analysis_date_time_str(self):
         with open(self._analysis_date_time_file_path, "w") as file:
             date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             file.write(date_time_str)
