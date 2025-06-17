@@ -62,12 +62,12 @@ class LocalResults:
     def analysis_paths(self) -> "_AnalysisPaths":
         if self._analysis_paths_cache is None:
             # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
-            analysis_date_time_str = AnalysisDateTimeCreator().get_analysis_date_time_str()
+            analysis_date_time_str = AnalysisDateTimeGenerator().get_analysis_date_time_str()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache
 
 
-class AnalysisDateTimeCreator:
+class AnalysisDateTimeGenerator:
     def __init__(self):
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
@@ -86,7 +86,7 @@ class AnalysisDateTimeCreator:
 class _AnalysisPaths:
     def __init__(self, analysis_date_time_str: str):
         self._analysis_date_time_str = (
-            analysis_date_time_str  # TODO use AnalysisDateTimeCreator and drop __init__ argument
+            analysis_date_time_str  # TODO use AnalysisDateTimeGenerator and drop __init__ argument
         )
         self._all_results_directory_path = LocalPaths().all_results_directory
 

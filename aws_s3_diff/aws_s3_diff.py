@@ -15,7 +15,7 @@ from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.exceptions import S3UrisFileError
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
-from aws_s3_diff.local_results import AnalysisDateTimeCreator
+from aws_s3_diff.local_results import AnalysisDateTimeGenerator
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
@@ -27,7 +27,7 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
-        self._analysis_date_time_creator = AnalysisDateTimeCreator()
+        self._analysis_date_time_creator = AnalysisDateTimeGenerator()
         self._local_results = LocalResults()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
