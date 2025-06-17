@@ -15,7 +15,6 @@ from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
-from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
@@ -30,62 +29,6 @@ from aws_s3_diff.types_custom import S3Query
 
 # TODO deprecate other classes
 class AccountCsvGenerator(CsvGenerator):
-    def __init__(self, account: str):
-        self._df_creator = _AccountNewDfCreator(account)
-
-    def get_df(self) -> Df:
-        return self._df_creator.get_df()
-
-
-# TODO everywhere where it is used, initialize in __init__
-# TODO deprecate
-class AccountDf:
-    def get_account_df_to_join(self, account: str, first_account: str) -> Df:
-        account_df = _AccountSimpleIndexDfCreator(account).get_df()
-        result = _AccountMultiIndexDfCreator(account, account_df).get_df()
-        if account == first_account:
-            return result
-        return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
-
-
-class AccountCsvCreator(CsvCreator):
-    # TODO rm
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        raise NotImplementedError()
-
-    @property
-    def _file_name(self) -> str:
-        return get_account_file_name(self._account)
-
-    @property
-    def _account(self) -> str:
-        return get_account_to_analyze()
-
-
-class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
-    def __init__(self, account: str):
-        self._account = account
-        self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
-        self._new_df_creator = _AccountNewDfCreator(account)
-        self._local_results = LocalResults()
-
-    def get_df(self) -> Df:
-        if self._get_file_path().is_file():
-            return self._get_df_from_csv()
-        return self._get_df_create_new()
-
-    def _get_df_from_csv(self) -> Df:
-        return self._df_from_csv_creator.get_df()
-
-    def _get_df_create_new(self) -> Df:
-        return self._new_df_creator.get_df()
-
-    # TODO refator, code duplicated in other files (in this file too)
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(get_account_file_name(self._account))
-
-
-class _AccountNewDfCreator(NewDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -117,6 +60,50 @@ class _AccountNewDfCreator(NewDfCreator):
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
+
+
+# TODO everywhere where it is used, initialize in __init__
+# TODO deprecate
+class AccountDf:
+    def get_account_df_to_join(self, account: str, first_account: str) -> Df:
+        account_df = _AccountSimpleIndexDfCreator(account).get_df()
+        result = _AccountMultiIndexDfCreator(account, account_df).get_df()
+        if account == first_account:
+            return result
+        return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
+
+
+class AccountCsvCreator(CsvCreator):
+    # TODO rm
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        raise NotImplementedError()
+
+    @property
+    def _file_name(self) -> str:
+        return get_account_file_name(self._account)
+
+    @property
+    def _account(self) -> str:
+        return get_account_to_analyze()
+
+
+class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
+    def __init__(self, account: str):
+        self._account = account
+        self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
+        self._local_results = LocalResults()
+
+    def get_df(self) -> Df:
+        if self._get_file_path().is_file():
+            return self._get_df_from_csv()
+        raise NotImplementedError()
+
+    def _get_df_from_csv(self) -> Df:
+        return self._df_from_csv_creator.get_df()
+
+    # TODO refator, code duplicated in other files (in this file too)
+    def _get_file_path(self) -> Path:
+        return self._local_results.get_file_path_results(get_account_file_name(self._account))
 
 
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
