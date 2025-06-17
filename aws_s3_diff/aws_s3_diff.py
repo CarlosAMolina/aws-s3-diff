@@ -27,7 +27,7 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
-        self._analysis_date_time_creator = AnalysisDateTimeGenerator()
+        self._analysis_date_time_generator = AnalysisDateTimeGenerator()
         self._local_results = LocalResults()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -42,7 +42,7 @@ class Main:
             return
         self._show_accounts_to_analyze()
         if not self._local_results.exist_analysis_date_time_file():
-            self._analysis_date_time_creator.export_analysis_date_time_str()
+            self._analysis_date_time_generator.export_analysis_date_time_str()
         if not self._local_results.exist_directory_analysis():
             self._local_results.create_directory_analysis()
         self._export_csvs()
