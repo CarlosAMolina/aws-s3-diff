@@ -31,7 +31,7 @@ from aws_s3_diff.types_custom import S3Query
 # TODO deprecate other classes
 class AccountCsvGenerator(CsvGenerator):
     def __init__(self, account: str):
-        self._df_creator = _AccountSimpleIndexDfCreator(account)
+        self._df_creator = _AccountNewDfCreator(account)
 
     def get_df(self) -> Df:
         return self._df_creator.get_df()
@@ -49,6 +49,7 @@ class AccountDf:
 
 
 class AccountCsvCreator(CsvCreator):
+    # TODO rm
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         raise NotImplementedError()
 
