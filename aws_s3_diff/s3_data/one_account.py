@@ -11,7 +11,7 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import get_account_file_name
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
-from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
@@ -63,6 +63,18 @@ class AccountCsvGenerator(CsvGenerator):
         return result
 
 
+class AccountCsvExporter(CsvExporter):
+    def __init__(self):
+        self._local_results = LocalResults()
+
+    def export_df(self, df: Df):
+        account = get_account_to_analyze()
+        file_name = get_account_file_name(account)
+        file_path = self._local_results.get_file_path_results(file_name)
+        _logger.info(f"Exporting {file_path}")
+        df.to_csv(index=False, path_or_buf=file_path)
+
+
 # TODO everywhere where it is used, initialize in __init__
 # TODO deprecate
 class AccountDf:
@@ -72,20 +84,6 @@ class AccountDf:
         if account == first_account:
             return result
         return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
-
-
-class AccountCsvCreator(CsvCreator):
-    # TODO rm
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        raise NotImplementedError()
-
-    @property
-    def _file_name(self) -> str:
-        return get_account_file_name(self._account)
-
-    @property
-    def _account(self) -> str:
-        return get_account_to_analyze()
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):

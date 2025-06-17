@@ -52,6 +52,12 @@ class CsvGenerator(ABC):
         pass
 
 
+class CsvExporter(ABC):
+    @abstractmethod
+    def export_df(self, df: Df):
+        pass
+
+
 # TODO deprecate
 class CsvCreator(ABC):
     def __init__(self):
