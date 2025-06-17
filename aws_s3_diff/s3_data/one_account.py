@@ -22,11 +22,6 @@ from aws_s3_diff.types_custom import MultiIndexDf
 from aws_s3_diff.types_custom import S3Data
 from aws_s3_diff.types_custom import S3Query
 
-# TODO deprecate `account` argument in all classes, genereate it by checking the files
-
-# TODO everywhere where a class is initialized, initialize it in __init__
-
-
 _logger = get_logger()
 
 
