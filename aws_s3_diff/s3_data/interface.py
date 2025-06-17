@@ -46,6 +46,13 @@ class FromSimpleMultiIndexDfCreator(DfCreator):
         self._df = df
 
 
+class CsvGenerator(ABC):
+    @abstractmethod
+    def get_df(self) -> Df:
+        pass
+
+
+# TODO deprecate
 class CsvCreator(ABC):
     def __init__(self):
         self._local_results = LocalResults()

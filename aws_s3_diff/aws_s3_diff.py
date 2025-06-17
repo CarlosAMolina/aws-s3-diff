@@ -21,6 +21,7 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
 from aws_s3_diff.s3_data.one_account import AccountCsvCreator
+from aws_s3_diff.s3_data.one_account import AccountCsvGenerator
 
 _logger = get_logger()
 
@@ -130,8 +131,9 @@ class _AccountState(_State):
         self._account_csv_creator = AccountCsvCreator()
 
     def get_df(self) -> Df:
-        _logger.info(f"Analyzing the AWS account '{get_account_to_analyze()}'")
-        return self._account_csv_creator.get_df()
+        account = get_account_to_analyze()
+        _logger.info(f"Analyzing the AWS account '{account}'")
+        return AccountCsvGenerator(account).get_df()
 
     def export_csv(self, df: Df):
         self._account_csv_creator.export_csv(df)
