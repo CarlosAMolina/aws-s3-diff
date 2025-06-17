@@ -27,10 +27,9 @@ from aws_s3_diff.types_custom import S3Query
 # TODO everywhere where a class is initialized, initialize it in __init__
 
 
-logger = get_logger()
+_logger = get_logger()
 
 
-# TODO deprecate other classes
 class AccountCsvGenerator(CsvGenerator):
     def __init__(self, account: str):
         self._account = account
@@ -39,7 +38,7 @@ class AccountCsvGenerator(CsvGenerator):
     def get_df(self) -> Df:
         result = Df()
         for query_index, s3_query in enumerate(self._get_s3_queries(), 1):
-            logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
+            _logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
             for s3_data in self._get_s3_data_of_query(s3_query):
                 query_and_data_df = self._get_df_from_s3_data_and_query(s3_data, s3_query)
                 result = pd.concat([result, query_and_data_df])
