@@ -17,6 +17,7 @@ from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import _AnalysisPaths
+from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalPaths
 from tests.aws import S3Server
 
@@ -74,7 +75,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             assert_frame_equal(expected_result_df, result_df)
 
     def _assert_analysis_file_has_expected_values(self, analysis_paths: _AnalysisPaths):
-        result = self._get_df_from_csv(analysis_paths.file_analysis)
+        result = self._get_df_from_csv(analysis_paths.directory_analysis.joinpath(ANALYSIS_FILE_NAME))
+
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["pro_date", "release_date", "dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))

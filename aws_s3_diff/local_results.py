@@ -95,9 +95,5 @@ class _AnalysisPaths:
         return self._all_results_directory_path.joinpath(self._analysis_date_time_str)
 
     @property
-    def file_analysis(self) -> Path:
-        return self.directory_analysis.joinpath(ANALYSIS_FILE_NAME)
-
-    @property
     def file_s3_data_all_accounts(self) -> Path:
         return self.directory_analysis.joinpath(ACCOUNTS_FILE_NAME)
