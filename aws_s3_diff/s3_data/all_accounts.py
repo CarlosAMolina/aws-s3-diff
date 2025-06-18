@@ -23,7 +23,7 @@ from aws_s3_diff.types_custom import MultiIndexDf
 
 class AccountsCsvGenerator(CsvGenerator):
     def get_df(self) -> Df:
-        return AccountsCsvCreator().get_df()
+        return _AccountsSimpleIndexDfCreator().get_df()
 
 
 # TODO deprecate
@@ -38,8 +38,9 @@ class AccountsDf:
 
 
 class AccountsCsvCreator(CsvCreator):
+    # TODO rm
     def _get_df_creator(self) -> SimpleIndexDfCreator:
-        return _AccountsSimpleIndexDfCreator()
+        raise NotImplementedError
 
     @property
     def _file_name(self) -> str:
