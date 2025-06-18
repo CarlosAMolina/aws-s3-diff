@@ -17,8 +17,8 @@ from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import _AnalysisPaths
-from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.local_results import LocalResults
 from tests.aws import S3Server
 
 
@@ -52,8 +52,10 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 local_s3_server.create_objects(account)
                 Main().run()
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        local_results = LocalResults()
+        local_results._analysis_paths_cache = analysis_paths
         self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
-        self._assert_analysis_file_has_expected_values(analysis_paths)
+        self._assert_analysis_file_has_expected_values(local_results)
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
@@ -74,9 +76,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
-    def _assert_analysis_file_has_expected_values(self, analysis_paths: _AnalysisPaths):
-        result = self._get_df_from_csv(analysis_paths.directory_analysis.joinpath(ANALYSIS_FILE_NAME))
-
+    def _assert_analysis_file_has_expected_values(self, local_results: LocalResults):
+        result = self._get_df_from_csv(local_results.get_file_path_analysis())
         expected_result = self._get_df_from_csv_expected_result()
         date_column_names = ["pro_date", "release_date", "dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))

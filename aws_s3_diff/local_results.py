@@ -44,6 +44,9 @@ class LocalResults:
     def get_file_path_all_accounts(self) -> Path:
         return self.get_file_path_results(_ACCOUNTS_FILE_NAME)
 
+    def get_file_path_analysis(self) -> Path:
+        return self.get_file_path_results(ANALYSIS_FILE_NAME)
+
     def drop_file(self, file_path: Path):
         self._logger.debug(f"Removing: {file_path}")
         file_path.unlink()

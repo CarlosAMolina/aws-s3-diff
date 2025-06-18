@@ -29,6 +29,8 @@ class AnalysisCsvCreator(CsvCreator):
 
     @property
     def _file_name(self) -> str:
+        # TODO make private when the class AnalysisCsvExporter is created and use the
+        # TODO method get_file_path_analysis
         return ANALYSIS_FILE_NAME
 
 
