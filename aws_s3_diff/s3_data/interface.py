@@ -58,6 +58,12 @@ class CsvGenerator(ABC):
         pass
 
 
+class CsvReader(ABC):
+    @abstractmethod
+    def get_df(self) -> Df:
+        pass
+
+
 # TODO deprecate
 class CsvCreator(ABC):
     def __init__(self):

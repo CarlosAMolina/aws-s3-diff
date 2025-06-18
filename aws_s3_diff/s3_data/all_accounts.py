@@ -12,6 +12,7 @@ from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
+from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
@@ -64,12 +65,11 @@ class AccountsCsvGenerator(CsvGenerator):
         df.columns = df.columns.map("_".join)
 
 
-# TODO deprecate
-class AccountsDf:
+class AccountsDf(CsvReader):
     def __init__(self):
         self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
 
-    def get_df(self) -> MultiIndexDf:
+    def get_df(self) -> Df:
         result = self._accounts_simple_index_df_creator.get_df()
         # TODO initialize in __init__
         return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
