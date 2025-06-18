@@ -8,7 +8,6 @@ from pandas import read_csv
 
 from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
-from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
@@ -25,7 +24,7 @@ class AccountsCsvExporter(CsvExporter):
         self._local_results = LocalResults()
 
     def export_df(self, df: Df):
-        file_path = self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
+        file_path = self._local_results.get_file_path_all_accounts()
         _logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
@@ -95,7 +94,7 @@ class AccountsCsvReader(CsvReader):
 
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
+        return self._local_results.get_file_path_all_accounts()
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df

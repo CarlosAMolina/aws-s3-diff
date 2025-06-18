@@ -14,7 +14,6 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.exceptions import S3UrisFileError
-from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import AnalysisDateTimeGenerator
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
@@ -86,7 +85,7 @@ class _CsvsGenerator:
         self._combine_state = _CombineState(self)
         self._must_run_next_state = True
         # TODO I prefer not to do it in __init__
-        if LocalResults().get_file_path_results(ACCOUNTS_FILE_NAME).is_file():
+        if LocalResults().get_file_path_all_accounts().is_file():
             self.set_state_analysis()
         elif have_all_accounts_been_analyzed():
             self.set_state_combine()
