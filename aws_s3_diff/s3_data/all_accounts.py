@@ -88,7 +88,6 @@ class AccountsCsvCreator(CsvCreator):
 class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
-        self._local_results = LocalResults()
 
     def get_df(self) -> Df:
         return self._df_from_csv_creator.get_df()
