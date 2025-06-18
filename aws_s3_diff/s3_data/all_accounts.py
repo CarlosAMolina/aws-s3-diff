@@ -13,7 +13,6 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
-from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.one_account import AccountDf
@@ -67,21 +66,16 @@ class AccountsCsvGenerator(CsvGenerator):
 
 class AccountsCsvReader(CsvReader):
     def __init__(self):
-        self._df_from_csv_creator = _AccountsFromCsvDfCreator()
-
-    def get_df(self) -> Df:
-        result = self._df_from_csv_creator.get_df()
-        # TODO initialize in __init__
-        return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
-
-
-class _AccountsFromCsvDfCreator(FromCsvDfCreator):
-    def __init__(self):
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
     def get_df(self) -> Df:
+        result = self._get_df_from_csv()
+        # TODO initialize in __init__
+        return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
+
+    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
+    def _get_df_from_csv(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(
             self._get_file_path(),
