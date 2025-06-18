@@ -88,16 +88,6 @@ class AccountsCsvReader(CsvReader):
         return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
 
 
-class AccountsCsvCreator(CsvCreator):
-    # TODO rm
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        raise NotImplementedError
-
-    @property
-    def _file_name(self) -> str:
-        return ACCOUNTS_FILE_NAME
-
-
 class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
     def __init__(self, df: Df):
         self._df = df
@@ -120,3 +110,13 @@ class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
+
+
+class AccountsCsvCreator(CsvCreator):
+    # TODO rm
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        raise NotImplementedError
+
+    @property
+    def _file_name(self) -> str:
+        return ACCOUNTS_FILE_NAME
