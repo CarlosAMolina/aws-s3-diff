@@ -70,8 +70,7 @@ class AccountsCsvReader(CsvReader):
 
     def get_df(self) -> Df:
         result = self._get_df_from_csv()
-        # TODO initialize in __init__
-        return _AccountsFromSimpleMultiIndexDfCreator().get_df_set_multi_index_columns(result)
+        return self._get_df_set_multi_index_columns(result)
 
     # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
     def _get_df_from_csv(self) -> Df:
@@ -85,6 +84,10 @@ class AccountsCsvReader(CsvReader):
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
         return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
+
+    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
+        # TODO initialize in __init__
+        return _AccountsFromSimpleMultiIndexDfCreator().get_df_set_multi_index_columns(df)
 
 
 class _AccountsFromSimpleMultiIndexDfCreator:
