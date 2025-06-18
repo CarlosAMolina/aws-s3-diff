@@ -14,7 +14,6 @@ from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
-from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.one_account import AccountDf
 from aws_s3_diff.types_custom import MultiIndexDf
@@ -22,11 +21,10 @@ from aws_s3_diff.types_custom import MultiIndexDf
 
 class AccountsCsvGenerator(CsvGenerator):
     def __init__(self):
-        self._new_df_creator = _AccountsNewDfCreator()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        result = self._new_df_creator.get_df()
+        result = self._get_df_multi_index()
         self._get_df_set_columns_as_single_index(result)
         account_1 = self._s3_uris_file_reader.get_first_account()
         return result.reset_index(
@@ -36,6 +34,31 @@ class AccountsCsvGenerator(CsvGenerator):
                 "file_name_all_accounts",
             ]
         )
+
+    def _get_df_multi_index(self) -> MultiIndexDf:
+        result = self._get_df_merge_accounts_s3_data()
+        return self._get_df_set_all_queries_despite_without_results(result)
+
+    def _get_df_merge_accounts_s3_data(self) -> Df:
+        accounts = self._s3_uris_file_reader.get_accounts()
+        account_df_array = [AccountDf().get_account_df_to_join(account, accounts[0]) for account in accounts]
+        result = account_df_array[0].join(account_df_array[1:], how="outer")
+        return result.dropna(axis="index", how="all")
+
+    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
+        result = self._get_empty_df_original_account_queries_as_index()
+        result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
+        result = result.join(df.reset_index("name"))
+        return result.set_index("name", append=True)
+
+    def _get_empty_df_original_account_queries_as_index(self) -> Df:
+        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
+        # TODO refactor extract function, this line is done in other files.
+        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        result.columns = ["bucket", "prefix"]
+        # TODO refactor extract function, this line is done in other files.
+        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
+        return result.set_index(["bucket", "prefix"])
 
     def _get_df_set_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
@@ -78,36 +101,6 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
         return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
-
-
-class _AccountsNewDfCreator(NewDfCreator):
-    def __init__(self):
-        self._s3_uris_file_reader = S3UrisFileReader()
-
-    def get_df(self) -> MultiIndexDf:
-        result = self._get_df_merge_accounts_s3_data()
-        return self._get_df_set_all_queries_despite_without_results(result)
-
-    def _get_df_merge_accounts_s3_data(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        account_df_array = [AccountDf().get_account_df_to_join(account, accounts[0]) for account in accounts]
-        result = account_df_array[0].join(account_df_array[1:], how="outer")
-        return result.dropna(axis="index", how="all")
-
-    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
-        result = self._get_empty_df_original_account_queries_as_index()
-        result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
-        result = result.join(df.reset_index("name"))
-        return result.set_index("name", append=True)
-
-    def _get_empty_df_original_account_queries_as_index(self) -> Df:
-        result = self._s3_uris_file_reader.file_df[self._s3_uris_file_reader.get_first_account()]
-        # TODO refactor extract function, this line is done in other files.
-        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
-        result.columns = ["bucket", "prefix"]
-        # TODO refactor extract function, this line is done in other files.
-        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
-        return result.set_index(["bucket", "prefix"])
 
 
 class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
