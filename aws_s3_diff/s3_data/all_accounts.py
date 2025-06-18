@@ -108,12 +108,10 @@ class AccountsCsvCreator(CsvExporter):
         self._local_results = LocalResults()
 
     def export_df(self, df: Df):
-        _logger.info(f"Exporting {self.get_file_path()}")
-        df.to_csv(index=False, path_or_buf=self.get_file_path())
+        file_path = self._local_results.get_file_path_results(self._file_name)
+        _logger.info(f"Exporting {file_path}")
+        df.to_csv(index=False, path_or_buf=file_path)
 
     @property
     def _file_name(self) -> str:
         return ACCOUNTS_FILE_NAME
-
-    def get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._file_name)
