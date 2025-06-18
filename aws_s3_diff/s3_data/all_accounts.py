@@ -89,19 +89,22 @@ class AccountsCsvReader(CsvReader):
         result = df
         result.columns = MultiIndex.from_tuples(
             # TODO initialize in __init__
-            _AccountsFromSimpleMultiIndexDfCreator().get_multi_index_tuples_for_df_columns(result.columns)
+            self._get_multi_index_tuples_for_df_columns(result.columns)
         )
         return result
+
+    def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
+        return [
+            _AccountsFromSimpleMultiIndexDfCreator().get_multi_index_from_column_name(column_name)
+            for column_name in columns
+        ]
 
 
 class _AccountsFromSimpleMultiIndexDfCreator:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
-        return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
-
-    def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
+    def get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
         for account in self._s3_uris_file_reader.get_accounts():
             regex_result = re.match(rf"{account}_(?P<key>.*)", column_name)
             if regex_result is not None:
