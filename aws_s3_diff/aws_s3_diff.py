@@ -158,7 +158,7 @@ class _CombineState(_State):
         return self._accounts_csv_generator.get_df()
 
     def export_csv(self, df: Df):
-        self._accounts_csv_creator.export_csv(df)
+        self._accounts_csv_creator.export_df(df)
         self._csvs_generator.set_state_analysis()
 
 

@@ -10,12 +10,14 @@ from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
-from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.logger import get_logger
+from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
-from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.one_account import AccountDf
 from aws_s3_diff.types_custom import MultiIndexDf
+
+_logger = get_logger()
 
 
 class AccountsCsvGenerator(CsvGenerator):
@@ -101,11 +103,17 @@ class AccountsCsvReader(CsvReader):
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class AccountsCsvCreator(CsvCreator):
-    # TODO rm
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        raise NotImplementedError
+class AccountsCsvCreator(CsvExporter):
+    def __init__(self):
+        self._local_results = LocalResults()
+
+    def export_df(self, df: Df):
+        _logger.info(f"Exporting {self.get_file_path()}")
+        df.to_csv(index=False, path_or_buf=self.get_file_path())
 
     @property
     def _file_name(self) -> str:
         return ACCOUNTS_FILE_NAME
+
+    def get_file_path(self) -> Path:
+        return self._local_results.get_file_path_results(self._file_name)
