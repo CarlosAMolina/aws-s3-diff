@@ -46,15 +46,15 @@ class FromSimpleMultiIndexDfCreator(DfCreator):
         self._df = df
 
 
-class CsvGenerator(ABC):
-    @abstractmethod
-    def get_df(self) -> Df:
-        pass
-
-
 class CsvExporter(ABC):
     @abstractmethod
     def export_df(self, df: Df):
+        pass
+
+
+class CsvGenerator(ABC):
+    @abstractmethod
+    def get_df(self) -> Df:
         pass
 
 
