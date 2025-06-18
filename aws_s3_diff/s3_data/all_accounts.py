@@ -20,6 +20,16 @@ from aws_s3_diff.types_custom import MultiIndexDf
 _logger = get_logger()
 
 
+class AccountsCsvExporter(CsvExporter):
+    def __init__(self):
+        self._local_results = LocalResults()
+
+    def export_df(self, df: Df):
+        file_path = self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
+        _logger.info(f"Exporting {file_path}")
+        df.to_csv(index=False, path_or_buf=file_path)
+
+
 class AccountsCsvGenerator(CsvGenerator):
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -101,13 +111,3 @@ class AccountsCsvReader(CsvReader):
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
-
-
-class AccountsCsvExporter(CsvExporter):
-    def __init__(self):
-        self._local_results = LocalResults()
-
-    def export_df(self, df: Df):
-        file_path = self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
-        _logger.info(f"Exporting {file_path}")
-        df.to_csv(index=False, path_or_buf=file_path)
