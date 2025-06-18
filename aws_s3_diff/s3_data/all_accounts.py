@@ -86,20 +86,19 @@ class AccountsCsvReader(CsvReader):
         return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
-        # TODO initialize in __init__
-        return _AccountsFromSimpleMultiIndexDfCreator().get_df_set_multi_index_columns(df)
+        result = df
+        result.columns = MultiIndex.from_tuples(
+            # TODO initialize in __init__
+            _AccountsFromSimpleMultiIndexDfCreator().get_multi_index_tuples_for_df_columns(result.columns)
+        )
+        return result
 
 
 class _AccountsFromSimpleMultiIndexDfCreator:
     def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df_set_multi_index_columns(self, df: Df) -> Df:
-        result = df
-        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
-        return result
-
-    def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
+    def get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
