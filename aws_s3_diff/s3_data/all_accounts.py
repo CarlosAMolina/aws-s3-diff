@@ -91,9 +91,7 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
-        if self._get_file_path().is_file():
-            return self._get_df_from_csv()
-        raise NotImplementedError()
+        return self._get_df_from_csv()
 
     def _get_df_from_csv(self) -> Df:
         return self._df_from_csv_creator.get_df()
