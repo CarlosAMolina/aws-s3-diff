@@ -75,6 +75,25 @@ class AccountsDf(CsvReader):
         return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
 
 
+class _AccountsFromCsvDfCreator(FromCsvDfCreator):
+    def __init__(self):
+        self._local_results = LocalResults()
+        self._s3_uris_file_reader = S3UrisFileReader()
+
+    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
+    def get_df(self) -> Df:
+        accounts = self._s3_uris_file_reader.get_accounts()
+        return read_csv(
+            self._get_file_path(),
+            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
+            parse_dates=[f"{account}_date" for account in accounts],
+        ).astype({f"{account}_size": "Int64" for account in accounts})
+
+    # TODO refator, code duplicated in other files
+    def _get_file_path(self) -> Path:
+        return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
+
+
 class AccountsCsvCreator(CsvCreator):
     # TODO rm
     def _get_df_creator(self) -> SimpleIndexDfCreator:
@@ -107,22 +126,3 @@ class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
-
-
-class _AccountsFromCsvDfCreator(FromCsvDfCreator):
-    def __init__(self):
-        self._local_results = LocalResults()
-        self._s3_uris_file_reader = S3UrisFileReader()
-
-    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
-    def get_df(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        return read_csv(
-            self._get_file_path(),
-            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
-            parse_dates=[f"{account}_date" for account in accounts],
-        ).astype({f"{account}_size": "Int64" for account in accounts})
-
-    # TODO refator, code duplicated in other files
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
