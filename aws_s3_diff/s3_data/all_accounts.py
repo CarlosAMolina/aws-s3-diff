@@ -87,14 +87,12 @@ class AccountsCsvReader(CsvReader):
 
     def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
-        result.columns = MultiIndex.from_tuples(
-            # TODO initialize in __init__
-            self._get_multi_index_tuples_for_df_columns(result.columns)
-        )
+        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
         return result
 
     def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
         return [
+            # TODO initialize in __init__
             _AccountsFromSimpleMultiIndexDfCreator().get_multi_index_from_column_name(column_name)
             for column_name in columns
         ]
