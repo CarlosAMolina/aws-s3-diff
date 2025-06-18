@@ -13,7 +13,6 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
-from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.one_account import AccountDf
 from aws_s3_diff.types_custom import MultiIndexDf
@@ -88,7 +87,7 @@ class AccountsCsvReader(CsvReader):
         return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
 
 
-class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
+class _AccountsFromSimpleMultiIndexDfCreator:
     def __init__(self, df: Df):
         self._df = df
         self._s3_uris_file_reader = S3UrisFileReader()
