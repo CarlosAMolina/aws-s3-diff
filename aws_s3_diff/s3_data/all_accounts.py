@@ -67,10 +67,10 @@ class AccountsCsvGenerator(CsvGenerator):
 
 class AccountsDf(CsvReader):
     def __init__(self):
-        self._accounts_simple_index_df_creator = _AccountsSimpleIndexDfCreator()
+        self._df_from_csv_creator = _AccountsFromCsvDfCreator()
 
     def get_df(self) -> Df:
-        result = self._accounts_simple_index_df_creator.get_df()
+        result = self._df_from_csv_creator.get_df()
         # TODO initialize in __init__
         return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
 
@@ -83,18 +83,6 @@ class AccountsCsvCreator(CsvCreator):
     @property
     def _file_name(self) -> str:
         return ACCOUNTS_FILE_NAME
-
-
-class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
-    def __init__(self):
-        self._df_from_csv_creator = _AccountsFromCsvDfCreator()
-
-    def get_df(self) -> Df:
-        return self._df_from_csv_creator.get_df()
-
-    # TODO refator, code duplicated in other files (in this file too)
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(ACCOUNTS_FILE_NAME)
 
 
 class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
