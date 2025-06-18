@@ -118,6 +118,11 @@ class TestAnalysisCsvCreator(unittest.TestCase):
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
         assert_frame_equal(expected_result, result_as_csv_export)
 
+    def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
+        accounts_csv_reader = AccountsCsvReader()
+        accounts_csv_reader._get_file_path = lambda: (Path(__file__).parent.absolute().joinpath(file_path_name))
+        return accounts_csv_reader.get_df()
+
     def _get_df_from_csv_expected_result(self) -> Df:
         expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")
         result = read_csv(expected_result_file_path).astype(
@@ -131,8 +136,3 @@ class TestAnalysisCsvCreator(unittest.TestCase):
         date_column_names = ["pro_date", "release_date", "dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         return result
-
-    def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
-        accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._get_file_path = lambda: (Path(__file__).parent.absolute().joinpath(file_path_name))
-        return accounts_csv_reader.get_df()
