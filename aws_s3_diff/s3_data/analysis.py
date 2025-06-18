@@ -9,7 +9,7 @@ from pandas import Series
 from aws_s3_diff.config_files import AnalysisConfigReader
 from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.logger import get_logger
-from aws_s3_diff.s3_data.all_accounts import AccountsDf
+from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
@@ -45,7 +45,7 @@ class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
 
 class _AnalysisNewDfCreator(NewDfCreator):
     def __init__(self):
-        self._accounts_from_csv_df_creator = AccountsDf()
+        self._accounts_csv_reader = AccountsCsvReader()
         self._analysis_config_reader = AnalysisConfigReader()
         self._logger = get_logger()
 
@@ -53,7 +53,7 @@ class _AnalysisNewDfCreator(NewDfCreator):
         return self._get_df_s3_data_analyzed()
 
     def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
-        all_accounts_s3_data_df = self._accounts_from_csv_df_creator.get_df()
+        all_accounts_s3_data_df = self._accounts_csv_reader.get_df()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> MultiIndexDf:

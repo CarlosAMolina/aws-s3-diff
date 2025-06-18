@@ -65,7 +65,7 @@ class AccountsCsvGenerator(CsvGenerator):
         df.columns = df.columns.map("_".join)
 
 
-class AccountsDf(CsvReader):
+class AccountsCsvReader(CsvReader):
     def __init__(self):
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
 

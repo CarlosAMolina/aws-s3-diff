@@ -10,7 +10,7 @@ from pandas import read_csv
 from pandas import to_datetime
 from pandas.testing import assert_frame_equal
 
-from aws_s3_diff.s3_data.all_accounts import AccountsDf
+from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
 from aws_s3_diff.s3_data.analysis import _AnalysisFromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.analysis import _AnalysisNewDfCreator
@@ -129,13 +129,12 @@ class TestAnalysisCsvCreator(unittest.TestCase):
 
 
 def _get_df_from_accounts_s3_data_csv(file_path_name: str) -> Df:
-    # TODO rename variable
-    accounts_from_csv_df_creator = AccountsDf()
-    accounts_from_csv_df_creator._df_from_csv_creator._get_file_path = lambda: (
+    accounts_csv_reader = AccountsCsvReader()
+    accounts_csv_reader._df_from_csv_creator._get_file_path = lambda: (
         Path(__file__).parent.absolute().joinpath(file_path_name)
     )
-    accounts_from_csv_df_creator._df_from_csv_creator._s3_uris_file_reader = Mock()
-    accounts_from_csv_df_creator._df_from_csv_creator._s3_uris_file_reader.get_accounts.return_value = (
-        _AccountsToCompare("pro", "release")
+    accounts_csv_reader._df_from_csv_creator._s3_uris_file_reader = Mock()
+    accounts_csv_reader._df_from_csv_creator._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
+        "pro", "release"
     )
-    return accounts_from_csv_df_creator.get_df()
+    return accounts_csv_reader.get_df()
