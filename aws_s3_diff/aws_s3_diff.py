@@ -19,6 +19,7 @@ from aws_s3_diff.local_results import AnalysisDateTimeGenerator
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvCreator
+from aws_s3_diff.s3_data.all_accounts import AccountsCsvGenerator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
 from aws_s3_diff.s3_data.one_account import AccountCsvExporter
 from aws_s3_diff.s3_data.one_account import AccountCsvGenerator
@@ -151,9 +152,10 @@ class _CombineState(_State):
     def __init__(self, csvs_generator: _CsvsGenerator):
         self._csvs_generator = csvs_generator
         self._accounts_csv_creator = AccountsCsvCreator()
+        self._accounts_csv_generator = AccountsCsvGenerator()
 
     def get_df(self) -> Df:
-        return self._accounts_csv_creator.get_df()
+        return self._accounts_csv_generator.get_df()
 
     def export_csv(self, df: Df):
         self._accounts_csv_creator.export_csv(df)

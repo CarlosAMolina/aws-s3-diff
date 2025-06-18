@@ -11,6 +11,7 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import ACCOUNTS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.s3_data.interface import CsvCreator
+from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
@@ -18,6 +19,11 @@ from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.one_account import AccountDf
 from aws_s3_diff.types_custom import MultiIndexDf
+
+
+class AccountsCsvGenerator(CsvGenerator):
+    def get_df(self) -> Df:
+        return AccountsCsvCreator().get_df()
 
 
 # TODO deprecate
