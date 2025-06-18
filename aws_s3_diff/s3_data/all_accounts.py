@@ -22,8 +22,12 @@ from aws_s3_diff.types_custom import MultiIndexDf
 
 
 class AccountsCsvGenerator(CsvGenerator):
+    def __init__(self):
+        self._new_df_creator = _AccountsNewDfCreator()
+
     def get_df(self) -> Df:
-        return _AccountsSimpleIndexDfCreator().get_df()
+        df = self._new_df_creator.get_df()
+        return _AccountsFromMultiSimpleIndexDfCreator(df).get_df()
 
 
 # TODO deprecate
@@ -51,21 +55,14 @@ class _AccountsSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._df_from_csv_creator = _AccountsFromCsvDfCreator()
         self._local_results = LocalResults()
-        # TODO deprecate these classes
-        self._new_df_creator = _AccountsNewDfCreator()
 
     def get_df(self) -> Df:
         if self._get_file_path().is_file():
             return self._get_df_from_csv()
-        return self._get_df_create_new()
+        raise NotImplementedError()
 
     def _get_df_from_csv(self) -> Df:
         return self._df_from_csv_creator.get_df()
-
-    def _get_df_create_new(self) -> Df:
-        df = self._new_df_creator.get_df()
-        # TODO initialize in __init__
-        return _AccountsFromMultiSimpleIndexDfCreator(df).get_df()
 
     # TODO refator, code duplicated in other files (in this file too)
     def _get_file_path(self) -> Path:
