@@ -13,7 +13,6 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
-from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import FromSimpleMultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
@@ -24,10 +23,22 @@ from aws_s3_diff.types_custom import MultiIndexDf
 class AccountsCsvGenerator(CsvGenerator):
     def __init__(self):
         self._new_df_creator = _AccountsNewDfCreator()
+        self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        df = self._new_df_creator.get_df()
-        return _AccountsFromMultiSimpleIndexDfCreator(df).get_df()
+        result = self._new_df_creator.get_df()
+        self._get_df_set_columns_as_single_index(result)
+        account_1 = self._s3_uris_file_reader.get_first_account()
+        return result.reset_index(
+            names=[
+                f"bucket_{account_1}",
+                f"file_path_in_s3_{account_1}",
+                "file_name_all_accounts",
+            ]
+        )
+
+    def _get_df_set_columns_as_single_index(self, df: Df):
+        df.columns = df.columns.map("_".join)
 
 
 # TODO deprecate
@@ -97,24 +108,6 @@ class _AccountsNewDfCreator(NewDfCreator):
         # TODO refactor extract function, this line is done in other files.
         result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
         return result.set_index(["bucket", "prefix"])
-
-
-class _AccountsFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
-    def __init__(self, df: Df):
-        self._s3_uris_file_reader = S3UrisFileReader()
-        super().__init__(df)
-
-    def get_df(self) -> Df:
-        result = self._df.copy()
-        self._set_df_columns_as_single_index(result)
-        account_1 = self._s3_uris_file_reader.get_first_account()
-        return result.reset_index(
-            names=[
-                f"bucket_{account_1}",
-                f"file_path_in_s3_{account_1}",
-                "file_name_all_accounts",
-            ]
-        )
 
 
 class _AccountsFromSimpleMultiIndexDfCreator(FromSimpleMultiIndexDfCreator):
