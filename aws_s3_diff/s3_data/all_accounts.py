@@ -103,7 +103,7 @@ class AccountsCsvReader(CsvReader):
         raise ValueError(f"Not managed column name: {column_name}")
 
 
-class AccountsCsvCreator(CsvExporter):
+class AccountsCsvExporter(CsvExporter):
     def __init__(self):
         self._local_results = LocalResults()
 
