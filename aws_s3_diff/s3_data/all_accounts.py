@@ -71,7 +71,7 @@ class AccountsCsvReader(CsvReader):
     def get_df(self) -> Df:
         result = self._get_df_from_csv()
         # TODO initialize in __init__
-        return _AccountsFromSimpleMultiIndexDfCreator(result).get_df()
+        return _AccountsFromSimpleMultiIndexDfCreator().get_df_set_multi_index_columns(result)
 
     # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
     def _get_df_from_csv(self) -> Df:
@@ -88,14 +88,10 @@ class AccountsCsvReader(CsvReader):
 
 
 class _AccountsFromSimpleMultiIndexDfCreator:
-    def __init__(self, df: Df):
-        self._df = df
+    def __init__(self):
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self) -> MultiIndexDf:
-        return self._get_df_set_multi_index_columns(self._df)
-
-    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
+    def get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
         result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
         return result
