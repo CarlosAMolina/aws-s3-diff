@@ -14,7 +14,6 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
-from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.s3_client import S3Client
@@ -91,16 +90,6 @@ class _AccountCsvReader(CsvReader):
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
-    def __init__(self, account: str):
-        self._account = account
-        self._df_from_csv_creator = _AccountFromCsvDfCreator(account)
-        self._local_results = LocalResults()
-
-    def get_df(self) -> Df:
-        return self._df_from_csv_creator.get_df()
-
-
-class _AccountFromCsvDfCreator(FromCsvDfCreator):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
