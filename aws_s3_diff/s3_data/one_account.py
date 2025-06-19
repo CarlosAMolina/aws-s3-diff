@@ -89,27 +89,18 @@ class _AccountCsvReader(CsvReader):
             self._get_file_path(),
             parse_dates=["date"],
         ).astype({"size": "Int64"})
-        return _AccountMultiIndexDfCreator(self._account, account_df).get_df()
+        return self._get_df_with_multi_index(account_df)
 
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
         return self._local_results.get_file_path_results(get_account_file_name(self._account))
 
-
-class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
-    def __init__(self, account: str, df: Df):
-        self._account = account
-        self._df = df
-
-    def get_df(self) -> MultiIndexDf:
-        result = self._df.copy()
-        result = self._get_df_with_multi_index(result)
+    def _get_df_with_multi_index(self, df: Df) -> Df:
+        result = df.copy()
+        result = result.set_index(["bucket", "prefix", "name"], drop=True)
         return self._get_df_with_multi_index_columns(result)
 
-    def _get_df_with_multi_index(self, df: Df) -> MultiIndex:
-        return df.set_index(["bucket", "prefix", "name"], drop=True)
-
-    def _get_df_with_multi_index_columns(self, df: Df | MultiIndexDf) -> MultiIndexDf:
+    def _get_df_with_multi_index_columns(self, df: Df) -> Df:
         result = df
         columns = self._get_index_as_mult_index(result.columns)
         result.columns = MultiIndex.from_tuples(columns)
