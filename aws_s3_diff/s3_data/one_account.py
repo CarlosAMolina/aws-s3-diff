@@ -13,6 +13,7 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvGenerator
+from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import FromCsvDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
@@ -74,11 +75,19 @@ class AccountCsvExporter(CsvExporter):
 # TODO deprecate
 class AccountDf:
     def get_account_df_to_join(self, account: str, first_account: str) -> Df:
-        account_df = _AccountSimpleIndexDfCreator(account).get_df()
-        result = _AccountMultiIndexDfCreator(account, account_df).get_df()
+        result = _AccountCsvReader(account).get_df()
         if account == first_account:
             return result
         return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
+
+
+class _AccountCsvReader(CsvReader):
+    def __init__(self, account: str):
+        self._account = account
+
+    def get_df(self) -> Df:
+        account_df = _AccountSimpleIndexDfCreator(self._account).get_df()
+        return _AccountMultiIndexDfCreator(self._account, account_df).get_df()
 
 
 class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
