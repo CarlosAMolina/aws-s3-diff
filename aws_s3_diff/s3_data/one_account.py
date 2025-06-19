@@ -15,7 +15,6 @@ from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
-from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
 from aws_s3_diff.types_custom import MultiIndexDf
@@ -83,22 +82,14 @@ class AccountDf:
 class _AccountCsvReader(CsvReader):
     def __init__(self, account: str):
         self._account = account
-
-    def get_df(self) -> Df:
-        account_df = _AccountSimpleIndexDfCreator(self._account).get_df()
-        return _AccountMultiIndexDfCreator(self._account, account_df).get_df()
-
-
-class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
-    def __init__(self, account: str):
-        self._account = account
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
-        return pd.read_csv(
+        account_df = pd.read_csv(
             self._get_file_path(),
             parse_dates=["date"],
         ).astype({"size": "Int64"})
+        return _AccountMultiIndexDfCreator(self._account, account_df).get_df()
 
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
