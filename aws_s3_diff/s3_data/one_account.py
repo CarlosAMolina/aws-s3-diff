@@ -99,10 +99,6 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
     def get_df(self) -> Df:
         return self._df_from_csv_creator.get_df()
 
-    # TODO refator, code duplicated in other files (in this file too)
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(get_account_file_name(self._account))
-
 
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     def __init__(self, account: str, df: Df):
