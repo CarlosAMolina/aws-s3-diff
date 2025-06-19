@@ -100,6 +100,22 @@ class _AccountSimpleIndexDfCreator(SimpleIndexDfCreator):
         return self._df_from_csv_creator.get_df()
 
 
+class _AccountFromCsvDfCreator(FromCsvDfCreator):
+    def __init__(self, account: str):
+        self._account = account
+        self._local_results = LocalResults()
+
+    def get_df(self) -> Df:
+        return pd.read_csv(
+            self._get_file_path(),
+            parse_dates=["date"],
+        ).astype({"size": "Int64"})
+
+    # TODO refator, code duplicated in other files
+    def _get_file_path(self) -> Path:
+        return self._local_results.get_file_path_results(get_account_file_name(self._account))
+
+
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     def __init__(self, account: str, df: Df):
         self._account = account
@@ -175,19 +191,3 @@ class _AccountWithOriginS3UrisMultiIndexDfCreator(MultiIndexDfCreator):
             [(column, "") for column in result.columns]
         )  # To merge with a MultiIndex columns Df.
         return result
-
-
-class _AccountFromCsvDfCreator(FromCsvDfCreator):
-    def __init__(self, account: str):
-        self._account = account
-        self._local_results = LocalResults()
-
-    def get_df(self) -> Df:
-        return pd.read_csv(
-            self._get_file_path(),
-            parse_dates=["date"],
-        ).astype({"size": "Int64"})
-
-    # TODO refator, code duplicated in other files
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(get_account_file_name(self._account))
