@@ -99,7 +99,7 @@ class TestDfAnalysis(unittest.TestCase):
         return accounts_csv_reader.get_df()
 
 
-class TestAnalysisCsvCreator(unittest.TestCase):
+class TestAnalysisCsvExporter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.current_path = Path(__file__).parent.absolute()

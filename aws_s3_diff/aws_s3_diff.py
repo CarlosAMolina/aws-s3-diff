@@ -19,7 +19,7 @@ from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
 from aws_s3_diff.s3_data.all_accounts import AccountsDataGenerator
-from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
+from aws_s3_diff.s3_data.analysis import AnalysisCsvExporter
 from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvExporter
 from aws_s3_diff.s3_data.one_account import AccountDataGenerator
@@ -167,7 +167,7 @@ class _AnalysisState(_State):
         self._csvs_generator = csvs_generator
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
-        self._analysis_csv_creator = AnalysisCsvCreator()
+        self._analysis_csv_creator = AnalysisCsvExporter()
         self._analysis_data_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
 
