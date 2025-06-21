@@ -93,7 +93,7 @@ class AccountsDataGenerator(DataGenerator):
         account_df_array = []
         for account in accounts:
             account_df = AccountDf(account, AccountCsvReader(account).get_df(), accounts[0]).get_account_df_to_join()
-            account_df_array += [account_df]
+            account_df_array.append(account_df)
         result = account_df_array[0].join(account_df_array[1:], how="outer")
         return result.dropna(axis="index", how="all")
 
