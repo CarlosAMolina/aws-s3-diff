@@ -96,7 +96,7 @@ class AccountCsvReader(CsvReader):
         return [(self._account, column_name) for column_name in index]
 
 
-class OriginS3UrisAsIndexDfModifier(DfModifier):
+class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
     def __init__(self, account_origin: str, account_target: str):
         self._account_origin = account_origin
         self._account_target = account_target

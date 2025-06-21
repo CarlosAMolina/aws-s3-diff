@@ -14,7 +14,7 @@ from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvReader
-from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexDfModifier
+from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
 from aws_s3_diff.types_custom import MultiIndexDf
 
 _logger = get_logger()
@@ -101,7 +101,9 @@ class AccountsDataGenerator(DataGenerator):
         result = []
         for account in account_targets:
             account_df = AccountCsvReader(account).get_df()
-            account_df_to_join = OriginS3UrisAsIndexDfModifier(account_origin, account).get_df_modified(account_df)
+            account_df_to_join = OriginS3UrisAsIndexAccountDfModifier(account_origin, account).get_df_modified(
+                account_df
+            )
             result.append(account_df_to_join)
         return result
 
