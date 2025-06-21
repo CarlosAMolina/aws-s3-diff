@@ -8,7 +8,6 @@ from pandas import MultiIndex
 from aws_s3_diff.accounts import get_account_to_analyze
 from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
-from aws_s3_diff.local_results import get_account_file_name
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
@@ -63,8 +62,7 @@ class AccountCsvExporter(CsvExporter):
 
     def export_df(self, df: Df):
         account = get_account_to_analyze()
-        file_name = get_account_file_name(account)
-        file_path = self._local_results.get_file_path_results(file_name)
+        file_path = self._local_results.get_file_path_account(account)
         _logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
