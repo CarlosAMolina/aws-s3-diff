@@ -106,11 +106,11 @@ class OriginS3UrisAsIndexDfModifier(DfModifier):
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target
         )
-        if self._has_df_origin_s3_uris_as_index(s3_uris_map_df):
+        if self._has_df_the_origin_s3_uris_as_index(s3_uris_map_df):
             return df
         return self._get_df_replace_index_with_s3_uris_map(df.copy(), s3_uris_map_df)
 
-    def _has_df_origin_s3_uris_as_index(self, s3_uris_map_df: Df) -> bool:
+    def _has_df_the_origin_s3_uris_as_index(self, s3_uris_map_df: Df) -> bool:
         return s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target])
 
     def _get_df_replace_index_with_s3_uris_map(self, df: Df, s3_uris_map_df: Df) -> Df:
