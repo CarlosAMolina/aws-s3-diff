@@ -38,7 +38,7 @@ class AccountsCsvReader(CsvReader):
         result = self._get_df_from_csv()
         return self._get_df_set_multi_index_columns(result)
 
-    # TODO extract common code with _AccountSimpleIndexDfCreator._get_df_from_csv
+    # TODO extract common code with other classes _get_df_from_csv
     def _get_df_from_csv(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         return read_csv(

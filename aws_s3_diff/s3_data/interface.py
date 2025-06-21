@@ -4,34 +4,10 @@ from abc import abstractmethod
 from aws_s3_diff.types_custom import Df
 
 
-class DfCreator(ABC):
+class MultiIndexDfCreator:
     @abstractmethod
     def get_df(self) -> Df:
         pass
-
-
-class NewDfCreator(DfCreator):
-    pass
-
-
-class FromCsvDfCreator(DfCreator):
-    pass
-
-
-class SimpleIndexDfCreator(DfCreator):
-    # TODO add logic: return read_file() if file exists else create_df()
-    pass
-
-
-# TODO
-class MultiIndexDfCreator(DfCreator):
-    # add logic: 1º get simple index, 2º convert index
-    pass
-
-
-class FromSimpleMultiIndexDfCreator(DfCreator):
-    def __init__(self, df: Df):
-        self._df = df
 
 
 class CsvExporter(ABC):
