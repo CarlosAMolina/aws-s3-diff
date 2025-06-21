@@ -2,15 +2,16 @@ import re
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
+from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Series
 
 from aws_s3_diff.config_files import AnalysisConfigReader
 from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
+from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
-from aws_s3_diff.s3_data.interface import CsvCreator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import NewDfCreator
@@ -21,6 +22,32 @@ from aws_s3_diff.types_custom import MultiIndexDf
 # TODO
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     pass
+
+
+# TODO deprecate
+class CsvCreator(ABC):
+    def __init__(self):
+        self._local_results = LocalResults()
+        self._logger = get_logger()
+
+    def get_df(self) -> Df:
+        return self._get_df_creator().get_df()
+
+    def export_csv(self, df: Df):
+        self._logger.info(f"Exporting {self.get_file_path()}")
+        df.to_csv(index=False, path_or_buf=self.get_file_path())
+
+    def get_file_path(self) -> Path:
+        return self._local_results.get_file_path_results(self._file_name)
+
+    @abstractmethod
+    def _get_df_creator(self) -> SimpleIndexDfCreator:
+        pass
+
+    @property
+    @abstractmethod
+    def _file_name(self) -> str:
+        pass
 
 
 class AnalysisCsvCreator(CsvCreator):

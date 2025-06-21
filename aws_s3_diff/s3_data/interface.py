@@ -1,9 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
-from pathlib import Path
 
-from aws_s3_diff.local_results import LocalResults
-from aws_s3_diff.logger import get_logger
 from aws_s3_diff.types_custom import Df
 
 
@@ -61,30 +58,4 @@ class CsvGenerator(ABC):
 class CsvReader(ABC):
     @abstractmethod
     def get_df(self) -> Df:
-        pass
-
-
-# TODO deprecate
-class CsvCreator(ABC):
-    def __init__(self):
-        self._local_results = LocalResults()
-        self._logger = get_logger()
-
-    def get_df(self) -> Df:
-        return self._get_df_creator().get_df()
-
-    def export_csv(self, df: Df):
-        self._logger.info(f"Exporting {self.get_file_path()}")
-        df.to_csv(index=False, path_or_buf=self.get_file_path())
-
-    def get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._file_name)
-
-    @abstractmethod
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        pass
-
-    @property
-    @abstractmethod
-    def _file_name(self) -> str:
         pass
