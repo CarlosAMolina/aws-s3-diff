@@ -7,7 +7,6 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from aws_s3_diff.config_files import AnalysisConfigReader
-from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
@@ -26,7 +25,7 @@ class AnalysisCsvExporter(CsvExporter):
     def export_df(self, df: Df):
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
-        file_path = self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)
+        file_path = self._local_results.get_file_path_analysis()
         logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
