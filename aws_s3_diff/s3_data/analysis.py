@@ -24,7 +24,7 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     pass
 
 
-# TODO add aprent class and rename as the parent class
+# TODO add parent class CsvExporter and rename as the parent class
 class AnalysisCsvCreator:
     def __init__(self):
         self._analysis_simple_index_df_creator = _AnalysisSimpleIndexDfCreator()
@@ -39,13 +39,9 @@ class AnalysisCsvCreator:
         df.to_csv(index=False, path_or_buf=self.get_file_path())
 
     def get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(self._file_name)
-
-    @property
-    def _file_name(self) -> str:
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
-        return ANALYSIS_FILE_NAME
+        return self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)
 
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
