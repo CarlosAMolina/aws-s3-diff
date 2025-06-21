@@ -108,7 +108,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("aws_s3_diff.aws_s3_diff.LocalResults")
     @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed")
     @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze")
-    @patch("aws_s3_diff.aws_s3_diff.AccountCsvGenerator.get_df")
+    @patch("aws_s3_diff.aws_s3_diff.AccountDataGenerator.get_df")
     @patch(
         "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
         new_callable=PropertyMock,

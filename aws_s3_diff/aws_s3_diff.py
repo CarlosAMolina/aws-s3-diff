@@ -18,10 +18,10 @@ from aws_s3_diff.local_results import AnalysisDateTimeGenerator
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
-from aws_s3_diff.s3_data.all_accounts import AccountsCsvGenerator
+from aws_s3_diff.s3_data.all_accounts import AccountsDataGenerator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
 from aws_s3_diff.s3_data.one_account import AccountCsvExporter
-from aws_s3_diff.s3_data.one_account import AccountCsvGenerator
+from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 
 _logger = get_logger()
 
@@ -133,7 +133,7 @@ class _AccountState(_State):
     def get_df(self) -> Df:
         account = get_account_to_analyze()
         _logger.info(f"Analyzing the AWS account '{account}'")
-        return AccountCsvGenerator(account).get_df()
+        return AccountDataGenerator(account).get_df()
 
     def export_csv(self, df: Df):
         self._account_csv_exporter.export_df(df)
@@ -151,10 +151,10 @@ class _CombineState(_State):
     def __init__(self, csvs_generator: _CsvsGenerator):
         self._csvs_generator = csvs_generator
         self._accounts_csv_exporter = AccountsCsvExporter()
-        self._accounts_csv_generator = AccountsCsvGenerator()
+        self._accounts_data_generator = AccountsDataGenerator()
 
     def get_df(self) -> Df:
-        return self._accounts_csv_generator.get_df()
+        return self._accounts_data_generator.get_df()
 
     def export_csv(self, df: Df):
         self._accounts_csv_exporter.export_df(df)

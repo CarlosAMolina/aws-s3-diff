@@ -11,8 +11,8 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
-from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import CsvReader
+from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
@@ -23,7 +23,7 @@ from aws_s3_diff.types_custom import S3Query
 _logger = get_logger()
 
 
-class AccountCsvGenerator(CsvGenerator):
+class AccountDataGenerator(DataGenerator):
     def __init__(self, account: str):
         self._account = account
         self._s3_uris_file_reader = S3UrisFileReader()
