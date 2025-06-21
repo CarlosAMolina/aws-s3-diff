@@ -15,7 +15,6 @@ from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
-from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.types_custom import MultiIndexDf
 
 logger = get_logger()
@@ -41,21 +40,13 @@ class AnalysisCsvExporter(CsvExporter):
 
 class AnalysisDataGenerator(DataGenerator):
     def __init__(self):
-        self._analysis_new_df_creator = _AnalysisNewDfCreator()
-
-    def get_df(self) -> Df:
-        df = self._analysis_new_df_creator.get_df()
-        # TODO initialize in __init__
-        return _AnalysisFromMultiSimpleIndexDfCreator(df).get_df()
-
-
-class _AnalysisNewDfCreator(NewDfCreator):
-    def __init__(self):
         self._accounts_csv_reader = AccountsCsvReader()
         self._analysis_config_reader = AnalysisConfigReader()
 
     def get_df(self) -> Df:
-        return self._get_df_s3_data_analyzed()
+        df = self._get_df_s3_data_analyzed()
+        # TODO initialize in __init__
+        return _AnalysisFromMultiSimpleIndexDfCreator(df).get_df()
 
     def _get_df_s3_data_analyzed(self) -> Df:
         all_accounts_s3_data_df = self._accounts_csv_reader.get_df()

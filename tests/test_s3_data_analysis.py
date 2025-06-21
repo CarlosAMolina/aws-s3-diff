@@ -13,10 +13,10 @@ from pandas.testing import assert_frame_equal
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
 from aws_s3_diff.s3_data.analysis import _AnalysisFromMultiSimpleIndexDfCreator
-from aws_s3_diff.s3_data.analysis import _AnalysisNewDfCreator
 from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisCreator
 from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisCreator
 from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisCreator
+from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 
 class _AnalysisBuilderConfig(ABC):
@@ -105,10 +105,10 @@ class TestAnalysisCsvExporter(unittest.TestCase):
         cls.current_path = Path(__file__).parent.absolute()
 
     def test_get_df_set_analysis_columns(self):
-        # TODO try to call _AnalysisNewDfCreator._get_df_s3_data_analyzed(df)
+        # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
         df = self._get_df_from_accounts_s3_data_csv(file_path_name)
-        result = _AnalysisNewDfCreator()._get_df_set_analysis_columns(df)
+        result = AnalysisDataGenerator()._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = _AnalysisFromMultiSimpleIndexDfCreator(result).get_df()
         expected_result = self._get_df_from_csv_expected_result()
