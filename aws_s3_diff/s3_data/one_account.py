@@ -93,7 +93,7 @@ class _AccountCsvReader(CsvReader):
 
     # TODO refator, code duplicated in other files
     def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_results(get_account_file_name(self._account))
+        return self._local_results.get_file_path_account(self._account)
 
     def _get_df_with_multi_index(self, df: Df) -> Df:
         result = df.copy()

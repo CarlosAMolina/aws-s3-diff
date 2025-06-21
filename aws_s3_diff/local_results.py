@@ -38,6 +38,9 @@ class LocalResults:
         paths = self.analysis_paths.directory_analysis.glob(f"*{_EXTENSION_FILE_NAME}")
         return [path.name for path in paths]
 
+    def get_file_path_account(self, account: str) -> Path:
+        return self.get_file_path_results(get_account_file_name(account))
+
     def get_file_path_results(self, file_name: str) -> Path:
         return self.analysis_paths.directory_analysis.joinpath(file_name)
 
