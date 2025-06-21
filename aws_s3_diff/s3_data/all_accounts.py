@@ -91,12 +91,12 @@ class AccountsDataGenerator(DataGenerator):
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         account_origin = accounts[0]
-        account_df_array = [AccountCsvReader(account_origin).get_df()]
+        target_account_df_array = [AccountCsvReader(account_origin).get_df()]
         for account in accounts[1:]:
             account_df = AccountCsvReader(account).get_df()
             account_df_to_join = AccountDf(account, account_df, account_origin).get_account_df_to_join()
-            account_df_array.append(account_df_to_join)
-        result = account_df_array[0].join(account_df_array[1:], how="outer")
+            target_account_df_array.append(account_df_to_join)
+        result = target_account_df_array[0].join(target_account_df_array[1:], how="outer")
         return result.dropna(axis="index", how="all")
 
     def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
