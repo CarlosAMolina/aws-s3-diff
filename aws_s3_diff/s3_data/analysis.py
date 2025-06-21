@@ -17,6 +17,8 @@ from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import NewDfCreator
 from aws_s3_diff.types_custom import MultiIndexDf
 
+logger = get_logger()
+
 
 # TODO
 class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
@@ -28,13 +30,12 @@ class AnalysisCsvCreator:
     def __init__(self):
         self._analysis_csv_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
-        self._logger = get_logger()
 
     def export_csv(self, df: Df):
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
         file_path = self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)
-        self._logger.info(f"Exporting {file_path}")
+        logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
 
@@ -52,7 +53,6 @@ class _AnalysisNewDfCreator(NewDfCreator):
     def __init__(self):
         self._accounts_csv_reader = AccountsCsvReader()
         self._analysis_config_reader = AnalysisConfigReader()
-        self._logger = get_logger()
 
     def get_df(self) -> MultiIndexDf:
         return self._get_df_s3_data_analyzed()
@@ -158,7 +158,6 @@ class _TwoAccountsAnalysisCreator(ABC):
         self._accounts = accounts
         self._condition = _AnalysisCondition(accounts, df)
         self._df = df
-        self._logger = get_logger()
 
     def get_df_set_analysis(self) -> MultiIndexDf:
         self._log_analysis()
@@ -194,7 +193,7 @@ class _TwoAccountsAnalysisCreator(ABC):
 
 class _IsFileCopiedTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
     def _log_analysis(self):
-        self._logger.info(
+        logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
         )
@@ -215,7 +214,7 @@ class _IsFileCopiedTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
 
 class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
     def _log_analysis(self):
-        self._logger.info(
+        logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )
