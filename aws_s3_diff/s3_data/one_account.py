@@ -72,7 +72,7 @@ class AccountDf:
     def __init__(self, account: str, first_account: str):
         self._account = account
         self._first_account = first_account
-        self._account_csv_reader = _AccountCsvReader(self._account)
+        self._account_csv_reader = AccountCsvReader(self._account)
         self._origin_s3_uris_as_index_df_modifier = _OriginS3UrisAsIndexDfModifier(self._first_account, self._account)
 
     def get_account_df_to_join(self) -> Df:
@@ -82,7 +82,7 @@ class AccountDf:
         return self._origin_s3_uris_as_index_df_modifier.get_df_modified(result)
 
 
-class _AccountCsvReader(CsvReader):
+class AccountCsvReader(CsvReader):
     def __init__(self, account: str):
         self._account = account
         self._local_results = LocalResults()
