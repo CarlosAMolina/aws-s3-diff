@@ -1,7 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 
-from aws_s3_diff.types_custom import Df
+from pandas import DataFrame as Df
 
 
 class CsvExporter(ABC):
