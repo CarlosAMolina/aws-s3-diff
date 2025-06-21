@@ -73,7 +73,7 @@ class AccountDf:
         result = _AccountCsvReader(account).get_df()
         if account == first_account:
             return result
-        return _OriginS3UrisAsIndexDfModifier(account).get_df_modified(result)
+        return _OriginS3UrisAsIndexDfModifier(first_account, account).get_df_modified(result)
 
 
 class _AccountCsvReader(CsvReader):
@@ -107,7 +107,8 @@ class _AccountCsvReader(CsvReader):
 
 
 class _OriginS3UrisAsIndexDfModifier(DfModifier):
-    def __init__(self, account_target: str):
+    def __init__(self, account_origin: str, account_target: str):
+        self._account_origin = account_origin
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
 
@@ -119,10 +120,6 @@ class _OriginS3UrisAsIndexDfModifier(DfModifier):
         if s3_uris_map_df[self._account_origin].equals(s3_uris_map_df[self._account_target]):
             return result
         return self._get_df_replace_index_with_s3_uris_map(result, s3_uris_map_df)
-
-    @property
-    def _account_origin(self) -> str:
-        return self._s3_uris_file_reader.get_first_account()
 
     def _get_df_replace_index_with_s3_uris_map(self, df: Df, s3_uris_map_df: Df) -> Df:
         original_length = len(df)
