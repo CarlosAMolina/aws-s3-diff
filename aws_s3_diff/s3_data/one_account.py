@@ -13,7 +13,6 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
-from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
 from aws_s3_diff.types_custom import MultiIndexDf
@@ -107,7 +106,7 @@ class _AccountCsvReader(CsvReader):
         return [(self._account, column_name) for column_name in index]
 
 
-class _AccountWithOriginS3UrisMultiIndexDfCreator(MultiIndexDfCreator):
+class _AccountWithOriginS3UrisMultiIndexDfCreator:
     def __init__(self, account_target):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()

@@ -4,12 +4,6 @@ from abc import abstractmethod
 from aws_s3_diff.types_custom import Df
 
 
-class MultiIndexDfCreator:
-    @abstractmethod
-    def get_df(self) -> Df:
-        pass
-
-
 class CsvExporter(ABC):
     @abstractmethod
     def export_df(self, df: Df):
