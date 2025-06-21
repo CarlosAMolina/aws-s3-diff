@@ -30,9 +30,6 @@ class AnalysisCsvCreator:
         self._local_results = LocalResults()
         self._logger = get_logger()
 
-    def get_df(self) -> Df:
-        return self._analysis_csv_generator.get_df()
-
     def export_csv(self, df: Df):
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
