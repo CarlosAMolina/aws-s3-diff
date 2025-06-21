@@ -85,19 +85,19 @@ class AccountsDataGenerator(DataGenerator):
         )
 
     def _get_df_multi_index(self) -> MultiIndexDf:
-        result = self._get_df_merge_accounts_s3_data()
+        result = self._get_df_combine_accounts_s3_data()
         return self._get_df_set_all_queries_despite_without_results(result)
 
-    def _get_df_merge_accounts_s3_data(self) -> Df:
+    def _get_df_combine_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         account_origin = accounts[0]
         account_targets = [account for account in accounts if account != account_origin]
         account_origin_df = AccountCsvReader(account_origin).get_df()
-        account_target_df_array = self._get_array_df_account_target_to_join(account_origin, account_targets)
+        account_target_df_array = self._get_array_df_account_target_to_combine(account_origin, account_targets)
         result = account_origin_df.join(account_target_df_array, how="outer")
         return result.dropna(axis="index", how="all")
 
-    def _get_array_df_account_target_to_join(self, account_origin: str, account_targets: list[str]) -> list[Df]:
+    def _get_array_df_account_target_to_combine(self, account_origin: str, account_targets: list[str]) -> list[Df]:
         result = []
         for account in account_targets:
             account_df = AccountCsvReader(account).get_df()
