@@ -92,7 +92,8 @@ class AccountsDataGenerator(DataGenerator):
         accounts = self._s3_uris_file_reader.get_accounts()
         account_origin = accounts[0]
         account_target_df_array = []
-        for account in accounts[1:]:
+        account_targets = accounts[1:]
+        for account in account_targets:
             account_df = AccountCsvReader(account).get_df()
             account_df_to_join = AccountDf(account, account_df, account_origin).get_account_df_to_join()
             account_target_df_array.append(account_df_to_join)
