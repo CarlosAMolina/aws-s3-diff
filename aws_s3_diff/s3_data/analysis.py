@@ -24,8 +24,8 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
     pass
 
 
-# TODO deprecate
-class CsvCreator(ABC):
+# TODO add aprent class and rename as the parent class
+class AnalysisCsvCreator:
     def __init__(self):
         self._local_results = LocalResults()
         self._logger = get_logger()
@@ -40,17 +40,6 @@ class CsvCreator(ABC):
     def get_file_path(self) -> Path:
         return self._local_results.get_file_path_results(self._file_name)
 
-    @abstractmethod
-    def _get_df_creator(self) -> SimpleIndexDfCreator:
-        pass
-
-    @property
-    @abstractmethod
-    def _file_name(self) -> str:
-        pass
-
-
-class AnalysisCsvCreator(CsvCreator):
     def _get_df_creator(self) -> SimpleIndexDfCreator:
         return _AnalysisSimpleIndexDfCreator()
 
