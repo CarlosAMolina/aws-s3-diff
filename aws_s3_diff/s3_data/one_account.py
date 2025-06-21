@@ -71,7 +71,7 @@ class AccountDataGenerator(DataGenerator):
 class AccountDf:
     def __init__(self, account: str, account_df: Df, first_account: str):
         self._account_df = account_df
-        self._origin_s3_uris_as_index_df_modifier = _OriginS3UrisAsIndexDfModifier(first_account, account)
+        self._origin_s3_uris_as_index_df_modifier = OriginS3UrisAsIndexDfModifier(first_account, account)
 
     def get_account_df_to_join(self) -> Df:
         return self._origin_s3_uris_as_index_df_modifier.get_df_modified(self._account_df)
@@ -107,7 +107,7 @@ class AccountCsvReader(CsvReader):
         return [(self._account, column_name) for column_name in index]
 
 
-class _OriginS3UrisAsIndexDfModifier(DfModifier):
+class OriginS3UrisAsIndexDfModifier(DfModifier):
     def __init__(self, account_origin: str, account_target: str):
         self._account_origin = account_origin
         self._account_target = account_target
