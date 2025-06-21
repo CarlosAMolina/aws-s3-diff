@@ -2,7 +2,6 @@ import re
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
-from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Series
@@ -35,13 +34,11 @@ class AnalysisCsvCreator:
         return self._analysis_simple_index_df_creator.get_df()
 
     def export_csv(self, df: Df):
-        self._logger.info(f"Exporting {self.get_file_path()}")
-        df.to_csv(index=False, path_or_buf=self.get_file_path())
-
-    def get_file_path(self) -> Path:
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
-        return self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)
+        file_path = self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)
+        self._logger.info(f"Exporting {file_path}")
+        df.to_csv(index=False, path_or_buf=file_path)
 
 
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
