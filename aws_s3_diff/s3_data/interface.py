@@ -49,13 +49,13 @@ class CsvExporter(ABC):
         pass
 
 
-class DataGenerator(ABC):
+class CsvReader(ABC):
     @abstractmethod
     def get_df(self) -> Df:
         pass
 
 
-class CsvReader(ABC):
+class DataGenerator(ABC):
     @abstractmethod
     def get_df(self) -> Df:
         pass
