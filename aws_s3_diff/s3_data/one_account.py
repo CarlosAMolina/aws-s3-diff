@@ -69,11 +69,15 @@ class AccountDataGenerator(DataGenerator):
 # TODO everywhere where it is used, initialize in __init__
 # TODO deprecate
 class AccountDf:
-    def get_account_df_to_join(self, account: str, first_account: str) -> Df:
-        result = _AccountCsvReader(account).get_df()
-        if account == first_account:
+    def __init__(self, account: str, first_account: str):
+        self._account = account
+        self._first_account = first_account
+
+    def get_account_df_to_join(self) -> Df:
+        result = _AccountCsvReader(self._account).get_df()
+        if self._account == self._first_account:
             return result
-        return _OriginS3UrisAsIndexDfModifier(first_account, account).get_df_modified(result)
+        return _OriginS3UrisAsIndexDfModifier(self._first_account, self._account).get_df_modified(result)
 
 
 class _AccountCsvReader(CsvReader):
