@@ -41,9 +41,6 @@ class LocalResults:
     def get_file_path_account(self, account: str) -> Path:
         return self._get_file_path_results(get_account_file_name(account))
 
-    def _get_file_path_results(self, file_name: str) -> Path:
-        return self.analysis_paths.directory_analysis.joinpath(file_name)
-
     def get_file_path_all_accounts(self) -> Path:
         return self._get_file_path_results(_ACCOUNTS_FILE_NAME)
 
@@ -74,6 +71,9 @@ class LocalResults:
             analysis_date_time_str = AnalysisDateTimeGenerator().get_analysis_date_time_str()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache
+
+    def _get_file_path_results(self, file_name: str) -> Path:
+        return self.analysis_paths.directory_analysis.joinpath(file_name)
 
 
 class AnalysisDateTimeGenerator:
