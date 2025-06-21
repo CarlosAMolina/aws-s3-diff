@@ -26,7 +26,7 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
 # TODO add parent class CsvExporter and rename as the parent class
 class AnalysisCsvCreator:
     def __init__(self):
-        self._account_csv_generator = _AccountDataGenerator()
+        self._account_csv_generator = AccountDataGenerator()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
@@ -41,7 +41,7 @@ class AnalysisCsvCreator:
         df.to_csv(index=False, path_or_buf=file_path)
 
 
-class _AccountDataGenerator(DataGenerator):
+class AccountDataGenerator(DataGenerator):
     def __init__(self):
         self._analysis_new_df_creator = _AnalysisNewDfCreator()
 
