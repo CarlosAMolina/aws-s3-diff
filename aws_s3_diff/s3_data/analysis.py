@@ -44,7 +44,6 @@ class AnalysisCsvCreator:
 class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
     def __init__(self):
         self._analysis_new_df_creator = _AnalysisNewDfCreator()
-        self._logger = get_logger()
 
     def get_df(self) -> Df:
         df = self._analysis_new_df_creator.get_df()
