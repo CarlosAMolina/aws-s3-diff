@@ -39,16 +39,16 @@ class LocalResults:
         return [path.name for path in paths]
 
     def get_file_path_account(self, account: str) -> Path:
-        return self.get_file_path_results(get_account_file_name(account))
+        return self._get_file_path_results(get_account_file_name(account))
 
-    def get_file_path_results(self, file_name: str) -> Path:
+    def _get_file_path_results(self, file_name: str) -> Path:
         return self.analysis_paths.directory_analysis.joinpath(file_name)
 
     def get_file_path_all_accounts(self) -> Path:
-        return self.get_file_path_results(_ACCOUNTS_FILE_NAME)
+        return self._get_file_path_results(_ACCOUNTS_FILE_NAME)
 
     def get_file_path_analysis(self) -> Path:
-        return self.get_file_path_results(_ANALYSIS_FILE_NAME)
+        return self._get_file_path_results(_ANALYSIS_FILE_NAME)
 
     def drop_file(self, file_path: Path):
         self._logger.debug(f"Removing: {file_path}")
