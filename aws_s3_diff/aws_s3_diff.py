@@ -20,6 +20,7 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
 from aws_s3_diff.s3_data.all_accounts import AccountsDataGenerator
 from aws_s3_diff.s3_data.analysis import AnalysisCsvCreator
+from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvExporter
 from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 
@@ -167,12 +168,13 @@ class _AnalysisState(_State):
         self._analysis_config_reader = AnalysisConfigReader()
         self._analysis_config_checker = AnalysisConfigChecker()
         self._analysis_csv_creator = AnalysisCsvCreator()
+        self._analysis_data_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
 
     def get_df(self) -> Df:
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
-            return self._analysis_csv_creator.get_df()
+            return self._analysis_data_generator.get_df()
         _logger.info("No analysis configured. Omitting")
         return Df()
 
