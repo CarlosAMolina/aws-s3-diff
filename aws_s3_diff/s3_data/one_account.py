@@ -16,7 +16,6 @@ from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.interface import DfModifier
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
-from aws_s3_diff.types_custom import MultiIndexDf
 from aws_s3_diff.types_custom import S3Data
 from aws_s3_diff.types_custom import S3Query
 
@@ -109,18 +108,10 @@ class _AccountCsvReader(CsvReader):
 
 class _OriginS3UrisAsIndexDfModifier(DfModifier):
     def __init__(self, account_target: str):
-        self._index_creator = _AccountWithOriginS3UrisMultiIndexDfCreator(account_target)
-
-    def get_df_modified(self, df: Df) -> Df:
-        return self._index_creator.get_df(df)
-
-
-class _AccountWithOriginS3UrisMultiIndexDfCreator:
-    def __init__(self, account_target: str):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
 
-    def get_df(self, df: Df) -> MultiIndexDf:
+    def get_df_modified(self, df: Df) -> Df:
         result = df.copy()
         s3_uris_map_df = self._s3_uris_file_reader.get_df_s3_uris_map_between_accounts(
             self._account_origin, self._account_target

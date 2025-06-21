@@ -3,7 +3,7 @@ import unittest
 from pandas import DataFrame as Df
 from pandas.testing import assert_frame_equal
 
-from aws_s3_diff.s3_data.one_account import _AccountWithOriginS3UrisMultiIndexDfCreator
+from aws_s3_diff.s3_data.one_account import _OriginS3UrisAsIndexDfModifier
 
 ExpectedResult = list[dict]
 
@@ -11,7 +11,7 @@ _ACCOUNT_ORIGIN = "pro"
 _ACCOUNT_TARGET = "dev"
 
 
-class TestS3UriDfModifier(unittest.TestCase):
+class TestOriginS3UrisAsIndexDfModifier(unittest.TestCase):
     def test_get_df_replace_index_with_s3_uris_map_if_prefixes_end_and_not_end_with_slash(self):
         expected_result = _get_df_as_multi_index(
             Df(
@@ -31,7 +31,7 @@ class TestS3UriDfModifier(unittest.TestCase):
             with self.subTest(df=df, s3_uris_map_df=s3_uris_map_df):
                 assert_frame_equal(
                     expected_result,
-                    _AccountWithOriginS3UrisMultiIndexDfCreator(_ACCOUNT_TARGET)._get_df_replace_index_with_s3_uris_map(
+                    _OriginS3UrisAsIndexDfModifier(_ACCOUNT_TARGET)._get_df_replace_index_with_s3_uris_map(
                         df, s3_uris_map_df
                     ),
                 )
