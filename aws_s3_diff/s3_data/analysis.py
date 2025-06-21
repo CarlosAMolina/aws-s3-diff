@@ -54,14 +54,14 @@ class _AnalysisNewDfCreator(NewDfCreator):
         self._accounts_csv_reader = AccountsCsvReader()
         self._analysis_config_reader = AnalysisConfigReader()
 
-    def get_df(self) -> MultiIndexDf:
+    def get_df(self) -> Df:
         return self._get_df_s3_data_analyzed()
 
-    def _get_df_s3_data_analyzed(self) -> MultiIndexDf:
+    def _get_df_s3_data_analyzed(self) -> Df:
         all_accounts_s3_data_df = self._accounts_csv_reader.get_df()
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
-    def _get_df_set_analysis_columns(self, df: MultiIndexDf) -> MultiIndexDf:
+    def _get_df_set_analysis_columns(self, df: Df) -> Df:
         result_builder = _AnalysisBuilder(df)
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
