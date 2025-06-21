@@ -20,3 +20,9 @@ class DataGenerator(ABC):
     @abstractmethod
     def get_df(self) -> Df:
         pass
+
+
+class DfModifier(ABC):
+    @abstractmethod
+    def get_df_modified(self, df: Df) -> Df:
+        pass

@@ -1,5 +1,3 @@
-from abc import ABC
-from abc import abstractmethod
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -15,6 +13,7 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
+from aws_s3_diff.s3_data.interface import DfModifier
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import FileS3Data
 from aws_s3_diff.types_custom import MultiIndexDf
@@ -108,13 +107,7 @@ class _AccountCsvReader(CsvReader):
         return [(self._account, column_name) for column_name in index]
 
 
-class _DfModifier(ABC):
-    @abstractmethod
-    def get_df_modified(self, df: Df) -> Df:
-        pass
-
-
-class _OriginS3UrisAsIndexDfModifier(_DfModifier):
+class _OriginS3UrisAsIndexDfModifier(DfModifier):
     def __init__(self, account_target: str):
         self._index_creator = _AccountWithOriginS3UrisMultiIndexDfCreator(account_target)
 
