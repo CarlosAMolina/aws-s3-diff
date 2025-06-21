@@ -11,6 +11,7 @@ from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
+from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
@@ -26,12 +27,12 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
 
 
 # TODO add parent class CsvExporter and rename as the parent class
-class AnalysisCsvCreator:
+class AnalysisCsvCreator(CsvExporter):
     def __init__(self):
         self._analysis_csv_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
 
-    def export_csv(self, df: Df):
+    def export_df(self, df: Df):
         # TODO make private when the class AnalysisCsvExporter is created and use the
         # TODO method get_file_path_analysis
         file_path = self._local_results.get_file_path_results(ANALYSIS_FILE_NAME)

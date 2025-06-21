@@ -181,6 +181,6 @@ class _AnalysisState(_State):
     def export_csv(self, df: Df):
         if df.empty:
             return
-        self._analysis_csv_creator.export_csv(df)
+        self._analysis_csv_creator.export_df(df)
         self._local_results.drop_file_with_analysis_date()
         self._csvs_generator.set_must_not_run_next_state()
