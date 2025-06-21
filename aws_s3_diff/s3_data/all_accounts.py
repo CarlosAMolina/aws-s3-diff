@@ -90,10 +90,10 @@ class AccountsDataGenerator(DataGenerator):
 
     def _get_df_merge_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
-        account_df_array = [
-            AccountDf(account, AccountCsvReader(account).get_df(), accounts[0]).get_account_df_to_join()
-            for account in accounts
-        ]
+        account_df_array = []
+        for account in accounts:
+            account_df = AccountDf(account, AccountCsvReader(account).get_df(), accounts[0]).get_account_df_to_join()
+            account_df_array += [account_df]
         result = account_df_array[0].join(account_df_array[1:], how="outer")
         return result.dropna(axis="index", how="all")
 
