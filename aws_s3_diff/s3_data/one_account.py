@@ -1,3 +1,5 @@
+from abc import ABC
+from abc import abstractmethod
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -73,7 +75,7 @@ class AccountDf:
         result = _AccountCsvReader(account).get_df()
         if account == first_account:
             return result
-        return _AccountWithOriginS3UrisMultiIndexDfCreator(account).get_df(result)
+        return _OriginS3UrisAsIndexDfModifier(account).get_df_modified(result)
 
 
 class _AccountCsvReader(CsvReader):
@@ -106,8 +108,22 @@ class _AccountCsvReader(CsvReader):
         return [(self._account, column_name) for column_name in index]
 
 
+class _DfModifier(ABC):
+    @abstractmethod
+    def get_df_modified(self, df: Df) -> Df:
+        pass
+
+
+class _OriginS3UrisAsIndexDfModifier(_DfModifier):
+    def __init__(self, account_target: str):
+        self._index_creator = _AccountWithOriginS3UrisMultiIndexDfCreator(account_target)
+
+    def get_df_modified(self, df: Df) -> Df:
+        return self._index_creator.get_df(df)
+
+
 class _AccountWithOriginS3UrisMultiIndexDfCreator:
-    def __init__(self, account_target):
+    def __init__(self, account_target: str):
         self._account_target = account_target
         self._s3_uris_file_reader = S3UrisFileReader()
 
