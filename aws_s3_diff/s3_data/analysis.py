@@ -11,10 +11,10 @@ from aws_s3_diff.local_results import ANALYSIS_FILE_NAME
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
+from aws_s3_diff.s3_data.interface import CsvGenerator
 from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.s3_data.interface import NewDfCreator
-from aws_s3_diff.s3_data.interface import SimpleIndexDfCreator
 from aws_s3_diff.types_custom import MultiIndexDf
 
 
@@ -26,12 +26,12 @@ class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
 # TODO add parent class CsvExporter and rename as the parent class
 class AnalysisCsvCreator:
     def __init__(self):
-        self._analysis_simple_index_df_creator = _AnalysisSimpleIndexDfCreator()
+        self._account_csv_generator = _AccountCsvGenerator()
         self._local_results = LocalResults()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
-        return self._analysis_simple_index_df_creator.get_df()
+        return self._account_csv_generator.get_df()
 
     def export_csv(self, df: Df):
         # TODO make private when the class AnalysisCsvExporter is created and use the
@@ -41,7 +41,7 @@ class AnalysisCsvCreator:
         df.to_csv(index=False, path_or_buf=file_path)
 
 
-class _AnalysisSimpleIndexDfCreator(SimpleIndexDfCreator):
+class _AccountCsvGenerator(CsvGenerator):
     def __init__(self):
         self._analysis_new_df_creator = _AnalysisNewDfCreator()
 
