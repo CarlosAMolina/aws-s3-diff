@@ -76,8 +76,6 @@ class AccountDf:
         self._origin_s3_uris_as_index_df_modifier = _OriginS3UrisAsIndexDfModifier(self._first_account, self._account)
 
     def get_account_df_to_join(self) -> Df:
-        if self._account == self._first_account:
-            return self._account_df
         return self._origin_s3_uris_as_index_df_modifier.get_df_modified(self._account_df)
 
 
