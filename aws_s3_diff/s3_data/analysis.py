@@ -13,15 +13,9 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
-from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.types_custom import MultiIndexDf
 
 logger = get_logger()
-
-
-# TODO
-class _AccountMultiIndexDfCreator(MultiIndexDfCreator):
-    pass
 
 
 class AnalysisCsvExporter(CsvExporter):
