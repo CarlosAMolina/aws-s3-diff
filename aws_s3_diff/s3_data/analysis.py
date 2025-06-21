@@ -13,7 +13,6 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
-from aws_s3_diff.s3_data.interface import FromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.interface import MultiIndexDfCreator
 from aws_s3_diff.types_custom import MultiIndexDf
 
@@ -45,8 +44,7 @@ class AnalysisDataGenerator(DataGenerator):
 
     def get_df(self) -> Df:
         df = self._get_df_s3_data_analyzed()
-        # TODO initialize in __init__
-        return _AnalysisFromMultiSimpleIndexDfCreator(df).get_df()
+        return self._get_df_with_single_index(df)
 
     def _get_df_s3_data_analyzed(self) -> Df:
         all_accounts_s3_data_df = self._accounts_csv_reader.get_df()
@@ -59,6 +57,15 @@ class AnalysisDataGenerator(DataGenerator):
         if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
             result_builder.with_analysis_can_exist_files()
         return result_builder.build()
+
+    def _get_df_with_single_index(self, df: Df) -> Df:
+        result = df.copy()
+        self._set_df_columns_as_single_index(result)
+        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
+        return result.reset_index()
+
+    def _set_df_columns_as_single_index(self, df: Df):
+        df.columns = df.columns.map("_".join)
 
 
 class _AnalysisBuilder:
@@ -287,11 +294,3 @@ class _AnalysisCondition:
 
     def _get_column_index_hash_for_account(self, account: str) -> tuple:
         return (account, "hash")
-
-
-class _AnalysisFromMultiSimpleIndexDfCreator(FromMultiSimpleIndexDfCreator):
-    def get_df(self) -> Df:
-        result = self._df.copy()
-        self._set_df_columns_as_single_index(result)
-        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
-        return result.reset_index()

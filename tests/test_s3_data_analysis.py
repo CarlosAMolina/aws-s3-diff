@@ -12,7 +12,6 @@ from pandas.testing import assert_frame_equal
 
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
-from aws_s3_diff.s3_data.analysis import _AnalysisFromMultiSimpleIndexDfCreator
 from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisCreator
 from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisCreator
 from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisCreator
@@ -108,9 +107,10 @@ class TestAnalysisCsvExporter(unittest.TestCase):
         # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
         df = self._get_df_from_accounts_s3_data_csv(file_path_name)
-        result = AnalysisDataGenerator()._get_df_set_analysis_columns(df)
+        analysis_data_generator = AnalysisDataGenerator()
+        result = analysis_data_generator._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        result_as_csv_export = _AnalysisFromMultiSimpleIndexDfCreator(result).get_df()
+        result_as_csv_export = analysis_data_generator._get_df_with_single_index(result)
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
         expected_result = expected_result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})

@@ -29,15 +29,6 @@ class MultiIndexDfCreator(DfCreator):
     pass
 
 
-# TODO add return read_file if file.exists else creat_df()
-class FromMultiSimpleIndexDfCreator(DfCreator):
-    def __init__(self, df: Df):
-        self._df = df
-
-    def _set_df_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
-
-
 class FromSimpleMultiIndexDfCreator(DfCreator):
     def __init__(self, df: Df):
         self._df = df
