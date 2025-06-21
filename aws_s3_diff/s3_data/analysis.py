@@ -23,8 +23,6 @@ class AnalysisCsvExporter(CsvExporter):
         self._local_results = LocalResults()
 
     def export_df(self, df: Df):
-        # TODO make private when the class AnalysisCsvExporter is created and use the
-        # TODO method get_file_path_analysis
         file_path = self._local_results.get_file_path_analysis()
         logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)

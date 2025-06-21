@@ -5,7 +5,7 @@ from aws_s3_diff.logger import get_logger
 
 _EXTENSION_FILE_NAME = ".csv"
 _ACCOUNTS_FILE_NAME = f"s3-files-all-accounts{_EXTENSION_FILE_NAME}"
-ANALYSIS_FILE_NAME = f"analysis{_EXTENSION_FILE_NAME}"
+_ANALYSIS_FILE_NAME = f"analysis{_EXTENSION_FILE_NAME}"
 
 
 def get_account_file_name(account: str) -> str:
@@ -48,7 +48,7 @@ class LocalResults:
         return self.get_file_path_results(_ACCOUNTS_FILE_NAME)
 
     def get_file_path_analysis(self) -> Path:
-        return self.get_file_path_results(ANALYSIS_FILE_NAME)
+        return self.get_file_path_results(_ANALYSIS_FILE_NAME)
 
     def drop_file(self, file_path: Path):
         self._logger.debug(f"Removing: {file_path}")
