@@ -23,6 +23,17 @@ from aws_s3_diff.types_custom import S3Query
 _logger = get_logger()
 
 
+class AccountCsvExporter(CsvExporter):
+    def __init__(self):
+        self._local_results = LocalResults()
+
+    def export_df(self, df: Df):
+        account = get_account_to_analyze()
+        file_path = self._local_results.get_file_path_account(account)
+        _logger.info(f"Exporting {file_path}")
+        df.to_csv(index=False, path_or_buf=file_path)
+
+
 class AccountDataGenerator(DataGenerator):
     def __init__(self, account: str):
         self._account = account
@@ -54,17 +65,6 @@ class AccountDataGenerator(DataGenerator):
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
         return result
-
-
-class AccountCsvExporter(CsvExporter):
-    def __init__(self):
-        self._local_results = LocalResults()
-
-    def export_df(self, df: Df):
-        account = get_account_to_analyze()
-        file_path = self._local_results.get_file_path_account(account)
-        _logger.info(f"Exporting {file_path}")
-        df.to_csv(index=False, path_or_buf=file_path)
 
 
 # TODO everywhere where it is used, initialize in __init__
