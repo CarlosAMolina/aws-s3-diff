@@ -37,7 +37,7 @@ class AccountsCsvReader(CsvReader):
     def get_df(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
         result = self._get_df_from_csv(accounts)
-        return self._get_df_set_multi_index_columns(result)
+        return self._get_df_set_multi_index_columns(accounts, result)
 
     # TODO extract common code with other classes _get_df_from_csv
     def _get_df_from_csv(self, accounts: list[str]) -> Df:
@@ -51,16 +51,16 @@ class AccountsCsvReader(CsvReader):
     def _get_file_path(self) -> Path:
         return self._local_results.get_file_path_all_accounts()
 
-    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
+    def _get_df_set_multi_index_columns(self, accounts: list[str], df: Df) -> Df:
         result = df
-        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
+        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(accounts, result.columns))
         return result
 
-    def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
-        return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
+    def _get_multi_index_tuples_for_df_columns(self, accounts: list[str], columns: Index) -> list[tuple[str, str]]:
+        return [self._get_multi_index_from_column_name(accounts, column_name) for column_name in columns]
 
-    def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
-        for account in self._s3_uris_file_reader.get_accounts():
+    def _get_multi_index_from_column_name(self, accounts: list[str], column_name: str) -> tuple[str, str]:
+        for account in accounts:
             regex_result = re.match(rf"{account}_(?P<key>.*)", column_name)
             if regex_result is not None:
                 return account, regex_result.group("key")
