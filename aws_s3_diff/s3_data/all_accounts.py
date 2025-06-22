@@ -30,36 +30,42 @@ class AccountsCsvExporter(CsvExporter):
 
 class AccountsCsvReader(CsvReader):
     def __init__(self):
+        self._accounts_cache = None
         self._local_results = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        result = self._get_df_from_csv(accounts)
-        return self._get_df_set_multi_index_columns(accounts, result)
+        result = self._get_df_from_csv()
+        return self._get_df_set_multi_index_columns(result)
 
     # TODO? accounts as __init__ parameter and attribute
-    def _get_df_from_csv(self, accounts: list[str]) -> Df:
+    def _get_df_from_csv(self) -> Df:
         return read_csv(
             self._local_results.get_file_path_all_accounts(),
-            index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
-            parse_dates=[f"{account}_date" for account in accounts],
-        ).astype({f"{account}_size": "Int64" for account in accounts})
+            index_col=[f"bucket_{self._accounts[0]}", f"file_path_in_s3_{self._accounts[0]}", "file_name_all_accounts"],
+            parse_dates=[f"{account}_date" for account in self._accounts],
+        ).astype({f"{account}_size": "Int64" for account in self._accounts})
 
-    def _get_df_set_multi_index_columns(self, accounts: list[str], df: Df) -> Df:
+    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
         result = df
-        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(accounts, result.columns))
+        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
         return result
 
-    def _get_multi_index_tuples_for_df_columns(self, accounts: list[str], columns: Index) -> list[tuple[str, str]]:
-        return [self._get_multi_index_from_column_name(accounts, column_name) for column_name in columns]
+    def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
+        return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
-    def _get_multi_index_from_column_name(self, accounts: list[str], column_name: str) -> tuple[str, str]:
-        for account in accounts:
+    def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
+        for account in self._accounts:
             regex_result = re.match(rf"{account}_(?P<key>.*)", column_name)
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
+
+    @property
+    def _accounts(self) -> list[str]:
+        if self._accounts_cache is None:
+            self._accounts_cache = self._s3_uris_file_reader.get_accounts()
+        return self._accounts_cache
 
 
 class AccountsDataGenerator(DataGenerator):
