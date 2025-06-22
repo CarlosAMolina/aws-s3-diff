@@ -41,6 +41,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 s3 = S3(account)
                 s3.create_buckets()
                 Main().run()
+        analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        local_results = LocalResults()
+        local_results._analysis_paths_cache = analysis_paths
         # TODO add assertions to check all files are created with expected values
 
     def test_run_all_acounts_generates_expected_results(self):
