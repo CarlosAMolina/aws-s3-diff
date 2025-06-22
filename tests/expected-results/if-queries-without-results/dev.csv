@@ -1,0 +1,5 @@
+bucket,prefix,name,date,size,hash
+cars_dev,europe/spain/,,,,
+pets_dev,dogs/size/heavy/,,,,
+pets_dev,horses/europe/,,,,
+pets_dev,non-existent-prefix/,,,,

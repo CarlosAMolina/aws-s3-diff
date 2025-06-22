@@ -44,7 +44,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         local_results = LocalResults()
         local_results._analysis_paths_cache = analysis_paths
-        # TODO add assertions to check all files are created with expected values
+        folder_name = "if-queries-without-results"
+        self._assert_extracted_accounts_data_have_expected_values(analysis_paths, folder_name)
+        self._assert_analysis_file_has_expected_values(folder_name, local_results)
 
     def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:

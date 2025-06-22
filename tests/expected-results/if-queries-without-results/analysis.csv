@@ -1,0 +1,5 @@
+bucket_pro,file_path_in_s3_pro,file_name_all_accounts,pro_date,pro_size,pro_hash,release_date,release_size,release_hash,dev_date,dev_size,dev_hash,is_sync_ok_in_release,is_sync_ok_in_dev,can_exist_in_release
+cars,europe/spain/,,,,,,,,,,,True,True,
+pets,dogs/big_size/,,,,,,,,,,,True,True,
+pets,horses/europe/,,,,,,,,,,,True,True,
+pets,non-existent-prefix/,,,,,,,,,,,True,True,
