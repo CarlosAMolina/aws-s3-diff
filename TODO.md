@@ -1,4 +1,5 @@
 - Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
+- Test https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-without-results/analysis.csv: check if columns sync_ok_in_release and is_sync_ok_in_dev should have values or maybe should be empty
 - Test. Drop aws_s3_diff/s3-uris-to-analyze.csv and run the tests to check that is mocked correctly. 
 - s3-urist-to-analyze.csv. Check if the script can work with an uri without prefix, only the bucket. Example: `s3://bucket/`. If not, implement it
 - analysis-config.json: rename is_the_file_copied_to to something like is_the_same_file
