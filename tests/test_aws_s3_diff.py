@@ -80,12 +80,12 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         return analysis_directory_names[-1]
 
     def _assert_extracted_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
-        for account, file_name_expected_result in {
-            "pro": "pro.csv",
-            "release": "release.csv",
-            "dev": "dev.csv",
-        }.items():
-            file_path_results = analysis_paths.directory_analysis.joinpath(f"{account}.csv")
+        for file_name_expected_result in [
+            "pro.csv",
+            "release.csv",
+            "dev.csv",
+        ]:
+            file_path_results = analysis_paths.directory_analysis.joinpath(file_name_expected_result)
             result_df = read_csv(file_path_results)
             expected_result_df = read_csv(f"tests/expected-results/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
