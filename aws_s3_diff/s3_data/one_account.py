@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame as Df
@@ -73,13 +72,10 @@ class AccountCsvReader(CsvReader):
 
     def get_df(self) -> Df:
         account_df = pd.read_csv(
-            self._get_file_path(),
+            self._local_results.get_file_path_account(self._account),
             parse_dates=["date"],
         ).astype({"size": "Int64"})
         return self._get_df_with_multi_index(account_df)
-
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_account(self._account)
 
     def _get_df_with_multi_index(self, df: Df) -> Df:
         result = df.copy()
