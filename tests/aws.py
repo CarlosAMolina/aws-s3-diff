@@ -19,7 +19,8 @@ class S3Server:
         self._stop()
 
     def create_objects(self, folder_name_with_files):
-        S3(folder_name_with_files).create_objects()
+        s3 = S3(folder_name_with_files)
+        s3.create_objects()
 
     def _start(self):
         self._mock_aws.start()
