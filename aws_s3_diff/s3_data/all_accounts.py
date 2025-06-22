@@ -35,12 +35,12 @@ class AccountsCsvReader(CsvReader):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        result = self._get_df_from_csv()
+        accounts = self._s3_uris_file_reader.get_accounts()
+        result = self._get_df_from_csv(accounts)
         return self._get_df_set_multi_index_columns(result)
 
     # TODO extract common code with other classes _get_df_from_csv
-    def _get_df_from_csv(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
+    def _get_df_from_csv(self, accounts: list[str]) -> Df:
         return read_csv(
             self._get_file_path(),
             index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
