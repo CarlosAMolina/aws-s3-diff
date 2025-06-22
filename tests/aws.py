@@ -47,10 +47,10 @@ class S3:
         self._local_s3_objects_path = current_path.joinpath("fake-files/local-s3-server", folder_name_with_files)
 
     def create_objects(self):
-        self._create_buckets()
-        self._upload_files()
+        self.create_buckets()
+        self.upload_files()
 
-    def _create_buckets(self):
+    def create_buckets(self):
         for bucket_name in self._get_bucket_names_to_create():
             self._create_bucket(bucket_name)
 
@@ -58,7 +58,7 @@ class S3:
         bucket = self._s3_resource.Bucket(bucket_name)
         bucket.create()
 
-    def _upload_files(self):
+    def upload_files(self):
         for bucket_name in self._get_bucket_names_to_create():
             bucket_name_local_path = self._local_s3_objects_path.joinpath(bucket_name)
             for local_file_path in self._get_file_paths_in_directory_path(bucket_name_local_path):
