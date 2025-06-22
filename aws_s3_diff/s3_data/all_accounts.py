@@ -76,8 +76,8 @@ class AccountsDataGenerator(DataGenerator):
     def get_df(self) -> Df:
         account_origin = self._accounts[0]
         account_targets = [account for account in self._accounts if account != account_origin]
-        result = self._get_df_combine_accounts_s3_data(account_origin, account_targets)
-        result = self._get_df_set_all_queries_despite_without_results(account_origin, result)
+        result = self._get_df_combine_accounts_s3_data(account_targets)
+        result = self._get_df_set_all_queries_despite_without_results(result)
         self._get_df_set_columns_as_single_index(result)
         return result.reset_index(
             names=[
@@ -87,30 +87,30 @@ class AccountsDataGenerator(DataGenerator):
             ]
         )
 
-    def _get_df_combine_accounts_s3_data(self, account_origin: str, account_targets: list[str]) -> Df:
-        account_origin_df = AccountCsvReader(account_origin).get_df()
-        account_target_df_array = self._get_array_df_account_target_to_combine(account_origin, account_targets)
+    def _get_df_combine_accounts_s3_data(self, account_targets: list[str]) -> Df:
+        account_origin_df = AccountCsvReader(self._account_origin).get_df()
+        account_target_df_array = self._get_array_df_account_target_to_combine(account_targets)
         result = account_origin_df.join(account_target_df_array, how="outer")
         return result.dropna(axis="index", how="all")
 
-    def _get_array_df_account_target_to_combine(self, account_origin: str, account_targets: list[str]) -> list[Df]:
+    def _get_array_df_account_target_to_combine(self, account_targets: list[str]) -> list[Df]:
         result = []
         for account in account_targets:
             account_df = AccountCsvReader(account).get_df()
-            account_df_to_join = OriginS3UrisAsIndexAccountDfModifier(account_origin, account).get_df_modified(
+            account_df_to_join = OriginS3UrisAsIndexAccountDfModifier(self._account_origin, account).get_df_modified(
                 account_df
             )
             result.append(account_df_to_join)
         return result
 
-    def _get_df_set_all_queries_despite_without_results(self, account_origin: str, df: Df) -> Df:
-        result = self._get_empty_df_original_account_queries_as_index(account_origin)
+    def _get_df_set_all_queries_despite_without_results(self, df: Df) -> Df:
+        result = self._get_empty_df_original_account_queries_as_index()
         result.columns = MultiIndex.from_arrays([[], []])  # To merge with a MultiIndex columns Df.
         result = result.join(df.reset_index("name"))
         return result.set_index("name", append=True)
 
-    def _get_empty_df_original_account_queries_as_index(self, account_origin: str) -> Df:
-        result = self._s3_uris_file_reader.file_df[account_origin]
+    def _get_empty_df_original_account_queries_as_index(self) -> Df:
+        result = self._s3_uris_file_reader.file_df[self._account_origin]
         # TODO refactor extract function, this line is done in other files.
         result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
         result.columns = ["bucket", "prefix"]
@@ -120,6 +120,10 @@ class AccountsDataGenerator(DataGenerator):
 
     def _get_df_set_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
+
+    @property
+    def _account_origin(self) -> str:
+        return self._accounts[0]
 
     @property
     def _accounts(self) -> list[str]:
