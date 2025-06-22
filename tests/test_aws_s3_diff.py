@@ -28,6 +28,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._original_current_path = LocalPaths._current_path
         tmp_directory_path_name = self.enterContext(tempfile.TemporaryDirectory())
         LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
+        self._copy_files_to_temporal_folder(tmp_directory_path_name)
+
+    def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
             Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
         for origin_path, final_path in [
