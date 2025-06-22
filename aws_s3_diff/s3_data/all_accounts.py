@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 from pandas import DataFrame as Df
 from pandas import Index
@@ -39,17 +38,13 @@ class AccountsCsvReader(CsvReader):
         result = self._get_df_from_csv(accounts)
         return self._get_df_set_multi_index_columns(accounts, result)
 
-    # TODO extract common code with other classes _get_df_from_csv
+    # TODO? accounts as __init__ parameter and attribute
     def _get_df_from_csv(self, accounts: list[str]) -> Df:
         return read_csv(
-            self._get_file_path(),
+            self._local_results.get_file_path_all_accounts(),
             index_col=[f"bucket_{accounts[0]}", f"file_path_in_s3_{accounts[0]}", "file_name_all_accounts"],
             parse_dates=[f"{account}_date" for account in accounts],
         ).astype({f"{account}_size": "Int64" for account in accounts})
-
-    # TODO refator, code duplicated in other files
-    def _get_file_path(self) -> Path:
-        return self._local_results.get_file_path_all_accounts()
 
     def _get_df_set_multi_index_columns(self, accounts: list[str], df: Df) -> Df:
         result = df

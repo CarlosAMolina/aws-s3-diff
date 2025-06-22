@@ -92,7 +92,10 @@ class TestDfAnalysis(unittest.TestCase):
 
     def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
         accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._get_file_path = lambda: (Path(__file__).parent.absolute().joinpath(file_path_name))
+        accounts_csv_reader._local_results = Mock()
+        accounts_csv_reader._local_results.get_file_path_all_accounts = lambda: (
+            Path(__file__).parent.absolute().joinpath(file_path_name)
+        )
         accounts_csv_reader._s3_uris_file_reader = Mock()
         accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare("pro", "release")
         return accounts_csv_reader.get_df()
@@ -120,7 +123,10 @@ class TestAnalysisCsvExporter(unittest.TestCase):
 
     def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
         accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._get_file_path = lambda: (Path(__file__).parent.absolute().joinpath(file_path_name))
+        accounts_csv_reader._local_results = Mock()
+        accounts_csv_reader._local_results.get_file_path_all_accounts = lambda: (
+            Path(__file__).parent.absolute().joinpath(file_path_name)
+        )
         return accounts_csv_reader.get_df()
 
     def _get_df_from_csv_expected_result(self) -> Df:
