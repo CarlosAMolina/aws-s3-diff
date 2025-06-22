@@ -54,8 +54,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         local_results = LocalResults()
         local_results._analysis_paths_cache = analysis_paths
-        self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
-        self._assert_analysis_file_has_expected_values(local_results)
+        folder_name = "if-queries-with-results"
+        self._assert_extracted_accounts_data_have_expected_values(analysis_paths, folder_name)
+        self._assert_analysis_file_has_expected_values(folder_name, local_results)
 
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
@@ -79,7 +80,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         analysis_directory_names.sort()
         return analysis_directory_names[-1]
 
-    def _assert_extracted_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths):
+    def _assert_extracted_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths, folder_name: str):
         for file_name_expected_result in [
             "pro.csv",
             "release.csv",
@@ -87,19 +88,19 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         ]:
             file_path_results = analysis_paths.directory_analysis.joinpath(file_name_expected_result)
             result_df = read_csv(file_path_results)
-            expected_result_df = read_csv(f"tests/expected-results/if-queries-with-results/{file_name_expected_result}")
+            expected_result_df = read_csv(f"tests/expected-results/{folder_name}/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
-    def _assert_analysis_file_has_expected_values(self, local_results: LocalResults):
+    def _assert_analysis_file_has_expected_values(self, folder_name: str, local_results: LocalResults):
         result = self._get_df_from_csv(local_results.get_file_path_analysis())
-        expected_result = self._get_df_from_csv_expected_result()
+        expected_result = self._get_df_from_csv_expected_result(folder_name)
         date_column_names = ["pro_date", "release_date", "dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
-    def _get_df_from_csv_expected_result(self) -> Df:
+    def _get_df_from_csv_expected_result(self, folder_name: str) -> Df:
         current_path = Path(__file__).parent.absolute()
-        expected_result_file_path = current_path.joinpath("expected-results/if-queries-with-results/analysis.csv")
+        expected_result_file_path = current_path.joinpath(f"expected-results/{folder_name}/analysis.csv")
         return self._get_df_from_csv(expected_result_file_path)
 
     def _get_df_from_csv(self, path: Path) -> Df:
