@@ -30,21 +30,6 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
         self._copy_files_to_temporal_folder(tmp_directory_path_name)
 
-    def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
-        for folder_name in ["aws_s3_diff", "config", "s3-results"]:
-            Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
-        for origin_path, final_path in [
-            (
-                Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
-                Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
-            ),
-            (
-                Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-                Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
-            ),
-        ]:
-            shutil.copyfile(origin_path, final_path)
-
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
@@ -59,6 +44,21 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         local_results._analysis_paths_cache = analysis_paths
         self._assert_extracted_accounts_data_have_expected_values(analysis_paths)
         self._assert_analysis_file_has_expected_values(local_results)
+
+    def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
+        for folder_name in ["aws_s3_diff", "config", "s3-results"]:
+            Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
+        for origin_path, final_path in [
+            (
+                Path(__file__).parent.parent.joinpath("config/analysis-config.json"),
+                Path(tmp_directory_path_name).joinpath("config/analysis-config.json"),
+            ),
+            (
+                Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
+                Path(tmp_directory_path_name).joinpath("config/s3-uris-to-analyze.csv"),
+            ),
+        ]:
+            shutil.copyfile(origin_path, final_path)
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
