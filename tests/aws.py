@@ -20,7 +20,8 @@ class S3Server:
 
     def create_objects(self, folder_name_with_files):
         s3 = S3(folder_name_with_files)
-        s3.create_objects()
+        s3.create_buckets()
+        s3.upload_files()
 
     def _start(self):
         self._mock_aws.start()
@@ -46,10 +47,6 @@ class S3:
         self._s3_client = boto3.client("s3", endpoint_url=endpoint_url)
         current_path = Path(__file__).parent.absolute()
         self._local_s3_objects_path = current_path.joinpath("fake-files/local-s3-server", folder_name_with_files)
-
-    def create_objects(self):
-        self.create_buckets()
-        self.upload_files()
 
     def create_buckets(self):
         for bucket_name in self._get_bucket_names_to_create():
