@@ -15,7 +15,6 @@ from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvReader
 from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
-from aws_s3_diff.types_custom import MultiIndexDf
 
 _logger = get_logger()
 
@@ -73,7 +72,8 @@ class AccountsDataGenerator(DataGenerator):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        result = self._get_df_multi_index()
+        result = self._get_df_combine_accounts_s3_data()
+        result = self._get_df_set_all_queries_despite_without_results(result)
         self._get_df_set_columns_as_single_index(result)
         account_1 = self._s3_uris_file_reader.get_first_account()
         return result.reset_index(
@@ -83,10 +83,6 @@ class AccountsDataGenerator(DataGenerator):
                 "file_name_all_accounts",
             ]
         )
-
-    def _get_df_multi_index(self) -> MultiIndexDf:
-        result = self._get_df_combine_accounts_s3_data()
-        return self._get_df_set_all_queries_despite_without_results(result)
 
     def _get_df_combine_accounts_s3_data(self) -> Df:
         accounts = self._s3_uris_file_reader.get_accounts()
