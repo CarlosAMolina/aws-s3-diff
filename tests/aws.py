@@ -55,16 +55,16 @@ class S3:
         for bucket_name in self._get_bucket_names_to_create():
             self._create_bucket(bucket_name)
 
-    def _create_bucket(self, bucket_name: str):
-        bucket = self._s3_resource.Bucket(bucket_name)
-        bucket.create()
-
     def upload_files(self):
         for bucket_name in self._get_bucket_names_to_create():
             bucket_name_local_path = self._local_s3_objects_path.joinpath(bucket_name)
             for local_file_path in self._get_file_paths_in_directory_path(bucket_name_local_path):
                 s3_file_path_name = str(local_file_path.relative_to(bucket_name_local_path))
                 self._upload_file(bucket_name, local_file_path, s3_file_path_name)
+
+    def _create_bucket(self, bucket_name: str):
+        bucket = self._s3_resource.Bucket(bucket_name)
+        bucket.create()
 
     def _upload_file(self, bucket_name: str, local_file_path: Path, s3_file_path_name: str):
         self._s3_client.upload_file(local_file_path, bucket_name, s3_file_path_name)
