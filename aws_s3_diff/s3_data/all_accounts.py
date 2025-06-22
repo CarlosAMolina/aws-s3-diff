@@ -74,28 +74,26 @@ class AccountsDataGenerator(DataGenerator):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        account_origin = self._accounts[0]
-        account_targets = [account for account in self._accounts if account != account_origin]
-        result = self._get_df_combine_accounts_s3_data(account_targets)
+        result = self._get_df_combine_accounts_s3_data()
         result = self._get_df_set_all_queries_despite_without_results(result)
         self._get_df_set_columns_as_single_index(result)
         return result.reset_index(
             names=[
-                f"bucket_{account_origin}",
-                f"file_path_in_s3_{account_origin}",
+                f"bucket_{self._account_origin}",
+                f"file_path_in_s3_{self._account_origin}",
                 "file_name_all_accounts",
             ]
         )
 
-    def _get_df_combine_accounts_s3_data(self, account_targets: list[str]) -> Df:
+    def _get_df_combine_accounts_s3_data(self) -> Df:
         account_origin_df = AccountCsvReader(self._account_origin).get_df()
-        account_target_df_array = self._get_array_df_account_target_to_combine(account_targets)
+        account_target_df_array = self._get_array_df_account_target_to_combine()
         result = account_origin_df.join(account_target_df_array, how="outer")
         return result.dropna(axis="index", how="all")
 
-    def _get_array_df_account_target_to_combine(self, account_targets: list[str]) -> list[Df]:
+    def _get_array_df_account_target_to_combine(self) -> list[Df]:
         result = []
-        for account in account_targets:
+        for account in self._account_targets:
             account_df = AccountCsvReader(account).get_df()
             account_df_to_join = OriginS3UrisAsIndexAccountDfModifier(self._account_origin, account).get_df_modified(
                 account_df
@@ -124,6 +122,10 @@ class AccountsDataGenerator(DataGenerator):
     @property
     def _account_origin(self) -> str:
         return self._accounts[0]
+
+    @property
+    def _account_targets(self) -> list[str]:
+        return [account for account in self._accounts if account != self._account_origin]
 
     @property
     def _accounts(self) -> list[str]:
