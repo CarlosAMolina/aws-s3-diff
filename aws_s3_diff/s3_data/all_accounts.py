@@ -75,11 +75,11 @@ class AccountsDataGenerator(DataGenerator):
         result = self._get_df_combine_accounts_s3_data()
         result = self._get_df_set_all_queries_despite_without_results(result)
         self._get_df_set_columns_as_single_index(result)
-        account_1 = self._s3_uris_file_reader.get_first_account()
+        account_origin = self._s3_uris_file_reader.get_first_account()
         return result.reset_index(
             names=[
-                f"bucket_{account_1}",
-                f"file_path_in_s3_{account_1}",
+                f"bucket_{account_origin}",
+                f"file_path_in_s3_{account_origin}",
                 "file_name_all_accounts",
             ]
         )
