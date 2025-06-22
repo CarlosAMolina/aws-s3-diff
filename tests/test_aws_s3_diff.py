@@ -87,7 +87,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         ]:
             file_path_results = analysis_paths.directory_analysis.joinpath(file_name_expected_result)
             result_df = read_csv(file_path_results)
-            expected_result_df = read_csv(f"tests/expected-results/{file_name_expected_result}")
+            expected_result_df = read_csv(f"tests/expected-results/if-queries-with-results/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
@@ -99,7 +99,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
     def _get_df_from_csv_expected_result(self) -> Df:
         current_path = Path(__file__).parent.absolute()
-        expected_result_file_path = current_path.joinpath("expected-results", "analysis.csv")
+        expected_result_file_path = current_path.joinpath("expected-results/if-queries-with-results/analysis.csv")
         return self._get_df_from_csv(expected_result_file_path)
 
     def _get_df_from_csv(self, path: Path) -> Df:

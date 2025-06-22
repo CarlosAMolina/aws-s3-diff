@@ -130,7 +130,7 @@ class TestAnalysisCsvExporter(unittest.TestCase):
         return accounts_csv_reader.get_df()
 
     def _get_df_from_csv_expected_result(self) -> Df:
-        expected_result_file_path = self.current_path.joinpath("expected-results", "analysis.csv")
+        expected_result_file_path = self.current_path.joinpath("expected-results/if-queries-with-results/analysis.csv")
         result = read_csv(expected_result_file_path).astype(
             {
                 "pro_size": "Int64",
