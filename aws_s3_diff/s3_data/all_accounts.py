@@ -72,10 +72,12 @@ class AccountsDataGenerator(DataGenerator):
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        result = self._get_df_combine_accounts_s3_data()
+        accounts = self._s3_uris_file_reader.get_accounts()
+        account_origin = accounts[0]
+        account_targets = [account for account in accounts if account != account_origin]
+        result = self._get_df_combine_accounts_s3_data(account_origin, account_targets)
         result = self._get_df_set_all_queries_despite_without_results(result)
         self._get_df_set_columns_as_single_index(result)
-        account_origin = self._s3_uris_file_reader.get_first_account()
         return result.reset_index(
             names=[
                 f"bucket_{account_origin}",
@@ -84,10 +86,7 @@ class AccountsDataGenerator(DataGenerator):
             ]
         )
 
-    def _get_df_combine_accounts_s3_data(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        account_origin = accounts[0]
-        account_targets = [account for account in accounts if account != account_origin]
+    def _get_df_combine_accounts_s3_data(self, account_origin: str, account_targets: list[str]) -> Df:
         account_origin_df = AccountCsvReader(account_origin).get_df()
         account_target_df_array = self._get_array_df_account_target_to_combine(account_origin, account_targets)
         result = account_origin_df.join(account_target_df_array, how="outer")
