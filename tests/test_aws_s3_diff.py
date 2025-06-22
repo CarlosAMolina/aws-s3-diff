@@ -19,6 +19,7 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import _AnalysisPaths
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.local_results import LocalResults
+from tests.aws import S3
 from tests.aws import S3Server
 
 
@@ -33,6 +34,14 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
+
+    def test_run_all_acounts_generates_expected_results_if_queries_without_results(self):
+        with S3Server() as _local_s3_server:
+            for account in S3UrisFileReader().get_accounts():
+                s3 = S3(account)
+                s3.create_buckets()
+                Main().run()
+        # TODO add assertions to check all files are created with expected values
 
     def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:
