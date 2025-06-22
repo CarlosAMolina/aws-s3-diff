@@ -36,20 +36,15 @@ class AccountsCsvReader(CsvReader):
 
     def get_df(self) -> Df:
         result = self._get_df_from_csv()
-        return self._get_df_set_multi_index_columns(result)
+        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
+        return result
 
-    # TODO? accounts as __init__ parameter and attribute
     def _get_df_from_csv(self) -> Df:
         return read_csv(
             self._local_results.get_file_path_all_accounts(),
             index_col=[f"bucket_{self._accounts[0]}", f"file_path_in_s3_{self._accounts[0]}", "file_name_all_accounts"],
             parse_dates=[f"{account}_date" for account in self._accounts],
         ).astype({f"{account}_size": "Int64" for account in self._accounts})
-
-    def _get_df_set_multi_index_columns(self, df: Df) -> Df:
-        result = df
-        result.columns = MultiIndex.from_tuples(self._get_multi_index_tuples_for_df_columns(result.columns))
-        return result
 
     def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
