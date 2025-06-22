@@ -70,12 +70,12 @@ class AccountsCsvReader(CsvReader):
 
 class AccountsDataGenerator(DataGenerator):
     def __init__(self):
+        self._accounts_cache = None
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
-        accounts = self._s3_uris_file_reader.get_accounts()
-        account_origin = accounts[0]
-        account_targets = [account for account in accounts if account != account_origin]
+        account_origin = self._accounts[0]
+        account_targets = [account for account in self._accounts if account != account_origin]
         result = self._get_df_combine_accounts_s3_data(account_origin, account_targets)
         result = self._get_df_set_all_queries_despite_without_results(account_origin, result)
         self._get_df_set_columns_as_single_index(result)
@@ -120,3 +120,9 @@ class AccountsDataGenerator(DataGenerator):
 
     def _get_df_set_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
+
+    @property
+    def _accounts(self) -> list[str]:
+        if self._accounts_cache is None:
+            self._accounts_cache = self._s3_uris_file_reader.get_accounts()
+        return self._accounts_cache
