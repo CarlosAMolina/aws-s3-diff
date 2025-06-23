@@ -98,8 +98,7 @@ class _AnalysisPaths:
         self._analysis_date_time_str = (
             analysis_date_time_str  # TODO use AnalysisDateTimeGenerator and drop __init__ argument
         )
-        self._all_results_directory_path = LocalPaths().all_results_directory
 
     @property
     def directory_analysis(self) -> Path:
-        return self._all_results_directory_path.joinpath(self._analysis_date_time_str)
+        return LocalPaths().all_results_directory.joinpath(self._analysis_date_time_str)
