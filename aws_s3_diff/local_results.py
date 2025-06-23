@@ -34,6 +34,23 @@ class LocalResults:
         self._local_paths = LocalPaths()
         self._directory_analysis_path_cache = None
 
+    def create_directory_analysis(self):
+        self._logger.debug(f"Creating the directory: {self._directory_analysis_path}")
+        self._directory_analysis_path.mkdir()
+
+    def drop_file(self, file_path: Path):
+        self._logger.debug(f"Removing: {file_path}")
+        file_path.unlink()
+
+    def drop_file_with_analysis_date(self):
+        self.drop_file(self._local_paths.analysis_date_time_file)
+
+    def exist_analysis_date_time_file(self) -> bool:
+        return self._local_paths.analysis_date_time_file.is_file()
+
+    def exist_directory_analysis(self) -> bool:
+        return self._directory_analysis_path.exists()
+
     def get_file_names_results(self) -> list[str]:
         paths = self._directory_analysis_path.glob(f"*{_EXTENSION_FILE_NAME}")
         return [path.name for path in paths]
@@ -46,23 +63,6 @@ class LocalResults:
 
     def get_file_path_analysis(self) -> Path:
         return self._get_file_path_results(_ANALYSIS_FILE_NAME)
-
-    def drop_file(self, file_path: Path):
-        self._logger.debug(f"Removing: {file_path}")
-        file_path.unlink()
-
-    def drop_file_with_analysis_date(self):
-        self.drop_file(self._local_paths.analysis_date_time_file)
-
-    def create_directory_analysis(self):
-        self._logger.debug(f"Creating the directory: {self._directory_analysis_path}")
-        self._directory_analysis_path.mkdir()
-
-    def exist_analysis_date_time_file(self) -> bool:
-        return self._local_paths.analysis_date_time_file.is_file()
-
-    def exist_directory_analysis(self) -> bool:
-        return self._directory_analysis_path.exists()
 
     @property
     def _directory_analysis_path(self) -> Path:
