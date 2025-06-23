@@ -70,7 +70,9 @@ class LocalResults:
             with open(self._local_paths.analysis_date_time_file) as file:
                 # `strip()` to avoid errors if the file is modified manually by te user.
                 analysis_date_time_str = file.read().strip()
-            self._directory_analysis_path_cache = _AnalysisPaths(analysis_date_time_str).directory_analysis
+            self._directory_analysis_path_cache = self._local_paths.all_results_directory.joinpath(
+                analysis_date_time_str
+            )
         return self._directory_analysis_path_cache
 
     def _get_file_path_results(self, file_name: str) -> Path:
@@ -86,16 +88,3 @@ class AnalysisDateTimeGenerator:
         with open(self._analysis_date_time_file_path, "w") as file:
             date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             file.write(date_time_str)
-
-
-# TODO deprecate
-class _AnalysisPaths:
-    def __init__(self, analysis_date_time_str: str):
-        self._local_paths = LocalPaths()
-        self._analysis_date_time_str = (
-            analysis_date_time_str  # TODO use AnalysisDateTimeGenerator and drop __init__ argument
-        )
-
-    @property
-    def directory_analysis(self) -> Path:
-        return self._local_paths.all_results_directory.joinpath(self._analysis_date_time_str)

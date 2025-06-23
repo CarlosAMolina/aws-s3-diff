@@ -16,7 +16,6 @@ from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.config_files import S3UrisFileReader
-from aws_s3_diff.local_results import _AnalysisPaths
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.local_results import LocalResults
 from tests.aws import S3
@@ -41,11 +40,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 s3 = S3(account)
                 s3.create_buckets()
                 Main().run()
-        analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
+        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         local_results = LocalResults()
-        local_results._directory_analysis_path_cache = analysis_paths.directory_analysis
+        local_results._directory_analysis_path_cache = directory_analysis_path
         folder_name = "if-queries-without-results"
-        self._assert_extracted_accounts_data_have_expected_values(analysis_paths, folder_name)
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
         self._assert_analysis_file_has_expected_values(folder_name, local_results)
 
     def test_run_all_acounts_generates_expected_results(self):
@@ -53,11 +52,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             for account in S3UrisFileReader().get_accounts():
                 local_s3_server.create_objects(account)
                 Main().run()
-        analysis_paths = _AnalysisPaths(self._get_analysis_date_time_str())
         local_results = LocalResults()
-        local_results._directory_analysis_path_cache = analysis_paths.directory_analysis
+        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
+        local_results._directory_analysis_path_cache = directory_analysis_path
         folder_name = "if-queries-with-results"
-        self._assert_extracted_accounts_data_have_expected_values(analysis_paths, folder_name)
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
         self._assert_analysis_file_has_expected_values(folder_name, local_results)
 
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
@@ -82,13 +81,13 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         analysis_directory_names.sort()
         return analysis_directory_names[-1]
 
-    def _assert_extracted_accounts_data_have_expected_values(self, analysis_paths: _AnalysisPaths, folder_name: str):
+    def _assert_extracted_accounts_data_have_expected_values(self, directory_analysis_path: Path, folder_name: str):
         for file_name_expected_result in [
             "pro.csv",
             "release.csv",
             "dev.csv",
         ]:
-            file_path_results = analysis_paths.directory_analysis.joinpath(file_name_expected_result)
+            file_path_results = directory_analysis_path.joinpath(file_name_expected_result)
             result_df = read_csv(file_path_results)
             expected_result_df = read_csv(f"tests/expected-results/{folder_name}/{file_name_expected_result}")
             expected_result_df["date"] = result_df["date"]
