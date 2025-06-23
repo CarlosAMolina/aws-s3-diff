@@ -31,8 +31,7 @@ class LocalPaths:
 class LocalResults:
     def __init__(self):
         self._logger = get_logger()
-        local_paths = LocalPaths()
-        self._analysis_date_time_file_path = local_paths.analysis_date_time_file
+        self._local_paths = LocalPaths()
         self._analysis_paths_cache = None  # To avoid read/create file in __init__.
 
     def get_file_names_results(self) -> list[str]:
@@ -53,14 +52,14 @@ class LocalResults:
         file_path.unlink()
 
     def drop_file_with_analysis_date(self):
-        self.drop_file(self._analysis_date_time_file_path)
+        self.drop_file(self._local_paths.analysis_date_time_file)
 
     def create_directory_analysis(self):
         self._logger.debug(f"Creating the directory: {self.analysis_paths.directory_analysis}")
         self.analysis_paths.directory_analysis.mkdir()
 
     def exist_analysis_date_time_file(self) -> bool:
-        return self._analysis_date_time_file_path.is_file()
+        return self._local_paths.analysis_date_time_file.is_file()
 
     def exist_directory_analysis(self) -> bool:
         return self.analysis_paths.directory_analysis.exists()
