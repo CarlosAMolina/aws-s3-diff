@@ -79,7 +79,7 @@ class LocalResults:
         return self._directory_analysis_path.joinpath(file_name)
 
 
-class AnalysisDateTimeGenerator:
+class AnalysisDateTimeExporter:
     def __init__(self):
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 

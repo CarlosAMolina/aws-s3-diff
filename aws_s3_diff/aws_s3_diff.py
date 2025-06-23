@@ -14,7 +14,7 @@ from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.exceptions import S3UrisFileError
-from aws_s3_diff.local_results import AnalysisDateTimeGenerator
+from aws_s3_diff.local_results import AnalysisDateTimeExporter
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
@@ -29,7 +29,7 @@ _logger = get_logger()
 
 class Main:
     def __init__(self):
-        self._analysis_date_time_generator = AnalysisDateTimeGenerator()
+        self._analysis_date_time_exporter = AnalysisDateTimeExporter()
         self._local_results = LocalResults()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -44,7 +44,7 @@ class Main:
             return
         self._show_accounts_to_analyze()
         if not self._local_results.exist_analysis_date_time_file():
-            self._analysis_date_time_generator.export_analysis_date_time_str()
+            self._analysis_date_time_exporter.export_analysis_date_time_str()
         if not self._local_results.exist_directory_analysis():
             self._local_results.create_directory_analysis()
         self._export_csvs()
