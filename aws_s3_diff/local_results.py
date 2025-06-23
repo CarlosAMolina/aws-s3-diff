@@ -81,7 +81,6 @@ class LocalResults:
 
 class AnalysisDateTimeGenerator:
     def __init__(self):
-        self._local_paths = LocalPaths()
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
     def export_analysis_date_time_str(self):
