@@ -54,7 +54,7 @@ class AccountDataGenerator(DataGenerator):
         for s3_data in S3Client(s3_query).get_s3_data():
             is_any_result = True
             yield s3_data
-        # TODO? try deprecate, maybe it is required to avoid exception when no results
+        # Required when no results.
         if not is_any_result:
             yield [FileS3Data()]
 
