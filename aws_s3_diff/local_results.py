@@ -33,6 +33,7 @@ class LocalResults:
         self._logger = get_logger()
         self._local_paths = LocalPaths()
         self._analysis_paths_cache = None  # To avoid read/create file in __init__.
+        self._analysis_date_time_generator = AnalysisDateTimeGenerator()
 
     def get_file_names_results(self) -> list[str]:
         paths = self.analysis_paths.directory_analysis.glob(f"*{_EXTENSION_FILE_NAME}")
@@ -68,7 +69,7 @@ class LocalResults:
     def analysis_paths(self) -> "_AnalysisPaths":
         if self._analysis_paths_cache is None:
             # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
-            analysis_date_time_str = AnalysisDateTimeGenerator().get_analysis_date_time_str()
+            analysis_date_time_str = self._analysis_date_time_generator.get_analysis_date_time_str()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache
 
