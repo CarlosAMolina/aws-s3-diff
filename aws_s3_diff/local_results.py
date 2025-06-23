@@ -79,6 +79,7 @@ class LocalResults:
 
 class AnalysisDateTimeGenerator:
     def __init__(self):
+        self._local_paths = LocalPaths()
         self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
 
     def export_analysis_date_time_str(self):
@@ -87,7 +88,7 @@ class AnalysisDateTimeGenerator:
             file.write(date_time_str)
 
     def get_analysis_date_time_str(self) -> str:
-        with open(self._analysis_date_time_file_path) as file:
+        with open(self._local_paths.analysis_date_time_file) as file:
             # `strip()` to avoid errors if the file is modified manually by te user.
             return file.read().strip()
 
