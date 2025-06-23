@@ -36,7 +36,7 @@ class LocalResults:
         self._analysis_date_time_generator = AnalysisDateTimeGenerator()
 
     def get_file_names_results(self) -> list[str]:
-        paths = self._path_directory_analysis.glob(f"*{_EXTENSION_FILE_NAME}")
+        paths = self._directory_analysis_path.glob(f"*{_EXTENSION_FILE_NAME}")
         return [path.name for path in paths]
 
     def get_file_path_account(self, account: str) -> Path:
@@ -56,17 +56,17 @@ class LocalResults:
         self.drop_file(self._local_paths.analysis_date_time_file)
 
     def create_directory_analysis(self):
-        self._logger.debug(f"Creating the directory: {self._path_directory_analysis}")
-        self._path_directory_analysis.mkdir()
+        self._logger.debug(f"Creating the directory: {self._directory_analysis_path}")
+        self._directory_analysis_path.mkdir()
 
     def exist_analysis_date_time_file(self) -> bool:
         return self._local_paths.analysis_date_time_file.is_file()
 
     def exist_directory_analysis(self) -> bool:
-        return self._path_directory_analysis.exists()
+        return self._directory_analysis_path.exists()
 
     @property
-    def _path_directory_analysis(self) -> Path:
+    def _directory_analysis_path(self) -> Path:
         if self._analysis_paths_cache is None:
             # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
             analysis_date_time_str = self._analysis_date_time_generator.get_analysis_date_time_str()
@@ -74,7 +74,7 @@ class LocalResults:
         return self._analysis_paths_cache.directory_analysis
 
     def _get_file_path_results(self, file_name: str) -> Path:
-        return self._path_directory_analysis.joinpath(file_name)
+        return self._directory_analysis_path.joinpath(file_name)
 
 
 class AnalysisDateTimeGenerator:
