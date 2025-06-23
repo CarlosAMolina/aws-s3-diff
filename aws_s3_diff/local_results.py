@@ -32,7 +32,7 @@ class LocalResults:
     def __init__(self):
         self._logger = get_logger()
         self._local_paths = LocalPaths()
-        self._analysis_paths_cache = None  # To avoid read/create file in __init__.
+        self._directory_analysis_path_cache = None
 
     def get_file_names_results(self) -> list[str]:
         paths = self._directory_analysis_path.glob(f"*{_EXTENSION_FILE_NAME}")
@@ -66,12 +66,12 @@ class LocalResults:
 
     @property
     def _directory_analysis_path(self) -> Path:
-        if self._analysis_paths_cache is None:
+        if self._directory_analysis_path_cache is None:
             with open(self._local_paths.analysis_date_time_file) as file:
                 # `strip()` to avoid errors if the file is modified manually by te user.
                 analysis_date_time_str = file.read().strip()
-            self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
-        return self._analysis_paths_cache.directory_analysis
+            self._directory_analysis_path_cache = _AnalysisPaths(analysis_date_time_str).directory_analysis
+        return self._directory_analysis_path_cache
 
     def _get_file_path_results(self, file_name: str) -> Path:
         return self._directory_analysis_path.joinpath(file_name)
