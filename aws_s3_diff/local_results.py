@@ -31,7 +31,8 @@ class LocalPaths:
 class LocalResults:
     def __init__(self):
         self._logger = get_logger()
-        self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
+        local_paths = LocalPaths()
+        self._analysis_date_time_file_path = local_paths.analysis_date_time_file
         self._analysis_paths_cache = None  # To avoid read/create file in __init__.
 
     def get_file_names_results(self) -> list[str]:
