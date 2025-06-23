@@ -91,10 +91,11 @@ class AnalysisDateTimeGenerator:
 # TODO deprecate
 class _AnalysisPaths:
     def __init__(self, analysis_date_time_str: str):
+        self._local_paths = LocalPaths()
         self._analysis_date_time_str = (
             analysis_date_time_str  # TODO use AnalysisDateTimeGenerator and drop __init__ argument
         )
 
     @property
     def directory_analysis(self) -> Path:
-        return LocalPaths().all_results_directory.joinpath(self._analysis_date_time_str)
+        return self._local_paths.all_results_directory.joinpath(self._analysis_date_time_str)
