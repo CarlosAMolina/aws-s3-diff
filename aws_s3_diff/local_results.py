@@ -33,7 +33,6 @@ class LocalResults:
         self._logger = get_logger()
         self._local_paths = LocalPaths()
         self._analysis_paths_cache = None  # To avoid read/create file in __init__.
-        self._analysis_date_time_generator = AnalysisDateTimeGenerator()
 
     def get_file_names_results(self) -> list[str]:
         paths = self._directory_analysis_path.glob(f"*{_EXTENSION_FILE_NAME}")
@@ -68,8 +67,9 @@ class LocalResults:
     @property
     def _directory_analysis_path(self) -> Path:
         if self._analysis_paths_cache is None:
-            # get_analysis_date_time_str has file input and outputs, don't do this in __init__.
-            analysis_date_time_str = self._analysis_date_time_generator.get_analysis_date_time_str()
+            with open(self._local_paths.analysis_date_time_file) as file:
+                # `strip()` to avoid errors if the file is modified manually by te user.
+                analysis_date_time_str = file.read().strip()
             self._analysis_paths_cache = _AnalysisPaths(analysis_date_time_str)
         return self._analysis_paths_cache.directory_analysis
 
@@ -86,11 +86,6 @@ class AnalysisDateTimeGenerator:
         with open(self._analysis_date_time_file_path, "w") as file:
             date_time_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             file.write(date_time_str)
-
-    def get_analysis_date_time_str(self) -> str:
-        with open(self._local_paths.analysis_date_time_file) as file:
-            # `strip()` to avoid errors if the file is modified manually by te user.
-            return file.read().strip()
 
 
 # TODO deprecate
