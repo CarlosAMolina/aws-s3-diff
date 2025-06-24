@@ -192,7 +192,6 @@ class _TypeAnalysisCreator(ABC):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
         pass
 
-    # TODO use _TwoAccountsAnalysisCreator without " in return type
     @property
     @abstractmethod
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
