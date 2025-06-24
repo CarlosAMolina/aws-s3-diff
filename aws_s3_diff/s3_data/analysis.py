@@ -80,6 +80,7 @@ _ArrayAccountsToCompare = list[_AccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
 
 
+# TODO deprecate, move logic to _TypeAnalysisCreator
 class _ArrayAccountsToCompareCreator(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
