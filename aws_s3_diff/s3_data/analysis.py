@@ -195,7 +195,7 @@ class _TypeAnalysisCreator(ABC):
     # TODO use _TwoAccountsAnalysisCreator without " in return type
     @property
     @abstractmethod
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
         pass
 
 
@@ -204,7 +204,7 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
         return _FileCopiedAnalysisArrayAccountsToCompareCreator().get_array_accounts()
 
     @property
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
         return _IsFileCopiedTwoAccountsAnalysisCreator
 
 
@@ -213,7 +213,7 @@ class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
         return _CanExistAnalysisArrayAccountsToCompareCreator().get_array_accounts()
 
     @property
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
         return _CanFileExistTwoAccountsAnalysisCreator
 
 
