@@ -106,42 +106,6 @@ class _CanExistAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCrea
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
 
-class _TypeAnalysisCreator(ABC):
-    def get_df(self, df: MultiIndexDf) -> Df:
-        result = df.copy()
-        for accounts in self._get_accounts_array():
-            result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
-        return result
-
-    @abstractmethod
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        pass
-
-    # TODO use _TwoAccountsAnalysisCreator without " in return type
-    @property
-    @abstractmethod
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
-        pass
-
-
-class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _FileCopiedAnalysisArrayAccountsToCompareCreator().get_array_accounts()
-
-    @property
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
-        return _IsFileCopiedTwoAccountsAnalysisCreator
-
-
-class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _CanExistAnalysisArrayAccountsToCompareCreator().get_array_accounts()
-
-    @property
-    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
-        return _CanFileExistTwoAccountsAnalysisCreator
-
-
 class _TwoAccountsAnalysisCreator(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
@@ -215,6 +179,42 @@ class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
     @property
     def _condition_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
+
+
+class _TypeAnalysisCreator(ABC):
+    def get_df(self, df: MultiIndexDf) -> Df:
+        result = df.copy()
+        for accounts in self._get_accounts_array():
+            result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
+        return result
+
+    @abstractmethod
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        pass
+
+    # TODO use _TwoAccountsAnalysisCreator without " in return type
+    @property
+    @abstractmethod
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+        pass
+
+
+class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        return _FileCopiedAnalysisArrayAccountsToCompareCreator().get_array_accounts()
+
+    @property
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+        return _IsFileCopiedTwoAccountsAnalysisCreator
+
+
+class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
+    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+        return _CanExistAnalysisArrayAccountsToCompareCreator().get_array_accounts()
+
+    @property
+    def _two_accounts_analysis_creator(self) -> type["_TwoAccountsAnalysisCreator"]:
+        return _CanFileExistTwoAccountsAnalysisCreator
 
 
 class _AnalysisCondition:
