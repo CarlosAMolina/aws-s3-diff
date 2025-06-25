@@ -79,7 +79,7 @@ _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 _ConditionConfig = dict[str, bool | str]
 
 
-class _TwoAccountsAnalysisCreator(ABC):
+class _TwoAccountsAnalysisSetter(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
         self._condition = _AnalysisCondition(accounts, df)
@@ -117,7 +117,7 @@ class _TwoAccountsAnalysisCreator(ABC):
         pass
 
 
-class _IsFileCopiedTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
+class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def _log_analysis(self):
         logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
@@ -138,7 +138,7 @@ class _IsFileCopiedTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
         }
 
 
-class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
+class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def _log_analysis(self):
         logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
@@ -172,7 +172,7 @@ class _AllAccountsAnalysisSetter(ABC):
 
     @property
     @abstractmethod
-    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
         pass
 
 
@@ -181,8 +181,8 @@ class _FileCopiedAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
     @property
-    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
-        return _IsFileCopiedTwoAccountsAnalysisCreator
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
+        return _IsFileCopiedTwoAccountsAnalysisSetter
 
 
 class _CanExistAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
@@ -190,8 +190,8 @@ class _CanExistAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
     @property
-    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
-        return _CanFileExistTwoAccountsAnalysisCreator
+    def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
+        return _CanFileExistTwoAccountsAnalysisSetter
 
 
 class _AnalysisCondition:

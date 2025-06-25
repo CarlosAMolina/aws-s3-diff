@@ -12,16 +12,16 @@ from pandas.testing import assert_frame_equal
 
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
-from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisCreator
-from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisCreator
-from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisCreator
+from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisSetter
+from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisSetter
+from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisSetter
 from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 
 class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
         pass
 
     @property
@@ -37,8 +37,8 @@ class _AnalysisBuilderConfig(ABC):
 
 class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
-        return _IsFileCopiedTwoAccountsAnalysisCreator
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
+        return _IsFileCopiedTwoAccountsAnalysisSetter
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
@@ -57,8 +57,8 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
 
 class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
     @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisCreator]:
-        return _CanFileExistTwoAccountsAnalysisCreator
+    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
+        return _CanFileExistTwoAccountsAnalysisSetter
 
     @property
     def file_name_and_expected_result(self) -> dict[str, list]:
