@@ -183,9 +183,8 @@ class _TypeAnalysisCreator(ABC):
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
 
-    @abstractmethod
     def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        pass
+        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     @abstractmethod
@@ -201,9 +200,6 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
-    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
-
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
         return _IsFileCopiedTwoAccountsAnalysisCreator
@@ -212,9 +208,6 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
 class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
-
-    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
