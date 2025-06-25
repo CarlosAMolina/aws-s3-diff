@@ -85,7 +85,7 @@ class _TwoAccountsAnalysisCreator(ABC):
         self._condition = _AnalysisCondition(accounts, df)
         self._df = df
 
-    def get_df_set_analysis(self) -> MultiIndexDf:
+    def get_df_set_analysis_column(self) -> MultiIndexDf:
         self._log_analysis()
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
@@ -163,7 +163,7 @@ class _AllAccountsAnalysisSetter(ABC):
         account_origin = self._analysis_config_reader.get_account_origin()
         for account_target in self._get_account_targets():
             accounts = _AccountsToCompare(account_origin, account_target)
-            result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
+            result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis_column()
         return result
 
     @abstractmethod
