@@ -82,8 +82,8 @@ _ConditionConfig = dict[str, bool | str]
 
 # TODO deprecate, move logic to _TypeAnalysisCreator
 class _ArrayAccountsToCompareCreator(ABC):
-    def __init__(self):
-        self._analysis_config_reader = AnalysisConfigReader()
+    def __init__(self, TODO_RM: "_TypeAnalysisCreator"):
+        self._analysis_config_reader = TODO_RM._analysis_config_reader
 
     def get_array_accounts(self) -> _ArrayAccountsToCompare:
         return self._get_array_accounts_for_target_accounts(self._get_account_targets())
@@ -204,7 +204,7 @@ class _TypeAnalysisCreator(ABC):
 
 class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _FileCopiedAnalysisArrayAccountsToCompareCreator().get_array_accounts()
+        return _FileCopiedAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
@@ -213,7 +213,7 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
 
 class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
     def _get_accounts_array(self) -> _ArrayAccountsToCompare:
-        return _CanExistAnalysisArrayAccountsToCompareCreator().get_array_accounts()
+        return _CanExistAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
