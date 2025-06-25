@@ -81,7 +81,7 @@ _ConditionConfig = dict[str, bool | str]
 
 
 # TODO deprecate, move logic to _TypeAnalysisCreator
-class _ArrayAccountsToCompareCreator(ABC):
+class _ArrayAccountsToCompareCreator:
     def __init__(self, TODO_RM: "_TypeAnalysisCreator"):
         self._TODO_RM = TODO_RM
         self._analysis_config_reader = TODO_RM._analysis_config_reader
@@ -93,19 +93,16 @@ class _ArrayAccountsToCompareCreator(ABC):
         account_origin = self._analysis_config_reader.get_account_origin()
         return [_AccountsToCompare(account_origin, account_target) for account_target in account_targets]
 
-    @abstractmethod
     def _get_account_targets(self) -> list[str]:
-        pass
+        return self._TODO_RM._get_account_targets()
 
 
 class _FileCopiedAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
-    def _get_account_targets(self) -> list[str]:
-        return self._TODO_RM._get_account_targets()
+    pass
 
 
 class _CanExistAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
-    def _get_account_targets(self) -> list[str]:
-        return self._TODO_RM._get_account_targets()
+    pass
 
 
 class _TwoAccountsAnalysisCreator(ABC):
