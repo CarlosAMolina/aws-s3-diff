@@ -83,6 +83,7 @@ _ConditionConfig = dict[str, bool | str]
 # TODO deprecate, move logic to _TypeAnalysisCreator
 class _ArrayAccountsToCompareCreator(ABC):
     def __init__(self, TODO_RM: "_TypeAnalysisCreator"):
+        self._TODO_RM = TODO_RM
         self._analysis_config_reader = TODO_RM._analysis_config_reader
 
     def get_array_accounts(self) -> _ArrayAccountsToCompare:
@@ -99,12 +100,12 @@ class _ArrayAccountsToCompareCreator(ABC):
 
 class _FileCopiedAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
     def _get_account_targets(self) -> list[str]:
-        return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
+        return self._TODO_RM._get_account_targets()
 
 
 class _CanExistAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
     def _get_account_targets(self) -> list[str]:
-        return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
+        return self._TODO_RM._get_account_targets()
 
 
 class _TwoAccountsAnalysisCreator(ABC):
@@ -187,6 +188,7 @@ class _TypeAnalysisCreator(ABC):
         self._analysis_config_reader = AnalysisConfigReader()
 
     def get_df(self, df: MultiIndexDf) -> Df:
+        # TODO extract here account variable
         result = df.copy()
         for accounts in self._get_array_accounts_to_compare():
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
@@ -201,8 +203,15 @@ class _TypeAnalysisCreator(ABC):
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
         pass
 
+    @abstractmethod
+    def _get_account_targets(self) -> list[str]:
+        pass
+
 
 class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
+    def _get_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
+
     def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
         return _FileCopiedAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
@@ -212,6 +221,9 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
 
 
 class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
+    def _get_account_targets(self) -> list[str]:
+        return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
+
     def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
         return _CanExistAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
