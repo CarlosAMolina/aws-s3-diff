@@ -177,9 +177,10 @@ class _TypeAnalysisCreator(ABC):
         self._analysis_config_reader = AnalysisConfigReader()
 
     def get_df(self, df: MultiIndexDf) -> Df:
-        # TODO extract here account variable
         result = df.copy()
-        for accounts in self._get_array_accounts_to_compare():
+        account_origin = self._analysis_config_reader.get_account_origin()
+        for account_target in self._get_account_targets():
+            accounts = _AccountsToCompare(account_origin, account_target)
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
 
