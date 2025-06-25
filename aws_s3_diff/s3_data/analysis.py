@@ -183,6 +183,9 @@ class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
 
 
 class _TypeAnalysisCreator(ABC):
+    def __init__(self):
+        self._analysis_config_reader = AnalysisConfigReader()
+
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         for accounts in self._get_accounts_array():
