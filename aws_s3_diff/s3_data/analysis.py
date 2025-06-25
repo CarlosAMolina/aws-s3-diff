@@ -166,13 +166,13 @@ class _TypeAnalysisCreator(ABC):
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
 
+    @abstractmethod
+    def _get_account_targets(self) -> list[str]:
+        pass
+
     @property
     @abstractmethod
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
-        pass
-
-    @abstractmethod
-    def _get_account_targets(self) -> list[str]:
         pass
 
 
