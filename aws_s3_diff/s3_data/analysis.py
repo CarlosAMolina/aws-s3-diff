@@ -188,12 +188,12 @@ class _TypeAnalysisCreator(ABC):
 
     def get_df(self, df: MultiIndexDf) -> Df:
         result = df.copy()
-        for accounts in self._get_accounts_array():
+        for accounts in self._get_array_accounts_to_compare():
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
 
     @abstractmethod
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
         pass
 
     @property
@@ -203,7 +203,7 @@ class _TypeAnalysisCreator(ABC):
 
 
 class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
         return _FileCopiedAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
@@ -212,7 +212,7 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
 
 
 class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
-    def _get_accounts_array(self) -> _ArrayAccountsToCompare:
+    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
         return _CanExistAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
