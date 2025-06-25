@@ -64,11 +64,11 @@ class _AnalysisBuilder:
         self._df = df
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._df = _FileCopiedAllAccountsAnalysisCreator().get_df(self._df)
+        self._df = _FileCopiedAllAccountsAnalysisSetter().get_df(self._df)
         return self
 
     def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
-        self._df = _CanExistAllAccountsAnalysisCreator().get_df(self._df)
+        self._df = _CanExistAllAccountsAnalysisSetter().get_df(self._df)
         return self
 
     def build(self) -> Df:
@@ -154,7 +154,7 @@ class _CanFileExistTwoAccountsAnalysisCreator(_TwoAccountsAnalysisCreator):
         return {"condition_must_not_exist": False}
 
 
-class _AllAccountsAnalysisCreator(ABC):
+class _AllAccountsAnalysisSetter(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
@@ -176,7 +176,7 @@ class _AllAccountsAnalysisCreator(ABC):
         pass
 
 
-class _FileCopiedAllAccountsAnalysisCreator(_AllAccountsAnalysisCreator):
+class _FileCopiedAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
@@ -185,7 +185,7 @@ class _FileCopiedAllAccountsAnalysisCreator(_AllAccountsAnalysisCreator):
         return _IsFileCopiedTwoAccountsAnalysisCreator
 
 
-class _CanExistAllAccountsAnalysisCreator(_AllAccountsAnalysisCreator):
+class _CanExistAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
     def _get_account_targets(self) -> list[str]:
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
