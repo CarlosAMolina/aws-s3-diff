@@ -64,11 +64,11 @@ class _AnalysisBuilder:
         self._df = df
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        self._df = _FileCopiedAllAccountsAnalysisSetter().get_df(self._df)
+        self._df = _FileCopiedAllAccountsAnalysisSetter().get_df_set_analysis_columns(self._df)
         return self
 
     def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
-        self._df = _CanExistAllAccountsAnalysisSetter().get_df(self._df)
+        self._df = _CanExistAllAccountsAnalysisSetter().get_df_set_analysis_columns(self._df)
         return self
 
     def build(self) -> Df:
@@ -158,7 +158,7 @@ class _AllAccountsAnalysisSetter(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
 
-    def get_df(self, df: MultiIndexDf) -> Df:
+    def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         account_origin = self._analysis_config_reader.get_account_origin()
         for account_target in self._get_account_targets():
