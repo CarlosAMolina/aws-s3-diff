@@ -97,14 +97,6 @@ class _ArrayAccountsToCompareCreator:
         return self._TODO_RM._get_account_targets()
 
 
-class _FileCopiedAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
-    pass
-
-
-class _CanExistAnalysisArrayAccountsToCompareCreator(_ArrayAccountsToCompareCreator):
-    pass
-
-
 class _TwoAccountsAnalysisCreator(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
@@ -210,7 +202,7 @@ class _FileCopiedTypeAnalysisCreator(_TypeAnalysisCreator):
         return self._analysis_config_reader.get_accounts_where_files_must_be_copied()
 
     def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        return _FileCopiedAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
+        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
@@ -222,7 +214,7 @@ class _CanExistTypeAnalysisCreator(_TypeAnalysisCreator):
         return self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
 
     def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        return _CanExistAnalysisArrayAccountsToCompareCreator(self).get_array_accounts()
+        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     def _two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisCreator]:
