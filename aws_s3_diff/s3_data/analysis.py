@@ -76,25 +76,7 @@ class _AnalysisBuilder:
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
-_ArrayAccountsToCompare = list[_AccountsToCompare]
 _ConditionConfig = dict[str, bool | str]
-
-
-# TODO deprecate, move logic to _TypeAnalysisCreator
-class _ArrayAccountsToCompareCreator:
-    def __init__(self, TODO_RM: "_TypeAnalysisCreator"):
-        self._TODO_RM = TODO_RM
-        self._analysis_config_reader = TODO_RM._analysis_config_reader
-
-    def get_array_accounts(self) -> _ArrayAccountsToCompare:
-        return self._get_array_accounts_for_target_accounts(self._get_account_targets())
-
-    def _get_array_accounts_for_target_accounts(self, account_targets: list[str]) -> _ArrayAccountsToCompare:
-        account_origin = self._analysis_config_reader.get_account_origin()
-        return [_AccountsToCompare(account_origin, account_target) for account_target in account_targets]
-
-    def _get_account_targets(self) -> list[str]:
-        return self._TODO_RM._get_account_targets()
 
 
 class _TwoAccountsAnalysisCreator(ABC):
@@ -183,9 +165,6 @@ class _TypeAnalysisCreator(ABC):
             accounts = _AccountsToCompare(account_origin, account_target)
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis()
         return result
-
-    def _get_array_accounts_to_compare(self) -> _ArrayAccountsToCompare:
-        return _ArrayAccountsToCompareCreator(self).get_array_accounts()
 
     @property
     @abstractmethod
