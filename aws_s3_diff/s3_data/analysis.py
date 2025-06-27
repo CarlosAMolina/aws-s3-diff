@@ -243,14 +243,11 @@ class _AnalysisCondition:
 
     @property
     def _column_index_size_origin(self) -> tuple:
-        return self._get_column_index_size_for_account(self._accounts.origin)
+        return (self._accounts.origin, "size")
 
     @property
     def _column_index_size_target(self) -> tuple:
-        return self._get_column_index_size_for_account(self._accounts.target)
-
-    def _get_column_index_size_for_account(self, account: str) -> tuple:
-        return (account, "size")
+        return (self._accounts.target, "size")
 
     @property
     def _column_index_hash_origin(self) -> tuple:
