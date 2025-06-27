@@ -225,7 +225,7 @@ class _AnalysisCondition:
 
     @property
     def _condition_exists_file_to_sync(self) -> Series:
-        return self._df.loc[:, self._column_index_size_origin].notnull()
+        return self._df.loc[:, (self._accounts.origin, "size")].notnull()
 
     @property
     def _condition_file_is_sync(self) -> Series:
@@ -240,10 +240,6 @@ class _AnalysisCondition:
     @property
     def _condition_exists_file_in_target_account(self) -> Series:
         return self._df.loc[:, self._column_index_size_target].notnull()
-
-    @property
-    def _column_index_size_origin(self) -> tuple:
-        return (self._accounts.origin, "size")
 
     @property
     def _column_index_size_target(self) -> tuple:
