@@ -209,15 +209,15 @@ class _AnalysisCondition:
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
-        return ~self._exists_file_in_account_origin & self._exists_file_in_target_account
+        return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
 
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
-        return ~self._exists_file_in_account_origin & ~self._exists_file_in_target_account
+        return ~self._exists_file_in_account_origin & ~self._exists_file_in_account_target
 
     @property
     def condition_must_not_exist(self) -> Series:
-        return ~self._exists_file_in_account_origin & self._exists_file_in_target_account
+        return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
 
     @property
     def _exists_file_in_account_origin(self) -> Series:
@@ -234,5 +234,5 @@ class _AnalysisCondition:
         )
 
     @property
-    def _exists_file_in_target_account(self) -> Series:
+    def _exists_file_in_account_target(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
