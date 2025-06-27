@@ -89,22 +89,18 @@ class _TwoAccountsAnalysisSetter(ABC):
         self._log_analysis()
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        result[[self._result_column_multi_index]] = None
+        result[[("analysis", self._column_name_result)]] = None
         for (
             condition_name,
             condition_result_to_set,
         ) in self._condition_config.items():
             condition_results: Series = getattr(self._condition, condition_name)
-            result.loc[condition_results, [self._result_column_multi_index]] = condition_result_to_set
+            result.loc[condition_results, [("analysis", self._column_name_result)]] = condition_result_to_set
         return result
 
     @abstractmethod
     def _log_analysis(self):
         pass
-
-    @property
-    def _result_column_multi_index(self) -> tuple[str, str]:
-        return ("analysis", self._column_name_result)
 
     @property
     @abstractmethod
