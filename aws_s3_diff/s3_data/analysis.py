@@ -233,14 +233,10 @@ class _AnalysisCondition:
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
             self._df.loc[:, (self._accounts.origin, "hash")]
-            .eq(self._df.loc[:, self._column_index_hash_target])
+            .eq(self._df.loc[:, (self._accounts.target, "hash")])
             .fillna(False)
         )
 
     @property
     def _condition_exists_file_in_target_account(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
-
-    @property
-    def _column_index_hash_target(self) -> tuple:
-        return (self._accounts.target, "hash")
