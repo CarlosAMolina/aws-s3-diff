@@ -239,11 +239,7 @@ class _AnalysisCondition:
 
     @property
     def _condition_exists_file_in_target_account(self) -> Series:
-        return self._df.loc[:, self._column_index_size_target].notnull()
-
-    @property
-    def _column_index_size_target(self) -> tuple:
-        return (self._accounts.target, "size")
+        return self._df.loc[:, (self._accounts.target, "size")].notnull()
 
     @property
     def _column_index_hash_origin(self) -> tuple:
