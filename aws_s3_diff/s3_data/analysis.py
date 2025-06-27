@@ -201,26 +201,26 @@ class _AnalysisCondition:
 
     @property
     def condition_sync_is_wrong(self) -> Series:
-        return self._exists_file_in_account_origin & ~self._is_file_copied
+        return self._is_file_in_account_origin & ~self._is_file_copied
 
     @property
     def condition_sync_is_ok(self) -> Series:
-        return self._exists_file_in_account_origin & self._is_file_copied
+        return self._is_file_in_account_origin & self._is_file_copied
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
-        return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
+        return ~self._is_file_in_account_origin & self._exists_file_in_account_target
 
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
-        return ~self._exists_file_in_account_origin & ~self._exists_file_in_account_target
+        return ~self._is_file_in_account_origin & ~self._exists_file_in_account_target
 
     @property
     def condition_must_not_exist(self) -> Series:
-        return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
+        return ~self._is_file_in_account_origin & self._exists_file_in_account_target
 
     @property
-    def _exists_file_in_account_origin(self) -> Series:
+    def _is_file_in_account_origin(self) -> Series:
         return self._df.loc[:, (self._accounts.origin, "size")].notnull()
 
     @property
