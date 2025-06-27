@@ -254,11 +254,8 @@ class _AnalysisCondition:
 
     @property
     def _column_index_hash_origin(self) -> tuple:
-        return self._get_column_index_hash_for_account(self._accounts.origin)
+        return (self._accounts.origin, "hash")
 
     @property
     def _column_index_hash_target(self) -> tuple:
-        return self._get_column_index_hash_for_account(self._accounts.target)
-
-    def _get_column_index_hash_for_account(self, account: str) -> tuple:
-        return (account, "hash")
+        return (self._accounts.target, "hash")
