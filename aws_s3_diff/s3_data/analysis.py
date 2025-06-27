@@ -201,11 +201,11 @@ class _AnalysisCondition:
 
     @property
     def condition_sync_is_wrong(self) -> Series:
-        return self._exists_file_in_account_origin & ~self._condition_file_is_sync
+        return self._exists_file_in_account_origin & ~self._is_file_copied
 
     @property
     def condition_sync_is_ok(self) -> Series:
-        return self._exists_file_in_account_origin & self._condition_file_is_sync
+        return self._exists_file_in_account_origin & self._is_file_copied
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
@@ -220,7 +220,7 @@ class _AnalysisCondition:
         return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
 
     @property
-    def _condition_file_is_sync(self) -> Series:
+    def _is_file_copied(self) -> Series:
         # Replace nan results to avoid incorrect values due to equality compaisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
