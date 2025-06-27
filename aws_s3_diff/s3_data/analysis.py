@@ -220,6 +220,14 @@ class _AnalysisCondition:
         return ~self._exists_file_in_account_origin & self._exists_file_in_account_target
 
     @property
+    def _exists_file_in_account_origin(self) -> Series:
+        return self._df.loc[:, (self._accounts.origin, "size")].notnull()
+
+    @property
+    def _exists_file_in_account_target(self) -> Series:
+        return self._df.loc[:, (self._accounts.target, "size")].notnull()
+
+    @property
     def _is_file_copied(self) -> Series:
         # Replace nan results to avoid incorrect values due to equality compaisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
@@ -228,11 +236,3 @@ class _AnalysisCondition:
             .eq(self._df.loc[:, (self._accounts.target, "hash")])
             .fillna(False)
         )
-
-    @property
-    def _exists_file_in_account_origin(self) -> Series:
-        return self._df.loc[:, (self._accounts.origin, "size")].notnull()
-
-    @property
-    def _exists_file_in_account_target(self) -> Series:
-        return self._df.loc[:, (self._accounts.target, "size")].notnull()
