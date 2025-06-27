@@ -220,10 +220,6 @@ class _AnalysisCondition:
         return ~self._condition_exists_file_to_sync & self._condition_exists_file_in_target_account
 
     @property
-    def condition_not_exist_file_to_sync(self) -> Series:
-        return ~self._condition_exists_file_to_sync
-
-    @property
     def _condition_exists_file_to_sync(self) -> Series:
         return self._df.loc[:, (self._accounts.origin, "size")].notnull()
 
