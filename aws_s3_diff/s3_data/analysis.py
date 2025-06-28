@@ -170,12 +170,12 @@ class _AllAccountsAnalysisSetter:
     ):
         self._account_targets = account_targets
         self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
-        self._analysis_config_reader = AnalysisConfigReader()
+        analysis_config_reader = AnalysisConfigReader()
+        self._account_origin = analysis_config_reader.get_account_origin()  # TODO not in init
 
     def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
         result = df.copy()
-        account_origin = self._analysis_config_reader.get_account_origin()
         for account_target in self._account_targets:
-            accounts = _AccountsToCompare(account_origin, account_target)
+            accounts = _AccountsToCompare(self._account_origin, account_target)
             result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
         return result
