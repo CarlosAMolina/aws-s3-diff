@@ -42,7 +42,8 @@ class AnalysisDataGenerator(DataGenerator):
         return self._get_df_set_analysis_columns(all_accounts_s3_data_df)
 
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
-        result_builder = _AnalysisBuilder(df)
+        account_origin = self._analysis_config_reader.get_account_origin()
+        result_builder = _AnalysisBuilder(account_origin, df)
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
         if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
@@ -60,10 +61,10 @@ class AnalysisDataGenerator(DataGenerator):
 
 
 class _AnalysisBuilder:
-    def __init__(self, df: MultiIndexDf):
+    def __init__(self, account_origin: str, df: MultiIndexDf):
+        self._account_origin = account_origin
         self._df = df
         self._analysis_config_reader = AnalysisConfigReader()
-        self._account_origin = self._analysis_config_reader.get_account_origin()  # TODO not in init
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
