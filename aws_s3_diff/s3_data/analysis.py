@@ -88,7 +88,7 @@ _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 class _TwoAccountsAnalysisSetter(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
-        self._df_analyzer = _AnalysisCondition(accounts, df)
+        self._df_analyzer = _DfAnalyzer(accounts, df)
         self._df = df
 
     @abstractmethod
@@ -153,7 +153,7 @@ class _AllAccountsAnalysisSetter:
         return result
 
 
-class _AnalysisCondition:
+class _DfAnalyzer:
     def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
         self._df = df
