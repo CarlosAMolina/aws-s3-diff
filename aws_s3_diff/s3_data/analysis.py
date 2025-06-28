@@ -96,20 +96,6 @@ class _TwoAccountsAnalysisSetter(ABC):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
         pass
 
-    @abstractmethod
-    def _get_df_set_analysis_columns(self, df: Df) -> Df:
-        pass
-
-    @property
-    @abstractmethod
-    def _column_name_result(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def _condition_config(self) -> _ConditionConfig:
-        pass
-
 
 class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
@@ -158,10 +144,6 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )
-
-    @property
-    def _condition_config(self) -> _ConditionConfig:
-        return {"condition_must_not_exist": False}
 
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df
