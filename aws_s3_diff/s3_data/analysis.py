@@ -114,7 +114,8 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
             [("analysis", self._column_name_result)],
         ] = True
         result.loc[
-            self._df_analyzer.condition_no_file_at_origin_but_at_target, [("analysis", self._column_name_result)]
+            ~self._df_analyzer.has_the_origin_account_a_file & self._df_analyzer.has_the_target_account_a_file,
+            [("analysis", self._column_name_result)],
         ] = False
         result.loc[
             self._df_analyzer.condition_no_file_at_origin_or_target, [("analysis", self._column_name_result)]
@@ -166,10 +167,6 @@ class _DfAnalyzer:
     def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
         self._df = df
-
-    @property
-    def condition_no_file_at_origin_but_at_target(self) -> Series:
-        return ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file
 
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
