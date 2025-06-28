@@ -46,7 +46,7 @@ class AnalysisDataGenerator(DataGenerator):
         if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
             result_builder.with_analysis_is_file_copied()
         if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
-            result_builder.with_analysis_can_exist_files()
+            result_builder.with_analysis_can_the_file_exist()
         return result_builder.build()
 
     def _get_df_with_single_index(self, df: Df) -> Df:
@@ -71,7 +71,7 @@ class _AnalysisBuilder:
         ).get_df_set_analysis_columns(self._df)
         return self
 
-    def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
+    def with_analysis_can_the_file_exist(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
         self._df = _AllAccountsAnalysisSetter(
             account_targets, _CanFileExistTwoAccountsAnalysisSetter
