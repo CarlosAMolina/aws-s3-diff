@@ -147,23 +147,6 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         return f"can_exist_in_{self._accounts.target}"
 
 
-class _AllAccountsAnalysisSetter:
-    def __init__(
-        self, account_targets: list[str], two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter]
-    ):
-        self._account_targets = account_targets
-        self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
-        self._analysis_config_reader = AnalysisConfigReader()
-
-    def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
-        result = df.copy()
-        account_origin = self._analysis_config_reader.get_account_origin()
-        for account_target in self._account_targets:
-            accounts = _AccountsToCompare(account_origin, account_target)
-            result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
-        return result
-
-
 class _TwoAccountsAnalyzer:
     def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
@@ -186,3 +169,20 @@ class _TwoAccountsAnalyzer:
     @property
     def has_the_target_account_a_file(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
+
+
+class _AllAccountsAnalysisSetter:
+    def __init__(
+        self, account_targets: list[str], two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter]
+    ):
+        self._account_targets = account_targets
+        self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
+        self._analysis_config_reader = AnalysisConfigReader()
+
+    def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
+        result = df.copy()
+        account_origin = self._analysis_config_reader.get_account_origin()
+        for account_target in self._account_targets:
+            accounts = _AccountsToCompare(account_origin, account_target)
+            result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
+        return result
