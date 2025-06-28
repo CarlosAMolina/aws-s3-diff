@@ -160,11 +160,11 @@ class _DfAnalyzer:
 
     @property
     def condition_sync_is_wrong(self) -> Series:
-        return self._is_file_in_account_origin & ~self._is_file_copied
+        return self._is_file_in_account_origin & ~self._is_the_same_file_in_both_accounts
 
     @property
     def condition_sync_is_ok(self) -> Series:
-        return self._is_file_in_account_origin & self._is_file_copied
+        return self._is_file_in_account_origin & self._is_the_same_file_in_both_accounts
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
@@ -179,7 +179,7 @@ class _DfAnalyzer:
         return ~self._is_file_in_account_origin & self._is_file_in_account_target
 
     @property
-    def _is_file_copied(self) -> Series:
+    def _is_the_same_file_in_both_accounts(self) -> Series:
         # Replace nan results to avoid incorrect values due to equality compaisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
