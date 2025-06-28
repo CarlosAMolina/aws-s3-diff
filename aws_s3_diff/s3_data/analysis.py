@@ -96,17 +96,9 @@ class _TwoAccountsAnalysisSetter(ABC):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
         pass
 
+    @abstractmethod
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
-        result = df
-        # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        result[[("analysis", self._column_name_result)]] = None
-        for (
-            condition_name,
-            condition_result_to_set,
-        ) in self._condition_config.items():
-            condition_results: Series = getattr(self._condition, condition_name)
-            result.loc[condition_results, [("analysis", self._column_name_result)]] = condition_result_to_set
-        return result
+        pass
 
     @property
     @abstractmethod
@@ -129,6 +121,18 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
         )
+
+    def _get_df_set_analysis_columns(self, df: Df) -> Df:
+        result = df
+        # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
+        result[[("analysis", self._column_name_result)]] = None
+        for (
+            condition_name,
+            condition_result_to_set,
+        ) in self._condition_config.items():
+            condition_results: Series = getattr(self._condition, condition_name)
+            result.loc[condition_results, [("analysis", self._column_name_result)]] = condition_result_to_set
+        return result
 
     @property
     def _column_name_result(self) -> str:
