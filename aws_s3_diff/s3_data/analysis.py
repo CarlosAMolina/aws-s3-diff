@@ -160,11 +160,12 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 class _AllAccountsAnalysisSetter(ABC):
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
+        self._account_targets = self._get_account_targets()  # TODO not in init
 
     def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
         result = df.copy()
         account_origin = self._analysis_config_reader.get_account_origin()
-        for account_target in self._get_account_targets():
+        for account_target in self._account_targets:
             accounts = _AccountsToCompare(account_origin, account_target)
             result = self._two_accounts_analysis_creator(accounts, result).get_df_set_analysis_column()
         return result
