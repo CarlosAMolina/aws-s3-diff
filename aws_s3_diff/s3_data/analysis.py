@@ -66,12 +66,16 @@ class _AnalysisBuilder:
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
-        self._df = _FileCopiedAllAccountsAnalysisSetter(account_targets).get_df_set_analysis_columns(self._df)
+        self._df = _FileCopiedAllAccountsAnalysisSetter(
+            account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
+        ).get_df_set_analysis_columns(self._df)
         return self
 
     def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
-        self._df = _CanExistAllAccountsAnalysisSetter(account_targets).get_df_set_analysis_columns(self._df)
+        self._df = _CanExistAllAccountsAnalysisSetter(
+            account_targets, _CanFileExistTwoAccountsAnalysisSetter
+        ).get_df_set_analysis_columns(self._df)
         return self
 
     def build(self) -> Df:
@@ -160,10 +164,12 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         return {"condition_must_not_exist": False}
 
 
-class _AllAccountsAnalysisSetter(ABC):
-    def __init__(self, account_targets: list[str]):
+class _AllAccountsAnalysisSetter:
+    def __init__(
+        self, account_targets: list[str], two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter]
+    ):
         self._account_targets = account_targets
-        self._two_accounts_analysis_creator_class = self._get_two_accounts_analysis_creator()
+        self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
         self._analysis_config_reader = AnalysisConfigReader()
 
     def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
@@ -174,19 +180,13 @@ class _AllAccountsAnalysisSetter(ABC):
             result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
         return result
 
-    @abstractmethod
-    def _get_two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
-        pass
-
 
 class _FileCopiedAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
-    def _get_two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
-        return _IsFileCopiedTwoAccountsAnalysisSetter
+    pass
 
 
 class _CanExistAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
-    def _get_two_accounts_analysis_creator(self) -> type[_TwoAccountsAnalysisSetter]:
-        return _CanFileExistTwoAccountsAnalysisSetter
+    pass
 
 
 class _AnalysisCondition:
