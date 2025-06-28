@@ -88,69 +88,11 @@ _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 class _TwoAccountsAnalysisSetter(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
-        self._df_analyzer = _TwoAccountsAnalyzer(accounts, df)
         self._df = df
 
     @abstractmethod
     def get_df_set_analysis_column(self) -> MultiIndexDf:
         pass
-
-
-class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
-    def get_df_set_analysis_column(self) -> MultiIndexDf:
-        logger.info(
-            f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
-            f" '{self._accounts.target}'"
-        )
-        result = self._df.copy()
-        # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
-        result[[("analysis", self._column_name_result)]] = None
-        result.loc[
-            self._df_analyzer.has_the_origin_account_a_file & ~self._df_analyzer.is_the_same_file_in_both_accounts,
-            [("analysis", self._column_name_result)],
-        ] = False
-        result.loc[
-            self._df_analyzer.has_the_origin_account_a_file & self._df_analyzer.is_the_same_file_in_both_accounts,
-            [("analysis", self._column_name_result)],
-        ] = True
-        result.loc[
-            ~self._df_analyzer.has_the_origin_account_a_file & self._df_analyzer.has_the_target_account_a_file,
-            [("analysis", self._column_name_result)],
-        ] = False
-        result.loc[
-            ~self._df_analyzer.has_the_origin_account_a_file & ~self._df_analyzer.has_the_target_account_a_file,
-            [("analysis", self._column_name_result)],
-        ] = True
-        return result
-
-    @property
-    def _column_name_result(self) -> str:
-        return f"is_sync_ok_in_{self._accounts.target}"
-
-
-class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
-    def get_df_set_analysis_column(self) -> MultiIndexDf:
-        logger.info(
-            f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
-            f" '{self._accounts.origin}'"
-        )
-        result = self._df.copy()
-        result[[("analysis", self._column_name_result)]] = None
-        result.loc[
-            ~self._df_analyzer.has_the_origin_account_a_file & self._df_analyzer.has_the_target_account_a_file,
-            [("analysis", self._column_name_result)],
-        ] = False
-        return result
-
-    @property
-    def _column_name_result(self) -> str:
-        return f"can_exist_in_{self._accounts.target}"
-
-
-class _TwoAccountsAnalyzer:
-    def __init__(self, accounts: _AccountsToCompare, df: Df):
-        self._accounts = accounts
-        self._df = df
 
     @property
     def is_the_same_file_in_both_accounts(self) -> Series:
@@ -169,6 +111,57 @@ class _TwoAccountsAnalyzer:
     @property
     def has_the_target_account_a_file(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
+
+
+class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
+    def get_df_set_analysis_column(self) -> MultiIndexDf:
+        logger.info(
+            f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
+            f" '{self._accounts.target}'"
+        )
+        result = self._df.copy()
+        # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
+        result[[("analysis", self._column_name_result)]] = None
+        result.loc[
+            self.has_the_origin_account_a_file & ~self.is_the_same_file_in_both_accounts,
+            [("analysis", self._column_name_result)],
+        ] = False
+        result.loc[
+            self.has_the_origin_account_a_file & self.is_the_same_file_in_both_accounts,
+            [("analysis", self._column_name_result)],
+        ] = True
+        result.loc[
+            ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file,
+            [("analysis", self._column_name_result)],
+        ] = False
+        result.loc[
+            ~self.has_the_origin_account_a_file & ~self.has_the_target_account_a_file,
+            [("analysis", self._column_name_result)],
+        ] = True
+        return result
+
+    @property
+    def _column_name_result(self) -> str:
+        return f"is_sync_ok_in_{self._accounts.target}"
+
+
+class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
+    def get_df_set_analysis_column(self) -> MultiIndexDf:
+        logger.info(
+            f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
+            f" '{self._accounts.origin}'"
+        )
+        result = self._df.copy()
+        result[[("analysis", self._column_name_result)]] = None
+        result.loc[
+            ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file,
+            [("analysis", self._column_name_result)],
+        ] = False
+        return result
+
+    @property
+    def _column_name_result(self) -> str:
+        return f"can_exist_in_{self._accounts.target}"
 
 
 class _AllAccountsAnalysisSetter:
