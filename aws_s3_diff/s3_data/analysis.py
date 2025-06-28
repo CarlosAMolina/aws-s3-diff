@@ -66,14 +66,14 @@ class _AnalysisBuilder:
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
-        self._df = _FileCopiedAllAccountsAnalysisSetter(
+        self._df = _AllAccountsAnalysisSetter(
             account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
         ).get_df_set_analysis_columns(self._df)
         return self
 
     def with_analysis_can_exist_files(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
-        self._df = _CanExistAllAccountsAnalysisSetter(
+        self._df = _AllAccountsAnalysisSetter(
             account_targets, _CanFileExistTwoAccountsAnalysisSetter
         ).get_df_set_analysis_columns(self._df)
         return self
@@ -179,14 +179,6 @@ class _AllAccountsAnalysisSetter:
             accounts = _AccountsToCompare(account_origin, account_target)
             result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
         return result
-
-
-class _FileCopiedAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
-    pass
-
-
-class _CanExistAllAccountsAnalysisSetter(_AllAccountsAnalysisSetter):
-    pass
 
 
 class _AnalysisCondition:
