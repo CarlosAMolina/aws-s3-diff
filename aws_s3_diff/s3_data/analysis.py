@@ -88,9 +88,10 @@ class _AnalysisBuilder:
         account_targets: list[str],
         two_accounts_analysis_creator_class: type["_TwoAccountsAnalysisSetter"],  # TODO not str
     ) -> Df:
-        return _AllAccountsAnalysisSetter(
-            self._account_origin, account_targets, two_accounts_analysis_creator_class
-        ).get_df_set_analysis_columns(self._df)
+        for account_target in account_targets:
+            accounts = _AccountsToCompare(self._account_origin, account_target)
+            self._df = two_accounts_analysis_creator_class(accounts, self._df).get_df_set_analysis_column()
+        return self._df
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
@@ -173,22 +174,3 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     @property
     def _column_name_result(self) -> str:
         return f"can_exist_in_{self._accounts.target}"
-
-
-class _AllAccountsAnalysisSetter:
-    def __init__(
-        self,
-        account_origin: str,
-        account_targets: list[str],
-        two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter],
-    ):
-        self._account_origin = account_origin
-        self._account_targets = account_targets
-        self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
-
-    def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
-        result = df.copy()
-        for account_target in self._account_targets:
-            accounts = _AccountsToCompare(self._account_origin, account_target)
-            result = self._two_accounts_analysis_creator_class(accounts, result).get_df_set_analysis_column()
-        return result
