@@ -114,21 +114,11 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result.loc[self._condition.condition_no_file_at_origin_or_target, [("analysis", self._column_name_result)]] = (
             True
         )
-        for (
-            condition_name,
-            condition_result_to_set,
-        ) in self._condition_config.items():
-            condition_results: Series = getattr(self._condition, condition_name)
-            result.loc[condition_results, [("analysis", self._column_name_result)]] = condition_result_to_set
         return result
 
     @property
     def _column_name_result(self) -> str:
         return f"is_sync_ok_in_{self._accounts.target}"
-
-    @property
-    def _condition_config(self) -> _ConditionConfig:
-        return {}
 
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
