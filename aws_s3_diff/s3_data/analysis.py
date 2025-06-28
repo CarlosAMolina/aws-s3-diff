@@ -107,6 +107,7 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
         result.loc[self._condition.condition_sync_is_wrong, [("analysis", self._column_name_result)]] = False
+        result.loc[self._condition.condition_sync_is_ok, [("analysis", self._column_name_result)]] = True
         for (
             condition_name,
             condition_result_to_set,
@@ -122,7 +123,6 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     @property
     def _condition_config(self) -> _ConditionConfig:
         return {
-            "condition_sync_is_ok": True,
             "condition_no_file_at_origin_but_at_target": False,
             "condition_no_file_at_origin_or_target": True,
         }
