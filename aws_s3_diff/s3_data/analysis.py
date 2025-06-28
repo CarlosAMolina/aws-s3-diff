@@ -99,14 +99,11 @@ class _TwoAccountsAnalysisSetter(ABC):
 
 class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
-        self._log_analysis()
-        return self._get_df_set_analysis_columns(self._df.copy())
-
-    def _log_analysis(self):
         logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
         )
+        return self._get_df_set_analysis_columns(self._df.copy())
 
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df
@@ -136,14 +133,11 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
-        self._log_analysis()
-        return self._get_df_set_analysis_columns(self._df.copy())
-
-    def _log_analysis(self):
         logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )
+        return self._get_df_set_analysis_columns(self._df.copy())
 
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df
