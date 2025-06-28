@@ -88,7 +88,7 @@ _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 class _TwoAccountsAnalysisSetter(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
         self._accounts = accounts
-        self._condition = _AnalysisCondition(accounts, df)
+        self._df_analyzer = _AnalysisCondition(accounts, df)
         self._df = df
 
     @abstractmethod
@@ -105,14 +105,14 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
-        result.loc[self._condition.condition_sync_is_wrong, [("analysis", self._column_name_result)]] = False
-        result.loc[self._condition.condition_sync_is_ok, [("analysis", self._column_name_result)]] = True
+        result.loc[self._df_analyzer.condition_sync_is_wrong, [("analysis", self._column_name_result)]] = False
+        result.loc[self._df_analyzer.condition_sync_is_ok, [("analysis", self._column_name_result)]] = True
         result.loc[
-            self._condition.condition_no_file_at_origin_but_at_target, [("analysis", self._column_name_result)]
+            self._df_analyzer.condition_no_file_at_origin_but_at_target, [("analysis", self._column_name_result)]
         ] = False
-        result.loc[self._condition.condition_no_file_at_origin_or_target, [("analysis", self._column_name_result)]] = (
-            True
-        )
+        result.loc[
+            self._df_analyzer.condition_no_file_at_origin_or_target, [("analysis", self._column_name_result)]
+        ] = True
         return result
 
     @property
@@ -128,7 +128,7 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         )
         result = self._df.copy()
         result[[("analysis", self._column_name_result)]] = None
-        result.loc[self._condition.condition_must_not_exist, [("analysis", self._column_name_result)]] = False
+        result.loc[self._df_analyzer.condition_must_not_exist, [("analysis", self._column_name_result)]] = False
         return result
 
     @property
