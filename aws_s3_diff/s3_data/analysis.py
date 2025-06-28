@@ -95,7 +95,7 @@ class _TwoAccountsAnalysisSetter(ABC):
         pass
 
     @property
-    def is_the_same_file_in_both_accounts(self) -> Series:
+    def _is_the_same_file_in_both_accounts(self) -> Series:
         # Replace nan results to avoid incorrect values due to equality comparisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
@@ -105,11 +105,11 @@ class _TwoAccountsAnalysisSetter(ABC):
         )
 
     @property
-    def has_the_origin_account_a_file(self) -> Series:
+    def _has_the_origin_account_a_file(self) -> Series:
         return self._df.loc[:, (self._accounts.origin, "size")].notnull()
 
     @property
-    def has_the_target_account_a_file(self) -> Series:
+    def _has_the_target_account_a_file(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
 
 
@@ -123,19 +123,19 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
         result.loc[
-            self.has_the_origin_account_a_file & ~self.is_the_same_file_in_both_accounts,
+            self._has_the_origin_account_a_file & ~self._is_the_same_file_in_both_accounts,
             [("analysis", self._column_name_result)],
         ] = False
         result.loc[
-            self.has_the_origin_account_a_file & self.is_the_same_file_in_both_accounts,
+            self._has_the_origin_account_a_file & self._is_the_same_file_in_both_accounts,
             [("analysis", self._column_name_result)],
         ] = True
         result.loc[
-            ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file,
+            ~self._has_the_origin_account_a_file & self._has_the_target_account_a_file,
             [("analysis", self._column_name_result)],
         ] = False
         result.loc[
-            ~self.has_the_origin_account_a_file & ~self.has_the_target_account_a_file,
+            ~self._has_the_origin_account_a_file & ~self._has_the_target_account_a_file,
             [("analysis", self._column_name_result)],
         ] = True
         return result
@@ -154,7 +154,7 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result = self._df.copy()
         result[[("analysis", self._column_name_result)]] = None
         result.loc[
-            ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file,
+            ~self._has_the_origin_account_a_file & self._has_the_target_account_a_file,
             [("analysis", self._column_name_result)],
         ] = False
         return result
