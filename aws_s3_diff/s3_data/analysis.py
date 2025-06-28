@@ -87,7 +87,10 @@ class _TwoAccountsAnalysisSetter(ABC):
 
     def get_df_set_analysis_column(self) -> MultiIndexDf:
         self._log_analysis()
-        result = self._df.copy()
+        return self._get_df_set_analysis_columns(self._df.copy())
+
+    def _get_df_set_analysis_columns(self, df: Df) -> Df:
+        result = df
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
         for (
