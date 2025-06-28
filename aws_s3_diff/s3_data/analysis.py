@@ -103,10 +103,7 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
         )
-        return self._get_df_set_analysis_columns(self._df.copy())
-
-    def _get_df_set_analysis_columns(self, df: Df) -> Df:
-        result = df
+        result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
         for (
@@ -137,10 +134,7 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )
-        return self._get_df_set_analysis_columns(self._df.copy())
-
-    def _get_df_set_analysis_columns(self, df: Df) -> Df:
-        result = df
+        result = self._df.copy()
         result[[("analysis", self._column_name_result)]] = None
         result.loc[self._condition.condition_must_not_exist, [("analysis", self._column_name_result)]] = False
         return result
