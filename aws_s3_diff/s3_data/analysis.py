@@ -163,6 +163,9 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def _condition_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
 
+    def _get_df_set_analysis_columns(self, df: Df) -> Df:
+        return super()._get_df_set_analysis_columns(df)
+
 
 class _AllAccountsAnalysisSetter:
     def __init__(
