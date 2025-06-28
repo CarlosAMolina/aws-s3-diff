@@ -128,7 +128,10 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         )
         result = self._df.copy()
         result[[("analysis", self._column_name_result)]] = None
-        result.loc[self._df_analyzer.condition_must_not_exist, [("analysis", self._column_name_result)]] = False
+        result.loc[
+            ~self._df_analyzer.has_the_origin_account_a_file & self._df_analyzer.has_the_target_account_a_file,
+            [("analysis", self._column_name_result)],
+        ] = False
         return result
 
     @property
@@ -173,10 +176,6 @@ class _DfAnalyzer:
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
         return ~self.has_the_origin_account_a_file & ~self.has_the_target_account_a_file
-
-    @property
-    def condition_must_not_exist(self) -> Series:
-        return ~self.has_the_origin_account_a_file & self.has_the_target_account_a_file
 
     @property
     def is_the_same_file_in_both_accounts(self) -> Series:
