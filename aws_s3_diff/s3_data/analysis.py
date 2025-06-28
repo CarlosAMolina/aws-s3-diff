@@ -111,6 +111,9 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result.loc[
             self._condition.condition_no_file_at_origin_but_at_target, [("analysis", self._column_name_result)]
         ] = False
+        result.loc[self._condition.condition_no_file_at_origin_or_target, [("analysis", self._column_name_result)]] = (
+            True
+        )
         for (
             condition_name,
             condition_result_to_set,
@@ -125,9 +128,7 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
     @property
     def _condition_config(self) -> _ConditionConfig:
-        return {
-            "condition_no_file_at_origin_or_target": True,
-        }
+        return {}
 
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
