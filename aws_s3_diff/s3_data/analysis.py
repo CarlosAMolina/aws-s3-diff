@@ -156,10 +156,6 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         )
 
     @property
-    def _column_name_result(self) -> str:
-        return f"can_exist_in_{self._accounts.target}"
-
-    @property
     def _condition_config(self) -> _ConditionConfig:
         return {"condition_must_not_exist": False}
 
@@ -168,6 +164,10 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result[[("analysis", self._column_name_result)]] = None
         result.loc[self._condition.condition_must_not_exist, [("analysis", self._column_name_result)]] = False
         return result
+
+    @property
+    def _column_name_result(self) -> str:
+        return f"can_exist_in_{self._accounts.target}"
 
 
 class _AllAccountsAnalysisSetter:
