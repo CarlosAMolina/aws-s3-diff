@@ -83,7 +83,6 @@ class _AnalysisBuilder:
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
-_ConditionConfig = dict[str, bool | str]
 
 
 class _TwoAccountsAnalysisSetter(ABC):
