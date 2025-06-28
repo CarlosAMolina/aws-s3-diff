@@ -168,15 +168,15 @@ class _DfAnalyzer:
 
     @property
     def condition_no_file_at_origin_but_at_target(self) -> Series:
-        return ~self._has_the_origin_account_a_file & self._is_file_in_account_target
+        return ~self._has_the_origin_account_a_file & self._has_the_target_account_a_file
 
     @property
     def condition_no_file_at_origin_or_target(self) -> Series:
-        return ~self._has_the_origin_account_a_file & ~self._is_file_in_account_target
+        return ~self._has_the_origin_account_a_file & ~self._has_the_target_account_a_file
 
     @property
     def condition_must_not_exist(self) -> Series:
-        return ~self._has_the_origin_account_a_file & self._is_file_in_account_target
+        return ~self._has_the_origin_account_a_file & self._has_the_target_account_a_file
 
     @property
     def _is_the_same_file_in_both_accounts(self) -> Series:
@@ -193,5 +193,5 @@ class _DfAnalyzer:
         return self._df.loc[:, (self._accounts.origin, "size")].notnull()
 
     @property
-    def _is_file_in_account_target(self) -> Series:
+    def _has_the_target_account_a_file(self) -> Series:
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
