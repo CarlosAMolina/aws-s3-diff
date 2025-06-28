@@ -63,18 +63,19 @@ class _AnalysisBuilder:
     def __init__(self, df: MultiIndexDf):
         self._df = df
         self._analysis_config_reader = AnalysisConfigReader()
+        self._account_origin = self._analysis_config_reader.get_account_origin()  # TODO not in init
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
         self._df = _AllAccountsAnalysisSetter(
-            account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
+            self._account_origin, account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
         ).get_df_set_analysis_columns(self._df)
         return self
 
     def with_analysis_can_the_file_exist(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
         self._df = _AllAccountsAnalysisSetter(
-            account_targets, _CanFileExistTwoAccountsAnalysisSetter
+            self._account_origin, account_targets, _CanFileExistTwoAccountsAnalysisSetter
         ).get_df_set_analysis_columns(self._df)
         return self
 
@@ -166,12 +167,14 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 class _AllAccountsAnalysisSetter:
     def __init__(
-        self, account_targets: list[str], two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter]
+        self,
+        account_origin: str,
+        account_targets: list[str],
+        two_accounts_analysis_creator_class: type[_TwoAccountsAnalysisSetter],
     ):
+        self._account_origin = account_origin
         self._account_targets = account_targets
         self._two_accounts_analysis_creator_class = two_accounts_analysis_creator_class
-        analysis_config_reader = AnalysisConfigReader()
-        self._account_origin = analysis_config_reader.get_account_origin()  # TODO not in init
 
     def get_df_set_analysis_columns(self, df: MultiIndexDf) -> Df:
         result = df.copy()
