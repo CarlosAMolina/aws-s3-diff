@@ -68,20 +68,29 @@ class _AnalysisBuilder:
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
-        self._df = _AllAccountsAnalysisSetter(
-            self._account_origin, account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
-        ).get_df_set_analysis_columns(self._df)
+        self._df = self._get_df_set_analysis_columns_for_all_accounts(
+            account_targets, _IsFileCopiedTwoAccountsAnalysisSetter
+        )
         return self
 
     def with_analysis_can_the_file_exist(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
-        self._df = _AllAccountsAnalysisSetter(
-            self._account_origin, account_targets, _CanFileExistTwoAccountsAnalysisSetter
-        ).get_df_set_analysis_columns(self._df)
+        self._df = self._get_df_set_analysis_columns_for_all_accounts(
+            account_targets, _CanFileExistTwoAccountsAnalysisSetter
+        )
         return self
 
     def build(self) -> Df:
         return self._df
+
+    def _get_df_set_analysis_columns_for_all_accounts(
+        self,
+        account_targets: list[str],
+        two_accounts_analysis_creator_class: type["_TwoAccountsAnalysisSetter"],  # TODO not str
+    ) -> Df:
+        return _AllAccountsAnalysisSetter(
+            self._account_origin, account_targets, two_accounts_analysis_creator_class
+        ).get_df_set_analysis_columns(self._df)
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
