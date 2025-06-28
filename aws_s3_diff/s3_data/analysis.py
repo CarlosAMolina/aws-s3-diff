@@ -52,7 +52,7 @@ class AnalysisDataGenerator(DataGenerator):
     def _get_df_with_single_index(self, df: Df) -> Df:
         result = df.copy()
         self._set_df_columns_as_single_index(result)
-        result = result.rename(columns=lambda x: re.sub("^analysis_", "", x))
+        result = result.rename(columns=lambda column_name: re.sub("^analysis_", "", column_name))
         return result.reset_index()
 
     def _set_df_columns_as_single_index(self, df: Df):
