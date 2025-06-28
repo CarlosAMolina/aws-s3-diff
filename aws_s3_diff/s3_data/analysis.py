@@ -171,7 +171,7 @@ class _DfAnalyzer:
 
     @property
     def is_the_same_file_in_both_accounts(self) -> Series:
-        # Replace nan results to avoid incorrect values due to equality compaisons between null values.
+        # Replace nan results to avoid incorrect values due to equality comparisons between null values.
         # https://pandas.pydata.org/docs/user_guide/missing_data.html#filling-missing-data
         return (
             self._df.loc[:, (self._accounts.origin, "hash")]
