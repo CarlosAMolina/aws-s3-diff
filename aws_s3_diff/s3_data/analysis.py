@@ -105,7 +105,10 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
         result[[("analysis", self._column_name_result)]] = None
-        result.loc[self._df_analyzer.condition_sync_is_wrong, [("analysis", self._column_name_result)]] = False
+        result.loc[
+            self._df_analyzer.has_the_origin_account_a_file & ~self._df_analyzer.is_the_same_file_in_both_accounts,
+            [("analysis", self._column_name_result)],
+        ] = False
         result.loc[self._df_analyzer.condition_sync_is_ok, [("analysis", self._column_name_result)]] = True
         result.loc[
             self._df_analyzer.condition_no_file_at_origin_but_at_target, [("analysis", self._column_name_result)]
@@ -160,10 +163,6 @@ class _DfAnalyzer:
     def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
         self._df = df
-
-    @property
-    def condition_sync_is_wrong(self) -> Series:
-        return self.has_the_origin_account_a_file & ~self.is_the_same_file_in_both_accounts
 
     @property
     def condition_sync_is_ok(self) -> Series:
