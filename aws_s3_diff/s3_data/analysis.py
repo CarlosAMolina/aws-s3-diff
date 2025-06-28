@@ -166,7 +166,9 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
         result = df
         result[[("analysis", self._column_name_result)]] = None
-        return super()._get_df_set_analysis_columns(result)
+        condition_results: Series = self._condition.condition_must_not_exist
+        result.loc[condition_results, [("analysis", self._column_name_result)]] = False
+        return result
 
 
 class _AllAccountsAnalysisSetter:
