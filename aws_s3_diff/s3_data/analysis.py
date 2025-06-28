@@ -82,11 +82,11 @@ class _AnalysisBuilder:
     def _set_analysis_columns_for_all_accounts(
         self,
         account_targets: list[str],
-        two_accounts_analysis_creator_class: type["_TwoAccountsAnalysisSetter"],  # TODO not str
+        two_accounts_analysis_setter_class: type["_TwoAccountsAnalysisSetter"],  # TODO not str
     ):
         for account_target in account_targets:
             accounts = _AccountsToCompare(self._account_origin, account_target)
-            self._df = two_accounts_analysis_creator_class(accounts, self._df).get_df_set_analysis_column()
+            self._df = two_accounts_analysis_setter_class(accounts, self._df).get_df_set_analysis_column()
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
