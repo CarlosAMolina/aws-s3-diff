@@ -66,7 +66,7 @@ class AnalysisConfigChecker:
 class AnalysisConfigReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        self.__analysis_config = None  # To avoid read a file in __init__.
+        self._analysis_config_cache = None  # To avoid read a file in __init__.
 
     def must_run_analysis(self) -> bool:
         return self._analysis_config["run_analysis"] is True
@@ -82,9 +82,9 @@ class AnalysisConfigReader:
 
     @property
     def _analysis_config(self) -> dict:
-        if self.__analysis_config is None:
-            self.__analysis_config = self._get_analysis_config()
-        return self.__analysis_config
+        if self._analysis_config_cache is None:
+            self._analysis_config_cache = self._get_analysis_config()
+        return self._analysis_config_cache
 
     def _get_analysis_config(self) -> dict:
         with open(self._file_path_what_to_analyze, encoding="utf-8") as read_file:
