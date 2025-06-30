@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
-from unittest import mock
+from unittest.mock import Mock
+from unittest.mock import patch
+from unittest.mock import PropertyMock
 
 from aws_s3_diff import config_files as m_config_files
 from aws_s3_diff.exceptions import AnalysisConfigError
@@ -11,8 +13,8 @@ from aws_s3_diff.types_custom import S3Query
 
 
 class TestAnalysisConfigChecker(unittest.TestCase):
-    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
+    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_origin_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -25,8 +27,8 @@ class TestAnalysisConfigChecker(unittest.TestCase):
             str(exception.exception),
         )
 
-    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
+    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_target_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -40,8 +42,8 @@ class TestAnalysisConfigChecker(unittest.TestCase):
             str(exception.exception),
         )
 
-    @mock.patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @mock.patch("aws_s3_diff.config_files.S3UrisFileReader")
+    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
+    @patch("aws_s3_diff.config_files.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_target_accounts_do_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -73,9 +75,9 @@ class TestS3UriParts(unittest.TestCase):
 
 
 class TestS3UrisFileReader(unittest.TestCase):
-    @mock.patch(
+    @patch(
         "aws_s3_diff.config_files.LocalPaths.config_directory",
-        new_callable=mock.PropertyMock,
+        new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     def test_get_s3_queries_for_account_returns_if_accounts_with_different_buckets(self, mock_config_directory):
@@ -104,9 +106,7 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
-    @mock.patch(
-        "aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=mock.PropertyMock, return_value=mock.Mock()
-    )
+    @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_exception_if_empty_account(self, mock_config_directory):
         mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
             "empty_account.csv"
@@ -115,9 +115,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Error in s3-uris-to-analyze.csv. Some AWS account names are empty", str(exception.exception))
 
-    @mock.patch(
-        "aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=mock.PropertyMock, return_value=mock.Mock()
-    )
+    @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_exception_if_empty_uri(self, mock_config_directory):
         mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
             "empty_uri.csv"
@@ -126,9 +124,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
             m_config_files.S3UrisFileChecker().assert_file_is_correct()
         self.assertEqual("Error in s3-uris-to-analyze.csv. Some URIs are empty", str(exception.exception))
 
-    @mock.patch(
-        "aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=mock.PropertyMock, return_value=mock.Mock()
-    )
+    @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_config_directory):
         mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
             "duplicated_uri.csv"
