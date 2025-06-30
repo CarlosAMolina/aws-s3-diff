@@ -105,11 +105,9 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 class TestS3UrisFileChecker(unittest.TestCase):
     @mock.patch(
-        "aws_s3_diff.config_files.LocalPaths.config_directory",
-        new_callable=mock.PropertyMock,
+        "aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=mock.PropertyMock, return_value=mock.Mock()
     )
     def test_assert_file_is_correct_raises_exception_if_empty_account(self, mock_config_directory):
-        mock_config_directory.return_value = mock.Mock()
         mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
             "empty_account.csv"
         )
