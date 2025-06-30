@@ -74,9 +74,9 @@ class TestS3UriParts(unittest.TestCase):
 
 class TestS3UrisFileReader(unittest.TestCase):
     @mock.patch(
-        "aws_s3_diff.config_files.S3UrisFileReader._file_path_what_to_analyze",
+        "aws_s3_diff.config_files.LocalPaths.config_directory",
         new_callable=mock.PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
+        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
     def test_get_s3_queries_for_account_returns_if_accounts_with_different_buckets(
         self, mock_file_path_what_to_analyze
