@@ -78,9 +78,7 @@ class TestS3UrisFileReader(unittest.TestCase):
         new_callable=mock.PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
-    def test_get_s3_queries_for_account_returns_if_accounts_with_different_buckets(
-        self, mock_file_path_what_to_analyze
-    ):
+    def test_get_s3_queries_for_account_returns_if_accounts_with_different_buckets(self, mock_config_directory):
         for account, expected_result in {
             "pro": [
                 S3Query("cars", "europe/spain"),
