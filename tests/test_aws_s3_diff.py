@@ -15,7 +15,7 @@ from aws_s3_diff.aws_s3_diff import AnalysisConfigError
 from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
-from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.aws_s3_diff import S3UrisFileReader
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.local_results import LocalResults
 from tests.aws import S3
