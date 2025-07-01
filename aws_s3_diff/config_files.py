@@ -66,7 +66,7 @@ class AnalysisConfigChecker:
 class AnalysisConfigReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        self._analysis_config_cache = None  # To avoid read a file in __init__.
+        self._analysis_config_cache = None
 
     def must_run_analysis(self) -> bool:
         return self._analysis_config["run_analysis"] is True
