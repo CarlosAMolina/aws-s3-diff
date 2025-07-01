@@ -134,9 +134,6 @@ class S3UrisFileReader:
         s3_uris_to_analyze = self.file_df[account].to_list()
         return [self._get_s3_query_for_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
-    def _get_s3_query_for_s3_uri(self, s3_uri: str) -> S3Query:
-        return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
-
     def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
         return self.file_df[[account_origin, account_target]]
 
@@ -149,6 +146,9 @@ class S3UrisFileReader:
             file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
             self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
         return self._df_file_what_to_analyze_cache
+
+    def _get_s3_query_for_s3_uri(self, s3_uri: str) -> S3Query:
+        return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
 
 
 class _S3UriParts:
