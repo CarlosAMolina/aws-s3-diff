@@ -122,7 +122,7 @@ class S3UrisFileChecker:
 class S3UrisFileReader:
     def __init__(self):
         self._config_directory_path = LocalPaths().config_directory
-        self._df_file_what_to_analyze_cache = None  # To avoid read a file in __init__.
+        self._df_file_what_to_analyze_cache = None
 
     def get_accounts(self) -> list[str]:
         return self._get_df_file().columns.to_list()
