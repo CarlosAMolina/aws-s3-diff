@@ -125,19 +125,19 @@ class S3UrisFileReader:
         self._df_file_what_to_analyze_cache = None  # To avoid read a file in __init__.
 
     def get_accounts(self) -> list[str]:
-        return self.get_file_df().columns.to_list()
+        return self.get_df_file().columns.to_list()
 
     def get_s3_queries_for_account(self, account: str) -> list[S3Query]:
-        s3_uris_to_analyze = self.get_file_df()[account].to_list()
+        s3_uris_to_analyze = self.get_df_file()[account].to_list()
         return [self._get_s3_query_for_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
 
     def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
-        return self.get_file_df()[[account_origin, account_target]]
+        return self.get_df_file()[[account_origin, account_target]]
 
     def is_any_uri_null(self) -> np.bool:
-        return self.get_file_df().isnull().values.any()
+        return self.get_df_file().isnull().values.any()
 
-    def get_file_df(self) -> Df:
+    def get_df_file(self) -> Df:
         if self._df_file_what_to_analyze_cache is None:
             file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
             self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
