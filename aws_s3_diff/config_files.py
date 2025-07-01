@@ -137,17 +137,17 @@ class S3UrisFileReader:
     def is_any_uri_null(self) -> np.bool:
         return self._get_df_file().isnull().values.any()
 
-    def _get_df_file(self) -> Df:
-        if self._df_file_what_to_analyze_cache is None:
-            file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
-            self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
-        return self._df_file_what_to_analyze_cache
-
     def get_df_file_for_account(self, account: str) -> Df:
         return self._get_df_file()[account]
 
     def _get_s3_query_for_s3_uri(self, s3_uri: str) -> S3Query:
         return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
+
+    def _get_df_file(self) -> Df:
+        if self._df_file_what_to_analyze_cache is None:
+            file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
+            self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
+        return self._df_file_what_to_analyze_cache
 
 
 class _S3UriParts:
