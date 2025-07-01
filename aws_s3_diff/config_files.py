@@ -146,14 +146,9 @@ class S3UrisFileReader:
     @property
     def file_df(self) -> Df:
         if self._df_file_what_to_analyze_cache is None:
-            # TODO refactor to:
-            # file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
-            self._df_file_what_to_analyze_cache = read_csv(self._file_path_what_to_analyze)
+            file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
+            self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
         return self._df_file_what_to_analyze_cache
-
-    @property
-    def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
 
 
 class _S3UriParts:
