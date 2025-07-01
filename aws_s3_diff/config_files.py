@@ -82,13 +82,10 @@ class AnalysisConfigReader:
     @property
     def _analysis_config(self) -> dict:
         if self._analysis_config_cache is None:
-            self._analysis_config_cache = self._get_analysis_config()
+            file_path_what_to_analyze = self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
+            with open(file_path_what_to_analyze, encoding="utf-8") as read_file:
+                self._analysis_config_cache = json.load(read_file)
         return self._analysis_config_cache
-
-    def _get_analysis_config(self) -> dict:
-        file_path_what_to_analyze = self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
-        with open(file_path_what_to_analyze, encoding="utf-8") as read_file:
-            return json.load(read_file)
 
 
 class S3UrisFileChecker:
