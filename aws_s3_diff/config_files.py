@@ -68,19 +68,18 @@ class AnalysisConfigReader:
         self._analysis_config_cache = None
 
     def must_run_analysis(self) -> bool:
-        return self._analysis_config["run_analysis"] is True
+        return self._get_analysis_config()["run_analysis"] is True
 
     def get_account_origin(self) -> str:
-        return self._analysis_config["origin"]
+        return self._get_analysis_config()["origin"]
 
     def get_accounts_that_must_not_have_more_files(self) -> list[str]:
-        return self._analysis_config["can_the_file_exist_in"]
+        return self._get_analysis_config()["can_the_file_exist_in"]
 
     def get_accounts_where_files_must_be_copied(self) -> list[str]:
-        return self._analysis_config["is_the_file_copied_to"]
+        return self._get_analysis_config()["is_the_file_copied_to"]
 
-    @property
-    def _analysis_config(self) -> dict:
+    def _get_analysis_config(self) -> dict:
         if self._analysis_config_cache is None:
             file_path_what_to_analyze = self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
             with open(file_path_what_to_analyze, encoding="utf-8") as read_file:
