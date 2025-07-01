@@ -1,6 +1,5 @@
 import json
 import re
-from pathlib import Path
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -87,12 +86,9 @@ class AnalysisConfigReader:
         return self._analysis_config_cache
 
     def _get_analysis_config(self) -> dict:
-        with open(self._file_path_what_to_analyze, encoding="utf-8") as read_file:
+        file_path_what_to_analyze = self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
+        with open(file_path_what_to_analyze, encoding="utf-8") as read_file:
             return json.load(read_file)
-
-    @property
-    def _file_path_what_to_analyze(self) -> Path:
-        return self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
 
 
 class S3UrisFileChecker:
