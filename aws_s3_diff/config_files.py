@@ -64,8 +64,8 @@ class AnalysisConfigChecker:
 # TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
     def __init__(self):
-        self._config_directory_path = LocalPaths().config_directory
         self._analysis_config_cache = None
+        self._config_directory_path = LocalPaths().config_directory
 
     def must_run_analysis(self) -> bool:
         return self._get_analysis_config()["run_analysis"] is True
