@@ -12,7 +12,7 @@ from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.types_custom import S3Query
 
-FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
+_FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
 # S3 uri regex: https://stackoverflow.com/a/47130367
 REGEX_BUCKET_PREFIX_FROM_S3_URI = r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"
 
@@ -58,7 +58,7 @@ class AnalysisConfigChecker:
         return self._get_error_message(f"The AWS accounts '{accounts_str}' are")
 
     def _get_error_message(self, text_prefix: str) -> str:
-        return f"{text_prefix} defined in {FILE_NAME_ANALYSIS_CONFIG} but not in s3-uris-to-analyze.csv"
+        return f"{text_prefix} defined in {_FILE_NAME_ANALYSIS_CONFIG} but not in s3-uris-to-analyze.csv"
 
 
 # TODO testing: not the file in the config folder, create one in for the tests
@@ -81,7 +81,7 @@ class AnalysisConfigReader:
 
     def _get_analysis_config(self) -> dict:
         if self._analysis_config_cache is None:
-            file_path_what_to_analyze = self._config_directory_path.joinpath(FILE_NAME_ANALYSIS_CONFIG)
+            file_path_what_to_analyze = self._config_directory_path.joinpath(_FILE_NAME_ANALYSIS_CONFIG)
             with open(file_path_what_to_analyze, encoding="utf-8") as read_file:
                 self._analysis_config_cache = json.load(read_file)
         return self._analysis_config_cache
