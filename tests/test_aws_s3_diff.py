@@ -4,7 +4,6 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from unittest.mock import PropertyMock
 
 from botocore.exceptions import ClientError
 from pandas import DataFrame as Df
@@ -126,14 +125,8 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed")
     @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze")
     @patch("aws_s3_diff.aws_s3_diff.AccountDataGenerator.get_df")
-    @patch(
-        "aws_s3_diff.aws_s3_diff.S3UrisFileReader._file_path_what_to_analyze",
-        new_callable=PropertyMock,
-        return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-uris-to-analyze.csv"),
-    )
     def test_run_manages_aws_client_errors_and_generates_expected_error_messages(
         self,
-        mock_file_path_what_to_analyze,
         mock_get_df,
         mock_get_account_to_analyze,
         mock_have_all_accounts_been_analyzed,
