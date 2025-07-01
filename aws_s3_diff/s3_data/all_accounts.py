@@ -103,7 +103,7 @@ class AccountsDataGenerator(DataGenerator):
         return result.set_index("name", append=True)
 
     def _get_empty_df_original_account_queries_as_index(self) -> Df:
-        result = self._s3_uris_file_reader.file_df[self._account_origin]
+        result = self._s3_uris_file_reader.get_file_df()[self._account_origin]
         # TODO refactor extract function, this line is done in other files.
         result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
         result.columns = ["bucket", "prefix"]
