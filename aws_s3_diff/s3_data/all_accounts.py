@@ -108,8 +108,13 @@ class AccountsDataGenerator(DataGenerator):
         result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
         result.columns = ["bucket", "prefix"]
         # TODO refactor extract function, this line is done in other files.
-        result.loc[~result["prefix"].str.endswith("/"), "prefix"] = result["prefix"] + "/"
+        result = self._get_df_add_last_slash_to_values(result, "prefix")
         return result.set_index(["bucket", "prefix"])
+
+    def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
+        result = df
+        result.loc[~result[column_name].str.endswith("/"), column_name] = result[column_name] + "/"
+        return result
 
     def _get_df_set_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
