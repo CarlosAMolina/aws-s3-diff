@@ -4,6 +4,7 @@ from pandas import DataFrame as Df
 from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
+from pandas import Series
 
 from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
@@ -105,11 +106,14 @@ class AccountsDataGenerator(DataGenerator):
     def _get_empty_df_original_account_queries_as_index(self) -> Df:
         result = self._s3_uris_file_reader.get_df_file_for_account(self._account_origin)
         # TODO refactor extract function, this line is done in other files.
-        result = result.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        result = self._get_df_uri_parts(result)
         result.columns = ["bucket", "prefix"]
         # TODO refactor extract function, this line is done in other files.
         result = self._get_df_add_last_slash_to_values(result, "prefix")
         return result.set_index(["bucket", "prefix"])
+
+    def _get_df_uri_parts(self, series: Series) -> Df:
+        return series.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
 
     def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
         result = df
