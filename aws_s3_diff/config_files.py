@@ -1,5 +1,4 @@
 import json
-import re
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -11,6 +10,7 @@ from aws_s3_diff.exceptions import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exceptions import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
 from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.s3_uri import S3UriParts
 from aws_s3_diff.types_custom import S3Query
 
 _FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
@@ -134,28 +134,10 @@ class S3UrisFileReader:
         return self._get_df_file().isnull().values.any()
 
     def _get_s3_query_for_s3_uri(self, s3_uri: str) -> S3Query:
-        return S3Query(_S3UriParts(s3_uri).bucket, _S3UriParts(s3_uri).key)
+        return S3Query(S3UriParts(s3_uri).bucket, S3UriParts(s3_uri).key)
 
     def _get_df_file(self) -> Df:
         if self._df_file_what_to_analyze_cache is None:
             file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
             self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
         return self._df_file_what_to_analyze_cache
-
-
-class _S3UriParts:
-    def __init__(self, s3_uri: str):
-        self._s3_uri = s3_uri
-
-    @property
-    def bucket(self) -> str:
-        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("bucket_name")
-
-    @property
-    def key(self) -> str:
-        return self._get_regex_match_s3_uri_parts(self._s3_uri).group("object_key")
-
-    def _get_regex_match_s3_uri_parts(self, s3_uri: str) -> re.Match:
-        result = re.match(REGEX_BUCKET_PREFIX_FROM_S3_URI, s3_uri)
-        assert result is not None
-        return result
