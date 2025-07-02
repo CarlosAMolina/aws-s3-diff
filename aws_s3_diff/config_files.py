@@ -4,6 +4,7 @@ import re
 import numpy as np
 from pandas import DataFrame as Df
 from pandas import read_csv
+from pandas import Series
 
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import DuplicatedUriS3UrisFileError
@@ -119,7 +120,7 @@ class S3UrisFileReader:
     def get_accounts(self) -> list[str]:
         return self._get_df_file().columns.to_list()
 
-    def get_df_file_for_account(self, account: str) -> Df:
+    def get_series_file_for_account(self, account: str) -> Series:
         return self._get_df_file()[account]
 
     def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
