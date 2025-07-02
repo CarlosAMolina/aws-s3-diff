@@ -1,7 +1,20 @@
 import re
 
+from pandas import DataFrame as Df
+from pandas import Series
+
 # S3 uri regex: https://stackoverflow.com/a/47130367
 _REGEX_BUCKET_PREFIX_FROM_S3_URI = r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"
+
+
+def get_df_add_last_slash_to_values(df: Df, column_name: str) -> Df:
+    result = df
+    result.loc[~result[column_name].str.endswith("/"), column_name] = result[column_name] + "/"
+    return result
+
+
+def get_df_uri_parts(series: Series) -> Df:
+    return series.str.extract(_REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
 
 
 class S3UriParts:

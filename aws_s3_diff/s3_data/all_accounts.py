@@ -4,7 +4,6 @@ from pandas import DataFrame as Df
 from pandas import Index
 from pandas import MultiIndex
 from pandas import read_csv
-from pandas import Series
 
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
@@ -14,7 +13,8 @@ from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvReader
 from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
-from aws_s3_diff.s3_uri import _REGEX_BUCKET_PREFIX_FROM_S3_URI  # TODO not use private
+from aws_s3_diff.s3_uri import get_df_add_last_slash_to_values
+from aws_s3_diff.s3_uri import get_df_uri_parts
 
 _logger = get_logger()
 
@@ -105,20 +105,10 @@ class AccountsDataGenerator(DataGenerator):
 
     def _get_empty_df_original_account_queries_as_index(self) -> Df:
         result = self._s3_uris_file_reader.get_series_file_for_account(self._account_origin)
-        # TODO refactor extract function, this line is done in other files.
-        result = self._get_df_uri_parts(result)
+        result = get_df_uri_parts(result)
         result.columns = ["bucket", "prefix"]
-        # TODO refactor extract function, this line is done in other files.
-        result = self._get_df_add_last_slash_to_values(result, "prefix")
+        result = get_df_add_last_slash_to_values(result, "prefix")
         return result.set_index(["bucket", "prefix"])
-
-    def _get_df_uri_parts(self, series: Series) -> Df:
-        return series.str.extract(_REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
-
-    def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
-        result = df
-        result.loc[~result[column_name].str.endswith("/"), column_name] = result[column_name] + "/"
-        return result
 
     def _get_df_set_columns_as_single_index(self, df: Df):
         df.columns = df.columns.map("_".join)
