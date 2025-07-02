@@ -120,15 +120,15 @@ class S3UrisFileReader:
     def get_accounts(self) -> list[str]:
         return self._get_df_file().columns.to_list()
 
-    def get_series_file_for_account(self, account: str) -> Series:
-        return self._get_df_file()[account]
-
     def get_df_s3_uris_map_between_accounts(self, account_origin: str, account_target: str) -> Df:
         return self._get_df_file()[[account_origin, account_target]]
 
     def get_s3_queries_for_account(self, account: str) -> list[S3Query]:
         s3_uris_to_analyze = self._get_df_file()[account].to_list()
         return [self._get_s3_query_for_s3_uri(s3_uri) for s3_uri in s3_uris_to_analyze]
+
+    def get_series_file_for_account(self, account: str) -> Series:
+        return self._get_df_file()[account]
 
     def is_any_uri_null(self) -> np.bool:
         return self._get_df_file().isnull().values.any()
