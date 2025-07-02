@@ -14,8 +14,6 @@ from aws_s3_diff.s3_uri import S3UriParts
 from aws_s3_diff.types_custom import S3Query
 
 _FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
-# S3 uri regex: https://stackoverflow.com/a/47130367
-REGEX_BUCKET_PREFIX_FROM_S3_URI = r"s3://(?P<bucket_name>.+?)/(?P<object_key>.+)"
 
 
 class AnalysisConfigChecker:

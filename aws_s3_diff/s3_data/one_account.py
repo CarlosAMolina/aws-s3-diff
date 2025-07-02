@@ -6,7 +6,6 @@ from pandas import MultiIndex
 from pandas import Series
 
 from aws_s3_diff.accounts import get_account_to_analyze
-from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
@@ -15,6 +14,7 @@ from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.s3_data.interface import DfModifier
 from aws_s3_diff.s3_data.s3_client import S3Client
+from aws_s3_diff.s3_uri import _REGEX_BUCKET_PREFIX_FROM_S3_URI  # TODO not use private
 from aws_s3_diff.types_custom import FileS3Data
 from aws_s3_diff.types_custom import S3Data
 from aws_s3_diff.types_custom import S3Query
@@ -142,7 +142,7 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
         return result
 
     def _get_df_uri_parts(self, series: Series) -> Df:
-        return series.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
+        return series.str.extract(_REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
 
     def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
         result = df
