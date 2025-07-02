@@ -131,9 +131,7 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
             result[[f"{account}_bucket", f"{account}_prefix"]] = result[account].str.extract(
                 REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False
             )
-            result.loc[~result[f"{account}_prefix"].str.endswith("/"), f"{account}_prefix"] = (
-                result[f"{account}_prefix"] + "/"
-            )
+            result = self._get_df_add_last_slash_to_values(result, f"{account}_prefix")
         result.drop(columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True)
         result = result.rename(
             columns={f"{self._account_target}_bucket": "bucket", f"{self._account_target}_prefix": "prefix"}
@@ -142,4 +140,9 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
         result.columns = MultiIndex.from_tuples(
             [(column, "") for column in result.columns]
         )  # To merge with a MultiIndex columns Df.
+        return result
+
+    def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
+        result = df
+        result.loc[~result[column_name].str.endswith("/"), column_name] = result[column_name] + "/"
         return result
