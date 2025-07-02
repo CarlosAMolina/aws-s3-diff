@@ -3,6 +3,7 @@ from collections.abc import Iterator
 import pandas as pd
 from pandas import DataFrame as Df
 from pandas import MultiIndex
+from pandas import Series
 
 from aws_s3_diff.accounts import get_account_to_analyze
 from aws_s3_diff.config_files import REGEX_BUCKET_PREFIX_FROM_S3_URI
@@ -128,9 +129,7 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
         result = s3_uris_map_df.copy()
         for account in (self._account_origin, self._account_target):
-            result[[f"{account}_bucket", f"{account}_prefix"]] = result[account].str.extract(
-                REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False
-            )
+            result[[f"{account}_bucket", f"{account}_prefix"]] = self._get_df_uri_parts(result[account])
             result = self._get_df_add_last_slash_to_values(result, f"{account}_prefix")
         result.drop(columns=[f"{account}" for account in (self._account_origin, self._account_target)], inplace=True)
         result = result.rename(
@@ -141,6 +140,9 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
             [(column, "") for column in result.columns]
         )  # To merge with a MultiIndex columns Df.
         return result
+
+    def _get_df_uri_parts(self, series: Series) -> Df:
+        return series.str.extract(REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
 
     def _get_df_add_last_slash_to_values(self, df: Df, column_name: str) -> Df:
         result = df
