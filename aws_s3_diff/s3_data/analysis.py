@@ -163,7 +163,7 @@ class _AnalysisBuilder:
     def _set_analysis_columns_for_all_accounts(
         self,
         account_targets: list[str],
-        two_accounts_analysis_setter_class: type["_TwoAccountsAnalysisSetter"],  # TODO not str
+        two_accounts_analysis_setter_class: type[_TwoAccountsAnalysisSetter],
     ):
         for account_target in account_targets:
             accounts = _AccountsToCompare(self._account_origin, account_target)
