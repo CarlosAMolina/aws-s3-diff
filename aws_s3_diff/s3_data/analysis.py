@@ -19,7 +19,6 @@ _logger = get_logger()
 
 class AnalysisCsvExporter(CsvExporter):
     def __init__(self):
-        self._analysis_csv_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
 
     def export_df(self, df: Df):
