@@ -14,7 +14,7 @@ from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
 from aws_s3_diff.types_custom import MultiIndexDf
 
-logger = get_logger()
+_logger = get_logger()
 
 
 class AnalysisCsvExporter(CsvExporter):
@@ -24,7 +24,7 @@ class AnalysisCsvExporter(CsvExporter):
 
     def export_df(self, df: Df):
         file_path = self._local_results.get_file_path_analysis()
-        logger.info(f"Exporting {file_path}")
+        _logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
 
@@ -122,7 +122,7 @@ class _TwoAccountsAnalysisSetter(ABC):
 
 class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
-        logger.info(
+        _logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
         )
@@ -154,7 +154,7 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> MultiIndexDf:
-        logger.info(
+        _logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )
