@@ -49,7 +49,7 @@ class _S3Requester:
 
 class _ResponseAnalyzer:
     def raise_exception_if_folders_in_response(self, response: dict, bucket: str):
-        folder_path_names = self._get_folder_path_names_in_response_list_objects_v2(response)
+        folder_path_names = self._get_folder_path_names_in_response(response)
         if len(folder_path_names) == 0:
             return
         folder_path_names = [common_prefix["Prefix"] for common_prefix in response["CommonPrefixes"]]
@@ -62,7 +62,7 @@ class _ResponseAnalyzer:
     def get_s3_data_from_response(self, response: dict) -> S3Data:
         return [self._get_file_s3_data_from_s3_response_content(content) for content in response["Contents"]]
 
-    def _get_folder_path_names_in_response_list_objects_v2(self, response: dict) -> list[str]:
+    def _get_folder_path_names_in_response(self, response: dict) -> list[str]:
         # Detect folders: https://stackoverflow.com/a/71579041
         if "CommonPrefixes" not in response:
             return []
