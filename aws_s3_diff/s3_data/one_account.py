@@ -1,6 +1,5 @@
 from collections.abc import Iterator
 
-import numpy as np
 import pandas as pd
 from pandas import DataFrame as Df
 from pandas import MultiIndex
@@ -128,8 +127,8 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
         assert original_length == len(result)
         return result
 
-    def _have_all_values_been_replaced(self, df: Df) -> np.bool:
-        return df[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().any()
+    def _have_all_values_been_replaced(self, df: Df) -> bool:
+        return bool(df[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().any())
 
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
         result = s3_uris_map_df.copy()
