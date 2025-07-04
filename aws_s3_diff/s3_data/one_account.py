@@ -40,8 +40,9 @@ class AccountDataGenerator(DataGenerator):
 
     def get_df(self) -> Df:
         result = Df()
-        for query_index, s3_query in enumerate(self._get_s3_queries(), 1):
-            _logger.info(f"Analyzing S3 URI {query_index}/{len(self._get_s3_queries())}: {s3_query}")
+        s3_queries = self._get_s3_queries()
+        for query_index, s3_query in enumerate(s3_queries, 1):
+            _logger.info(f"Analyzing S3 URI {query_index}/{len(s3_queries)}: {s3_query}")
             for s3_data in self._get_s3_data_of_query(s3_query):
                 query_and_data_df = self._get_df_from_s3_data_and_query(s3_data, s3_query)
                 result = pd.concat([result, query_and_data_df])
