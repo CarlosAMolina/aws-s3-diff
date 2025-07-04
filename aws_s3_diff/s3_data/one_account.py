@@ -137,7 +137,6 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
             columns={f"{self._account_target}_bucket": "bucket", f"{self._account_target}_prefix": "prefix"}
         )
         result = result.set_index(["bucket", "prefix"])
-        result.columns = MultiIndex.from_tuples(
-            [(column, "") for column in result.columns]
-        )  # To merge with a MultiIndex columns Df.
+        # To merge with a MultiIndex columns Df.
+        result.columns = MultiIndex.from_tuples([(column, "") for column in result.columns])
         return result
