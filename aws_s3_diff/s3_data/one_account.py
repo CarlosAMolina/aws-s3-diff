@@ -119,7 +119,7 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
         result = result.reset_index("name")
         s3_uris_map_df = self._get_s3_uris_map_prepared_for_join(s3_uris_map_df)
         result = result.join(s3_uris_map_df)
-        if True in self._have_all_values_been_replaced(result):
+        if self._have_all_values_been_replaced(result):
             raise ValueError("Some values could not be replaced")
         result = result.rename(
             columns={f"{self._account_origin}_bucket": "bucket", f"{self._account_origin}_prefix": "prefix"}
@@ -128,8 +128,8 @@ class OriginS3UrisAsIndexAccountDfModifier(DfModifier):
         assert original_length == len(result)
         return result
 
-    def _have_all_values_been_replaced(self, df: Df) -> tuple[np.bool, np.bool]:
-        return df[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().values
+    def _have_all_values_been_replaced(self, df: Df) -> np.bool:
+        return df[[f"{self._account_origin}_bucket", f"{self._account_origin}_prefix"]].isna().any().any()
 
     def _get_s3_uris_map_prepared_for_join(self, s3_uris_map_df: Df) -> Df:
         result = s3_uris_map_df.copy()
