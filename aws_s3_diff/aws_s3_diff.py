@@ -92,11 +92,11 @@ class _CsvsGenerator:
         else:
             self.set_state_account()
 
-    def get_df(self) -> Df:
-        return self._state.get_df()
-
     def export_csv(self, df: Df):
         self._state.export_csv(df)
+
+    def get_df(self) -> Df:
+        return self._state.get_df()
 
     def set_state_account(self):
         self._state = self._account_state
