@@ -15,6 +15,7 @@ def get_account_file_name(account: str) -> str:
 
 
 class LocalPaths:
+    # TODO try to convert to instance attribute
     _current_path = Path(__file__).parent.absolute()
 
     @property
