@@ -98,6 +98,9 @@ class _CsvsGenerator:
     def get_df(self) -> Df:
         return self._state.get_df()
 
+    def set_must_not_run_next_state(self):
+        self._must_run_next_state = False
+
     def set_state_account(self):
         self._state = self._account_state
 
@@ -110,9 +113,6 @@ class _CsvsGenerator:
     @property
     def must_run_next_state(self) -> bool:
         return self._must_run_next_state
-
-    def set_must_not_run_next_state(self):
-        self._must_run_next_state = False
 
 
 class _State(ABC):
