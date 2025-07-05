@@ -20,6 +20,7 @@ class AnalysisConfigChecker:
     def __init__(self):
         self._analysis_config_reader = AnalysisConfigReader()
         self._s3_uris_file_reader = S3UrisFileReader()
+        self._accounts_cache = None
 
     def assert_file_is_correct(self):
         self._assert_account_origin_exists()
@@ -44,7 +45,9 @@ class AnalysisConfigChecker:
             raise AnalysisConfigError(self._get_error_message_accounts_do_not_exist(sorted(accounts_wrong)))
 
     def _exists_account(self, account: str) -> bool:
-        return account in self._s3_uris_file_reader.get_accounts()
+        if self._accounts_cache is None:
+            self._accounts_cache = self._s3_uris_file_reader.get_accounts()
+        return account in self._accounts_cache
 
     def _get_accounts_not_exist(self, accounts: list[str]) -> set[str]:
         return {account for account in accounts if not self._exists_account(account)}
