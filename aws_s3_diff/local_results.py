@@ -15,7 +15,6 @@ def get_account_file_name(account: str) -> str:
 
 
 class LocalPaths:
-    # TODO try to convert to instance attribute
     _current_path = Path(__file__).parent.absolute()
 
     @property
@@ -40,12 +39,8 @@ class LocalResults:
         _logger.debug(f"Creating the directory: {self._directory_analysis_path}")
         self._directory_analysis_path.mkdir()
 
-    def drop_file(self, file_path: Path):
-        _logger.debug(f"Removing: {file_path}")
-        file_path.unlink()
-
     def drop_file_with_analysis_date(self):
-        self.drop_file(self._local_paths.analysis_date_time_file)
+        self._drop_file(self._local_paths.analysis_date_time_file)
 
     def exist_analysis_date_time_file(self) -> bool:
         return self._local_paths.analysis_date_time_file.is_file()
@@ -76,6 +71,10 @@ class LocalResults:
                 analysis_date_time_str
             )
         return self._directory_analysis_path_cache
+
+    def _drop_file(self, file_path: Path):
+        _logger.debug(f"Removing: {file_path}")
+        file_path.unlink()
 
     def _get_file_path_results(self, file_name: str) -> Path:
         return self._directory_analysis_path.joinpath(file_name)
