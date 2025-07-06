@@ -12,7 +12,6 @@ from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
-from aws_s3_diff.types_custom import MultiIndexDf
 
 _logger = get_logger()
 
@@ -63,12 +62,12 @@ _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")
 
 
 class _TwoAccountsAnalysisSetter(ABC):
-    def __init__(self, accounts: _AccountsToCompare, df: MultiIndexDf):
+    def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
         self._df = df
 
     @abstractmethod
-    def get_df_set_analysis_column(self) -> MultiIndexDf:
+    def get_df_set_analysis_column(self) -> Df:
         pass
 
     @property
@@ -91,7 +90,7 @@ class _TwoAccountsAnalysisSetter(ABC):
 
 
 class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
-    def get_df_set_analysis_column(self) -> MultiIndexDf:
+    def get_df_set_analysis_column(self) -> Df:
         _logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
             f" '{self._accounts.target}'"
@@ -123,7 +122,7 @@ class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
-    def get_df_set_analysis_column(self) -> MultiIndexDf:
+    def get_df_set_analysis_column(self) -> Df:
         _logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
@@ -142,7 +141,7 @@ class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 
 class _AnalysisBuilder:
-    def __init__(self, account_origin: str, df: MultiIndexDf):
+    def __init__(self, account_origin: str, df: Df):
         self._account_origin = account_origin
         self._df = df
         self._analysis_config_reader = AnalysisConfigReader()

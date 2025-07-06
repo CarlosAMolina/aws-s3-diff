@@ -1,7 +1,5 @@
 from typing import NamedTuple
 
-from pandas import DataFrame as Df
-
 
 class S3Query:
     def __init__(self, bucket: str, prefix: str):
@@ -33,4 +31,3 @@ class FileS3Data(NamedTuple):
 
 
 S3Data = list[FileS3Data]
-MultiIndexDf = Df
