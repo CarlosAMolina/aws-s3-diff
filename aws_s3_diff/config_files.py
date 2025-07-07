@@ -63,7 +63,6 @@ class AnalysisConfigChecker:
         return f"{text_prefix} defined in {_FILE_NAME_ANALYSIS_CONFIG} but not in s3-uris-to-analyze.csv"
 
 
-# TODO testing: not the file in the config folder, create one in for the tests
 class AnalysisConfigReader:
     def __init__(self):
         self._analysis_config_cache = None
