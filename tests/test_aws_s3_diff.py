@@ -40,12 +40,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 s3.create_buckets()
                 # Buckets are created but no objetes are loaded.
                 Main().run()
-        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
-        local_results = LocalResults()
-        local_results._directory_analysis_path_cache = directory_analysis_path
         folder_name_expected_results = "if-queries-without-results"
-        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
-        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
+        self._asssert_csvs_have_expected_values(folder_name_expected_results)
 
     def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:
@@ -60,7 +56,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
 
     def _asssert_csvs_have_expected_values(self, folder_name_expected_results: str):
-        pass
+        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
+        local_results = LocalResults()
+        local_results._directory_analysis_path_cache = directory_analysis_path
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
+        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
 
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
