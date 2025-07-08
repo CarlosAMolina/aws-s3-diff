@@ -52,8 +52,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             for account in S3UrisFileReader().get_accounts():
                 local_s3_server.create_objects(account)
                 Main().run()
-        local_results = LocalResults()
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
+        local_results = LocalResults()
         local_results._directory_analysis_path_cache = directory_analysis_path
         folder_name = "if-queries-with-results"
         self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
