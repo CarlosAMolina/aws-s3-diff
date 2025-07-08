@@ -38,6 +38,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             for account in S3UrisFileReader().get_accounts():
                 s3 = S3(account)
                 s3.create_buckets()
+                # Buckets are created but no objetes are loaded.
                 Main().run()
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         local_results = LocalResults()
