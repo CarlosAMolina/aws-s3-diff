@@ -53,9 +53,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
     def _asssert_created_csv_files_have_expected_values(self, folder_name_expected_results: str):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
         local_results = LocalResults()
         local_results._directory_analysis_path_cache = directory_analysis_path
-        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
         self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
 
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
