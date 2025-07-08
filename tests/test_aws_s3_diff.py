@@ -43,9 +43,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         local_results = LocalResults()
         local_results._directory_analysis_path_cache = directory_analysis_path
-        folder_name = "if-queries-without-results"
-        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
-        self._assert_analysis_file_has_expected_values(folder_name, local_results)
+        folder_name_expected_results = "if-queries-without-results"
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
+        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
 
     def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:
@@ -55,9 +55,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         local_results = LocalResults()
         local_results._directory_analysis_path_cache = directory_analysis_path
-        folder_name = "if-queries-with-results"
-        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
-        self._assert_analysis_file_has_expected_values(folder_name, local_results)
+        folder_name_expected_results = "if-queries-with-results"
+        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
+        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
 
     def _asssert_csvs_have_expected_values(self, folder_name_expected_results: str):
         pass
