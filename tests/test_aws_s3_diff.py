@@ -34,7 +34,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         LocalPaths._current_path = self._original_current_path
 
     def test_run_all_acounts_generates_expected_results_if_queries_without_results(self):
-        with S3Server() as _local_s3_server:
+        with S3Server() as _:
             for account in S3UrisFileReader().get_accounts():
                 s3 = S3(account)
                 s3.create_buckets()
