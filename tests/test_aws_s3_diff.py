@@ -113,6 +113,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         return self._get_df_from_csv(expected_result_file_path)
 
 
+# TODO continue here
 class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("aws_s3_diff.aws_s3_diff._CsvsGenerator")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_s3_diff_process):
