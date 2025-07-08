@@ -41,7 +41,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 # Buckets are created but no objetes are loaded.
                 Main().run()
         folder_name_expected_results = "if-queries-without-results"
-        self._asssert_csvs_have_expected_values(folder_name_expected_results)
+        self._asssert_created_csv_files_have_expected_values(folder_name_expected_results)
 
     def test_run_all_acounts_generates_expected_results(self):
         with S3Server() as local_s3_server:
@@ -49,9 +49,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 local_s3_server.create_objects(account)
                 Main().run()
         folder_name_expected_results = "if-queries-with-results"
-        self._asssert_csvs_have_expected_values(folder_name_expected_results)
+        self._asssert_created_csv_files_have_expected_values(folder_name_expected_results)
 
-    def _asssert_csvs_have_expected_values(self, folder_name_expected_results: str):
+    def _asssert_created_csv_files_have_expected_values(self, folder_name_expected_results: str):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         local_results = LocalResults()
         local_results._directory_analysis_path_cache = directory_analysis_path
