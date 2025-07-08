@@ -10,7 +10,7 @@ from aws_s3_diff.exceptions import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exceptions import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
 from aws_s3_diff.local_results import LocalPaths
-from aws_s3_diff.s3_uri import S3UriParts
+from aws_s3_diff.s3_uri import S3UriPart
 from aws_s3_diff.types_custom import S3Query
 
 _FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
@@ -134,7 +134,7 @@ class S3UrisFileReader:
         return self._get_df_file().isnull().values.any()
 
     def _get_s3_query_for_s3_uri(self, s3_uri: str) -> S3Query:
-        return S3Query(S3UriParts(s3_uri).bucket, S3UriParts(s3_uri).key)
+        return S3Query(S3UriPart(s3_uri).bucket, S3UriPart(s3_uri).key)
 
     def _get_df_file(self) -> Df:
         if self._df_file_what_to_analyze_cache is None:

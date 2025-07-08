@@ -17,7 +17,7 @@ def get_df_uri_parts(series: Series) -> Df:
     return series.str.extract(_REGEX_BUCKET_PREFIX_FROM_S3_URI, expand=False)
 
 
-class S3UriParts:
+class S3UriPart:
     def __init__(self, s3_uri: str):
         self._s3_uri = s3_uri
 
