@@ -98,11 +98,6 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         date_column_names = ["pro_date", "release_date", "dev_date"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
-    def _get_df_from_csv_expected_result(self, folder_name: str) -> Df:
-        current_path = Path(__file__).parent.absolute()
-        expected_result_file_path = current_path.joinpath(f"expected-results/{folder_name}/analysis.csv")
-        return self._get_df_from_csv(expected_result_file_path)
-
     def _get_df_from_csv(self, path: Path) -> Df:
         return read_csv(path).astype(
             {
@@ -111,6 +106,11 @@ class TestMainWithLocalS3Server(unittest.TestCase):
                 "dev_size": "Int64",
             }
         )
+
+    def _get_df_from_csv_expected_result(self, folder_name: str) -> Df:
+        current_path = Path(__file__).parent.absolute()
+        expected_result_file_path = current_path.joinpath(f"expected-results/{folder_name}/analysis.csv")
+        return self._get_df_from_csv(expected_result_file_path)
 
 
 class TestMainWithoutLocalS3Server(unittest.TestCase):
