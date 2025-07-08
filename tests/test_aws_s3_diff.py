@@ -48,12 +48,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             for account in S3UrisFileReader().get_accounts():
                 local_s3_server.create_objects(account)
                 Main().run()
-        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
-        local_results = LocalResults()
-        local_results._directory_analysis_path_cache = directory_analysis_path
         folder_name_expected_results = "if-queries-with-results"
-        self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
-        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
+        self._asssert_csvs_have_expected_values(folder_name_expected_results)
 
     def _asssert_csvs_have_expected_values(self, folder_name_expected_results: str):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
