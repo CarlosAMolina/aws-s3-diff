@@ -59,6 +59,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name)
         self._assert_analysis_file_has_expected_values(folder_name, local_results)
 
+    def _asssert_csvs_have_expected_values(self, folder_name_expected_results: str):
+        pass
+
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
             Path(tmp_directory_path_name).joinpath(folder_name).mkdir()
