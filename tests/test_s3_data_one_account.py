@@ -17,7 +17,7 @@ _ACCOUNT_TARGET = "dev"
 class TestAccountDataGenerator(unittest.TestCase):
     @mock.patch("aws_s3_diff.s3_data.one_account.S3Client")
     @mock.patch("aws_s3_diff.s3_data.one_account.S3UrisFileReader")
-    def test_get_df_returns_expected_result_if_query_without_results(
+    def test_get_df_returns_df_with_bucket_and_prefix_values_if_query_without_results(
         self,
         mock_s3_uris_file_reader,
         mock_s3_client,
