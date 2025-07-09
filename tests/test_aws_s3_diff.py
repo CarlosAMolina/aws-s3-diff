@@ -36,7 +36,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def test_run_all_acounts_generates_expected_results_if_queries_without_results(self):
         with S3Server() as _:
             # TODO manage only 2 accounts to get a faster test
-            for account in S3UrisFileReader().get_accounts():
+            for account in ["pro", "release", "dev"]:
                 s3 = S3(account)
                 s3.create_buckets()
                 # Buckets are created but no objetes are loaded.
