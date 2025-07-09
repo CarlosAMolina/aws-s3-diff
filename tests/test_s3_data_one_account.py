@@ -1,14 +1,42 @@
 import unittest
+from unittest import mock
 
 from pandas import DataFrame as Df
 from pandas.testing import assert_frame_equal
 
+from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
+from aws_s3_diff.types_custom import S3Query
 
 ExpectedResult = list[dict]
 
 _ACCOUNT_ORIGIN = "pro"
 _ACCOUNT_TARGET = "dev"
+
+
+class TestAccountDataGenerator(unittest.TestCase):
+    @mock.patch("aws_s3_diff.s3_data.one_account.S3Client")
+    @mock.patch("aws_s3_diff.s3_data.one_account.S3UrisFileReader")
+    def test_get_df_returns_expected_result_if_query_without_results(
+        self,
+        mock_s3_uris_file_reader,
+        mock_s3_client,
+    ):
+        mock_s3_uris_file_reader().get_s3_queries_for_account.return_value = [
+            S3Query("bucket_1", "prefix_1"),
+            S3Query("bucket_2", "prefix_2"),
+        ]
+        mock_s3_client().get_s3_data.return_value = []
+        expected_result = Df(
+            data=[
+                ["bucket_1", "prefix_1/", None, None, None, None],
+                ["bucket_2", "prefix_2/", None, None, None, None],
+            ],
+            columns=["bucket", "prefix", "name", "date", "size", "hash"],
+            index=[0, 0],
+        )
+        result = AccountDataGenerator("foo").get_df()
+        assert_frame_equal(expected_result, result)
 
 
 class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
