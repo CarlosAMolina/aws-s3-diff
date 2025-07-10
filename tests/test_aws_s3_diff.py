@@ -39,7 +39,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             for account in ["pro", "release", "dev"]:
                 s3 = S3(account)
                 s3.create_buckets()
-                # Buckets are created but no objetes are loaded.
+                # Buckets are created but no objects are loaded.
                 Main().run()
         folder_name_expected_results = "if-queries-without-results"
         self._asssert_created_csv_files_have_expected_values(folder_name_expected_results)
