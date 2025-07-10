@@ -17,7 +17,6 @@ from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.aws_s3_diff import S3UrisFileReader
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.local_results import LocalResults
-from tests.aws import S3
 from tests.aws import S3Server
 
 
@@ -33,18 +32,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         os.environ.pop("AWS_MAX_KEYS")
         LocalPaths._current_path = self._original_current_path
 
-    def test_run_all_acounts_generates_expected_results_if_queries_without_results(self):
-        with S3Server() as _:
-            # TODO manage only 2 accounts to get a faster test
-            for account in ["pro", "release", "dev"]:
-                s3 = S3(account)
-                s3.create_buckets()
-                # Buckets are created but no objects are loaded.
-                Main().run()
-        folder_name_expected_results = "if-queries-without-results"
-        self._asssert_created_csv_files_have_expected_values(folder_name_expected_results)
-
-    def test_run_all_acounts_generates_expected_results(self):
+    def test_run_all_acounts_generates_expected_results_if_queries_with_results(self):
         with S3Server() as local_s3_server:
             for account in S3UrisFileReader().get_accounts():
                 local_s3_server.create_objects(account)
