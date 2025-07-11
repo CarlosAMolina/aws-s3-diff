@@ -102,7 +102,6 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         return self._get_df_from_csv(expected_result_file_path)
 
 
-# TODO continue here
 class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("aws_s3_diff.aws_s3_diff._CsvsGenerator")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_s3_diff_process):
@@ -111,6 +110,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
+    # TODO continue here
     @patch("aws_s3_diff.aws_s3_diff.LocalResults")
     @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed")
     @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze")
