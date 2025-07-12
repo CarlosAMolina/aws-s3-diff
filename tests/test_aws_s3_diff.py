@@ -122,6 +122,9 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         mock_have_all_accounts_been_analyzed,
         mock_local_results,
     ):
+        mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
+        mock_local_results().get_file_path_all_accounts().is_file.return_value = False
+        mock_local_results().directory_analysis.is_dir.return_value = True
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/"
@@ -153,9 +156,6 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         ):
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_get_df.side_effect = aws_error
-                mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
-                mock_local_results().get_file_path_all_accounts().is_file.return_value = False
-                mock_local_results().directory_analysis.is_dir.return_value = True
                 with self.assertLogs(level="ERROR") as cm:
                     Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
