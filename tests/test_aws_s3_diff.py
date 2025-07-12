@@ -164,7 +164,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
     def _mock_to_not_generate_analysis_date_time_file(
         self, mock_get_account_to_analyze, mock_have_all_accounts_been_analyzed, mock_local_results
     ):
-        mock_get_account_to_analyze.return_value = S3UrisFileReader().get_accounts()[0]
+        mock_get_account_to_analyze.return_value = "foo"
         mock_have_all_accounts_been_analyzed.return_value = False
         mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
         mock_local_results().get_file_path_all_accounts().is_file.return_value = False
