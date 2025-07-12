@@ -12,6 +12,7 @@ from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
 from aws_s3_diff.types_custom import S3Query
 
 
+# TODO continue here
 class TestAnalysisConfigChecker(unittest.TestCase):
     @patch("aws_s3_diff.config_files.AnalysisConfigReader")
     @patch("aws_s3_diff.config_files.S3UrisFileReader")

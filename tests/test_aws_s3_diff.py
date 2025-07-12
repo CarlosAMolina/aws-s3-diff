@@ -110,7 +110,6 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
-    # TODO continue here
     @patch("aws_s3_diff.aws_s3_diff.LocalResults")
     @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed", return_value=False)
     @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze", return_value="foo")
