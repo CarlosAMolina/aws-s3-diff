@@ -153,16 +153,12 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         ):
             with self.subTest(expected_error_message=expected_error_message, aws_error=aws_error):
                 mock_get_df.side_effect = aws_error
-                self._mock_to_not_generate_analysis_date_time_file(mock_local_results)
+                mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
+                mock_local_results().get_file_path_all_accounts().is_file.return_value = False
+                mock_local_results().directory_analysis.is_dir.return_value = True
                 with self.assertLogs(level="ERROR") as cm:
                     Main().run()
                 self.assertEqual(expected_error_message, cm.records[0].message)
-
-    # TODO try avoid this method using temporal directories
-    def _mock_to_not_generate_analysis_date_time_file(self, mock_local_results):
-        mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
-        mock_local_results().get_file_path_all_accounts().is_file.return_value = False
-        mock_local_results().directory_analysis.is_dir.return_value = True
 
 
 class _ListObjectsV2ClientErrorBuilder:
