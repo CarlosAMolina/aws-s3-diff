@@ -94,17 +94,13 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 class TestS3UrisFileChecker(unittest.TestCase):
     @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
-    def test_assert_file_is_correct_raises_exception_if_empty_account(self, mock_config_directory):
-        mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
-            "empty_account.csv"
-        )
-        with self.assertRaises(EmptyAccountNameS3UrisFileError) as exception:
-            m_config_files.S3UrisFileChecker().assert_file_is_correct()
-        self.assertEqual("Error in s3-uris-to-analyze.csv. Some AWS account names are empty", str(exception.exception))
-
-    @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_expected_exception_for_all_cases(self, mock_config_directory):
         for expected_error_message, expected_exception, s3_uri_file_name in [
+            [
+                "Error in s3-uris-to-analyze.csv. Some AWS account names are empty",
+                EmptyAccountNameS3UrisFileError,
+                "empty_account.csv",
+            ],
             ["Error in s3-uris-to-analyze.csv. Some URIs are empty", EmptyUriS3UrisFileError, "empty_uri.csv"],
             [
                 "Error in s3-uris-to-analyze.csv. The AWS account foo has duplicated URIs",
