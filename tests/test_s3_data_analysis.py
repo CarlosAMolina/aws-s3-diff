@@ -18,6 +18,7 @@ from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisSetter
 from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 
+# TODO continue here
 class _AnalysisBuilderConfig(ABC):
     @property
     @abstractmethod
