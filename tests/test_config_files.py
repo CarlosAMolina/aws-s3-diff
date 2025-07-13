@@ -30,7 +30,7 @@ class TestAnalysisConfigChecker(unittest.TestCase):
 
     @patch("aws_s3_diff.config_files.AnalysisConfigReader")
     @patch("aws_s3_diff.config_files.S3UrisFileReader")
-    def test_assert_file_is_correct_raises_expected_exception_if_target_account_does_not_exist(
+    def test_assert_file_is_correct_raises_expected_exception_messages(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
         for expected_result, accounts_target_config_file, accounts_target_uri_file in [
@@ -53,12 +53,6 @@ class TestAnalysisConfigChecker(unittest.TestCase):
                 with self.assertRaises(AnalysisConfigError) as exception:
                     m_config_files.AnalysisConfigChecker().assert_file_is_correct()
                 self.assertEqual(expected_result, str(exception.exception))
-
-    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @patch("aws_s3_diff.config_files.S3UrisFileReader")
-    def test_assert_file_is_correct_raises_expected_exception_messages(
-        self, mock_s3_uris_file_reader, mock_analysis_config_reader
-    ):
         accounts_target_config_file = ["releas", "de", "pre"]
         accounts_target_uri_file = ["pro", "release", "dev", "pre"]
         expected_result = (
