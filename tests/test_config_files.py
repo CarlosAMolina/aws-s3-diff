@@ -109,13 +109,11 @@ class TestS3UrisFileChecker(unittest.TestCase):
             ],
         ]:
             with self.subTest(expected_error_message=expected_error_message, s3_uri_file_name=s3_uri_file_name):
-                mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
-                    s3_uri_file_name
+                mock_config_directory.return_value.joinpath.return_value = (
+                    Path(__file__)
+                    .parent.absolute()
+                    .joinpath("fake-files/s3-uris-to-analyze/possible-values", s3_uri_file_name)
                 )
                 with self.assertRaises(expected_exception) as exception:
                     m_config_files.S3UrisFileChecker().assert_file_is_correct()
                 self.assertEqual(expected_error_message, str(exception.exception))
-
-    @staticmethod
-    def _get_file_path_s3_uri_to_analyze(file_name: str) -> Path:
-        return Path(__file__).parent.absolute().joinpath("fake-files/s3-uris-to-analyze/possible-values", file_name)
