@@ -19,7 +19,7 @@ from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 
 # TODO continue here
-class _AnalysisBuilderConfig(ABC):
+class _AnalysisConfig(ABC):
     @property
     @abstractmethod
     def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
@@ -36,7 +36,7 @@ class _AnalysisBuilderConfig(ABC):
         pass
 
 
-class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
+class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
     @property
     def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
         return _IsFileCopiedTwoAccountsAnalysisSetter
@@ -56,7 +56,7 @@ class _IsFileCopiedAnalysisBuilderConfig(_AnalysisBuilderConfig):
         return "is_sync_ok_in_release"
 
 
-class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
+class _CanFileExistAnalysisConfig(_AnalysisConfig):
     @property
     def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
         return _CanFileExistTwoAccountsAnalysisSetter
@@ -78,12 +78,12 @@ class _CanFileExistAnalysisBuilderConfig(_AnalysisBuilderConfig):
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
         for analysis_config in [
-            _IsFileCopiedAnalysisBuilderConfig(),
-            _CanFileExistAnalysisBuilderConfig(),
+            _IsFileCopiedAnalysisConfig(),
+            _CanFileExistAnalysisConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
 
-    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisBuilderConfig):
+    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisConfig):
         for file_name, expected_result in config.file_name_and_expected_result.items():
             file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
             df = self._get_df_from_accounts_s3_data_csv(file_path_name)
