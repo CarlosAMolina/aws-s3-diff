@@ -87,8 +87,9 @@ class TestS3UrisFileReader(unittest.TestCase):
                 S3Query("pets_dev", "non-existent-prefix"),
             ],
         }.items():
-            result = m_config_files.S3UrisFileReader().get_s3_queries_for_account(account)
-            self.assertEqual(expected_result, result)
+            with self.subTest(expected_result=expected_result, account=account):
+                result = m_config_files.S3UrisFileReader().get_s3_queries_for_account(account)
+                self.assertEqual(expected_result, result)
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
