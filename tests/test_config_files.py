@@ -38,7 +38,12 @@ class TestAnalysisConfigChecker(unittest.TestCase):
                 "The AWS account 'releas' is defined in analysis-config.json but not in s3-uris-to-analyze.csv",
                 ["releas"],
                 ["pro", "release"],
-            ]
+            ],
+            [
+                "The AWS accounts 'de', 'releas' are defined in analysis-config.json but not in s3-uris-to-analyze.csv",
+                ["releas", "de", "pre"],
+                ["pro", "release", "dev", "pre"],
+            ],
         ]:
             with self.subTest(
                 expected_result=expected_result,
@@ -53,22 +58,6 @@ class TestAnalysisConfigChecker(unittest.TestCase):
                 with self.assertRaises(AnalysisConfigError) as exception:
                     m_config_files.AnalysisConfigChecker().assert_file_is_correct()
                 self.assertEqual(expected_result, str(exception.exception))
-        accounts_target_config_file = ["releas", "de", "pre"]
-        accounts_target_uri_file = ["pro", "release", "dev", "pre"]
-        expected_result = (
-            "The AWS accounts 'de', 'releas' are defined in analysis-config.json but not in s3-uris-to-analyze.csv"
-        )
-        mock_analysis_config_reader.return_value.get_account_origin.return_value = "pro"
-        mock_analysis_config_reader.return_value.get_accounts_where_files_must_be_copied.return_value = (
-            accounts_target_config_file
-        )
-        mock_s3_uris_file_reader.return_value.get_accounts.return_value = accounts_target_uri_file
-        with self.assertRaises(AnalysisConfigError) as exception:
-            m_config_files.AnalysisConfigChecker().assert_file_is_correct()
-        self.assertEqual(
-            expected_result,
-            str(exception.exception),
-        )
 
 
 class TestS3UrisFileReader(unittest.TestCase):
