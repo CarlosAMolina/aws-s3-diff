@@ -113,14 +113,16 @@ class TestS3UrisFileChecker(unittest.TestCase):
 
     @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_config_directory):
-        mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
-            "duplicated_uri.csv"
-        )
-        with self.assertRaises(DuplicatedUriS3UrisFileError) as exception:
-            m_config_files.S3UrisFileChecker().assert_file_is_correct()
-        self.assertEqual(
-            "Error in s3-uris-to-analyze.csv. The AWS account foo has duplicated URIs", str(exception.exception)
-        )
+        for expected_error_message, s3_uri_file_name in [
+            ["Error in s3-uris-to-analyze.csv. The AWS account foo has duplicated URIs", "duplicated_uri.csv"]
+        ]:
+            with self.subTest(expected_error_message=expected_error_message, s3_uri_file_name=s3_uri_file_name):
+                mock_config_directory.return_value.joinpath.return_value = self._get_file_path_s3_uri_to_analyze(
+                    s3_uri_file_name
+                )
+                with self.assertRaises(DuplicatedUriS3UrisFileError) as exception:
+                    m_config_files.S3UrisFileChecker().assert_file_is_correct()
+                self.assertEqual(expected_error_message, str(exception.exception))
 
     @staticmethod
     def _get_file_path_s3_uri_to_analyze(file_name: str) -> Path:
