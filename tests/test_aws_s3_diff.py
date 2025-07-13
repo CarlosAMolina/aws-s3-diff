@@ -105,7 +105,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 class TestMainWithoutLocalS3Server(unittest.TestCase):
     @patch("aws_s3_diff.aws_s3_diff._CsvsGenerator")
     def test_run_manages_analysis_config_error_and_generates_expected_error_messages(self, mock_s3_diff_process):
-        mock_s3_diff_process().get_df.side_effect = AnalysisConfigError("foo")
+        mock_s3_diff_process.return_value.get_df.side_effect = AnalysisConfigError("foo")
         with self.assertLogs(level="ERROR") as cm:
             Main().run()
         self.assertEqual("foo", cm.records[0].message)
@@ -121,9 +121,9 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         mock_have_all_accounts_been_analyzed,
         mock_local_results,
     ):
-        mock_local_results().analysis_paths.directory_analysis.is_dir.return_value = True
-        mock_local_results().get_file_path_all_accounts().is_file.return_value = False
-        mock_local_results().directory_analysis.is_dir.return_value = True
+        mock_local_results.return_value.analysis_paths.directory_analysis.is_dir.return_value = True
+        mock_local_results.return_value.get_file_path_all_accounts.return_value.is_file.return_value = False
+        mock_local_results.return_value.directory_analysis.is_dir.return_value = True
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/"
