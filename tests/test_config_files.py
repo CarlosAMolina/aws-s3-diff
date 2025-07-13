@@ -112,7 +112,7 @@ class TestS3UrisFileChecker(unittest.TestCase):
         self.assertEqual("Error in s3-uris-to-analyze.csv. Some URIs are empty", str(exception.exception))
 
     @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
-    def test_assert_file_is_correct_raises_exception_if_duplicated_account(self, mock_config_directory):
+    def test_assert_file_is_correct_raises_expected_exception_for_all_cases(self, mock_config_directory):
         for expected_error_message, s3_uri_file_name in [
             ["Error in s3-uris-to-analyze.csv. The AWS account foo has duplicated URIs", "duplicated_uri.csv"]
         ]:
