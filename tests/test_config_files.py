@@ -56,7 +56,7 @@ class TestAnalysisConfigChecker(unittest.TestCase):
 
     @patch("aws_s3_diff.config_files.AnalysisConfigReader")
     @patch("aws_s3_diff.config_files.S3UrisFileReader")
-    def test_assert_file_is_correct_raises_expected_exception_if_target_accounts_do_not_exist(
+    def test_assert_file_is_correct_raises_expected_exception_messages(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
         accounts_target_config_file = ["releas", "de", "pre"]
