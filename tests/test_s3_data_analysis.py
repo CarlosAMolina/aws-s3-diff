@@ -82,7 +82,6 @@ class TestDfAnalysis(unittest.TestCase):
             _CanFileExistAnalysisConfig(),
         ]:
             self._run_test_get_df_set_analysis_for_several_file_cases(
-                analysis_config,
                 analysis_config.file_name_and_expected_result,
                 analysis_config.analysis_class_to_check,
                 analysis_config.column_name_to_check,
@@ -90,7 +89,6 @@ class TestDfAnalysis(unittest.TestCase):
 
     def _run_test_get_df_set_analysis_for_several_file_cases(
         self,
-        config: _AnalysisConfig,
         file_name_and_expected_result: dict[str, list],
         analysis_class_to_check: type[_TwoAccountsAnalysisSetter],
         column_name_to_check: str,
