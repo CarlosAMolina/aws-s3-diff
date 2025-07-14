@@ -47,22 +47,21 @@ class TestDfAnalysis(unittest.TestCase):
             ):
                 for file_name, expected_result in file_name_and_expected_result.items():
                     file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
-                    df = self._get_df_accounts_csv(file_path_name)
+                    accounts_csv_reader = AccountsCsvReader()
+                    accounts_csv_reader._local_results = Mock()
+                    accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
+                        Path(__file__).parent.absolute().joinpath(file_path_name)
+                    )
+                    accounts_csv_reader._s3_uris_file_reader = Mock()
+                    accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
+                        "pro", "release"
+                    )
+                    df = accounts_csv_reader.get_df()
                     result = analysis_class_to_check(
                         _AccountsToCompare("pro", "release"), df
                     ).get_df_set_analysis_column()
                     result_to_check = result.loc[:, ("analysis", column_name_to_check)].tolist()
                     self.assertEqual(expected_result, result_to_check)
-
-    def _get_df_accounts_csv(self, file_path_name: str) -> Df:
-        accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._local_results = Mock()
-        accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
-            Path(__file__).parent.absolute().joinpath(file_path_name)
-        )
-        accounts_csv_reader._s3_uris_file_reader = Mock()
-        accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare("pro", "release")
-        return accounts_csv_reader.get_df()
 
 
 # TODO continue here
