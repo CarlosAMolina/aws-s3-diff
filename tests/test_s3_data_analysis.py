@@ -81,10 +81,14 @@ class TestDfAnalysis(unittest.TestCase):
             _IsFileCopiedAnalysisConfig(),
             _CanFileExistAnalysisConfig(),
         ]:
-            self._run_test_get_df_set_analysis_for_several_file_cases(analysis_config)
+            self._run_test_get_df_set_analysis_for_several_file_cases(
+                analysis_config, analysis_config.file_name_and_expected_result
+            )
 
-    def _run_test_get_df_set_analysis_for_several_file_cases(self, config: _AnalysisConfig):
-        for file_name, expected_result in config.file_name_and_expected_result.items():
+    def _run_test_get_df_set_analysis_for_several_file_cases(
+        self, config: _AnalysisConfig, file_name_and_expected_result: dict[str, list]
+    ):
+        for file_name, expected_result in file_name_and_expected_result.items():
             file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
             df = self._get_df_accounts_csv(file_path_name)
             result = config.analysis_class_to_check(
