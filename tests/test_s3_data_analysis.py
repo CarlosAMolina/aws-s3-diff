@@ -1,6 +1,4 @@
 import unittest
-from abc import ABC
-from abc import abstractmethod
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -14,26 +12,7 @@ from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
 from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisSetter
 from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisSetter
-from aws_s3_diff.s3_data.analysis import _TwoAccountsAnalysisSetter
 from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
-
-
-# TODO continue here
-class _AnalysisConfig(ABC):
-    @property
-    @abstractmethod
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
-        pass
-
-    @property
-    @abstractmethod
-    def file_name_and_expected_result(self) -> dict[str, list]:
-        pass
-
-    @property
-    @abstractmethod
-    def column_name_to_check(self) -> str:
-        pass
 
 
 class TestDfAnalysis(unittest.TestCase):
@@ -86,6 +65,7 @@ class TestDfAnalysis(unittest.TestCase):
         return accounts_csv_reader.get_df()
 
 
+# TODO continue here
 class TestAnalysisCsvExporter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
