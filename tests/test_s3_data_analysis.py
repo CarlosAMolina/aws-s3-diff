@@ -89,24 +89,14 @@ class TestDfAnalysis(unittest.TestCase):
                 analysis_class_to_check=analysis_class_to_check,
                 column_name_to_check=column_name_to_check,
             ):
-                self._run_test_get_df_set_analysis_for_several_file_cases(
-                    file_name_and_expected_result,
-                    analysis_class_to_check,
-                    column_name_to_check,
-                )
-
-    def _run_test_get_df_set_analysis_for_several_file_cases(
-        self,
-        file_name_and_expected_result: dict[str, list],
-        analysis_class_to_check: type[_TwoAccountsAnalysisSetter],
-        column_name_to_check: str,
-    ):
-        for file_name, expected_result in file_name_and_expected_result.items():
-            file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
-            df = self._get_df_accounts_csv(file_path_name)
-            result = analysis_class_to_check(_AccountsToCompare("pro", "release"), df).get_df_set_analysis_column()
-            result_to_check = result.loc[:, ("analysis", column_name_to_check)].tolist()
-            self.assertEqual(expected_result, result_to_check)
+                for file_name, expected_result in file_name_and_expected_result.items():
+                    file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
+                    df = self._get_df_accounts_csv(file_path_name)
+                    result = analysis_class_to_check(
+                        _AccountsToCompare("pro", "release"), df
+                    ).get_df_set_analysis_column()
+                    result_to_check = result.loc[:, ("analysis", column_name_to_check)].tolist()
+                    self.assertEqual(expected_result, result_to_check)
 
     def _get_df_accounts_csv(self, file_path_name: str) -> Df:
         accounts_csv_reader = AccountsCsvReader()
