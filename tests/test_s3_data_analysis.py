@@ -36,34 +36,19 @@ class _AnalysisConfig(ABC):
         pass
 
 
-class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
-    @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
-        return _IsFileCopiedTwoAccountsAnalysisSetter
-
-    @property
-    def file_name_and_expected_result(self) -> dict[str, list]:
-        return {
-            "file-sync-ok.csv": [True],
-            "file-sync-wrong.csv": [False],
-            "file-not-in-origin.csv": [False],
-            "file-not-in-target.csv": [False],
-            "file-not-in-origin-target.csv": [True],
-        }
-
-    @property
-    def column_name_to_check(self) -> str:
-        return "is_sync_ok_in_release"
-
-
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
-        analysis_config_a = _IsFileCopiedAnalysisConfig()
         for file_name_and_expected_result, analysis_class_to_check, column_name_to_check in [
             [
-                analysis_config_a.file_name_and_expected_result,
-                analysis_config_a.analysis_class_to_check,
-                analysis_config_a.column_name_to_check,
+                {
+                    "file-sync-ok.csv": [True],
+                    "file-sync-wrong.csv": [False],
+                    "file-not-in-origin.csv": [False],
+                    "file-not-in-target.csv": [False],
+                    "file-not-in-origin-target.csv": [True],
+                },
+                _IsFileCopiedTwoAccountsAnalysisSetter,
+                "is_sync_ok_in_release",
             ],
             [
                 {
