@@ -81,11 +81,16 @@ class TestDfAnalysis(unittest.TestCase):
             _IsFileCopiedAnalysisConfig(),
             _CanFileExistAnalysisConfig(),
         ]:
-            self._run_test_get_df_set_analysis_for_several_file_cases(
-                analysis_config.file_name_and_expected_result,
-                analysis_config.analysis_class_to_check,
-                analysis_config.column_name_to_check,
-            )
+            with self.subTest(
+                file_name_and_expected_result=analysis_config.file_name_and_expected_result,
+                analysis_class_to_check=analysis_config.analysis_class_to_check,
+                column_name_to_check=analysis_config.column_name_to_check,
+            ):
+                self._run_test_get_df_set_analysis_for_several_file_cases(
+                    analysis_config.file_name_and_expected_result,
+                    analysis_config.analysis_class_to_check,
+                    analysis_config.column_name_to_check,
+                )
 
     def _run_test_get_df_set_analysis_for_several_file_cases(
         self,
