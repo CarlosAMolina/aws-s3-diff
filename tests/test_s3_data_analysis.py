@@ -78,7 +78,6 @@ class _CanFileExistAnalysisConfig(_AnalysisConfig):
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
         analysis_config_a = _IsFileCopiedAnalysisConfig()
-        analysis_config_b = _CanFileExistAnalysisConfig()
         for file_name_and_expected_result, analysis_class_to_check, column_name_to_check in [
             [
                 analysis_config_a.file_name_and_expected_result,
@@ -86,9 +85,14 @@ class TestDfAnalysis(unittest.TestCase):
                 analysis_config_a.column_name_to_check,
             ],
             [
-                analysis_config_b.file_name_and_expected_result,
-                analysis_config_b.analysis_class_to_check,
-                analysis_config_b.column_name_to_check,
+                {
+                    "file-sync-ok.csv": [None],
+                    "file-not-in-origin.csv": [False],
+                    "file-not-in-target.csv": [None],
+                    "file-not-in-origin-target.csv": [None],
+                },
+                _CanFileExistTwoAccountsAnalysisSetter,
+                "can_exist_in_release",
             ],
         ]:
             with self.subTest(
