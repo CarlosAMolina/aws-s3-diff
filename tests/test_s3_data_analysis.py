@@ -17,6 +17,10 @@ from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
+        accounts_csv_reader = AccountsCsvReader()
+        accounts_csv_reader._local_results = Mock()
+        accounts_csv_reader._s3_uris_file_reader = Mock()
+        accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare("pro", "release")
         for file_name_and_expected_result, analysis_class_to_check, column_name_to_check in [
             [
                 {
@@ -46,12 +50,6 @@ class TestDfAnalysis(unittest.TestCase):
                 column_name_to_check=column_name_to_check,
             ):
                 for file_name, expected_result in file_name_and_expected_result.items():
-                    accounts_csv_reader = AccountsCsvReader()
-                    accounts_csv_reader._local_results = Mock()
-                    accounts_csv_reader._s3_uris_file_reader = Mock()
-                    accounts_csv_reader._s3_uris_file_reader.get_accounts.return_value = _AccountsToCompare(
-                        "pro", "release"
-                    )
                     file_path_name = f"fake-files/possible-s3-files-all-accounts/{file_name}"
                     accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
                         Path(__file__).parent.absolute().joinpath(file_path_name)
