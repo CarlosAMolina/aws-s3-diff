@@ -56,25 +56,6 @@ class _IsFileCopiedAnalysisConfig(_AnalysisConfig):
         return "is_sync_ok_in_release"
 
 
-class _CanFileExistAnalysisConfig(_AnalysisConfig):
-    @property
-    def analysis_class_to_check(self) -> type[_TwoAccountsAnalysisSetter]:
-        return _CanFileExistTwoAccountsAnalysisSetter
-
-    @property
-    def file_name_and_expected_result(self) -> dict[str, list]:
-        return {
-            "file-sync-ok.csv": [None],
-            "file-not-in-origin.csv": [False],
-            "file-not-in-target.csv": [None],
-            "file-not-in-origin-target.csv": [None],
-        }
-
-    @property
-    def column_name_to_check(self) -> str:
-        return "can_exist_in_release"
-
-
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
         analysis_config_a = _IsFileCopiedAnalysisConfig()
