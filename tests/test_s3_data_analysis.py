@@ -96,7 +96,7 @@ class TestDfAnalysis(unittest.TestCase):
     def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
         accounts_csv_reader = AccountsCsvReader()
         accounts_csv_reader._local_results = Mock()
-        accounts_csv_reader._local_results.get_file_path_all_accounts = lambda: (
+        accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
             Path(__file__).parent.absolute().joinpath(file_path_name)
         )
         accounts_csv_reader._s3_uris_file_reader = Mock()
