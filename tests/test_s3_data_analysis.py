@@ -77,20 +77,22 @@ class _CanFileExistAnalysisConfig(_AnalysisConfig):
 
 class TestDfAnalysis(unittest.TestCase):
     def test_get_df_set_analysis_result_for_several_df_analysis(self):
-        for analysis_config in [
+        analysis_config_a = _IsFileCopiedAnalysisConfig()
+        analysis_config_b = _CanFileExistAnalysisConfig()
+        for _ in [
             _IsFileCopiedAnalysisConfig(),
             _CanFileExistAnalysisConfig(),
         ]:
             for file_name_and_expected_result, analysis_class_to_check, column_name_to_check in [
                 [
-                    analysis_config.file_name_and_expected_result,
-                    analysis_config.analysis_class_to_check,
-                    analysis_config.column_name_to_check,
+                    analysis_config_a.file_name_and_expected_result,
+                    analysis_config_a.analysis_class_to_check,
+                    analysis_config_a.column_name_to_check,
                 ],
                 [
-                    analysis_config.file_name_and_expected_result,
-                    analysis_config.analysis_class_to_check,
-                    analysis_config.column_name_to_check,
+                    analysis_config_b.file_name_and_expected_result,
+                    analysis_config_b.analysis_class_to_check,
+                    analysis_config_b.column_name_to_check,
                 ],
             ]:
                 with self.subTest(
