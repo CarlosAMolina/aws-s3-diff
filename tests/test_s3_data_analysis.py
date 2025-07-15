@@ -62,25 +62,20 @@ class TestDfAnalysis(unittest.TestCase):
                     self.assertEqual(expected_result, result_to_check)
 
 
-# TODO continue here
 class TestAnalysisDataGenerator(unittest.TestCase):
     def test_get_df_returns_expected_result(self):
+        mock_local_results = Mock()
+        mock_local_results.get_file_path_all_accounts.return_value = (
+            Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-files-all-accounts.csv")
+        )
         analysis_data_generator = AnalysisDataGenerator()
-        analysis_data_generator._accounts_csv_reader = self._get_accounts_csv_reader_with_mocked_local_results()
+        analysis_data_generator._accounts_csv_reader._local_results = mock_local_results
         result = analysis_data_generator.get_df()
         expected_result = self._get_df_expected_result_from_csv()
         result = result.replace({np.nan: None})
         assert_frame_equal(expected_result, result)
 
-    def _get_accounts_csv_reader_with_mocked_local_results(self) -> AccountsCsvReader:
-        mock_local_results = Mock()
-        mock_local_results.get_file_path_all_accounts.return_value = (
-            Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-files-all-accounts.csv")
-        )
-        accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._local_results = mock_local_results
-        return accounts_csv_reader
-
+    # TODO continue here
     def _get_df_expected_result_from_csv(self) -> Df:
         expected_result_file_path = (
             Path(__file__).parent.absolute().joinpath("expected-results/if-queries-with-results/analysis.csv")
