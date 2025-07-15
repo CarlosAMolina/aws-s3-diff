@@ -64,10 +64,6 @@ class TestDfAnalysis(unittest.TestCase):
 
 # TODO continue here
 class TestAnalysisCsvExporter(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.current_path = Path(__file__).parent.absolute()
-
     def test_get_df_set_analysis_columns(self):
         # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
         file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
@@ -92,7 +88,9 @@ class TestAnalysisCsvExporter(unittest.TestCase):
         return accounts_csv_reader.get_df()
 
     def _get_df_from_csv_expected_result(self) -> Df:
-        expected_result_file_path = self.current_path.joinpath("expected-results/if-queries-with-results/analysis.csv")
+        expected_result_file_path = (
+            Path(__file__).parent.absolute().joinpath("expected-results/if-queries-with-results/analysis.csv")
+        )
         result = read_csv(expected_result_file_path).astype(
             {
                 "pro_size": "Int64",
