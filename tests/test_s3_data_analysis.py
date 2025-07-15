@@ -63,16 +63,16 @@ class TestDfAnalysis(unittest.TestCase):
 
 
 # TODO continue here
-class TestAnalysisCsvExporter(unittest.TestCase):
+class TestAnalysisDataGenerator(unittest.TestCase):
     def test_get_df_set_analysis_columns(self):
         # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
         df = self._get_df_from_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         analysis_data_generator = AnalysisDataGenerator()
         result = analysis_data_generator._get_df_set_analysis_columns(df)
-        # Required to convert to str because reading a csv column with bools and strings returns a str column.
         result_as_csv_export = analysis_data_generator._get_df_with_single_index(result)
         expected_result = self._get_df_from_csv_expected_result()
         expected_result = expected_result.replace({np.nan: None})
+        # Required to convert to str because reading a csv column with bools and strings returns a str column.
         expected_result = expected_result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
         expected_result = expected_result.replace({"None": None})
         result_as_csv_export = result_as_csv_export.replace({np.nan: None})
