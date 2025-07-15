@@ -66,8 +66,7 @@ class TestDfAnalysis(unittest.TestCase):
 class TestAnalysisCsvExporter(unittest.TestCase):
     def test_get_df_set_analysis_columns(self):
         # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
-        file_path_name = "fake-files/test-full-analysis/s3-files-all-accounts.csv"
-        df = self._get_df_from_accounts_s3_data_csv(file_path_name)
+        df = self._get_df_from_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         analysis_data_generator = AnalysisDataGenerator()
         result = analysis_data_generator._get_df_set_analysis_columns(df)
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
