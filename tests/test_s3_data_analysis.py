@@ -1,7 +1,6 @@
 import unittest
 from pathlib import Path
 from unittest.mock import Mock
-from unittest.mock import patch
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -65,22 +64,22 @@ class TestDfAnalysis(unittest.TestCase):
 
 # TODO continue here
 class TestAnalysisDataGenerator(unittest.TestCase):
-    @patch("aws_s3_diff.s3_data.analysis.AccountsCsvReader")
-    def test_get_df_returns_expected_result(self, mock_accounts_csv_reader):
-        mock_accounts_csv_reader.return_value.get_df.return_value = self._get_df_from_accounts_s3_data_csv()
-        result = AnalysisDataGenerator().get_df()
+    def test_get_df_returns_expected_result(self):
+        analysis_data_generator = AnalysisDataGenerator()
+        analysis_data_generator._accounts_csv_reader = self._get_accounts_csv_reader_with_mocked_local_results()
+        result = analysis_data_generator.get_df()
         expected_result = self._get_df_expected_result_from_csv()
         result = result.replace({np.nan: None})
         assert_frame_equal(expected_result, result)
 
-    def _get_df_from_accounts_s3_data_csv(self) -> Df:
+    def _get_accounts_csv_reader_with_mocked_local_results(self) -> AccountsCsvReader:
         mock_local_results = Mock()
         mock_local_results.get_file_path_all_accounts.return_value = (
             Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         )
         accounts_csv_reader = AccountsCsvReader()
         accounts_csv_reader._local_results = mock_local_results
-        return accounts_csv_reader.get_df()
+        return accounts_csv_reader
 
     def _get_df_expected_result_from_csv(self) -> Df:
         expected_result_file_path = (
