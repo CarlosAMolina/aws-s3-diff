@@ -74,11 +74,12 @@ class TestAnalysisDataGenerator(unittest.TestCase):
         assert_frame_equal(expected_result, result)
 
     def _get_df_from_accounts_s3_data_csv(self) -> Df:
-        accounts_csv_reader = AccountsCsvReader()
-        accounts_csv_reader._local_results = Mock()
-        accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
+        mock_local_results = Mock()
+        mock_local_results.get_file_path_all_accounts.return_value = (
             Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         )
+        accounts_csv_reader = AccountsCsvReader()
+        accounts_csv_reader._local_results = mock_local_results
         return accounts_csv_reader.get_df()
 
     def _get_df_expected_result_from_csv(self) -> Df:
