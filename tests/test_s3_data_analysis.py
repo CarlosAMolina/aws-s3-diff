@@ -75,7 +75,6 @@ class TestAnalysisDataGenerator(unittest.TestCase):
         result = result.replace({np.nan: None})
         assert_frame_equal(expected_result, result)
 
-    # TODO continue here
     def _get_df_expected_result_from_csv(self) -> Df:
         expected_result_file_path = (
             Path(__file__).parent.absolute().joinpath("expected-results/if-queries-with-results/analysis.csv")
