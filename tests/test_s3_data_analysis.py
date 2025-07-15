@@ -1,6 +1,7 @@
 import unittest
 from pathlib import Path
 from unittest.mock import Mock
+from unittest.mock import patch
 
 import numpy as np
 from pandas import DataFrame as Df
@@ -64,29 +65,23 @@ class TestDfAnalysis(unittest.TestCase):
 
 # TODO continue here
 class TestAnalysisDataGenerator(unittest.TestCase):
-    def test_get_df_set_analysis_columns(self):
-        # TODO try to call AnalysisDataGenerator._get_df_s3_data_analyzed(df)
-        df = self._get_df_from_accounts_s3_data_csv("fake-files/test-full-analysis/s3-files-all-accounts.csv")
-        analysis_data_generator = AnalysisDataGenerator()
-        result = analysis_data_generator._get_df_set_analysis_columns(df)
-        result_as_csv_export = analysis_data_generator._get_df_with_single_index(result)
-        expected_result = self._get_df_from_csv_expected_result()
-        expected_result = expected_result.replace({np.nan: None})
-        # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        expected_result = expected_result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
-        expected_result = expected_result.replace({"None": None})
-        result_as_csv_export = result_as_csv_export.replace({np.nan: None})
-        assert_frame_equal(expected_result, result_as_csv_export)
+    @patch("aws_s3_diff.s3_data.analysis.AccountsCsvReader")
+    def test_get_df_returns_expected_result(self, mock_accounts_csv_reader):
+        mock_accounts_csv_reader.return_value.get_df.return_value = self._get_df_from_accounts_s3_data_csv()
+        result = AnalysisDataGenerator().get_df()
+        expected_result = self._get_df_expected_result_from_csv()
+        result = result.replace({np.nan: None})
+        assert_frame_equal(expected_result, result)
 
-    def _get_df_from_accounts_s3_data_csv(self, file_path_name: str) -> Df:
+    def _get_df_from_accounts_s3_data_csv(self) -> Df:
         accounts_csv_reader = AccountsCsvReader()
         accounts_csv_reader._local_results = Mock()
-        accounts_csv_reader._local_results.get_file_path_all_accounts = lambda: (
-            Path(__file__).parent.absolute().joinpath(file_path_name)
+        accounts_csv_reader._local_results.get_file_path_all_accounts.return_value = (
+            Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis/s3-files-all-accounts.csv")
         )
         return accounts_csv_reader.get_df()
 
-    def _get_df_from_csv_expected_result(self) -> Df:
+    def _get_df_expected_result_from_csv(self) -> Df:
         expected_result_file_path = (
             Path(__file__).parent.absolute().joinpath("expected-results/if-queries-with-results/analysis.csv")
         )
@@ -100,4 +95,7 @@ class TestAnalysisDataGenerator(unittest.TestCase):
         # https://stackoverflow.com/questions/26763344/convert-pandas-column-to-datetime/26763793#26763793
         date_column_names = ["pro_date", "release_date", "dev_date"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
-        return result
+        result = result.replace({np.nan: None})
+        # Required to convert to str because reading a csv column with bools and strings returns a str column.
+        result = result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
+        return result.replace({"None": None})

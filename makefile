@@ -28,10 +28,10 @@ test:
 
 test-filter:
 	#poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithLocalS3Server.test_run_all_acounts_generates_expected_results_if_queries_with_results
-	poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithoutLocalS3Server.test_run_manages_aws_client_errors_and_generates_expected_error_messages
+	#poetry run python -m unittest discover -p test_aws_s3_diff.py -k TestMainWithoutLocalS3Server.test_run_manages_aws_client_errors_and_generates_expected_error_messages
 	#poetry run python -m unittest discover -p test_config_files.py -k TestAnalysisConfigChecker
 	#poetry run python -m unittest discover -p test_s3_client.py
 	#poetry run python -m unittest discover -p test_s3_data.py -k TestS3UriDfModifier
-	#poetry run python -m unittest discover -p test_s3_data_analysis.py -k TestDfAnalysis.test_get_df_set_analysis_result_for_several_df_analysis
+	poetry run python -m unittest discover -p test_s3_data_analysis.py -k TestAnalysisDataGenerator
 	#poetry run python -m unittest discover -p test_s3_data_one_account.py -k TestAccountDataGenerator.test_get_df_returns_expected_result_if_query_without_results
 
