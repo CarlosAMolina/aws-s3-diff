@@ -70,8 +70,8 @@ class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
         return [
             (df, s3_uris_map_df)
             for s3_uris_map_df in (
-                _S3UrisMapDfFactory().get_df_with_trailing_slash(),
-                _S3UrisMapDfFactory().get_df_without_trailing_slash(),
+                _S3UrisMapDfBuilder().with_trailing_slash().build(),
+                _S3UrisMapDfBuilder().without_trailing_slash().build(),
             )
         ]
 
@@ -111,7 +111,7 @@ class _AccountS3DataDfBuilder:
         return self
 
 
-class _S3UrisMapDfFactory:
+class _S3UrisMapDfBuilder:
     def __init__(self):
         self._df = Df(
             {
@@ -130,10 +130,13 @@ class _S3UrisMapDfFactory:
             }
         )
 
-    def get_df_without_trailing_slash(self) -> Df:
+    def build(self) -> Df:
         return self._df
 
-    def get_df_with_trailing_slash(self) -> Df:
+    def with_trailing_slash(self) -> "_S3UrisMapDfBuilder":
         for account in (_ACCOUNT_ORIGIN, _ACCOUNT_TARGET):
             self._df[account] = self._df[account] + "/"
-        return self._df
+        return self
+
+    def without_trailing_slash(self) -> "_S3UrisMapDfBuilder":
+        return self
