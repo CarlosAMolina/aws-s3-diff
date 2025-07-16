@@ -14,7 +14,6 @@ _ACCOUNT_ORIGIN = "pro"
 _ACCOUNT_TARGET = "dev"
 
 
-# TODO continue here
 class TestAccountDataGenerator(unittest.TestCase):
     @mock.patch("aws_s3_diff.s3_data.one_account.S3Client")
     @mock.patch("aws_s3_diff.s3_data.one_account.S3UrisFileReader")
@@ -40,6 +39,7 @@ class TestAccountDataGenerator(unittest.TestCase):
         assert_frame_equal(expected_result, result)
 
 
+# TODO continue here
 class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
     def test_get_df_replace_index_with_s3_uris_map_if_prefixes_end_and_not_end_with_slash(self):
         expected_result = _get_df_as_multi_index(
@@ -66,7 +66,7 @@ class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
-        df = _AccountS3DataDfCreator().get_df_with_trailing_slash_in_prefix()
+        df = _AccountS3DataDfBuilder().get_df_with_trailing_slash_in_prefix()
         return [
             (df, s3_uris_map_df)
             for s3_uris_map_df in (
@@ -83,7 +83,7 @@ def _get_df_as_multi_index(df: Df) -> Df:
     return result
 
 
-class _AccountS3DataDfCreator:
+class _AccountS3DataDfBuilder:
     def __init__(self):
         self._df = Df(
             [
@@ -103,7 +103,7 @@ class _AccountS3DataDfCreator:
         self._with_multi_index()
         return self._df
 
-    def _with_multi_index(self) -> "_AccountS3DataDfCreator":
+    def _with_multi_index(self) -> "_AccountS3DataDfBuilder":
         self._df = _get_df_as_multi_index(self._df)
         return self
 
