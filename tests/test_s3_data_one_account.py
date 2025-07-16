@@ -39,7 +39,6 @@ class TestAccountDataGenerator(unittest.TestCase):
         assert_frame_equal(expected_result, result)
 
 
-# TODO continue here
 class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
     def test_get_df_replace_index_with_s3_uris_map_if_prefixes_end_and_not_end_with_slash(self):
         expected_result = _get_df_as_multi_index(

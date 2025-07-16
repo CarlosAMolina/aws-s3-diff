@@ -6,6 +6,7 @@ from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.types_custom import S3Query
 
 
+# TODO continue here
 class TestS3Client(unittest.TestCase):
     @patch("aws_s3_diff.s3_data.s3_client.boto3")
     def test_get_s3_data_raises_folder_error(self, mock_boto3):
