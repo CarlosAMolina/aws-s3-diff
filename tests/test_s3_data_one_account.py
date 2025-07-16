@@ -66,7 +66,7 @@ class TestOriginS3UrisAsIndexAccountDfModifier(unittest.TestCase):
                 )
 
     def _get_all_combinations_for_df_and_map_df_with_and_without_trailing_slash(self) -> list[tuple[Df, Df]]:
-        df = _AccountS3DataDfBuilder().get_df_with_trailing_slash_in_prefix()
+        df = _AccountS3DataDfBuilder().with_trailing_slash_in_prefix().build()
         return [
             (df, s3_uris_map_df)
             for s3_uris_map_df in (
@@ -98,10 +98,13 @@ class _AccountS3DataDfBuilder:
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
         )
 
-    def get_df_with_trailing_slash_in_prefix(self) -> Df:
+    def build(self) -> Df:
+        return self._df
+
+    def with_trailing_slash_in_prefix(self) -> "_AccountS3DataDfBuilder":
         self._df["prefix"] = self._df["prefix"] + "/"
         self._with_multi_index()
-        return self._df
+        return self
 
     def _with_multi_index(self) -> "_AccountS3DataDfBuilder":
         self._df = _get_df_as_multi_index(self._df)
