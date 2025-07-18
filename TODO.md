@@ -1,5 +1,4 @@
-- Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
+- Analysis column is_hash_the_same_in_...: if hashes are None, the columns must be None instead of True
+- Docs. update example script output (`copied` has been modified as `is the same hash`)
 - Docs. README, add more info
-- Analysis column is_sync_ok_in_...:
-  - If hashes are None, the columns must be False instead of True
-  - analysis-config.json: rename is_the_file_copied_to to something like is_hash_the_same
+- Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
