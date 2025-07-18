@@ -1,4 +1,6 @@
 - Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
-- Test https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-without-results/analysis.csv: check if columns sync_ok_in_release and is_sync_ok_in_dev should have values or maybe should be empty
-- analysis-config.json: rename is_the_file_copied_to to something like is_the_same_file
 - Docs. README, add more info
+- Analysis column is_sync_ok_in_...:
+  - Change name to is_hash_the_same_in_...
+  - If hashes are None, the columns must be False instead of True
+  - analysis-config.json: rename is_the_file_copied_to to something like is_hash_the_same
