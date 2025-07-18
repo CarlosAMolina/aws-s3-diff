@@ -32,13 +32,13 @@ class AnalysisConfigChecker:
             raise AnalysisConfigError(self._get_error_message_account_does_not_exist(account_origin))
 
     def _assert_accounts_target_exist(self):
-        accounts_wrong_check_copy = self._get_accounts_not_exist(
+        accounts_wrong_check_hash_match = self._get_accounts_not_exist(
             self._analysis_config_reader.get_accounts_where_hash_must_match()
         )
         accounts_wrong_check_more_files = self._get_accounts_not_exist(
             self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
         )
-        accounts_wrong = accounts_wrong_check_copy | accounts_wrong_check_more_files
+        accounts_wrong = accounts_wrong_check_hash_match | accounts_wrong_check_more_files
         if len(accounts_wrong) == 1:
             raise AnalysisConfigError(self._get_error_message_account_does_not_exist(list(accounts_wrong)[0]))
         if len(accounts_wrong) > 1:
