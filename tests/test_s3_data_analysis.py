@@ -11,7 +11,7 @@ from pandas.testing import assert_frame_equal
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.analysis import _AccountsToCompare
 from aws_s3_diff.s3_data.analysis import _CanFileExistTwoAccountsAnalysisSetter
-from aws_s3_diff.s3_data.analysis import _IsFileCopiedTwoAccountsAnalysisSetter
+from aws_s3_diff.s3_data.analysis import _IsHashMatchedTwoAccountsAnalysisSetter
 from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 
 
@@ -30,7 +30,7 @@ class TestDfAnalysis(unittest.TestCase):
                     "file-not-in-target.csv": [False],
                     "file-not-in-origin-target.csv": [True],
                 },
-                _IsFileCopiedTwoAccountsAnalysisSetter,
+                _IsHashMatchedTwoAccountsAnalysisSetter,
                 "is_sync_ok_in_release",
             ],
             [

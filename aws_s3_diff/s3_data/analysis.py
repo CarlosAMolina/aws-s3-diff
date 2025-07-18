@@ -89,7 +89,7 @@ class _TwoAccountsAnalysisSetter(ABC):
         return self._df.loc[:, (self._accounts.target, "size")].notnull()
 
 
-class _IsFileCopiedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
+class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
         _logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
@@ -148,7 +148,7 @@ class _AnalysisBuilder:
 
     def with_analysis_is_hash_matched(self) -> "_AnalysisBuilder":
         account_targets = self._analysis_config_reader.get_accounts_where_hash_must_match()
-        self._set_analysis_columns_for_all_accounts(account_targets, _IsFileCopiedTwoAccountsAnalysisSetter)
+        self._set_analysis_columns_for_all_accounts(account_targets, _IsHashMatchedTwoAccountsAnalysisSetter)
         return self
 
     def with_analysis_can_the_file_exist(self) -> "_AnalysisBuilder":
