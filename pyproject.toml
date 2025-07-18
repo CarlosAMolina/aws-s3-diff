@@ -2,7 +2,7 @@
 package-mode = false
 name = "aws-s3-diff"
 version = "1.0.0"
-description = "Compare S3 files between different AWS accounts"
+description = "Compare S3 files between AWS accounts"
 authors = ["CarlosAMolina <15368012+CarlosAMolina@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
