@@ -42,7 +42,7 @@ class AnalysisDataGenerator(DataGenerator):
     def _get_df_set_analysis_columns(self, df: Df) -> Df:
         account_origin = self._analysis_config_reader.get_account_origin()
         result_builder = _AnalysisBuilder(account_origin, df)
-        if len(self._analysis_config_reader.get_accounts_where_files_must_be_copied()):
+        if len(self._analysis_config_reader.get_accounts_where_hash_must_match()):
             result_builder.with_analysis_is_file_copied()
         if len(self._analysis_config_reader.get_accounts_that_must_not_have_more_files()):
             result_builder.with_analysis_can_the_file_exist()
@@ -147,7 +147,7 @@ class _AnalysisBuilder:
         self._analysis_config_reader = AnalysisConfigReader()
 
     def with_analysis_is_file_copied(self) -> "_AnalysisBuilder":
-        account_targets = self._analysis_config_reader.get_accounts_where_files_must_be_copied()
+        account_targets = self._analysis_config_reader.get_accounts_where_hash_must_match()
         self._set_analysis_columns_for_all_accounts(account_targets, _IsFileCopiedTwoAccountsAnalysisSetter)
         return self
 

@@ -50,7 +50,7 @@ class TestAnalysisConfigChecker(unittest.TestCase):
                 accounts_target_uri_file=accounts_target_uri_file,
             ):
                 mock_analysis_config_reader.return_value.get_account_origin.return_value = "pro"
-                mock_analysis_config_reader.return_value.get_accounts_where_files_must_be_copied.return_value = (
+                mock_analysis_config_reader.return_value.get_accounts_where_hash_must_match.return_value = (
                     accounts_target_config_file
                 )
                 mock_s3_uris_file_reader.return_value.get_accounts.return_value = accounts_target_uri_file

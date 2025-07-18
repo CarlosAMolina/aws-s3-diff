@@ -33,7 +33,7 @@ class AnalysisConfigChecker:
 
     def _assert_accounts_target_exist(self):
         accounts_wrong_check_copy = self._get_accounts_not_exist(
-            self._analysis_config_reader.get_accounts_where_files_must_be_copied()
+            self._analysis_config_reader.get_accounts_where_hash_must_match()
         )
         accounts_wrong_check_more_files = self._get_accounts_not_exist(
             self._analysis_config_reader.get_accounts_that_must_not_have_more_files()
@@ -77,7 +77,7 @@ class AnalysisConfigReader:
     def get_accounts_that_must_not_have_more_files(self) -> list[str]:
         return self._get_analysis_config()["can_the_file_exist_in"]
 
-    def get_accounts_where_files_must_be_copied(self) -> list[str]:
+    def get_accounts_where_hash_must_match(self) -> list[str]:
         return self._get_analysis_config()["is_hash_the_same_in"]
 
     def _get_analysis_config(self) -> dict:
