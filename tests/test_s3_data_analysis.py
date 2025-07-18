@@ -31,7 +31,7 @@ class TestDfAnalysis(unittest.TestCase):
                     "file-not-in-origin-target.csv": [True],
                 },
                 _IsHashMatchedTwoAccountsAnalysisSetter,
-                "is_sync_ok_in_release",
+                "is_hash_the_same_in_release",
             ],
             [
                 {
@@ -91,5 +91,5 @@ class TestAnalysisDataGenerator(unittest.TestCase):
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         result = result.replace({np.nan: None})
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
-        result = result.astype({"is_sync_ok_in_release": "object", "is_sync_ok_in_dev": "object"})
+        result = result.astype({"is_hash_the_same_in_release": "object", "is_hash_the_same_in_dev": "object"})
         return result.replace({"None": None})

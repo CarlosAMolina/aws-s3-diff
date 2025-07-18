@@ -92,7 +92,7 @@ class _TwoAccountsAnalysisSetter(ABC):
 class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
         _logger.info(
-            f"Analyzing if files of the account '{self._accounts.origin}' have been copied to the account"
+            f"Analyzing if files of the account '{self._accounts.origin}' have the same hash as in account"
             f" '{self._accounts.target}'"
         )
         result = self._df.copy()
@@ -118,7 +118,7 @@ class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
     @property
     def _column_name_result(self) -> str:
-        return f"is_sync_ok_in_{self._accounts.target}"
+        return f"is_hash_the_same_in_{self._accounts.target}"
 
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
