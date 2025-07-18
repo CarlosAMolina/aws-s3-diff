@@ -1,6 +1,6 @@
 {
   "run_analysis": true,
   "origin": "pro",
-  "is_the_file_copied_to": ["release", "dev"],
-  "can_the_file_exist_in": ["release"]
+  "can_the_file_exist_in": ["release"],
+  "is_hash_the_same_in": ["release", "dev"]
 }

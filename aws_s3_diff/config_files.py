@@ -78,7 +78,7 @@ class AnalysisConfigReader:
         return self._get_analysis_config()["can_the_file_exist_in"]
 
     def get_accounts_where_files_must_be_copied(self) -> list[str]:
-        return self._get_analysis_config()["is_the_file_copied_to"]
+        return self._get_analysis_config()["is_hash_the_same_in"]
 
     def _get_analysis_config(self) -> dict:
         if self._analysis_config_cache is None:
