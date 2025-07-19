@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from botocore.exceptions import ClientError
 from botocore.exceptions import EndpointConnectionError
+from botocore.exceptions import NoCredentialsError
 from pandas import DataFrame as Df
 
 from aws_s3_diff.account import get_account_to_analyze
@@ -71,6 +72,9 @@ class Main:
                     self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                     return
                 raise Exception from exception
+            except NoCredentialsError:
+                self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                return
             csvs_generator.export_csv(df)
 
     def _get_error_message_no_such_bucket(self, exception: ClientError) -> str:
