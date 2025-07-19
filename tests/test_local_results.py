@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.local_result import LocalPaths
 
 
 class TestLocalPaths(unittest.TestCase):

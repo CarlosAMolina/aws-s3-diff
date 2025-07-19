@@ -15,8 +15,8 @@ from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.aws_s3_diff import S3UrisFileReader
-from aws_s3_diff.local_results import LocalPaths
-from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.local_result import LocalPaths
+from aws_s3_diff.local_result import LocalResults
 from tests.aws import S3Server
 
 
@@ -43,9 +43,9 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def _asssert_created_csv_files_have_expected_values(self, folder_name_expected_results: str):
         directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
-        local_results = LocalResults()
-        local_results._directory_analysis_path_cache = directory_analysis_path
-        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_results)
+        local_result = LocalResults()
+        local_result._directory_analysis_path_cache = directory_analysis_path
+        self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_result)
 
     def _copy_files_to_temporal_folder(self, tmp_directory_path_name: str):
         for folder_name in ["aws_s3_diff", "config", "s3-results"]:
@@ -81,8 +81,8 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
-    def _assert_analysis_file_has_expected_values(self, folder_name: str, local_results: LocalResults):
-        result = self._get_df_from_csv(local_results.get_file_path_analysis())
+    def _assert_analysis_file_has_expected_values(self, folder_name: str, local_result: LocalResults):
+        result = self._get_df_from_csv(local_result.get_file_path_analysis())
         expected_result = self._get_df_from_csv_expected_result(folder_name)
         date_column_names = ["date_in_pro", "date_in_release", "date_in_dev"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
@@ -119,11 +119,11 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         mock_get_df,
         mock_get_account_to_analyze,
         mock_have_all_accounts_been_analyzed,
-        mock_local_results,
+        mock_local_result,
     ):
-        mock_local_results.return_value.analysis_paths.directory_analysis.is_dir.return_value = True
-        mock_local_results.return_value.get_file_path_all_accounts.return_value.is_file.return_value = False
-        mock_local_results.return_value.directory_analysis.is_dir.return_value = True
+        mock_local_result.return_value.analysis_paths.directory_analysis.is_dir.return_value = True
+        mock_local_result.return_value.get_file_path_all_accounts.return_value.is_file.return_value = False
+        mock_local_result.return_value.directory_analysis.is_dir.return_value = True
         message_error_subfolder = (
             "Subfolders detected in bucket 'bucket-1'. The current version of the program cannot manage subfolders"
             ". Subfolders (1): folder/subfolder/"

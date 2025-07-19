@@ -9,7 +9,7 @@ from aws_s3_diff.exception import AnalysisConfigError
 from aws_s3_diff.exception import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exception import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exception import EmptyUriS3UrisFileError
-from aws_s3_diff.local_results import LocalPaths
+from aws_s3_diff.local_result import LocalPaths
 from aws_s3_diff.s3_uri import S3UriPart
 from aws_s3_diff.type_custom import S3Query
 

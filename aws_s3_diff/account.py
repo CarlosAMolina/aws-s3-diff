@@ -1,6 +1,6 @@
 from aws_s3_diff.config_file import S3UrisFileReader
-from aws_s3_diff.local_results import get_account_file_name
-from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.local_result import get_account_file_name
+from aws_s3_diff.local_result import LocalResults
 
 
 def get_account_to_analyze() -> str:

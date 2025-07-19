@@ -6,7 +6,7 @@ from pandas import MultiIndex
 from pandas import read_csv
 
 from aws_s3_diff.config_file import S3UrisFileReader
-from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.local_result import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.df_utility import get_column_name_from_column_multi_index
 from aws_s3_diff.s3_data.interface import CsvExporter
@@ -20,11 +20,11 @@ from aws_s3_diff.s3_uri import get_df_uri_parts
 
 class AccountsCsvExporter(CsvExporter):
     def __init__(self):
-        self._local_results = LocalResults()
+        self._local_result = LocalResults()
         self._logger = get_logger()
 
     def export_df(self, df: Df):
-        file_path = self._local_results.get_file_path_all_accounts()
+        file_path = self._local_result.get_file_path_all_accounts()
         self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
@@ -32,7 +32,7 @@ class AccountsCsvExporter(CsvExporter):
 class AccountsCsvReader(CsvReader):
     def __init__(self):
         self._accounts_cache = None
-        self._local_results = LocalResults()
+        self._local_result = LocalResults()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
@@ -42,7 +42,7 @@ class AccountsCsvReader(CsvReader):
 
     def _get_df_from_csv(self) -> Df:
         return read_csv(
-            self._local_results.get_file_path_all_accounts(),
+            self._local_result.get_file_path_all_accounts(),
             index_col=[
                 f"bucket_in_{self._accounts[0]}",
                 f"prefix_in_{self._accounts[0]}",

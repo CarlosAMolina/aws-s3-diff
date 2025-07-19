@@ -7,7 +7,7 @@ from pandas import DataFrame as Df
 from pandas import Series
 
 from aws_s3_diff.config_file import AnalysisConfigReader
-from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.local_result import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.df_utility import get_column_name_from_column_multi_index
@@ -17,11 +17,11 @@ from aws_s3_diff.s3_data.interface import DataGenerator
 
 class AnalysisCsvExporter(CsvExporter):
     def __init__(self):
-        self._local_results = LocalResults()
+        self._local_result = LocalResults()
         self._logger = get_logger()
 
     def export_df(self, df: Df):
-        file_path = self._local_results.get_file_path_analysis()
+        file_path = self._local_result.get_file_path_analysis()
         self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 

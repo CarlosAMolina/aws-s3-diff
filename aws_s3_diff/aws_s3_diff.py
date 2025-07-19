@@ -14,8 +14,8 @@ from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.exception import AnalysisConfigError
 from aws_s3_diff.exception import FolderInS3UriError
 from aws_s3_diff.exception import S3UrisFileError
-from aws_s3_diff.local_results import AnalysisDateTimeExporter
-from aws_s3_diff.local_results import LocalResults
+from aws_s3_diff.local_result import AnalysisDateTimeExporter
+from aws_s3_diff.local_result import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
 from aws_s3_diff.s3_data.all_accounts import AccountsDataGenerator
@@ -28,7 +28,7 @@ from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 class Main:
     def __init__(self):
         self._analysis_date_time_exporter = AnalysisDateTimeExporter()
-        self._local_results = LocalResults()
+        self._local_result = LocalResults()
         self._logger = get_logger()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -42,10 +42,10 @@ class Main:
             self._logger.error(exception)
             return
         self._show_accounts_to_analyze()
-        if not self._local_results.exist_analysis_date_time_file():
+        if not self._local_result.exist_analysis_date_time_file():
             self._analysis_date_time_exporter.export_analysis_date_time_str()
-        if not self._local_results.exist_directory_analysis():
-            self._local_results.create_directory_analysis()
+        if not self._local_result.exist_directory_analysis():
+            self._local_result.create_directory_analysis()
         self._export_csvs()
 
     def _show_accounts_to_analyze(self):
@@ -168,7 +168,7 @@ class _AnalysisState(_State):
         self._analysis_config_checker = AnalysisConfigChecker()
         self._analysis_csv_creator = AnalysisCsvExporter()
         self._analysis_data_generator = AnalysisDataGenerator()
-        self._local_results = LocalResults()
+        self._local_result = LocalResults()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
@@ -182,5 +182,5 @@ class _AnalysisState(_State):
         if df.empty:
             return
         self._analysis_csv_creator.export_df(df)
-        self._local_results.drop_file_with_analysis_date()
+        self._local_result.drop_file_with_analysis_date()
         self._csvs_generator.set_must_not_run_next_state()
