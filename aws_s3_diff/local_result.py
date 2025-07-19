@@ -28,7 +28,7 @@ class LocalPath:
         return self.all_results_directory.joinpath("analysis_date_time.txt")
 
 
-class LocalResults:
+class LocalResult:
     def __init__(self):
         self._directory_analysis_path_cache = None
         self._local_paths = LocalPath()

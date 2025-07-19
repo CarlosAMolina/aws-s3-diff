@@ -1,10 +1,10 @@
 from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.local_result import get_account_file_name
-from aws_s3_diff.local_result import LocalResults
+from aws_s3_diff.local_result import LocalResult
 
 
 def get_account_to_analyze() -> str:
-    result_file_names = LocalResults().get_file_names_results()
+    result_file_names = LocalResult().get_file_names_results()
     for account_to_analyze in S3UrisFileReader().get_accounts():
         if get_account_file_name(account_to_analyze) not in result_file_names:
             return account_to_analyze
@@ -13,7 +13,7 @@ def get_account_to_analyze() -> str:
 
 
 def have_all_accounts_been_analyzed() -> bool:
-    result_file_names = LocalResults().get_file_names_results()
+    result_file_names = LocalResult().get_file_names_results()
     for account_to_analyze in S3UrisFileReader().get_accounts():
         if get_account_file_name(account_to_analyze) not in result_file_names:
             return False

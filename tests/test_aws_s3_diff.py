@@ -16,7 +16,7 @@ from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.aws_s3_diff import S3UrisFileReader
 from aws_s3_diff.local_result import LocalPath
-from aws_s3_diff.local_result import LocalResults
+from aws_s3_diff.local_result import LocalResult
 from tests.aws import S3Server
 
 
@@ -43,7 +43,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def _asssert_created_csv_files_have_expected_values(self, folder_name_expected_results: str):
         directory_analysis_path = LocalPath().all_results_directory.joinpath(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
-        local_result = LocalResults()
+        local_result = LocalResult()
         local_result._directory_analysis_path_cache = directory_analysis_path
         self._assert_analysis_file_has_expected_values(folder_name_expected_results, local_result)
 
@@ -81,7 +81,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
             expected_result_df["date"] = result_df["date"]
             assert_frame_equal(expected_result_df, result_df)
 
-    def _assert_analysis_file_has_expected_values(self, folder_name: str, local_result: LocalResults):
+    def _assert_analysis_file_has_expected_values(self, folder_name: str, local_result: LocalResult):
         result = self._get_df_from_csv(local_result.get_file_path_analysis())
         expected_result = self._get_df_from_csv_expected_result(folder_name)
         date_column_names = ["date_in_pro", "date_in_release", "date_in_dev"]
@@ -110,7 +110,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             Main().run()
         self.assertEqual("foo", cm.records[0].message)
 
-    @patch("aws_s3_diff.aws_s3_diff.LocalResults")
+    @patch("aws_s3_diff.aws_s3_diff.LocalResult")
     @patch("aws_s3_diff.aws_s3_diff.have_all_accounts_been_analyzed", return_value=False)
     @patch("aws_s3_diff.aws_s3_diff.get_account_to_analyze", return_value="foo")
     @patch("aws_s3_diff.aws_s3_diff.AccountDataGenerator.get_df")

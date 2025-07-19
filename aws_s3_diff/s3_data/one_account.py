@@ -6,7 +6,7 @@ from pandas import MultiIndex
 
 from aws_s3_diff.account import get_account_to_analyze
 from aws_s3_diff.config_file import S3UrisFileReader
-from aws_s3_diff.local_result import LocalResults
+from aws_s3_diff.local_result import LocalResult
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
@@ -22,7 +22,7 @@ from aws_s3_diff.type_custom import S3Query
 
 class AccountCsvExporter(CsvExporter):
     def __init__(self):
-        self._local_result = LocalResults()
+        self._local_result = LocalResult()
         self._logger = get_logger()
 
     def export_df(self, df: Df):
@@ -70,7 +70,7 @@ class AccountDataGenerator(DataGenerator):
 class AccountCsvReader(CsvReader):
     def __init__(self, account: str):
         self._account = account
-        self._local_result = LocalResults()
+        self._local_result = LocalResult()
 
     def get_df(self) -> Df:
         account_df = pd.read_csv(

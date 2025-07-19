@@ -15,7 +15,7 @@ from aws_s3_diff.exception import AnalysisConfigError
 from aws_s3_diff.exception import FolderInS3UriError
 from aws_s3_diff.exception import S3UrisFileError
 from aws_s3_diff.local_result import AnalysisDateTimeExporter
-from aws_s3_diff.local_result import LocalResults
+from aws_s3_diff.local_result import LocalResult
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvExporter
 from aws_s3_diff.s3_data.all_accounts import AccountsDataGenerator
@@ -28,7 +28,7 @@ from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 class Main:
     def __init__(self):
         self._analysis_date_time_exporter = AnalysisDateTimeExporter()
-        self._local_result = LocalResults()
+        self._local_result = LocalResult()
         self._logger = get_logger()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
@@ -84,7 +84,7 @@ class _CsvsGenerator:
         self._analysis_state = _AnalysisState(self)
         self._combine_state = _CombineState(self)
         self._must_run_next_state = True
-        if LocalResults().get_file_path_all_accounts().is_file():
+        if LocalResult().get_file_path_all_accounts().is_file():
             self.set_state_analysis()
         elif have_all_accounts_been_analyzed():
             self.set_state_combine()
@@ -168,7 +168,7 @@ class _AnalysisState(_State):
         self._analysis_config_checker = AnalysisConfigChecker()
         self._analysis_csv_creator = AnalysisCsvExporter()
         self._analysis_data_generator = AnalysisDataGenerator()
-        self._local_result = LocalResults()
+        self._local_result = LocalResult()
         self._logger = get_logger()
 
     def get_df(self) -> Df:
