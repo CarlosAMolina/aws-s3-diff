@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from botocore.exceptions import ClientError
+from botocore.exceptions import NoCredentialsError
 from pandas import DataFrame as Df
 from pandas import read_csv
 from pandas.testing import assert_frame_equal
@@ -147,6 +148,10 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
             (
                 message_error_subfolder,
                 FolderInS3UriError(message_error_subfolder),
+            ),
+            (
+                "Incorrect AWS credentials. Authenticate and run the program again",
+                NoCredentialsError,
             ),
             (
                 'Could not connect to the endpoint URL: "foo"',
