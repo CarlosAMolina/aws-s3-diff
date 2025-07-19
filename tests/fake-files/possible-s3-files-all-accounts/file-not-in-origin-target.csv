@@ -1,2 +1,2 @@
-bucket_in_pro,prefix_in_s3_pro,file_name_all_accounts,pro_date,pro_size,pro_hash,release_date,release_size,release_hash
+bucket_in_pro,prefix_in_pro,file_name_all_accounts,pro_date,pro_size,pro_hash,release_date,release_size,release_hash
 bucket_1,folder_a/folder_b,file_1.csv,,,,,,

@@ -44,7 +44,7 @@ class AccountsCsvReader(CsvReader):
             self._local_results.get_file_path_all_accounts(),
             index_col=[
                 f"bucket_in_{self._accounts[0]}",
-                f"prefix_in_s3_{self._accounts[0]}",
+                f"prefix_in_{self._accounts[0]}",
                 "file_name_all_accounts",
             ],
             parse_dates=[f"{account}_date" for account in self._accounts],
@@ -79,7 +79,7 @@ class AccountsDataGenerator(DataGenerator):
         return result.reset_index(
             names=[
                 f"bucket_in_{self._account_origin}",
-                f"prefix_in_s3_{self._account_origin}",
+                f"prefix_in_{self._account_origin}",
                 "file_name_all_accounts",
             ]
         )
