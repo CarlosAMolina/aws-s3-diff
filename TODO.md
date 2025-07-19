@@ -1,4 +1,3 @@
-- Analysis column is_hash_the_same_in_...: if hashes are None, the columns must be None instead of True
 - Docs. update example script output (`copied` has been modified as `is the same hash`)
 - Docs. README, add more info
 - Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
