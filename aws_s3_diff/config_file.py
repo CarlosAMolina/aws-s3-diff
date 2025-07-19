@@ -9,7 +9,7 @@ from aws_s3_diff.exception import AnalysisConfigError
 from aws_s3_diff.exception import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exception import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exception import EmptyUriS3UrisFileError
-from aws_s3_diff.local_result import LocalPaths
+from aws_s3_diff.local_result import LocalPath
 from aws_s3_diff.s3_uri import S3UriPart
 from aws_s3_diff.type_custom import S3Query
 
@@ -66,7 +66,7 @@ class AnalysisConfigChecker:
 class AnalysisConfigReader:
     def __init__(self):
         self._analysis_config_cache = None
-        self._config_directory_path = LocalPaths().config_directory
+        self._config_directory_path = LocalPath().config_directory
 
     def must_run_analysis(self) -> bool:
         return self._get_analysis_config()["run_analysis"] is True
@@ -114,7 +114,7 @@ class S3UrisFileChecker:
 
 class S3UrisFileReader:
     def __init__(self):
-        self._config_directory_path = LocalPaths().config_directory
+        self._config_directory_path = LocalPath().config_directory
         self._df_file_what_to_analyze_cache = None
 
     def get_accounts(self) -> list[str]:

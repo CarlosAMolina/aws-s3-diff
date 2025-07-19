@@ -61,7 +61,7 @@ class TestAnalysisConfigChecker(unittest.TestCase):
 
 class TestS3UrisFileReader(unittest.TestCase):
     @patch(
-        "aws_s3_diff.config_file.LocalPaths.config_directory",
+        "aws_s3_diff.config_file.LocalPath.config_directory",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
@@ -92,7 +92,7 @@ class TestS3UrisFileReader(unittest.TestCase):
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
-    @patch("aws_s3_diff.config_file.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
+    @patch("aws_s3_diff.config_file.LocalPath.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_expected_exception_for_all_cases(self, mock_config_directory):
         for expected_error_message, expected_exception, s3_uri_file_name in [
             [

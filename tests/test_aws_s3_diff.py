@@ -15,7 +15,7 @@ from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.aws_s3_diff import S3UrisFileReader
-from aws_s3_diff.local_result import LocalPaths
+from aws_s3_diff.local_result import LocalPath
 from aws_s3_diff.local_result import LocalResults
 from tests.aws import S3Server
 
@@ -23,14 +23,14 @@ from tests.aws import S3Server
 class TestMainWithLocalS3Server(unittest.TestCase):
     def setUp(self):
         os.environ["AWS_MAX_KEYS"] = "2"  # To check that multiple request loops work ok.
-        self._original_current_path = LocalPaths._current_path
+        self._original_current_path = LocalPath._current_path
         tmp_directory_path_name = self.enterContext(tempfile.TemporaryDirectory())
-        LocalPaths._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
+        LocalPath._current_path = Path(tmp_directory_path_name).joinpath("aws_s3_diff")
         self._copy_files_to_temporal_folder(tmp_directory_path_name)
 
     def tearDown(self):
         os.environ.pop("AWS_MAX_KEYS")
-        LocalPaths._current_path = self._original_current_path
+        LocalPath._current_path = self._original_current_path
 
     def test_run_all_acounts_generates_expected_results_if_queries_with_results(self):
         with S3Server() as local_s3_server:
@@ -41,7 +41,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
         self._asssert_created_csv_files_have_expected_values(folder_name_expected_results)
 
     def _asssert_created_csv_files_have_expected_values(self, folder_name_expected_results: str):
-        directory_analysis_path = LocalPaths().all_results_directory.joinpath(self._get_analysis_date_time_str())
+        directory_analysis_path = LocalPath().all_results_directory.joinpath(self._get_analysis_date_time_str())
         self._assert_extracted_accounts_data_have_expected_values(directory_analysis_path, folder_name_expected_results)
         local_result = LocalResults()
         local_result._directory_analysis_path_cache = directory_analysis_path
@@ -64,7 +64,7 @@ class TestMainWithLocalS3Server(unittest.TestCase):
 
     def _get_analysis_date_time_str(self) -> str:
         analysis_directory_names = [
-            directory_path.name for directory_path in LocalPaths().all_results_directory.glob("20*")
+            directory_path.name for directory_path in LocalPath().all_results_directory.glob("20*")
         ]
         analysis_directory_names.sort()
         return analysis_directory_names[-1]

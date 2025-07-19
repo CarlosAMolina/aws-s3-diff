@@ -12,7 +12,7 @@ def get_account_file_name(account: str) -> str:
     return f"{account}{_EXTENSION_FILE_NAME}"
 
 
-class LocalPaths:
+class LocalPath:
     _current_path = Path(__file__).parent.absolute()
 
     @property
@@ -31,7 +31,7 @@ class LocalPaths:
 class LocalResults:
     def __init__(self):
         self._directory_analysis_path_cache = None
-        self._local_paths = LocalPaths()
+        self._local_paths = LocalPath()
         self._logger = get_logger()
 
     def create_directory_analysis(self):
@@ -81,7 +81,7 @@ class LocalResults:
 
 class AnalysisDateTimeExporter:
     def __init__(self):
-        self._analysis_date_time_file_path = LocalPaths().analysis_date_time_file
+        self._analysis_date_time_file_path = LocalPath().analysis_date_time_file
 
     def export_analysis_date_time_str(self):
         with open(self._analysis_date_time_file_path, "w") as file:
