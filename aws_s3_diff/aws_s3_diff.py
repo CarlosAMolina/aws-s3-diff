@@ -62,6 +62,9 @@ class Main:
             except (AnalysisConfigError, EndpointConnectionError, FolderInS3UriError) as exception:
                 self._logger.error(exception)
                 return
+            except NoCredentialsError:
+                self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                return
             # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
             except ClientError as exception:
                 error_code = exception.response["Error"]["Code"]
@@ -72,9 +75,6 @@ class Main:
                     self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                     return
                 raise Exception from exception
-            except NoCredentialsError:
-                self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
-                return
             csvs_generator.export_csv(df)
 
     def _get_error_message_no_such_bucket(self, exception: ClientError) -> str:
