@@ -1,3 +1,6 @@
+MESSAGE_INCORRECT_CREDENTIALS = "Incorrect AWS credentials. Authenticate and run the program again"
+
+
 class FolderInS3UriError(IsADirectoryError):
     pass
 

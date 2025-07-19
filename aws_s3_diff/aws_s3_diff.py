@@ -14,6 +14,7 @@ from aws_s3_diff.config_file import S3UrisFileChecker
 from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.exception import AnalysisConfigError
 from aws_s3_diff.exception import FolderInS3UriError
+from aws_s3_diff.exception import MESSAGE_INCORRECT_CREDENTIALS
 from aws_s3_diff.exception import S3UrisFileError
 from aws_s3_diff.local_result import AnalysisDateTimeExporter
 from aws_s3_diff.local_result import LocalResult
@@ -63,7 +64,7 @@ class Main:
                 self._logger.error(exception)
                 return
             except NoCredentialsError:
-                self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                self._logger.error(MESSAGE_INCORRECT_CREDENTIALS)
                 return
             # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
             except ClientError as exception:
@@ -72,7 +73,7 @@ class Main:
                     self._logger.error(self._get_error_message_no_such_bucket(exception))
                     return
                 if error_code in ("AccessDenied", "InvalidAccessKeyId"):
-                    self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                    self._logger.error(MESSAGE_INCORRECT_CREDENTIALS)
                     return
                 raise Exception from exception
             csvs_generator.export_csv(df)
