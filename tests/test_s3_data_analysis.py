@@ -28,7 +28,7 @@ class TestDfAnalysis(unittest.TestCase):
                     "file-sync-wrong.csv": [False],
                     "file-not-in-origin.csv": [False],
                     "file-not-in-target.csv": [False],
-                    "file-not-in-origin-target.csv": [True],
+                    "file-not-in-origin-target.csv": [None],
                 },
                 _IsHashMatchedTwoAccountsAnalysisSetter,
                 "is_hash_the_same_in_release",

@@ -113,7 +113,7 @@ class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
         result.loc[
             ~self._has_the_origin_account_a_file & ~self._has_the_target_account_a_file,
             [("analysis", self._column_name_result)],
-        ] = True
+        ] = None
         return result
 
     @property
