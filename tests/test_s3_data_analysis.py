@@ -24,8 +24,8 @@ class TestDfAnalysis(unittest.TestCase):
         for file_name_and_expected_result, analysis_class_to_check, column_name_to_check in [
             [
                 {
-                    "file-sync-ok.csv": [True],
-                    "file-sync-wrong.csv": [False],
+                    "file-hash-match.csv": [True],
+                    "file-hash-not-match.csv": [False],
                     "file-not-in-origin.csv": [False],
                     "file-not-in-target.csv": [False],
                     "file-not-in-origin-target.csv": [None],
@@ -35,7 +35,7 @@ class TestDfAnalysis(unittest.TestCase):
             ],
             [
                 {
-                    "file-sync-ok.csv": [None],
+                    "file-hash-match.csv": [None],
                     "file-not-in-origin.csv": [False],
                     "file-not-in-target.csv": [None],
                     "file-not-in-origin-target.csv": [None],
