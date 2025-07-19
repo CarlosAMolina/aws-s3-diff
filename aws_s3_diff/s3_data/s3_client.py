@@ -60,7 +60,11 @@ class _ResponseAnalyzer:
         raise FolderInS3UriError(error_text)
 
     def get_s3_data_from_response(self, response: dict) -> S3Data:
-        return [self._get_file_s3_data_from_s3_response_content(content) for content in response["Contents"]]
+        return [
+            self._get_file_s3_data_from_s3_response_content(content)
+            for content in response["Contents"]
+            if self._is_file(content)
+        ]
 
     def _get_folder_path_names_in_response(self, response: dict) -> list[str]:
         # Detect folders: https://stackoverflow.com/a/71579041
@@ -76,3 +80,8 @@ class _ResponseAnalyzer:
             s3_response_content["Size"],
             s3_response_content["ETag"].strip('"'),
         )
+
+    @staticmethod
+    def _is_file(content: dict) -> bool:
+        """Sometimes Boto3 retuns the folder in the response"""
+        return not (content["Key"].endswith("/") and content["Size"] == 0)
