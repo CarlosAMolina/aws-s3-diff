@@ -1,3 +1,5 @@
+- Rename plural file names to singular
+- Rename plural class names to singular
 - Docs. update example script output (`copied` has been modified as `is the same hash`)
 - Docs. README, add more info
 - Docs, update url with results (add folder if-queries-with-results): https://github.com/CarlosAMolina/aws-s3-diff/blob/feat/design-patterns/tests/expected-results/if-queries-with-results/analysis.csv
