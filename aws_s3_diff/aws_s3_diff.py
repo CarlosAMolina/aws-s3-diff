@@ -5,8 +5,8 @@ from botocore.exceptions import ClientError
 from botocore.exceptions import EndpointConnectionError
 from pandas import DataFrame as Df
 
-from aws_s3_diff.accounts import get_account_to_analyze
-from aws_s3_diff.accounts import have_all_accounts_been_analyzed
+from aws_s3_diff.account import get_account_to_analyze
+from aws_s3_diff.account import have_all_accounts_been_analyzed
 from aws_s3_diff.config_file import AnalysisConfigChecker
 from aws_s3_diff.config_file import AnalysisConfigReader
 from aws_s3_diff.config_file import S3UrisFileChecker

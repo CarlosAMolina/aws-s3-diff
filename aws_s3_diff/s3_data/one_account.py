@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import DataFrame as Df
 from pandas import MultiIndex
 
-from aws_s3_diff.accounts import get_account_to_analyze
+from aws_s3_diff.account import get_account_to_analyze
 from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
