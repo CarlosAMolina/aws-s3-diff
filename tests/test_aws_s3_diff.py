@@ -16,6 +16,7 @@ from aws_s3_diff.aws_s3_diff import EndpointConnectionError
 from aws_s3_diff.aws_s3_diff import FolderInS3UriError
 from aws_s3_diff.aws_s3_diff import Main
 from aws_s3_diff.aws_s3_diff import S3UrisFileReader
+from aws_s3_diff.exception import MESSAGE_INCORRECT_CREDENTIALS
 from aws_s3_diff.local_result import LocalPath
 from aws_s3_diff.local_result import LocalResult
 from tests.aws import S3Server
@@ -131,11 +132,11 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
         )
         for expected_error_message, aws_error in (
             (
-                "Incorrect AWS credentials. Authenticate and run the program again",
+                MESSAGE_INCORRECT_CREDENTIALS,
                 _ListObjectsV2ClientErrorBuilder().with_error_code("InvalidAccessKeyId").build(),
             ),
             (
-                "Incorrect AWS credentials. Authenticate and run the program again",
+                MESSAGE_INCORRECT_CREDENTIALS,
                 _ListObjectsV2ClientErrorBuilder().with_error_code("AccessDenied").build(),
             ),
             (
@@ -150,7 +151,7 @@ class TestMainWithoutLocalS3Server(unittest.TestCase):
                 FolderInS3UriError(message_error_subfolder),
             ),
             (
-                "Incorrect AWS credentials. Authenticate and run the program again",
+                MESSAGE_INCORRECT_CREDENTIALS,
                 NoCredentialsError,
             ),
             (
