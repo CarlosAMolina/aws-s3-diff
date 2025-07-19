@@ -8,6 +8,7 @@ from pandas import read_csv
 from aws_s3_diff.config_files import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
+from aws_s3_diff.s3_data.df_util import get_column_name_from_column_multi_index
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
@@ -47,15 +48,15 @@ class AccountsCsvReader(CsvReader):
                 f"prefix_in_{self._accounts[0]}",
                 "file_name_in_all_accounts",
             ],
-            parse_dates=[f"{account}_date" for account in self._accounts],
-        ).astype({f"{account}_size": "Int64" for account in self._accounts})
+            parse_dates=[f"date_in_{account}" for account in self._accounts],
+        ).astype({f"size_in_{account}": "Int64" for account in self._accounts})
 
     def _get_multi_index_tuples_for_df_columns(self, columns: Index) -> list[tuple[str, str]]:
         return [self._get_multi_index_from_column_name(column_name) for column_name in columns]
 
     def _get_multi_index_from_column_name(self, column_name: str) -> tuple[str, str]:
         for account in self._accounts:
-            regex_result = re.match(rf"{account}_(?P<key>.*)", column_name)
+            regex_result = re.match(rf"(?P<key>.*)_in_{account}", column_name)
             if regex_result is not None:
                 return account, regex_result.group("key")
         raise ValueError(f"Not managed column name: {column_name}")
@@ -114,7 +115,7 @@ class AccountsDataGenerator(DataGenerator):
         return result.set_index(["bucket", "prefix"])
 
     def _get_df_set_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
+        df.columns = df.columns.map(get_column_name_from_column_multi_index)
 
     @property
     def _account_origin(self) -> str:

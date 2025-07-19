@@ -10,6 +10,7 @@ from aws_s3_diff.config_files import AnalysisConfigReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
+from aws_s3_diff.s3_data.df_util import get_column_name_from_column_multi_index
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
 
@@ -54,7 +55,7 @@ class AnalysisDataGenerator(DataGenerator):
         return result.reset_index()
 
     def _set_df_columns_as_single_index(self, df: Df):
-        df.columns = df.columns.map("_".join)
+        df.columns = df.columns.map(get_column_name_from_column_multi_index)
 
 
 _AccountsToCompare = namedtuple("_AccountsToCompare", "origin target")

@@ -84,15 +84,15 @@ class TestMainWithLocalS3Server(unittest.TestCase):
     def _assert_analysis_file_has_expected_values(self, folder_name: str, local_results: LocalResults):
         result = self._get_df_from_csv(local_results.get_file_path_analysis())
         expected_result = self._get_df_from_csv_expected_result(folder_name)
-        date_column_names = ["pro_date", "release_date", "dev_date"]
+        date_column_names = ["date_in_pro", "date_in_release", "date_in_dev"]
         assert_frame_equal(expected_result.drop(columns=date_column_names), result.drop(columns=date_column_names))
 
     def _get_df_from_csv(self, path: Path) -> Df:
         return read_csv(path).astype(
             {
-                "pro_size": "Int64",
-                "release_size": "Int64",
-                "dev_size": "Int64",
+                "size_in_pro": "Int64",
+                "size_in_release": "Int64",
+                "size_in_dev": "Int64",
             }
         )
 

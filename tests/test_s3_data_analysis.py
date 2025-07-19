@@ -81,13 +81,13 @@ class TestAnalysisDataGenerator(unittest.TestCase):
         )
         result = read_csv(expected_result_file_path).astype(
             {
-                "pro_size": "Int64",
-                "release_size": "Int64",
-                "dev_size": "Int64",
+                "size_in_pro": "Int64",
+                "size_in_release": "Int64",
+                "size_in_dev": "Int64",
             }
         )
         # https://stackoverflow.com/questions/26763344/convert-pandas-column-to-datetime/26763793#26763793
-        date_column_names = ["pro_date", "release_date", "dev_date"]
+        date_column_names = ["date_in_pro", "date_in_release", "date_in_dev"]
         result[date_column_names] = result[date_column_names].apply(to_datetime)
         result = result.replace({np.nan: None})
         # Required to convert to str because reading a csv column with bools and strings returns a str column.
