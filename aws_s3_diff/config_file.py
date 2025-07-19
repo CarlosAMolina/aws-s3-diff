@@ -140,4 +140,11 @@ class S3UrisFileReader:
         if self._df_file_what_to_analyze_cache is None:
             file_path_what_to_analyze = self._config_directory_path.joinpath("s3-uris-to-analyze.csv")
             self._df_file_what_to_analyze_cache = read_csv(file_path_what_to_analyze)
+            self._df_file_what_to_analyze_cache = self._get_df_strip_strings(self._df_file_what_to_analyze_cache)
         return self._df_file_what_to_analyze_cache
+
+    def _get_df_strip_strings(self, df: Df) -> Df:
+        result = df
+        result = result.fillna("")  # Avoid errors stripping null data.
+        result = result.apply(lambda column: column.fillna("").astype(str).str.strip())
+        return result.replace("", None)
