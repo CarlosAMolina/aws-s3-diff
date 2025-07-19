@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from unittest.mock import patch
 from unittest.mock import PropertyMock
 
-from aws_s3_diff import config_files as m_config_files
+from aws_s3_diff import config_file as m_config_file
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exceptions import EmptyAccountNameS3UrisFileError
@@ -13,22 +13,22 @@ from aws_s3_diff.types_custom import S3Query
 
 
 class TestAnalysisConfigChecker(unittest.TestCase):
-    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @patch("aws_s3_diff.config_files.S3UrisFileReader")
+    @patch("aws_s3_diff.config_file.AnalysisConfigReader")
+    @patch("aws_s3_diff.config_file.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_if_origin_account_does_not_exist(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
         mock_analysis_config_reader.return_value.get_account_origin.return_value = "pr"
         mock_s3_uris_file_reader.return_value.get_accounts.return_value = ["pro", "release"]
         with self.assertRaises(AnalysisConfigError) as exception:
-            m_config_files.AnalysisConfigChecker().assert_file_is_correct()
+            m_config_file.AnalysisConfigChecker().assert_file_is_correct()
         self.assertEqual(
             "The AWS account 'pr' is defined in analysis-config.json but not in s3-uris-to-analyze.csv",
             str(exception.exception),
         )
 
-    @patch("aws_s3_diff.config_files.AnalysisConfigReader")
-    @patch("aws_s3_diff.config_files.S3UrisFileReader")
+    @patch("aws_s3_diff.config_file.AnalysisConfigReader")
+    @patch("aws_s3_diff.config_file.S3UrisFileReader")
     def test_assert_file_is_correct_raises_expected_exception_messages(
         self, mock_s3_uris_file_reader, mock_analysis_config_reader
     ):
@@ -55,13 +55,13 @@ class TestAnalysisConfigChecker(unittest.TestCase):
                 )
                 mock_s3_uris_file_reader.return_value.get_accounts.return_value = accounts_target_uri_file
                 with self.assertRaises(AnalysisConfigError) as exception:
-                    m_config_files.AnalysisConfigChecker().assert_file_is_correct()
+                    m_config_file.AnalysisConfigChecker().assert_file_is_correct()
                 self.assertEqual(expected_result, str(exception.exception))
 
 
 class TestS3UrisFileReader(unittest.TestCase):
     @patch(
-        "aws_s3_diff.config_files.LocalPaths.config_directory",
+        "aws_s3_diff.config_file.LocalPaths.config_directory",
         new_callable=PropertyMock,
         return_value=Path(__file__).parent.absolute().joinpath("fake-files/test-full-analysis"),
     )
@@ -87,12 +87,12 @@ class TestS3UrisFileReader(unittest.TestCase):
             ],
         }.items():
             with self.subTest(expected_result=expected_result, account=account):
-                result = m_config_files.S3UrisFileReader().get_s3_queries_for_account(account)
+                result = m_config_file.S3UrisFileReader().get_s3_queries_for_account(account)
                 self.assertEqual(expected_result, result)
 
 
 class TestS3UrisFileChecker(unittest.TestCase):
-    @patch("aws_s3_diff.config_files.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
+    @patch("aws_s3_diff.config_file.LocalPaths.config_directory", new_callable=PropertyMock, return_value=Mock())
     def test_assert_file_is_correct_raises_expected_exception_for_all_cases(self, mock_config_directory):
         for expected_error_message, expected_exception, s3_uri_file_name in [
             [
@@ -114,5 +114,5 @@ class TestS3UrisFileChecker(unittest.TestCase):
                     .joinpath("fake-files/s3-uris-to-analyze/possible-values", s3_uri_file_name)
                 )
                 with self.assertRaises(expected_exception) as exception:
-                    m_config_files.S3UrisFileChecker().assert_file_is_correct()
+                    m_config_file.S3UrisFileChecker().assert_file_is_correct()
                 self.assertEqual(expected_error_message, str(exception.exception))

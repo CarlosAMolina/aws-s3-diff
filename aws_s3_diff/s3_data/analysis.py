@@ -6,7 +6,7 @@ from collections import namedtuple
 from pandas import DataFrame as Df
 from pandas import Series
 
-from aws_s3_diff.config_files import AnalysisConfigReader
+from aws_s3_diff.config_file import AnalysisConfigReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
 from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader

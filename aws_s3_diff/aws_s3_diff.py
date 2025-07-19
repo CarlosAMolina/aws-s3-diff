@@ -7,10 +7,10 @@ from pandas import DataFrame as Df
 
 from aws_s3_diff.accounts import get_account_to_analyze
 from aws_s3_diff.accounts import have_all_accounts_been_analyzed
-from aws_s3_diff.config_files import AnalysisConfigChecker
-from aws_s3_diff.config_files import AnalysisConfigReader
-from aws_s3_diff.config_files import S3UrisFileChecker
-from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.config_file import AnalysisConfigChecker
+from aws_s3_diff.config_file import AnalysisConfigReader
+from aws_s3_diff.config_file import S3UrisFileChecker
+from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import FolderInS3UriError
 from aws_s3_diff.exceptions import S3UrisFileError

@@ -1,4 +1,4 @@
-from aws_s3_diff.config_files import S3UrisFileReader
+from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.local_results import get_account_file_name
 from aws_s3_diff.local_results import LocalResults
 
