@@ -24,23 +24,22 @@ from aws_s3_diff.s3_data.analysis import AnalysisDataGenerator
 from aws_s3_diff.s3_data.one_account import AccountCsvExporter
 from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 
-_logger = get_logger()
-
 
 class Main:
     def __init__(self):
         self._analysis_date_time_exporter = AnalysisDateTimeExporter()
         self._local_results = LocalResults()
+        self._logger = get_logger()
         self._s3_uris_file_checker = S3UrisFileChecker()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def run(self):
-        _logger.info("Welcome to the AWS S3 Diff tool!")
-        _logger.debug("Checking if the URIs to analyze configuration file is correct")
+        self._logger.info("Welcome to the AWS S3 Diff tool!")
+        self._logger.debug("Checking if the URIs to analyze configuration file is correct")
         try:
             self._s3_uris_file_checker.assert_file_is_correct()
         except S3UrisFileError as exception:
-            _logger.error(exception)
+            self._logger.error(exception)
             return
         self._show_accounts_to_analyze()
         if not self._local_results.exist_analysis_date_time_file():
@@ -52,7 +51,7 @@ class Main:
     def _show_accounts_to_analyze(self):
         accounts = self._s3_uris_file_reader.get_accounts()
         accounts_list = [f"\n{index}. {account}" for index, account in enumerate(accounts, 1)]
-        _logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
+        self._logger.info(f"AWS accounts configured to be analyzed:{''.join(accounts_list)}")
 
     def _export_csvs(self):
         csvs_generator = _CsvsGenerator()
@@ -60,16 +59,16 @@ class Main:
             try:
                 df = csvs_generator.get_df()
             except (AnalysisConfigError, EndpointConnectionError, FolderInS3UriError) as exception:
-                _logger.error(exception)
+                self._logger.error(exception)
                 return
             # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html
             except ClientError as exception:
                 error_code = exception.response["Error"]["Code"]
                 if error_code == "NoSuchBucket":
-                    _logger.error(self._get_error_message_no_such_bucket(exception))
+                    self._logger.error(self._get_error_message_no_such_bucket(exception))
                     return
                 if error_code in ("AccessDenied", "InvalidAccessKeyId"):
-                    _logger.error("Incorrect AWS credentials. Authenticate and run the program again")
+                    self._logger.error("Incorrect AWS credentials. Authenticate and run the program again")
                     return
                 raise Exception from exception
             csvs_generator.export_csv(df)
@@ -129,10 +128,11 @@ class _AccountState(_State):
     def __init__(self, csvs_generator: _CsvsGenerator):
         self._csvs_generator = csvs_generator
         self._account_csv_exporter = AccountCsvExporter()
+        self._logger = get_logger()
 
     def get_df(self) -> Df:
         account = get_account_to_analyze()
-        _logger.info(f"Analyzing the AWS account '{account}'")
+        self._logger.info(f"Analyzing the AWS account '{account}'")
         return AccountDataGenerator(account).get_df()
 
     def export_csv(self, df: Df):
@@ -140,7 +140,7 @@ class _AccountState(_State):
         if have_all_accounts_been_analyzed():
             self._csvs_generator.set_state_combine()
         else:
-            _logger.info(
+            self._logger.info(
                 f"The next account to be analyzed is '{get_account_to_analyze()}'"
                 ". Authenticate and run the program again"
             )
@@ -169,12 +169,13 @@ class _AnalysisState(_State):
         self._analysis_csv_creator = AnalysisCsvExporter()
         self._analysis_data_generator = AnalysisDataGenerator()
         self._local_results = LocalResults()
+        self._logger = get_logger()
 
     def get_df(self) -> Df:
         if self._analysis_config_reader.must_run_analysis():
             self._analysis_config_checker.assert_file_is_correct()
             return self._analysis_data_generator.get_df()
-        _logger.info("No analysis configured. Omitting")
+        self._logger.info("No analysis configured. Omitting")
         return Df()
 
     def export_csv(self, df: Df):

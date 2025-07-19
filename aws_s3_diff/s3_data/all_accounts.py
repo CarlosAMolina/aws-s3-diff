@@ -16,16 +16,15 @@ from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
 from aws_s3_diff.s3_uri import get_df_add_last_slash_to_values
 from aws_s3_diff.s3_uri import get_df_uri_parts
 
-_logger = get_logger()
-
 
 class AccountsCsvExporter(CsvExporter):
     def __init__(self):
         self._local_results = LocalResults()
+        self._logger = get_logger()
 
     def export_df(self, df: Df):
         file_path = self._local_results.get_file_path_all_accounts()
-        _logger.info(f"Exporting {file_path}")
+        self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
 

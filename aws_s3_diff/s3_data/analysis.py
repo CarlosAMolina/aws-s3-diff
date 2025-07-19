@@ -13,16 +13,15 @@ from aws_s3_diff.s3_data.all_accounts import AccountsCsvReader
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import DataGenerator
 
-_logger = get_logger()
-
 
 class AnalysisCsvExporter(CsvExporter):
     def __init__(self):
         self._local_results = LocalResults()
+        self._logger = get_logger()
 
     def export_df(self, df: Df):
         file_path = self._local_results.get_file_path_analysis()
-        _logger.info(f"Exporting {file_path}")
+        self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
 
@@ -65,6 +64,7 @@ class _TwoAccountsAnalysisSetter(ABC):
     def __init__(self, accounts: _AccountsToCompare, df: Df):
         self._accounts = accounts
         self._df = df
+        self._logger = get_logger()
 
     @abstractmethod
     def get_df_set_analysis_column(self) -> Df:
@@ -91,7 +91,7 @@ class _TwoAccountsAnalysisSetter(ABC):
 
 class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
-        _logger.info(
+        self._logger.info(
             f"Analyzing if files of the account '{self._accounts.origin}' have the same hash as in account"
             f" '{self._accounts.target}'"
         )
@@ -123,7 +123,7 @@ class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
-        _logger.info(
+        self._logger.info(
             f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
             f" '{self._accounts.origin}'"
         )

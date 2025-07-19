@@ -7,8 +7,6 @@ _EXTENSION_FILE_NAME = ".csv"
 _ACCOUNTS_FILE_NAME = f"s3-files-all-accounts{_EXTENSION_FILE_NAME}"
 _ANALYSIS_FILE_NAME = f"analysis{_EXTENSION_FILE_NAME}"
 
-_logger = get_logger()
-
 
 def get_account_file_name(account: str) -> str:
     return f"{account}{_EXTENSION_FILE_NAME}"
@@ -32,11 +30,12 @@ class LocalPaths:
 
 class LocalResults:
     def __init__(self):
-        self._local_paths = LocalPaths()
         self._directory_analysis_path_cache = None
+        self._local_paths = LocalPaths()
+        self._logger = get_logger()
 
     def create_directory_analysis(self):
-        _logger.debug(f"Creating the directory: {self._directory_analysis_path}")
+        self._logger.debug(f"Creating the directory: {self._directory_analysis_path}")
         self._directory_analysis_path.mkdir()
 
     def drop_file_with_analysis_date(self):
@@ -73,7 +72,7 @@ class LocalResults:
         return self._directory_analysis_path_cache
 
     def _drop_file(self, file_path: Path):
-        _logger.debug(f"Removing: {file_path}")
+        self._logger.debug(f"Removing: {file_path}")
         file_path.unlink()
 
     def _get_file_path_results(self, file_name: str) -> Path:

@@ -19,30 +19,30 @@ from aws_s3_diff.types_custom import FileS3Data
 from aws_s3_diff.types_custom import S3Data
 from aws_s3_diff.types_custom import S3Query
 
-_logger = get_logger()
-
 
 class AccountCsvExporter(CsvExporter):
     def __init__(self):
         self._local_results = LocalResults()
+        self._logger = get_logger()
 
     def export_df(self, df: Df):
         account = get_account_to_analyze()
         file_path = self._local_results.get_file_path_account(account)
-        _logger.info(f"Exporting {file_path}")
+        self._logger.info(f"Exporting {file_path}")
         df.to_csv(index=False, path_or_buf=file_path)
 
 
 class AccountDataGenerator(DataGenerator):
     def __init__(self, account: str):
         self._account = account
+        self._logger = get_logger()
         self._s3_uris_file_reader = S3UrisFileReader()
 
     def get_df(self) -> Df:
         result = Df()
         s3_queries = self._get_s3_queries()
         for query_index, s3_query in enumerate(s3_queries, 1):
-            _logger.info(f"Analyzing S3 URI {query_index}/{len(s3_queries)}: {s3_query}")
+            self._logger.info(f"Analyzing S3 URI {query_index}/{len(s3_queries)}: {s3_query}")
             for s3_data in self._get_s3_data_of_query(s3_query):
                 query_and_data_df = self._get_df_from_s3_data_and_query(s3_data, s3_query)
                 result = pd.concat([result, query_and_data_df])
