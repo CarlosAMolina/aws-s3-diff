@@ -145,6 +145,6 @@ class S3UrisFileReader:
 
     def _get_df_strip_strings(self, df: Df) -> Df:
         result = df
-        result = result.fillna("")  # Avoid errors stripping null data.
+        result = result.fillna("")  # Avoid error stripping column where all data is null.
         result = result.apply(lambda column: column.fillna("").astype(str).str.strip())
         return result.replace("", None)
