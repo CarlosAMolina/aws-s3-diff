@@ -42,7 +42,11 @@ class AccountsCsvReader(CsvReader):
     def _get_df_from_csv(self) -> Df:
         return read_csv(
             self._local_results.get_file_path_all_accounts(),
-            index_col=[f"bucket_{self._accounts[0]}", f"file_path_in_s3_{self._accounts[0]}", "file_name_all_accounts"],
+            index_col=[
+                f"bucket_in_{self._accounts[0]}",
+                f"file_path_in_s3_{self._accounts[0]}",
+                "file_name_all_accounts",
+            ],
             parse_dates=[f"{account}_date" for account in self._accounts],
         ).astype({f"{account}_size": "Int64" for account in self._accounts})
 
@@ -74,7 +78,7 @@ class AccountsDataGenerator(DataGenerator):
         self._get_df_set_columns_as_single_index(result)
         return result.reset_index(
             names=[
-                f"bucket_{self._account_origin}",
+                f"bucket_in_{self._account_origin}",
                 f"file_path_in_s3_{self._account_origin}",
                 "file_name_all_accounts",
             ]

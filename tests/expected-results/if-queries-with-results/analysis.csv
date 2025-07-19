@@ -1,4 +1,4 @@
-bucket_pro,file_path_in_s3_pro,file_name_all_accounts,pro_date,pro_size,pro_hash,release_date,release_size,release_hash,dev_date,dev_size,dev_hash,is_hash_the_same_in_release,is_hash_the_same_in_dev,can_exist_in_release
+bucket_in_pro,file_path_in_s3_pro,file_name_all_accounts,pro_date,pro_size,pro_hash,release_date,release_size,release_hash,dev_date,dev_size,dev_hash,is_hash_the_same_in_release,is_hash_the_same_in_dev,can_exist_in_release
 cars,europe/spain/,cars-20241014.csv,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-19 22:33:01+00:00,49,f15993242621717c5eb2a329b672bc1d,2024-10-14 08:49:01+00:00,49,f15993242621717c5eb2a329b672bc1d,True,True,
 pets,dogs/big_size/,dogs-20240914.csv,2024-09-14 09:22:11+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:01:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,2024-09-14 22:11:33+00:00,20,78e051ff226ded4e9aa2b03e07788619,True,True,
 pets,dogs/big_size/,dogs-20241015.csv,2024-10-15 10:23:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 11:20:18+00:00,28,4d58ea08451ece64e3924aeb78b2c2af,2024-10-15 12:29:18+00:00,19,77bb49be128f088eda87f370b58b2ee0,True,False,
