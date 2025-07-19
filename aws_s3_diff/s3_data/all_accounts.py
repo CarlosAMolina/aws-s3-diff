@@ -8,7 +8,7 @@ from pandas import read_csv
 from aws_s3_diff.config_file import S3UrisFileReader
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
-from aws_s3_diff.s3_data.df_util import get_column_name_from_column_multi_index
+from aws_s3_diff.s3_data.df_utility import get_column_name_from_column_multi_index
 from aws_s3_diff.s3_data.interface import CsvExporter
 from aws_s3_diff.s3_data.interface import CsvReader
 from aws_s3_diff.s3_data.interface import DataGenerator
