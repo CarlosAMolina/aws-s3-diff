@@ -11,7 +11,7 @@ from aws_s3_diff.exceptions import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
 from aws_s3_diff.local_results import LocalPaths
 from aws_s3_diff.s3_uri import S3UriPart
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import S3Query
 
 _FILE_NAME_ANALYSIS_CONFIG = "analysis-config.json"
 

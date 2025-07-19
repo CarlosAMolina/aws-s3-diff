@@ -6,7 +6,7 @@ from pandas.testing import assert_frame_equal
 
 from aws_s3_diff.s3_data.one_account import AccountDataGenerator
 from aws_s3_diff.s3_data.one_account import OriginS3UrisAsIndexAccountDfModifier
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import S3Query
 
 ExpectedResult = list[dict]
 

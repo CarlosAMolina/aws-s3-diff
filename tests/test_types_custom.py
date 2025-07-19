@@ -1,6 +1,6 @@
 import unittest
 
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import S3Query
 
 
 class TestS3Query(unittest.TestCase):

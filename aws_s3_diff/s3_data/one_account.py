@@ -15,9 +15,9 @@ from aws_s3_diff.s3_data.interface import DfModifier
 from aws_s3_diff.s3_data.s3_client import S3Client
 from aws_s3_diff.s3_uri import get_df_add_last_slash_to_values
 from aws_s3_diff.s3_uri import get_df_uri_parts
-from aws_s3_diff.types_custom import FileS3Data
-from aws_s3_diff.types_custom import S3Data
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import FileS3Data
+from aws_s3_diff.type_custom import S3Data
+from aws_s3_diff.type_custom import S3Query
 
 
 class AccountCsvExporter(CsvExporter):

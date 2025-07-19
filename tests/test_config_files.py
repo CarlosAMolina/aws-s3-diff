@@ -9,7 +9,7 @@ from aws_s3_diff.exceptions import AnalysisConfigError
 from aws_s3_diff.exceptions import DuplicatedUriS3UrisFileError
 from aws_s3_diff.exceptions import EmptyAccountNameS3UrisFileError
 from aws_s3_diff.exceptions import EmptyUriS3UrisFileError
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import S3Query
 
 
 class TestAnalysisConfigChecker(unittest.TestCase):

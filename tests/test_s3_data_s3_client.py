@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from aws_s3_diff.s3_data.s3_client import FolderInS3UriError
 from aws_s3_diff.s3_data.s3_client import S3Client
-from aws_s3_diff.types_custom import S3Query
+from aws_s3_diff.type_custom import S3Query
 
 
 class TestS3Client(unittest.TestCase):
