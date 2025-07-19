@@ -4,7 +4,7 @@ from pathlib import Path
 
 import boto3
 
-from aws_s3_diff.exceptions import FolderInS3UriError
+from aws_s3_diff.exception import FolderInS3UriError
 from aws_s3_diff.type_custom import FileS3Data
 from aws_s3_diff.type_custom import S3Data
 from aws_s3_diff.type_custom import S3Query

@@ -11,9 +11,9 @@ from aws_s3_diff.config_file import AnalysisConfigChecker
 from aws_s3_diff.config_file import AnalysisConfigReader
 from aws_s3_diff.config_file import S3UrisFileChecker
 from aws_s3_diff.config_file import S3UrisFileReader
-from aws_s3_diff.exceptions import AnalysisConfigError
-from aws_s3_diff.exceptions import FolderInS3UriError
-from aws_s3_diff.exceptions import S3UrisFileError
+from aws_s3_diff.exception import AnalysisConfigError
+from aws_s3_diff.exception import FolderInS3UriError
+from aws_s3_diff.exception import S3UrisFileError
 from aws_s3_diff.local_results import AnalysisDateTimeExporter
 from aws_s3_diff.local_results import LocalResults
 from aws_s3_diff.logger import get_logger
