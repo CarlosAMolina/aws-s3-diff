@@ -93,8 +93,8 @@ class _TwoAccountsAnalysisSetter(ABC):
 class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
         self._logger.info(
-            f"Analyzing if files of the account '{self._accounts.origin}' have the same hash as in account"
-            f" '{self._accounts.target}'"
+            f"Analyzing if the files in the '{self._accounts.target}' account have the same hash as in the"
+            f"'{self._accounts.origin}' account"
         )
         result = self._df.copy()
         # https://stackoverflow.com/questions/18470323/selecting-columns-from-pandas-multiindex
