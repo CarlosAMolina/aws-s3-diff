@@ -137,7 +137,7 @@ class _AccountState(_State):
 
     def get_df(self) -> Df:
         account = get_account_to_analyze()
-        self._logger.info(f"Analyzing the AWS account '{account}'")
+        self._logger.info(f"Analyzing the AWS '{account}' account")
         return AccountDataGenerator(account).get_df()
 
     def export_csv(self, df: Df):
