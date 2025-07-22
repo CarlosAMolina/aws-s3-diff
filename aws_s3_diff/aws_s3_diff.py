@@ -37,7 +37,6 @@ class Main:
 
     def run(self):
         self._logger.info("Welcome to the AWS S3 Diff tool!")
-        self._logger.debug("Checking if the file with the URIs to be analyzed is correct")
         try:
             self._s3_uris_file_checker.assert_file_is_correct()
         except S3UrisFileError as exception:

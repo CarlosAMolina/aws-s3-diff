@@ -24,7 +24,6 @@ $ awsume pro
 $ make run
 poetry run python run.py
 [INFO] Welcome to the AWS S3 Diff tool!
-[DEBUG] Checking if the file with the URIs to be analyzed is correct
 [INFO] AWS accounts configured to be analyzed:
 1. pro
 2. dev
@@ -40,7 +39,6 @@ $ awsume dev
 $ make run
 poetry run python run.py
 [INFO] Welcome to the AWS S3 Diff tool!
-[DEBUG] Checking if the file with the URIs to be analyzed is correct
 [INFO] AWS accounts configured to be analyzed:
 1. pro
 2. dev
