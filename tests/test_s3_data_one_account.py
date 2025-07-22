@@ -1,6 +1,7 @@
 import unittest
 from unittest import mock
 
+import numpy as np
 from pandas import DataFrame as Df
 from pandas.testing import assert_frame_equal
 
@@ -29,8 +30,8 @@ class TestAccountDataGenerator(unittest.TestCase):
         mock_s3_client().get_s3_data.return_value = []
         expected_result = Df(
             data=[
-                ["bucket_1", "prefix_1/", None, None, None, None],
-                ["bucket_2", "prefix_2/", None, None, None, None],
+                ["bucket_1", "prefix_1/", np.nan, np.nan, np.nan, np.nan],
+                ["bucket_2", "prefix_2/", np.nan, np.nan, np.nan, np.nan],
             ],
             columns=["bucket", "prefix", "name", "date", "size", "hash"],
             index=[0, 0],

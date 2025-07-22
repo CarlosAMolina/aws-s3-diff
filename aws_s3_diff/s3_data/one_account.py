@@ -44,26 +44,40 @@ class AccountDataGenerator(DataGenerator):
         for query_index, s3_query in enumerate(s3_queries, 1):
             self._logger.info(f"Analyzing S3 URI {query_index}/{len(s3_queries)}: {s3_query}")
             for s3_data in self._get_s3_data_of_query(s3_query):
-                query_and_data_df = self._get_df_from_s3_data_and_query(s3_data, s3_query)
+                if s3_data is None:
+                    # To avoid pandas warning when concatenating a Df with a Df with null values.
+                    query_and_data_df = self._get_df_for_query_without_result(s3_query)
+                else:
+                    query_and_data_df = self._get_df_from_s3_data_and_query(s3_data, s3_query)
                 result = pd.concat([result, query_and_data_df])
-        return result
+        return self._get_df_add_lost_columns(result)
 
     def _get_s3_queries(self) -> list[S3Query]:
         return self._s3_uris_file_reader.get_s3_queries_for_account(self._account)
 
-    def _get_s3_data_of_query(self, s3_query: S3Query) -> Iterator[S3Data]:
+    def _get_s3_data_of_query(self, s3_query: S3Query) -> Iterator[S3Data | None]:
         is_any_result = False
         for s3_data in S3Client(s3_query).get_s3_data():
             is_any_result = True
             yield s3_data
-        # Required when no results.
         if not is_any_result:
-            yield [FileS3Data()]
+            yield None
 
     def _get_df_from_s3_data_and_query(self, s3_data: S3Data, s3_query: S3Query) -> Df:
         result = Df(file_data._asdict() for file_data in s3_data)
         result.insert(0, "bucket", s3_query.bucket)
         result.insert(1, "prefix", s3_query.prefix)
+        return result
+
+    def _get_df_for_query_without_result(self, s3_query: S3Query) -> Df:
+        return Df({"bucket": [s3_query.bucket], "prefix": [s3_query.prefix]})
+
+    def _get_df_add_lost_columns(self, df: Df) -> Df:
+        result = df
+        lost_columns = [column_name for column_name in FileS3Data._fields if column_name not in result]
+        if len(lost_columns) > 0:
+            column_names = result.columns.tolist() + lost_columns
+            return result.reindex(columns=column_names)
         return result
 
 
