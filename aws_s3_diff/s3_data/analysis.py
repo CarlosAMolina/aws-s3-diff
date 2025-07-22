@@ -125,8 +125,8 @@ class _IsHashMatchedTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
 class _CanFileExistTwoAccountsAnalysisSetter(_TwoAccountsAnalysisSetter):
     def get_df_set_analysis_column(self) -> Df:
         self._logger.info(
-            f"Analyzing if files in account '{self._accounts.target}' can exist, compared to account"
-            f" '{self._accounts.origin}'"
+            f"Analyzing if the files in the '{self._accounts.target}' account can exist, compared to the"
+            f" '{self._accounts.origin}' account"
         )
         result = self._df.copy()
         result[[("analysis", self._column_name_result)]] = None
